@@ -2,6 +2,9 @@ packages:
   - "apps/*"
   - "packages/*"
 
+# Expo/Metro y React Native necesitan node_modules planos.
+nodeLinker: hoisted
+
 allowBuilds:
   sharp: false
   unrs-resolver: false

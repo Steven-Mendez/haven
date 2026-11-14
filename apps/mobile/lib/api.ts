@@ -1,6 +1,14 @@
 import type { CreateItemInput, Item } from '@haven/shared';
 
-const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
+// EXPO_PUBLIC_USE_LOCAL_API=true → API local; si no, la de Vercel.
+const API_URL =
+  process.env.EXPO_PUBLIC_USE_LOCAL_API === 'true'
+    ? process.env.EXPO_PUBLIC_LOCAL_API_URL ?? 'http://localhost:3000'
+    : process.env.EXPO_PUBLIC_API_URL;
+
+if (!API_URL) {
+  throw new Error('Falta EXPO_PUBLIC_API_URL en apps/mobile/.env (o usa EXPO_PUBLIC_USE_LOCAL_API=true)');
+}
 
 export async function getItems(): Promise<Item[]> {
   const res = await fetch(`${API_URL}/api/items`);

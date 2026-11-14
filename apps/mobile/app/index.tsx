@@ -8,6 +8,7 @@ import * as React from 'react';
 import { ScrollView, View } from 'react-native';
 import type { Item } from '@haven/shared';
 import { createItem, getItems } from '@/lib/api';
+import { sendToWatch, useWatchMessages, useWatchReachable } from '@/lib/watch';
 
 const SCREEN_OPTIONS = {
   title: 'HAVEN',
@@ -18,16 +19,28 @@ export default function Screen() {
   const [items, setItems] = React.useState<Item[]>([]);
   const [error, setError] = React.useState<string | null>(null);
 
+  const watchReachable = useWatchReachable();
+
   const load = React.useCallback(() => {
     getItems()
       .then((data) => {
         setItems(data);
         setError(null);
+        sendToWatch('items', { items: data });
       })
       .catch((e) => setError(String(e)));
   }, []);
 
   React.useEffect(load, [load]);
+
+  // El reloj no habla con la API: pide acciones y el iPhone le devuelve el estado.
+  useWatchMessages((message) => {
+    if (message.type === 'sync') load();
+    if (message.type === 'addItem') {
+      const { title } = message.payload as { title: string };
+      createItem({ title }).then(load).catch((e) => setError(String(e)));
+    }
+  });
 
   async function addItem() {
     await createItem({ title: `Item desde iOS ${new Date().toLocaleTimeString()}` });
@@ -47,6 +60,7 @@ export default function Screen() {
             <Text>Recargar</Text>
           </Button>
         </View>
+        {watchReachable && <Text className="text-sm text-muted-foreground">⌚ Apple Watch conectado</Text>}
         {error && <Text className="text-destructive">{error}</Text>}
         {items.map((item) => (
           <View key={item._id} className="rounded-lg border border-border bg-card p-4">

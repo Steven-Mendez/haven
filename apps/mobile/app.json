@@ -12,7 +12,10 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.haven.app"
+      "bundleIdentifier": "com.haven.app",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -37,7 +40,8 @@
         }
       ],
       "expo-status-bar",
-      "@bacons/apple-targets"
+      "@bacons/apple-targets",
+      "./plugins/withPodsMinDeploymentTarget"
     ],
     "experiments": {
       "typedRoutes": true
