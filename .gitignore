@@ -1,0 +1,19 @@
+node_modules
+.DS_Store
+.turbo
+# iOS nativo se genera con `expo prebuild` (CNG)
+apps/mobile/ios
+apps/mobile/android
+
+# Secrets
+.env
+.env.local
+.env*.local
+!.env.example
+
+# Next.js
+.next
+out
+
+# Expo
+.expo
