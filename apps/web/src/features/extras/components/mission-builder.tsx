@@ -38,19 +38,14 @@ type Props = {
   lang: Language;
   environments: EnvironmentOption[];
   templates: TemplateOption[];
-  /** Today as YYYY-MM-DD (UTC), from the server. */
   today: string;
-  /** Saves the plan (a bound server action); on success it redirects to the mission. */
   submit: (previous: MissionFormState, form: FormData) => Promise<MissionFormState>;
-  /** The mission being edited: its plan, name and start. */
   initial: {
     name: string;
     phases: MissionPhase[];
     startMode: StartMode;
-    /** YYYY-MM-DD; the planned day 1 when `startMode` is `date`. */
     start: string;
   };
-  /** Where the link «Cancel» goes. */
   cancelHref: string;
 };
 
@@ -61,13 +56,10 @@ const SCRATCH: MissionPhase[] = [
 ];
 const STEP_OF: Record<MissionField, 1 | 2 | 3> = { phases: 2, name: 3, start: 3 };
 
-/** When days start to run: on «Start mission» (default), right away, or on a chosen date. */
 export type StartMode = 'manual' | 'now' | 'date';
 const START_MODES: StartMode[] = ['manual', 'now', 'date'];
-/** Effective dose of a chest X-ray, the usual everyday reference (RadiologyInfo.org: ≈ 0.1 mSv). */
 const CHEST_XRAY_MSV = 0.1;
 
-/** Same rule as core `phaseDelay`: the phase's own delay, kept inside the environment range. */
 function delayOf(phase: MissionPhase, env: EnvironmentOption | undefined) {
   if (!env) return phase.delayMin ?? 0;
   const low = Math.min(env.delayMin, env.delayMax);
@@ -75,7 +67,6 @@ function delayOf(phase: MissionPhase, env: EnvironmentOption | undefined) {
   return Math.min(high, Math.max(low, phase.delayMin ?? env.delayMin));
 }
 
-/** Day ranges of a plan: phase i runs from `a` to `b` (1-based, inclusive). */
 function dayRanges(phases: MissionPhase[]) {
   let day = 1;
   return phases.map((p) => {
@@ -85,13 +76,6 @@ function dayRanges(phases: MissionPhase[]) {
   });
 }
 
-/**
- * «New mission» as its own page (Vercel «New project», Asana templates, Mindtrip itinerary): 1) pick a plan
- * from a list, with the chosen one explained on the right in plain language — what happens, what it is based
- * on, its timeline and what HAVEN will look after; 2) review the phases as an expandable timeline whose
- * figures are translated into everyday terms (chest X-rays a day, how long a message takes); 3) name and date,
- * then the six-character join code.
- */
 export function MissionBuilder({
   lang,
   environments,
@@ -103,7 +87,6 @@ export function MissionBuilder({
 }: Props) {
   const t = textsFor(texts, lang);
   const [state, action, pending] = useActionState(submit, INITIAL);
-  // Editing an existing plan opens on its phases; «Back» still lets the operator pick another base plan.
   const [step, setStep] = useState<1 | 2 | 3>(2);
   const [template, setTemplate] = useState('current');
   const [phases, setPhases] = useState<MissionPhase[]>(initial.phases);
@@ -129,14 +112,12 @@ export function MissionBuilder({
   const total = phases.reduce((n, p) => n + p.days, 0);
   const phasesValid = phases.length > 0 && phases.every((p) => env(p.environment) && p.days >= 1);
 
-  // Each step starts at the top of the page.
   // biome-ignore lint/correctness/useExhaustiveDependencies: runs on step change only
   useEffect(() => {
     window.scrollTo({ top: 0 });
     document.getElementById('content')?.scrollTo({ top: 0 });
   }, [step]);
 
-  // A server error sends the operator back to the step that holds the field.
   useEffect(() => {
     if (state.status === 'error' && state.fields[0]) setStep(STEP_OF[state.fields[0]]);
   }, [state]);
@@ -149,7 +130,6 @@ export function MissionBuilder({
   };
   const error = (f: MissionField) => (invalid(f) ? <FormError>{messages[f]}</FormError> : null);
 
-  // ── Plain-language facts of an environment ──
   const gravityText = (g: number) =>
     g === 0
       ? t.gZero
@@ -174,7 +154,6 @@ export function MissionBuilder({
     if (!(d > 0)) return t.commsNow;
     if (d < 1) {
       const secs = d * 60;
-      // One decimal under 10 s: the Moon is ~1.3 s away.
       return format(t.commsSeconds, { s: formatNumber(secs, lang, secs < 10 ? 1 : 0) });
     }
     return format(t.commsMinutes, { m: formatNumber(d, lang, 0) });
@@ -184,7 +163,6 @@ export function MissionBuilder({
     setPhases((list) =>
       list.map((p, k) => {
         if (k !== i) return p;
-        // A new environment drops the old phase's own name and delay (they described the old one).
         if (patch.environment && patch.environment !== p.environment)
           return { environment: patch.environment, days: p.days };
         return { ...p, ...patch };
@@ -393,7 +371,6 @@ export function MissionBuilder({
               return (
                 // biome-ignore lint/suspicious/noArrayIndexKey: phases are positional
                 <li key={i} className="flex gap-3">
-                  {/* Timeline rail: numbered node + line to the next phase. */}
                   <div className="flex flex-col items-center">
                     <span
                       aria-hidden="true"
@@ -637,8 +614,6 @@ export function MissionBuilder({
         </div>
       ) : null}
 
-      {/* Wizard footer (Zillow, Xero, Deel): fixed to the bottom of the page — back / cancel on the left,
-          what comes next and the primary action on the right, always in the same place. */}
       <div className="bg-background/90 sticky bottom-0 z-10 -mx-4 mt-auto -mb-5 flex items-center gap-3 border-t px-4 py-3 backdrop-blur-md sm:-mx-6 sm:-mb-6 sm:px-6">
         {step > 1 ? (
           <Button
@@ -663,7 +638,6 @@ export function MissionBuilder({
             </span>
           ) : null}
         </span>
-        {/* Separate keys: reusing one <button> and flipping its type to submit mid-click submits the form. */}
         {step < 3 ? (
           <Button
             key="next"
@@ -690,7 +664,6 @@ export function MissionBuilder({
   );
 }
 
-/** One plain-language fact of an environment: icon, short label, everyday value. */
 function Fact({ icon, label, children }: { icon: ReactNode; label: string; children: ReactNode }) {
   return (
     <div className="flex gap-2.5">

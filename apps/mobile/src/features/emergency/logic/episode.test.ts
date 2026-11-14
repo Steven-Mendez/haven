@@ -18,7 +18,6 @@ describe('emergency episodes', () => {
     expect(markPacketSent(episode)).toBe(episode);
     episode = onEmergencyOpen(episode, 'spo2');
     expect(episode).toEqual({ number: 2, origin: 'spo2', packetSent: false });
-    // A second trigger before that one is sent stays in emergency 2.
     expect(onEmergencyOpen(episode, 'heartRate').number).toBe(2);
   });
 });

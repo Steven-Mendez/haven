@@ -50,8 +50,6 @@ export default function Screen() {
   const lastMood = useLatestReading('mood');
   const moodReadings = useReadings('mood');
   const stressReadings = useReadings('stress');
-  // Mood and stress usually come from the inline card in Routine (DESIGN_SYSTEM.md 4.1b): here they
-  // are only asked when today has none; contact and the journal are the optional part.
   const scalesDoneToday = useMemo(() => {
     const today = new Date().toISOString().slice(0, 10);
     const has = (list: { takenAt: string }[]) => list.some((r) => r.takenAt.slice(0, 10) === today);
@@ -89,8 +87,6 @@ export default function Screen() {
         newId: randomUUID,
         unitOf,
       });
-      // The journal and the contact go to their own local collections, never into a Reading.
-      // One write at a time: SQLite rejects concurrent transactions ("database is locked").
       if (c.readings.length > 0) await store.saveReadings(c.readings);
       await checkins.put(c.record.id, c.record);
       if (c.journal) await journalEntries.put(c.journal.id, c.journal);
@@ -143,7 +139,6 @@ export default function Screen() {
 
         <Section title={t.contact}>
           <Text className="text-body-sm text-muted-foreground">{t.contactHint}</Text>
-          {/* Options as rows inside one hairline box (alias); selected = accent tint + check. */}
           <ToggleGroup
             type="multiple"
             value={contact}
@@ -212,7 +207,6 @@ export default function Screen() {
           <WhereFrom text={t.whereFrom} />
         </More>
       </ScrollView>
-      {/* Main action fixed at the foot, above the home indicator (8.12, safe areas) */}
       <Footer>
         <BigButton
           size="lg"

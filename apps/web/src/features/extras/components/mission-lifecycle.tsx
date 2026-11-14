@@ -9,10 +9,6 @@ import type { MissionStatus } from '@/server/types';
 import { finishMissionAction, startMissionAction } from '../actions';
 import { texts } from '../i18n';
 
-/**
- * The one action that moves a mission to its next state: «Start mission» while in preparation (day 1 is today),
- * «Finish mission» while running (asks once, inline: it cannot be undone). A finished mission has none.
- */
 export function MissionLifecycle({
   code,
   status,

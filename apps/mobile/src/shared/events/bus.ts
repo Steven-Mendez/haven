@@ -1,8 +1,5 @@
 import type { HavenEvents } from '@haven/core';
 
-// In-memory bus (Shared contracts §8): the emitter does not know who listens.
-// It is the only communication channel between features.
-
 type Name = keyof HavenEvents;
 type Listener<N extends Name> = (payload: HavenEvents[N]) => void;
 
@@ -18,7 +15,6 @@ export const bus = {
       }
     }
   },
-  /** Returns the unsubscribe function. */
   on<N extends Name>(name: N, listener: Listener<N>): () => void {
     const set = listeners.get(name) ?? new Set();
     set.add(listener as Listener<Name>);

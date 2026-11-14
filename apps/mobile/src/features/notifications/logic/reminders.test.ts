@@ -50,7 +50,6 @@ describe('planReminders', () => {
 
   it('an overdue target repeats every nagHours, aligned to the due time', () => {
     const [p] = planReminders([bp], { 'systolic-bp': hoursAgo(25.5) }, NOW);
-    // due 1.5 h ago, nag 6 h → 4.5 h from now
     expect(p?.overdue).toBe(true);
     expect(p?.at).toBe(new Date(NOW.getTime() + 4.5 * 3_600_000).toISOString());
     expect(nagHours(24)).toBe(6);

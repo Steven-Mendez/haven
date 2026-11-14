@@ -23,18 +23,12 @@ type State =
   | { step: 'done'; mission: string; name: string }
   | { step: 'error'; message: string; retry: boolean };
 
-/**
- * `haven://join?mission=CODE&crew=ID&api=URL`: the QR invite mission control shows on Earth, scanned
- * with the system Camera. Saves the Earth URL, joins by code (never offline: an invite is checked),
- * makes this phone the invited person and ends on a confirmation. Errors stay on this screen.
- */
 export default function JoinScreen() {
   const t = useTexts(texts);
   const params = useLocalSearchParams<{ mission?: string; crew?: string; api?: string }>();
   const phase = useStartup();
   const records = useMissionRecords();
   const [state, setState] = useState<State>({ step: 'joining' });
-  // `records` is a new object on every render; the latest one is read when the join runs.
   const recordsRef = useRef(records);
   recordsRef.current = records;
   const started = useRef<string | undefined>(undefined);
@@ -50,7 +44,6 @@ export default function JoinScreen() {
     }
     const { code, crew, apiUrl } = parsed.invite;
     setState({ step: 'joining', code });
-    // Before joining, so the lookup asks the Earth that made the QR.
     if (apiUrl) await store.setPreferences({ apiUrl });
     const result = await records.join(code, { allowOffline: false });
     if (result.from === 'unknown') {

@@ -31,14 +31,9 @@ const unitOf = (id: string) => config.indicators.find((i) => i.id === id)?.unit 
 
 type Props = {
   crewMember: string;
-  /** Today's latest mood and stress, if already recorded. */
   today?: { mood: Reading; stress: Reading };
 };
 
-/**
- * "How are you today?" inline (DESIGN_SYSTEM.md 4.1b): mood (tap) + stress (tap) and it saves by
- * itself after a short undo window. Contact and the private journal stay in the wellbeing screen.
- */
 export function CheckinCard({ crewMember, today }: Props) {
   const t = useTexts(texts);
   const h = useTexts(havenTexts);
@@ -70,7 +65,6 @@ export function CheckinCard({ crewMember, today }: Props) {
   const commitRef = useRef(commit);
   commitRef.current = commit;
 
-  // Both chosen → save after the undo window (or right away if the screen goes away).
   useEffect(() => {
     if (!mood || !stress) return;
     pending.current = { mood, stress };
@@ -104,7 +98,6 @@ export function CheckinCard({ crewMember, today }: Props) {
     </Button>
   );
 
-  // Done today: one flat row (X); source, journal and "again" behind a tap.
   if (today && !again && !pending.current) {
     return (
       <Collapsible open={open} onOpenChange={setOpen} className="border-border rounded-lg border">
@@ -136,7 +129,6 @@ export function CheckinCard({ crewMember, today }: Props) {
     );
   }
 
-  // One question per step (alias questionnaire): mood, then stress; segmented progress on top.
   const step = mood && stress ? 2 : mood ? 1 : 0;
   return (
     <View className="border-border gap-5 rounded-lg border p-4">

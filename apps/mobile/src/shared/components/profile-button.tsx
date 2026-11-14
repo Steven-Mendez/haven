@@ -6,7 +6,6 @@ import { useTexts } from '@/shared/i18n';
 import { navigationTexts } from '@/shared/i18n/navigation';
 import { cn } from '@/shared/lib/utils';
 
-/** Up to two initials of a name («Elena Vega» → «EV»). */
 export function initialsOf(name: string): string {
   return name
     .split(/[\s-]+/)
@@ -16,14 +15,12 @@ export function initialsOf(name: string): string {
     .join('');
 }
 
-/** Name of the crew member using this phone (falls back to the id). */
 export function useCrewMemberName(): string {
   const mission = useMission();
   const { crewMember } = usePreferences();
   return mission.crew.find((c) => c.id === crewMember)?.name ?? crewMember;
 }
 
-/** Round initials avatar (muted fill, hairline), sized in pt. */
 export function CrewAvatar({ size = 32, className }: { size?: number; className?: string }) {
   const name = useCrewMemberName();
   return (
@@ -45,10 +42,6 @@ export function CrewAvatar({ size = 32, className }: { size?: number; className?
   );
 }
 
-/**
- * X-style profile entry (top-left of the tab headers): the crew member's 32 pt round avatar, opens
- * `/profile`. 44 pt touch target via hit slop.
- */
 export function ProfileButton({ className }: { className?: string }) {
   const t = useTexts(navigationTexts);
   const name = useCrewMemberName();

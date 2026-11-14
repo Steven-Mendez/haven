@@ -31,10 +31,8 @@ import { WhoGroup } from './who-group';
 
 type Records = ReturnType<typeof useMissionRecords>;
 type Mode = 'idle' | 'join' | 'create' | 'who';
-/** After a join: the mission's roster, to pick who uses this phone. */
 type Joined = { code: string; message: string; crew: CrewOption[]; offline: boolean };
 
-/** Six boxes under one transparent real input that receives the taps (Places / Numo style). Typing with gloves: big, uppercase, no symbols. */
 function CodeBoxes({
   value,
   onChange,
@@ -73,7 +71,6 @@ function CodeBoxes({
         accessibilityLabel={label}
         caretHidden
         selectionColor="transparent"
-        // Transparent, not `opacity-0`: iOS ignores touches on views with alpha below 0.01.
         className="absolute inset-0 h-16 border-0 bg-transparent text-transparent shadow-none"
       />
     </View>
@@ -104,7 +101,7 @@ function JoinForm({
         setUnknown(code);
         return;
       }
-      if (result.from === 'unreachable') return; // only with `offline: false`
+      if (result.from === 'unreachable') return;
       const { record, from } = result;
       const message =
         from === 'local' ? t.joinedLocal : from === 'earth' ? t.joinedEarth : t.joinedOffline;
@@ -262,7 +259,6 @@ function CreateForm({
   );
 }
 
-/** Current mission (name, phase, small code) with «Create mission» and the «Join with a code» fallback. */
 export function MissionGroup({
   mission,
   records,
@@ -350,7 +346,6 @@ export function MissionGroup({
                 })}`
               : ''}
           </Text>
-          {/* The code still travels in every packet; it is a fallback, not the way in. */}
           <Text
             className="text-tertiary text-caption"
             accessibilityLabel={`${t.missionCode}: ${mission.code.split('').join(' ')}`}

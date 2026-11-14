@@ -3,7 +3,6 @@ import type { Reading } from '../contracts';
 import { cognitiveVerdict } from './cognition';
 import { NOW, reading, TEST_CONFIG } from './test-fixtures';
 
-/** 10 daily batteries around 280 ms, ending one day before NOW. */
 function history(): Reading[] {
   const rs: Reading[] = [];
   for (let d = 10; d >= 1; d--) {

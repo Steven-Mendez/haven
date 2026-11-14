@@ -1,11 +1,3 @@
-// First-run tour (the mobile counterpart of driver.js on Earth), on react-native-spotlight-tour.
-// It walks the essential screens: Body (status, alerts, first steps or next action, zones), Routine
-// (how you feel, today's actions), Trends (indicators), Mission (link with Earth), then the SOS and the
-// profile back on Body. Before each step it opens the step's tab, waits for the element and scrolls it
-// into view. Body steps that depend on data (alerts, first steps, next action) only run when shown.
-// The provider sits in the tabs layout, so it can point at any tab and at the tab bar's SOS.
-// Seen once per install (kv-store); Settings › «Show the tour» runs it again.
-
 import { router } from 'expo-router';
 import Storage from 'expo-sqlite/kv-store';
 import { X } from 'lucide-react-native';
@@ -43,7 +35,6 @@ import { useColors } from '@/shared/lib/theme';
 import { cn } from '@/shared/lib/utils';
 import { tourTexts } from './i18n';
 
-/** Every step, in tour order. */
 const ORDER = [
   'verdict',
   'alerts',
@@ -59,7 +50,6 @@ const ORDER = [
 ] as const;
 export type TourStepName = (typeof ORDER)[number];
 
-/** Tabs the tour opens. */
 export type TourScreen = 'body' | 'routine' | 'trends' | 'mission';
 const PATH: Record<TourScreen, '/' | '/routine' | '/trends' | '/mission'> = {
   body: '/',
@@ -68,7 +58,6 @@ const PATH: Record<TourScreen, '/' | '/routine' | '/trends' | '/mission'> = {
   mission: '/mission',
 };
 
-/** The tab each step lives on (the SOS is in the tab bar: no tab). */
 const SCREEN: Partial<Record<TourStepName, TourScreen>> = {
   verdict: 'body',
   alerts: 'body',
@@ -82,11 +71,8 @@ const SCREEN: Partial<Record<TourStepName, TourScreen>> = {
   profile: 'body',
 };
 
-/** Body steps that only exist with some data: they run only when Body shows them. */
 const OPTIONAL = new Set<TourStepName>(['alerts', 'start', 'next']);
-/** Round targets get a round spotlight and ring. */
 const ROUND = new Set<TourStepName>(['sos', 'profile']);
-/** Targets inside a clipped card (overflow hidden): the ring goes inside their edges. */
 const INSIDE = new Set<TourStepName>(['next', 'mission-link']);
 
 type TextKey = keyof (typeof tourTexts)['en'];
@@ -104,7 +90,6 @@ const COPY: Record<TourStepName, { title: TextKey; body: TextKey }> = {
   profile: { title: 'profileTitle', body: 'profileBody' },
 };
 
-// v4: the steps changed, so the tour shows once more to everyone who saw an earlier one.
 const KEY = 'haven.tour.v4';
 
 function seen(): boolean {
@@ -118,13 +103,9 @@ function seen(): boolean {
 function markSeen() {
   try {
     Storage.setItemSync(KEY, '1');
-  } catch {
-    // Not persisted: the tour shows again next launch, which is harmless.
-  }
+  } catch {}
 }
 
-// Mounted anchors (name → view). Tabs mount on first visit, so only the optional Body steps
-// depend on this; the rest always run.
 const anchors = new Map<TourStepName, ViewInstance>();
 const anchorListeners = new Set<() => void>();
 let steps: TourStepName[] = ORDER.filter((s) => !OPTIONAL.has(s));
@@ -149,17 +130,11 @@ function useSteps(): TourStepName[] {
 
 export type WindowRect = { x: number; y: number; width: number; height: number };
 
-/** Brings a target on screen in a tab's scroll view. Resolves once it has settled. */
 type Scroller = (rect: WindowRect) => Promise<void>;
 const scrollers = new Map<TourScreen, Scroller>();
 
 const wait = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
-/**
- * Lets the tour scroll a tab: pass the tab's ScrollView ref, and put the returned handler on its
- * `onScroll` (with `scrollEventThrottle`). Targets are brought under the top inset with room for the
- * popover below.
- */
 export function useTourScroll(
   screen: TourScreen,
   scroll: RefObject<ScrollViewInstance | null>,
@@ -170,7 +145,6 @@ export function useTourScroll(
   useEffect(() => {
     const fn: Scroller = async (rect) => {
       const top = insets.top + 24;
-      // Tab bar (~90 pt) and the popover (~240 pt) below the target.
       const bottom = height - 90 - 240;
       if (rect.y >= top && rect.y + rect.height <= bottom) return;
       scroll.current?.scrollTo({
@@ -197,13 +171,11 @@ function measure(view: ViewInstance): Promise<WindowRect> {
 
 let onScreen: TourScreen = 'body';
 
-/** Opens the step's tab, waits for its element to mount and lay out, then scrolls it into view. */
 async function bringIntoView(step: TourStepName) {
   const screen = SCREEN[step];
   if (screen && screen !== onScreen) {
     router.navigate(PATH[screen]);
     onScreen = screen;
-    // A tab mounts on its first visit: wait for the element (at most ~2 s).
     for (let i = 0; i < 20 && !anchors.has(step); i++) await wait(100);
     await wait(250);
   }
@@ -215,16 +187,11 @@ async function bringIntoView(step: TourStepName) {
 let requested = false;
 const requestListeners = new Set<() => void>();
 
-/** Settings › «Show the tour»: runs it again the next time Body is on screen. */
 export function requestTour() {
   requested = true;
   for (const l of requestListeners) l();
 }
 
-/**
- * One step's popover (My BMW / monday.com on Mobbin): title and ✕, one or two short lines that say
- * what to do, then «2 of 5» · Back · Next (Done on the last).
- */
 function Popover({ step, total, ...p }: RenderProps & { step: TourStepName; total: number }) {
   const t = useTexts(tourTexts);
   const { width } = useWindowDimensions();
@@ -280,15 +247,11 @@ function stepOf(step: TourStepName, total: number): TourStep {
   };
 }
 
-/** The steps on screen, for the anchors' indexes. */
 const StepsContext = createContext<TourStepName[]>([]);
 
-/** Wraps the tabs: the overlay can spotlight Body and the tab bar. */
 export function TourProvider({ children }: { children: ReactNode }) {
   const colors = useColors();
   const insets = useSafeAreaInsets();
-  // The popover stays inside the safe areas (Dynamic Island, home indicator) and off the edges.
-  // Next to a tall target with no room above or below, it slides over the target instead.
   const safe = {
     top: insets.top + 8,
     bottom: insets.bottom + 8,
@@ -306,7 +269,6 @@ export function TourProvider({ children }: { children: ReactNode }) {
         nativeDriver
         onStop={() => {
           markSeen();
-          // Back to Body when the tour ends elsewhere.
           if (onScreen !== 'body') router.navigate(PATH.body);
           onScreen = 'body';
         }}
@@ -321,10 +283,6 @@ export function TourProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/**
- * Marks `children` as the target of a step. While its step runs it draws a brand ring around it, so
- * it is clear what the popover talks about.
- */
 export function TourAnchor({
   step,
   fill,
@@ -332,9 +290,7 @@ export function TourAnchor({
   children,
 }: {
   step: TourStepName;
-  /** Stretch to the parent's width (cards); otherwise the wrapper hugs its content. */
   fill?: boolean;
-  /** Keep the target centred in a centring parent (the SOS in the tab bar). */
   center?: boolean;
   children: ReactNode;
 }) {
@@ -351,8 +307,6 @@ export function TourAnchor({
   }, [step]);
   const index = steps.indexOf(step);
   const active = index >= 0 && current === index;
-  // Same tree before and after the provider lists the step (index -1 never runs), so the
-  // registered view stays the mounted one.
   return (
     <AttachStep index={index} fill={fill} style={center ? { alignSelf: 'center' } : undefined}>
       <View ref={ref} collapsable={false}>
@@ -372,10 +326,6 @@ export function TourAnchor({
   );
 }
 
-/**
- * Starts the tour once, `ready` = the screen has its content (Body after startup), and again
- * whenever Settings asks for it.
- */
 export function useAutoStartTour(ready: boolean) {
   const { start, current } = useSpotlightTour();
   useEffect(() => {
@@ -386,9 +336,7 @@ export function useAutoStartTour(ready: boolean) {
       onScreen = 'body';
       start();
     };
-    // Let the first frame lay out (and the anchors register) before the spotlight measures.
     let id = !seen() || requested ? setTimeout(run, 900) : undefined;
-    // Repeated requests (a double tap in Settings) start it once.
     const onRequest = () => {
       if (id) clearTimeout(id);
       id = setTimeout(run, 900);

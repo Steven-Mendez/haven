@@ -7,16 +7,11 @@ import { levelLabel } from './levels';
 import type { VisualLevel } from './types';
 
 export type Stat = {
-  /** Short label over the figure («Daily actions»). No subtitle. */
   label: string;
   value: ReactNode;
-  /** Unit next to the figure in tertiary («/21», «min»). */
   unit?: string;
-  /** Level shape before the label, only when the value means something (e.g. red zones > 0). */
   level?: VisualLevel;
-  /** Makes the whole tile a link (e.g. a filter of the list below). */
   href?: string;
-  /** The tile is the filter in effect: brand underline and `aria-current`. */
   active?: boolean;
 };
 
@@ -26,10 +21,6 @@ type Props = {
   className?: string;
 };
 
-/**
- * KPI strip (SPEC §6, Vercel analytics tiles): one hairline box split by 1 px dividers; each tile is a
- * 12 px label over a 28 px tabular figure. No fills, no shadows. 2 columns on phones, one row from `sm`.
- */
 export function StatStrip({ items, lang, className }: Props) {
   return (
     <dl
@@ -72,7 +63,6 @@ export function StatStrip({ items, lang, className }: Props) {
                   href={s.href}
                   scroll={false}
                   aria-current={s.active ? 'true' : undefined}
-                  // Stretched link: the whole tile is the target, the label stays readable text.
                   className="focus-visible:before:ring-ring flex items-baseline gap-1 outline-none before:absolute before:inset-0 before:content-[''] focus-visible:before:ring-2 focus-visible:before:ring-inset"
                 >
                   {figure}

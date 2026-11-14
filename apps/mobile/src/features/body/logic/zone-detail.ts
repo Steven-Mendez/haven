@@ -1,10 +1,7 @@
 import type { Assessment, Config, Indicator, Level, Zone } from '@haven/core';
 
-// Inline zone detail (M01): the zone purpose and its indicators with their assessment.
-
 export type ZoneIndicator = {
   indicator: Indicator;
-  /** Missing when the engine did not evaluate this indicator: shown as pending. */
   assessment: Assessment | undefined;
   level: Level;
 };
@@ -15,10 +12,6 @@ export type ZoneDetail = {
   indicators: ZoneIndicator[];
 };
 
-/**
- * Detail of one zone: the indicators listed in `Zone.indicators` (config order) plus any indicator
- * whose `zone` points here but the zone list forgot. The zone level comes from `evaluateZones`.
- */
 export function zoneDetail(
   zoneId: string,
   zones: { zone: string; level: Level }[],
@@ -47,7 +40,6 @@ export function zoneDetail(
   };
 }
 
-/** Tapping the selected zone again closes its detail. */
 export function toggleZone(current: string | undefined, tapped: string): string | undefined {
   return current === tapped ? undefined : tapped;
 }

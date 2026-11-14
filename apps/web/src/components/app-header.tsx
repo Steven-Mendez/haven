@@ -22,13 +22,9 @@ import { format, type Language } from '@/lib/i18n';
 
 type Props = {
   lang: Language;
-  /** Mission day, shown in the header strip. */
   day?: number;
-  /** The mission reports no link: neutral «No link» chip in the header strip. */
   linkDown?: boolean;
-  /** Astronaut id → name, for the `/astronaut/[id]` crumb. */
   crewNames?: Record<string, string>;
-  /** Crew for the ⌘K menu. */
   crew?: CommandCrewMember[];
 };
 
@@ -37,7 +33,6 @@ type Crumb = { label: string; href?: string };
 const HEADER =
   'bg-surface/80 sticky top-0 z-30 flex h-[calc(2.75rem_+_env(safe-area-inset-top))] shrink-0 items-center gap-2 border-b pt-[env(safe-area-inset-top)] pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] backdrop-blur-md md:rounded-t-xl';
 
-/** Header frame without the URL-dependent breadcrumb, for the layout's <Suspense> fallback. */
 export function AppHeaderSkeleton() {
   return (
     <header className={HEADER}>
@@ -46,10 +41,6 @@ export function AppHeaderSkeleton() {
   );
 }
 
-/**
- * Content header (44 px, SPEC §6 «Armazón web», Linear): sidebar trigger, breadcrumb from the route, the
- * mission strip (day, and «No link» when the link is down; the delay lives in the data-age tooltips) and the ⌘K command menu.
- */
 export function AppHeader({ lang, day, linkDown, crewNames, crew = [] }: Props) {
   const t = havenTexts[lang];
   const pathname = usePathname();

@@ -14,7 +14,6 @@ import {
 } from '@/components/ui/select';
 import { format, type Language } from '@/lib/i18n';
 
-/** One selectable indicator, already prepared on the server (serialisable). */
 export type TrendOption = {
   id: string;
   name: string;
@@ -24,31 +23,23 @@ export type TrendOption = {
   level?: Level;
   points: [number, number][];
   baseline?: { median: number; range: [number, number] };
-  /** Drawn on the chart when it does not flatten the line. */
   normalRange?: [number, number];
-  /** Always given as text. */
   green?: [number, number];
   decimals: number;
-  /** `bar` for daily counts (steps, sleep…), `line` otherwise. */
   kind?: 'line' | 'bar';
-  /** Plain-language explanation of the indicator (shared glossary). */
   explain?: TermExplanation;
-  /** What the current level means (glossary `level-*`). */
   levelMeaning?: TermExplanation;
-  /** Glossary for the chart header: baseline, reference range, «now». */
   glossary?: { baseline?: TermExplanation; reference?: TermExplanation; now?: TermExplanation };
 };
 
 type Props = {
   options: TrendOption[];
   defaultId: string;
-  /** Earth «now» (epoch ms): dashed line and hatched gap since the last reading. */
   nowAt?: number;
   lang: Language;
   texts: { indicator: string; normalRangeText: string; pointsCount: string; nowEarth?: string };
 };
 
-/** Trend of one indicator at a time, with an indicator selector grouped by zone (ref. Bevel, LangChain). */
 export function TrendsPanel({ options, defaultId, nowAt, lang, texts }: Props) {
   const [selected, setSelected] = useState(defaultId);
   const current = options.find((o) => o.id === selected) ?? options[0];

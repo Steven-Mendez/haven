@@ -12,7 +12,6 @@ import { useTexts, useTranslate } from '@/shared/i18n';
 import { texts } from '../i18n';
 import { SYMPTOM_LIST, type Symptom } from '../logic/packet';
 
-/** The ones the chest-pain step asks about first; the rest behind "See all" (DESIGN_SYSTEM 8.0). */
 const FIRST: readonly Symptom[] = [
   'chest-pain',
   'sweating',
@@ -26,7 +25,6 @@ type Props = {
   onMark: (symptom: Symptom) => void;
 };
 
-/** One-line rows; each tap becomes a `symptom` reading at once (one-way). Names from the config. */
 export function SymptomChecklist({ marked, onMark }: Props) {
   const t = useTexts(texts);
   const tr = useTranslate();

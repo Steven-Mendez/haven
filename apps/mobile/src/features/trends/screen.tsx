@@ -34,32 +34,22 @@ import { markersInWindow } from './logic/markers';
 import { firstReadingMs, rangeWindow, TREND_RANGES, type TrendRange } from './logic/series';
 
 const DAY_MS = 86_400_000;
-/** The chart window follows new readings at most this often. */
 const NOW_STEP_MS = 5_000;
 
-/**
- * M04 · Trends (DESIGN_SYSTEM §8.8). List view: a level summary (Superpower «Biomarkers»), then
- * one-datum rows grouped by zone (Apple Health categories), worst zone and worst row first; source
- * and age once below the list. Tapping a
- * row opens the single-chart view (Google Health · weight) with the range and event markers.
- * «Export packet to Earth» is a row at the end. No mission strip (§8.0.6).
- */
 export default function Screen() {
   const t = useTexts(texts);
   const translate = useTranslate();
-  const insets = useScreenInsets(); // top safe area comes from the tabs layout;
+  const insets = useScreenInsets();
   const ready = useDataReady();
   const mission = useMission();
   const assessments = useAssessments();
   const markers = useTrendMarkers();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
-  // First-run tour: lets it scroll Trends to its target.
   const onTourScroll = useTourScroll('trends', scroll);
   const [selected, setSelected] = useState<string | undefined>();
   const [range, setRange] = useState<TrendRange>('mission');
   const [now, setNow] = useState(() => Date.now());
 
-  // New readings move the right edge of the chart (throttled).
   useEvent('reading:new', () => {
     const next = Date.now();
     if (next - now >= NOW_STEP_MS) setNow(next);
@@ -93,7 +83,6 @@ export default function Screen() {
   const indicator = numeric.find((i) => i.id === selected);
   const zone = config.zones.find((z) => z.id === indicator?.zone);
 
-  // «Mission» starts on mission day 1, or at the first reading of this indicator if later.
   const missionStartMs = useMemo(() => {
     const dayOne = now - (Math.max(1, mission.day) - 1) * DAY_MS;
     if (!selected) return dayOne;
@@ -235,7 +224,6 @@ export default function Screen() {
                     <ListGroup inset={16}>{group.items.map(row)}</ListGroup>
                   </Section>
                 );
-                // The tour points at the first (worst) zone.
                 return i === 0 ? (
                   <TourAnchor key={group.zone} step="trends-list" fill>
                     {section}

@@ -1,29 +1,21 @@
-// Event markers for Trends charts (emergencies and environment changes).
-// Pure: only `@haven/core` and relative modules.
-
 import type { Mission } from '@haven/core';
 
 export type MarkerKind = 'emergency' | 'environment';
 
 export type TrendMarker = {
   id: string;
-  /** Epoch ms. */
   t: number;
   kind: MarkerKind;
-  /** Environment id or emergency origin. */
   ref: string;
-  /** Emergency packet id (`emergency:close`): one marker per packet. */
   packet?: string;
 };
 
-/** An `emergency:close` within this window after an `emergency:open` is the same emergency. */
 export const SAME_EMERGENCY_MS = 2 * 3_600_000;
 
 export function markerId(kind: MarkerKind, t: number, ref: string): string {
   return `${kind}:${t}:${ref}`;
 }
 
-/** Marker produced by a mission change: the new environment. */
 export function markersFromMissionChange(
   previous: Pick<Mission, 'environment'> | undefined,
   next: Pick<Mission, 'environment'>,
@@ -40,15 +32,6 @@ export function markersFromMissionChange(
   ];
 }
 
-/**
- * Marker for a closed emergency, unique per `packet.id` (Fénix may re-emit `emergency:close` with
- * the same packet after adding a note). Returns the marker to upsert, or `undefined` if nothing
- * changes:
- * - a marker for this packet already exists → that marker (same id, time updated);
- * - an emergency opened in the preceding `SAME_EMERGENCY_MS` without a packet yet → that marker,
- *   now linked to the packet (no duplicate);
- * - otherwise a new marker whose id is derived from the packet id.
- */
 export function markerForClosedEmergency(
   markers: TrendMarker[],
   t: number,
@@ -71,11 +54,6 @@ export function markerForClosedEmergency(
   };
 }
 
-/**
- * Markers inside `[from, to]`, sorted, at most `max` (keeps the latest; emergencies first).
- * Markers closer than `minGapFraction` of the window collapse into one so labels never overlap:
- * an emergency wins, otherwise the latest.
- */
 export function markersInWindow(
   markers: TrendMarker[],
   window: [number, number],

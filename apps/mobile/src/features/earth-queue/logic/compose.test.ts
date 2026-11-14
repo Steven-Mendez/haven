@@ -52,8 +52,8 @@ function routine(): Packet {
       reading('mood', 2),
       reading('stress', 2),
       reading('diary', 3, { value: 'private words' }),
-      reading('heart-rate', 30), // too old
-      reading('heart-rate', 1, { crewMember: 'mateo-rios' }), // someone else
+      reading('heart-rate', 30),
+      reading('heart-rate', 1, { crewMember: 'mateo-rios' }),
     ],
     dailyProgress: [{ zone: 'heart', progress: 1 }],
     notes: '  Slept badly  ',

@@ -54,7 +54,6 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-/** «Why?» (M02): value, baseline, the rule that matched and the config version. */
 export function WhyPanel({
   indicator,
   assessment,

@@ -21,7 +21,6 @@ const initials = (name: string) =>
     .slice(0, 2)
     .toUpperCase();
 
-/** Linked crew: avatar, name, watch. Tapping a person makes this phone theirs (`crewMember`). */
 export function CrewGroup({ mission }: { mission: Mission }) {
   const t = useTexts(texts);
   const preferences = usePreferences();
@@ -29,7 +28,6 @@ export function CrewGroup({ mission }: { mission: Mission }) {
 
   return (
     <Group title={t.crewGroup} hint={t.crewHint}>
-      {/* One ToggleGroup child: the separators `Group` adds between rows are drawn here. */}
       <ToggleGroup
         type="single"
         value={preferences.crewMember}

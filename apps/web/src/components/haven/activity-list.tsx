@@ -21,13 +21,9 @@ import type { Now, VisualLevel } from './types';
 export type ActivityItem = {
   id: string;
   level: VisualLevel;
-  /** «Heart rate» — what happened. */
   title: string;
-  /** Explanation from the engine, already translated. */
   detail?: string;
-  /** Crew member name. */
   who?: string;
-  /** ISO instant it became visible on Earth (`visibleAt`). */
   at: string;
   href?: string;
 };
@@ -37,14 +33,11 @@ type Props = {
   now: Now;
   lang: Language;
   title?: string;
-  /** Empty-state copy. */
   emptyText?: string;
-  /** Right-hand slot in the header. */
   actions?: ReactNode;
   className?: string;
 };
 
-/** Recent alerts as an activity feed on shadcn `Card` + `Item`, newest first (ref. Better Stack). */
 export function ActivityList({ items, now, lang, title, emptyText, actions, className }: Props) {
   const t = havenTexts[lang];
   const sorted = [...items].sort((a, b) => Date.parse(b.at) - Date.parse(a.at));

@@ -1,7 +1,5 @@
-// T03 · Form states shared by the server actions (actions.ts) and the client forms.
 import type { ThresholdError } from './logic/rules';
 
-/** Earth tool pages (`/rules`, `/trends`, `/eva`); also the old `/extras?tab=` values. */
 export const EXTRAS_TABS = ['rules', 'trends', 'eva'] as const;
 export type ExtrasTab = (typeof EXTRAS_TABS)[number];
 

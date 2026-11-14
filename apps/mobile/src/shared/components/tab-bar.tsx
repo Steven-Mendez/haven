@@ -16,15 +16,8 @@ import { useTexts } from '@/shared/i18n';
 import { cn } from '@/shared/lib/utils';
 import { TourAnchor } from '@/shared/tour';
 
-/** Icon per tab route name (outline lucide icons, X style). */
 export type TabIcons = Record<string, LucideIcon>;
 
-/**
- * HAVEN tab bar (SPEC.md §6 «Barra de pestañas»): on `background` with a 1 px top hairline, outline
- * icons, the active tab in `foreground` (heavier stroke), the rest in grey. The round SOS sits in
- * the centre slot (Bevel's centre «+»): on every tab, always one tap away, never over content.
- * Tap → emergency screen (its own 3 s hold); hold the SOS 3 s → the emergency starts directly.
- */
 export function HavenTabBar({
   state,
   descriptors,

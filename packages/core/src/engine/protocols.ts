@@ -6,12 +6,10 @@ function applies(step: Step, environment?: string): boolean {
   );
 }
 
-/** Steps that apply in the environment (filters `onlyIn`), in config order. */
 export function protocolSteps(protocol: Protocol, environment: string): Step[] {
   return protocol.steps.filter((s) => applies(s, environment));
 }
 
-/** Resolves a step id, skipping steps that do not apply in the environment (follows their `next`). */
 function resolve(
   protocol: Protocol,
   id: string | undefined,
@@ -29,16 +27,10 @@ function resolve(
   return undefined;
 }
 
-/** First step of the protocol (`start`), skipping steps that do not apply in the environment. */
 export function firstStep(protocol: Protocol, environment?: string): Step | undefined {
   return resolve(protocol, protocol.start, environment);
 }
 
-/**
- * Step after `stepId`. With `options`, one must be chosen (`option` = index); without a choice it
- * returns undefined. Without options, "done" goes to `next`; without `next`, the protocol ends
- * (undefined). With `environment`, steps whose `onlyIn` excludes it are skipped.
- */
 export function nextStep(
   protocol: Protocol,
   stepId: string,

@@ -13,10 +13,6 @@ type Toast = { id: number; message: string; icon?: boolean };
 let next = 1;
 const listeners = new Set<(toast: Toast) => void>();
 
-/**
- * Shows a confirmation toast at the top («Saved», «Queued for Earth»). Only confirmations: an
- * emergency is never announced with a toast (SPEC.md §6).
- */
 export function showToast(message: string, options: { icon?: boolean } = {}) {
   const toast = { id: next++, message, icon: options.icon ?? true };
   for (const listener of listeners) listener(toast);
@@ -24,10 +20,6 @@ export function showToast(message: string, options: { icon?: boolean } = {}) {
 
 const VISIBLE_MS = 2400;
 
-/**
- * Renders the current toast: top of the screen under the status bar, `elevated` surface, hairline,
- * radius 12, fade + 4 pt drop (Reduce Motion: fade only). Announced to screen readers.
- */
 export function ToastHost() {
   const insets = useSafeAreaInsets();
   const reduce = useReducedMotion();

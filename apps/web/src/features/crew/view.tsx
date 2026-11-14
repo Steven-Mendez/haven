@@ -29,7 +29,6 @@ import { texts } from './i18n';
 import { rosterOf } from './roster';
 import { earthUrlForPhones, getCrew } from './server';
 
-/** Seconds between automatic refreshes of the page (see components/auto-refresh.tsx). */
 export const REFRESH_INTERVAL_SEC = 15;
 
 type Names = {
@@ -38,7 +37,6 @@ type Names = {
   indicators: Record<string, { name: string; unit: string }>;
 };
 
-/** Display names from the config, translated (presentation only). */
 function namesFor(environment: string, lang: Language): Names {
   const config = loadConfig();
   const env = config.environments.find((e) => e.id === environment);
@@ -54,14 +52,12 @@ function namesFor(environment: string, lang: Language): Names {
   };
 }
 
-/** Crew id → role (`CrewCard.role`, I18n from core), translated; members without a role are left out. */
 function rolesFor(crew: CrewResponse['crew'], lang: Language): Record<string, string> {
   return Object.fromEntries(
     crew.flatMap((m) => (m.role ? [[m.id, translate(m.role, lang)] as const] : [])),
   );
 }
 
-/** `?filter=` of the crew page: the KPI tiles filter the crew list (Sentry / Vapi issue tiles). */
 const FILTERS = ['amber', 'red', 'stale'] as const;
 type CrewFilter = (typeof FILTERS)[number];
 
@@ -69,19 +65,13 @@ function parseFilter(value: string | string[] | undefined): CrewFilter | undefin
   return FILTERS.find((f) => f === value);
 }
 
-/** Crew members a filter keeps: any zone at that level, or no recent data. */
 function matchesFilter(member: CrewCard, filter: CrewFilter) {
   if (filter === 'stale') return member.noRecentData;
   return member.zones.some((z) => z.level === filter);
 }
 
-/** Link of a filter tile: toggles it off when it is already the one in effect. */
 const filterHref = (f: CrewFilter, active?: CrewFilter) => (f === active ? '/' : `/?filter=${f}`);
 
-/**
- * The four summary figures (DESIGN_SYSTEM.md §8.1): label + value, no subtitles; level mark only when not zero.
- * The three level figures filter the crew list when they are not zero.
- */
 function summaryStats(
   data: CrewResponse,
   crew: CrewCard[],
@@ -173,8 +163,6 @@ async function CrewContent({ searchParams }: { searchParams: SearchParams }) {
   const earthUrl = await earthUrlForPhones();
   const roster = await rosterOf(data.crew, code, earthUrl, lang);
 
-  // Nothing visible yet: no figures, no rows (an empty row would look like "all normal"). Instead, the code to
-  // share and the roster to fill.
   if (!data.mission.lastDataAt) {
     return (
       <>
@@ -204,7 +192,6 @@ async function CrewContent({ searchParams }: { searchParams: SearchParams }) {
     );
   }
 
-  // Only those whose phone has sent something have health data; the invited are listed apart.
   const crew = data.crew.filter((m) => m.lastPacket !== null);
   const shown = filter ? crew.filter((m) => matchesFilter(m, filter)) : crew;
   const roles = rolesFor(crew, lang);
@@ -291,7 +278,6 @@ async function CrewContent({ searchParams }: { searchParams: SearchParams }) {
   );
 }
 
-/** T01 · Crew page (`/`): mission header, KPI strip and the crew grouped by level (Linear grouped list, j/k). */
 export function View({ searchParams }: { searchParams: SearchParams }) {
   return (
     <PageContainer>

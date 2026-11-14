@@ -1,13 +1,10 @@
 import { defineTexts } from '@/shared/i18n';
 
-// UI copy for M06. Steps, options and medical texts come from the config (useTranslate).
-
 export const texts = defineTexts({
   es: {
     title: 'Emergencia',
     protocolMissing: 'No se encontró el protocolo en la configuración.',
 
-    // Origin
     originLabel: 'Origen',
     originButton: 'Botón de emergencia',
     originFall: 'Caída detectada por el reloj',
@@ -18,7 +15,6 @@ export const texts = defineTexts({
     originAssessment: 'Estado rojo en la app',
     onBoard: 'Decisión a bordo · no depende de Tierra',
 
-    // Monitor
     monitor: 'Monitor del paciente',
     pulse: 'Pulso',
     bpm: 'lpm',
@@ -28,7 +24,6 @@ export const texts = defineTexts({
     noSpo2: 'Sin oxígeno registrado',
     lastMinutes: 'Pulso · últimos 10 min',
 
-    // Steps
     stepN: 'Paso {n}',
     phaseTriage: 'Triage',
     phaseCpr: 'RCP',
@@ -49,7 +44,6 @@ export const texts = defineTexts({
     restartTimer: 'Reiniciar',
     timeUp: 'Tiempo cumplido',
 
-    // Crew alert
     alertCrew: 'Avisar otra vez',
     crewAlerted: 'Tripulación avisada en sus relojes ✓',
     crewAlertFailed: 'Sin reloj conectado: avisa a la tripulación en voz alta',
@@ -60,13 +54,11 @@ export const texts = defineTexts({
     crewMessage: 'Emergencia médica: {n} necesita ayuda ahora',
     crewMemberFallback: 'un tripulante',
 
-    // Symptoms
     symptoms: 'Síntomas',
     symptomsHint: 'Cada marca se guarda al momento',
     seeAll: 'Ver todos ({n})',
     symptomsMarked: '{n} marcado(s)',
 
-    // End
     endEmergency: 'Terminar emergencia',
     endShort: 'Terminar',
     endConfirm: '¿Terminar la emergencia?',
@@ -76,7 +68,6 @@ export const texts = defineTexts({
     protocolDone: 'Protocolo completado',
     protocolDoneHint: 'Sigue vigilando al paciente. Al terminar, el paquete se envía a Tierra.',
 
-    // Packet
     packetContents: 'Contenido',
     measurements: 'Mediciones',
     symptomsCount: 'Síntomas',
@@ -96,7 +87,6 @@ export const texts = defineTexts({
     linkUp: 'Con enlace · retardo de la misión {n} min',
     followUp: 'Seguimiento',
     close: 'Cerrar emergencia',
-    // Hold to confirm (SOS)
     holdTitle: 'Mantén pulsado para empezar',
     holdDetail: 'Se avisa a la tripulación en sus relojes y empieza el protocolo a bordo.',
     holdButton: 'SOS',

@@ -10,12 +10,7 @@ import {
   type TrendMarker,
 } from '../logic/markers';
 
-// Chart event markers (M04), persisted in the `trend_markers` collection. The bus listeners are
-// registered when this module is imported (the trends route loads it at app start), so emergencies
-// and environment changes are recorded even while the Trends tab is not open.
-
 const COLLECTION = 'trend_markers';
-/** Older markers are dropped (the longest range shows the last 30 days of data). */
 const KEEP_MS = 60 * 86_400_000;
 
 const collection = db.collection<TrendMarker>(COLLECTION);
@@ -32,7 +27,6 @@ function remember(mission: Mission) {
   previous = { environment: mission.environment };
 }
 
-/** Inserts new markers and replaces those with the same id (upsert). */
 function add(list: TrendMarker[]) {
   const fresh = list.filter((m) => {
     const known = markers.find((k) => k.id === m.id);
@@ -47,7 +41,6 @@ function add(list: TrendMarker[]) {
   );
 }
 
-/** Loads persisted markers once the database is open (store ready). Idempotent. */
 function load(): Promise<void> {
   if (!store.isReady()) return Promise.resolve();
   previous ??= { environment: store.mission().environment };
@@ -93,7 +86,6 @@ function subscribe(listener: () => void) {
 
 const snapshot = () => markers;
 
-/** Every recorded marker, sorted by time. */
 export function useTrendMarkers(): TrendMarker[] {
   useEffect(() => {
     void load();

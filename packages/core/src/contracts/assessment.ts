@@ -1,5 +1,3 @@
-// Shared contracts §5 · Evaluated assessment (was "Estado").
-
 import type { Action, I18n } from './config';
 
 export type Level = 'green' | 'amber' | 'red' | 'pending';
@@ -9,8 +7,8 @@ export type Assessment = {
   level: Level;
   value?: number;
   baseline?: { median: number; range: [number, number] };
-  explanation: I18n; // why this level, in plain language
-  actions: Action[]; // up to three, prioritized
+  explanation: I18n;
+  actions: Action[];
   ageMin: number;
   simulated: boolean;
 };

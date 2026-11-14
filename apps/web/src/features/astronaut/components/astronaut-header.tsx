@@ -19,18 +19,11 @@ import { astronautHref, byNewest, TABS, type Tab } from '../logic';
 type Props = {
   data: AstronautResponse;
   tab: Tab;
-  /** Level to show: an open emergency has priority over the zone assessment (presentation only). */
   level: VisualLevel;
   lang: Language;
   t: AstronautTexts;
 };
 
-/**
- * Header (DESIGN_SYSTEM.md §8.2, Sentry inline status): portrait 32, name 20/600 and the level chip, then one
- * 12 px status line (role · last packet). When an emergency is open the chip says so and the line names the
- * zone assessment, so «Check» never sits unexplained next to an open emergency. The five tabs are links
- * (`?tab=`) with the active one underlined in the accent.
- */
 export function AstronautHeader({ data, tab, level, lang, t }: Props) {
   const { crewMember: member, generatedAt: now } = data;
   const last = byNewest(data.packets)[0];

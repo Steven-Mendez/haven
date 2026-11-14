@@ -22,11 +22,6 @@ type Props = {
   delayMin?: number;
 };
 
-/**
- * Open emergencies (SPEC §6 «Paquetes de emergencia», Vercel logs / Sentry inbox): one 52 px row per crew member
- * whose latest received packet is an emergency, newest first. 2 px red rule on the left (emergencies only),
- * mono Earth receive time, data age and a link to the packet. Renders nothing when there is none.
- */
 export function EmergencyInbox({ crew, now, lang, roles, indicators, delayMin }: Props) {
   const t = texts[lang];
   const h = havenTexts[lang];

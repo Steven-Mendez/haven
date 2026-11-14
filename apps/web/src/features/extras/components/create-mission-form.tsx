@@ -17,16 +17,11 @@ import { PhaseBar } from './phase-bar';
 
 const INITIAL: MissionFormState = { status: 'idle' };
 
-/**
- * «New mission» (Linear «New project», Notion templates): a name and an optional base plan, nothing else. The
- * mission is created in preparation and its page opens, where the plan, the start and the crew are set up.
- */
 export function CreateMissionForm({
   lang,
   templates,
 }: {
   lang: Language;
-  /** Real mission plans; «From scratch» is added at the end. */
   templates: (TemplateOption & { phaseNames: string[] })[];
 }) {
   const t = textsFor(texts, lang);

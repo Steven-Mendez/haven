@@ -21,7 +21,6 @@ describe('nextDailyAction', () => {
       ],
       config,
     );
-    // Zones without a level are pending, which ranks above green but below amber.
     expect(next?.zone.id).toBe('metabolism');
   });
 

@@ -17,13 +17,11 @@ import { testEarthApi } from '../hooks/missions';
 import { texts } from '../i18n';
 import { Group, Row } from './rows';
 
-/** Language names are shown in their own language. */
 const LANGUAGES: { value: Language; label: string }[] = [
   { value: 'es', label: 'Español' },
   { value: 'en', label: 'English' },
 ];
 
-/** Language and Earth API URL (with a connection test that never blocks the app). */
 export function SettingsGroup() {
   const t = useTexts(texts);
   const preferences = usePreferences();

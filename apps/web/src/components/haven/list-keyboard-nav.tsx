@@ -2,11 +2,6 @@
 
 import { useEffect } from 'react';
 
-/**
- * j / k (and ↓ / ↑ once a row has focus) move the focus between the `[data-row-link]` links of a list;
- * ↵ opens the focused one (native link behaviour). Ignored while typing or when a modifier is held.
- * Renders nothing.
- */
 export function ListKeyboardNav({ containerId }: { containerId: string }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {

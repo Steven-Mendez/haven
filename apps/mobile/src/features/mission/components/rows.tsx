@@ -7,13 +7,8 @@ import { Icon } from '@/shared/components/ui/icon';
 import { Text } from '@/shared/components/ui/text';
 import { cn } from '@/shared/lib/utils';
 
-/** Title of the open detail view: a group with the same title does not repeat its heading. */
 const DetailTitle = createContext<string | undefined>(undefined);
 
-/**
- * Settings group (DESIGN_SYSTEM §3.5 and §8.9, X / Apple Health style): sentence-case heading above
- * the card, rows split by `Separator`, and the optional grey `hint` as a note **under** the card.
- */
 export function Group({
   title,
   hint,
@@ -51,7 +46,6 @@ export function Group({
   );
 }
 
-/** One-line row that opens another view: title on the left, value on the right, chevron. */
 export function LinkRow({
   label,
   value,
@@ -83,7 +77,6 @@ export function LinkRow({
   );
 }
 
-/** Row of 56 pt: title, one line of explanation and a control on the right (or below if `stacked`). */
 export function Row({
   label,
   hint,
@@ -117,7 +110,6 @@ export function Row({
   );
 }
 
-/** Detail view shown in place of the Mission list: back link, title and its groups. */
 export function DetailView({
   title,
   subtitle,

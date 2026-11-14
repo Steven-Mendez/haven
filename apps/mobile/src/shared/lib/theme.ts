@@ -2,13 +2,8 @@ import { DarkTheme, DefaultTheme, type Theme } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { Platform } from 'react-native';
 
-// HAVEN mobile tokens «Vela 3.1» (Apple system data colours). Source of truth: haven/design/tokens.json · design/redesign/SPEC.md.
-// Exact mirror of global.css. THEME keeps React Native Reusables names (hsl, for navigation);
-// COLORS has the same values in hex for react-native-svg and inline styles.
-
 export type Scheme = 'light' | 'dark';
 
-/** On board we use dark mode: low light and OLED screens. */
 export const DEFAULT_SCHEME: Scheme = 'dark';
 
 export const THEME = {
@@ -70,7 +65,6 @@ export const THEME = {
   },
 };
 
-// Navigation: tab bar and headers sit on the page background; selected tab = foreground.
 export const NAV_THEME: Record<Scheme, Theme> = {
   light: {
     ...DefaultTheme,
@@ -96,14 +90,11 @@ export const NAV_THEME: Record<Scheme, Theme> = {
   },
 };
 
-/** Traffic-light levels (same ids as `Level` in @haven/core). */
 export const LEVELS = ['green', 'amber', 'red', 'pending'] as const;
 export type ThemeLevel = (typeof LEVELS)[number];
 
-/** Severity for sorting (red first). Pending ranks above green: it is never treated as "fine". */
 export const SEVERITY: Record<ThemeLevel, number> = { red: 3, amber: 2, pending: 1, green: 0 };
 
-/** Level symbol, identical on phone, watch and Earth (tokens.json → level.symbol). */
 export const LEVEL_SYMBOL: Record<ThemeLevel, string> = {
   green: '●',
   amber: '◐',
@@ -111,10 +102,8 @@ export const LEVEL_SYMBOL: Record<ThemeLevel, string> = {
   pending: '○',
 };
 
-/** Symbol sizes (tokens.json → level.symbolSize). */
 export const LEVEL_SYMBOL_SIZE = { dot: 6, inline: 8, badge: 10, header: 12 } as const;
 
-/** The seven body zones (ids from config/zones.json), in reading order. */
 export const ZONES = [
   'heart',
   'lungs',
@@ -130,7 +119,6 @@ type LevelColors = { fg: string; bg: string; border: string };
 
 export type Palette = {
   background: string;
-  /** Sticky headers, web panel. */
   surface: string;
   foreground: string;
   card: string;
@@ -138,11 +126,8 @@ export type Palette = {
   muted: string;
   hover: string;
   active: string;
-  /** Labels, metadata (muted-foreground). */
   secondary: string;
-  /** @deprecated Use `secondary`. */
   mutedForeground: string;
-  /** Timestamps, axes, baseline. */
   tertiary: string;
   disabled: string;
   borderSubtle: string;
@@ -151,10 +136,8 @@ export type Palette = {
   input: string;
   primary: string;
   primaryForeground: string;
-  /** @deprecated Use `accent`. Focus ring (border.focus). */
   focus: string;
   link: string;
-  /** «Ion»: focus, selection, links, progress, active tab. */
   accent: string;
   accentSubtle: string;
   destructive: string;
@@ -170,24 +153,16 @@ export type Palette = {
     grid: string;
     axis: string;
     cursor: string;
-    /** @deprecated Use `baseline`. */
     median: string;
-    /** chart.palette */
     series: string[];
   };
-  /** Day ring: done = accent, partial = secondary, track = muted. */
   ring: { done: string; track: string; partial: string };
-  /**
-   * @deprecated Zone identity colours were removed (DESIGN_SYSTEM.md §1.2 #3): zones are
-   * identified by name and icon. Every entry is the neutral secondary text colour. Do not use.
-   */
   zone: Record<ThemeZone, string>;
 };
 
 const neutralZones = (c: string): Record<ThemeZone, string> =>
   Object.fromEntries(ZONES.map((z) => [z, c])) as Record<ThemeZone, string>;
 
-/** Same values as global.css in hex/rgba, for SVG and inline styles (tokens.json → color.*). */
 export const COLORS: Record<Scheme, Palette> = {
   dark: {
     background: '#000000',
@@ -285,10 +260,6 @@ export const COLORS: Record<Scheme, Palette> = {
   },
 };
 
-/**
- * Mission disc (HAVEN's progress mark, same as Earth's `--ring-*`): three cool hues — cyan, blue, violet — that
- * never read as a health level. Flat colour per scheme; unlit segments are the same hue at 20 % (14 % light).
- */
 export const RINGS = {
   routine: { light: '#0e9fc2', dark: '#4fd2ec' },
   measurements: { light: '#3a6ff0', dark: '#6b93ff' },
@@ -297,38 +268,29 @@ export const RINGS = {
 export type RingId = keyof typeof RINGS;
 export const RING_TRACK_OPACITY: Record<Scheme, number> = { dark: 0.2, light: 0.14 };
 
-/** Colour of one disc sector in the active scheme. */
 export function useRingColor(id: RingId): string {
   const { colorScheme } = useColorScheme();
   return RINGS[id][colorScheme ?? DEFAULT_SCHEME];
 }
 
-/** Palette of the active scheme (for SVG). */
 export function useColors(): Palette {
   const { colorScheme } = useColorScheme();
   return COLORS[colorScheme ?? DEFAULT_SCHEME];
 }
 
-/**
- * Durations in ms and the standard curve (tokens.json → motion). Figures change with a fade + 4 pt
- * rise (`figure`). Reduce Motion: opacity only. `hold` = SOS hold-to-confirm.
- */
 export const MOTION = {
   micro: 100,
   standard: 160,
   enter: 240,
   figure: 400,
   hold: 3000,
-  /** @deprecated aliases */
   fast: 100,
   base: 160,
   slow: 240,
 } as const;
 
-/** Standard easing cubic-bezier(0.16, 1, 0.3, 1) as a tuple (Reanimated `Easing.bezier(...EASING.standard)`). */
 export const EASING = { standard: [0.16, 1, 0.3, 1] } as const;
 
-/** Touch targets and row heights in pt (tokens.json → touch.mobile). */
 export const TOUCH = {
   min: 44,
   row: 52,
@@ -336,12 +298,10 @@ export const TOUCH = {
   settingsRow: 44,
   primary: 52,
   sos: 72,
-  /** @deprecated aliases */
   large: 60,
   triage: 96,
 } as const;
 
-/** 4 pt grid plus mobile layout values (tokens.json → space). */
 export const SPACE = {
   1: 4,
   2: 8,
@@ -357,14 +317,11 @@ export const SPACE = {
   heroToList: 32,
   separatorInset: 16,
   card: 16,
-  /** @deprecated The SOS lives in the tab bar now: nothing floats over content. */
   sosInset: 24,
 } as const;
 
-/** Lucide stroke widths (tokens.json → icon.strokeWidth). */
 export const ICON_STROKE = { default: 1.75, small: 2 } as const;
 
-/** Monospace family (SF Mono on iOS, monospace on Android): ids, mission code, payloads, stimuli. */
 export const MONO_FONT = Platform.select({
   ios: 'Menlo',
   android: 'monospace',

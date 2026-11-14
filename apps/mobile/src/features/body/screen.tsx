@@ -62,11 +62,8 @@ import { zoneOrigins } from './logic/origins';
 import { formatValue } from './logic/value';
 import { toggleZone, zoneDetail } from './logic/zone-detail';
 
-/** Alert rows shown before «See all» (DESIGN_SYSTEM §8.5). */
 const MAX_ALERT_ROWS = 3;
-/** Height of the front silhouette on a 402 pt phone (Tonal aesthetic, one figure); scales with width. */
 const FIGURE_HEIGHT = 280;
-/** Smaller while there is nothing to colour, so «Getting started» leads the screen. */
 const FIGURE_HEIGHT_WAITING = 200;
 
 const SCREENS: Record<string, Href> = {
@@ -102,12 +99,6 @@ const ORIGIN_KEY = {
   screen: 'originScreen',
 } as const satisfies Record<string, keyof BodyTexts>;
 
-/**
- * M01 · Body (no top bar): greeting, mission and link status beside the avatar (Withings, Hers), a
- * link strip only when the link is down or sends wait (WHOOP), verdict with one plain sentence (Gentler Streak) and «Open
- * protocol», WHOOP indicator rows (≤ 3 alerts), «Your day» with the next action first (Calm, Withings
- * «Today's Missions»), then the organ figure (Tonal aesthetic) with zone chips and the origin link.
- */
 export default function Screen() {
   const t = useTexts(texts);
   const { scale } = useLayout();
@@ -132,7 +123,6 @@ export default function Screen() {
   const detailY = useRef(0);
   const originY = useRef(0);
   const pendingScroll = useRef<'detail' | 'origin' | null>(null);
-  // First-run tour: lets it scroll Body to each target.
   const onTourScroll = useTourScroll('body', scroll);
   useAutoStartTour(useStartup() === 'ready');
 
@@ -142,8 +132,6 @@ export default function Screen() {
   const alerts = useMemo(() => activeAlerts(assessments, config), [assessments]);
   const detail = selected ? zoneDetail(selected, zones, assessments, config) : undefined;
 
-  // Daily actions: independent from health. Recomputed when readings or assessments refresh
-  // (the store re-evaluates every minute), so "today" follows the clock.
   // biome-ignore lint/correctness/useExhaustiveDependencies: `assessments` is the minute tick
   const progress = useMemo(
     () => dailyProgress(readings, config, new Date()),
@@ -152,7 +140,6 @@ export default function Screen() {
   const done = countDone(progress);
   const next = nextDailyAction(progress, zones, config);
 
-  // Latest reading per indicator (readings are sorted by takenAt): source and age of each row.
   const latest = useMemo(() => new Map(readings.map((r) => [r.indicator, r])), [readings]);
   const origins = useMemo(() => zoneOrigins(config, (id) => latest.get(id)), [latest]);
 
@@ -219,13 +206,10 @@ export default function Screen() {
         ? t.verdictPending
         : levelLabel(h, overall);
   const now = new Date();
-  // No top bar (Withings, Hers): greeting and mission sit beside the link button and the avatar.
   const greeting = [t[GREETING[dayPart(now.getHours())]], crewName?.split(' ')[0]]
     .filter(Boolean)
     .join(', ');
   const missionLine = [mission.name ?? mission.code, phaseText(mission)].join(' · ');
-  // Link down: one strip above the verdict (WHOOP «Data catching up»). Packets waiting to leave are not
-  // the astronaut's concern: they go out on their own (the queue is only reachable from Settings).
   const linkNote = mission.linkDown ? h.linkDown : '';
   const hint = noData
     ? undefined
@@ -242,7 +226,6 @@ export default function Screen() {
       ? format(t.summaryAmber, { n: alerts.length })
       : undefined;
 
-  // One data line for the whole alert list: sources · newest age.
   const alertReadings = alerts
     .map((a) => latest.get(a.indicator.id))
     .filter((r) => r !== undefined);
@@ -275,7 +258,7 @@ export default function Screen() {
           detail: t.startSourcesDetail,
           onPress: () => router.push('/sources'),
         };
-      default: // 'who'
+      default:
         return {
           key: step.id,
           icon: 'who',
@@ -287,7 +270,6 @@ export default function Screen() {
   });
   const shownAlerts = allAlerts ? alerts : alerts.slice(0, MAX_ALERT_ROWS);
 
-  // Zones grouped by level for the chips under the figure (Emergency → Check → In range → Pending).
   const zoneGroups: Partial<
     Record<
       'red' | 'amber' | 'green' | 'pending',
@@ -376,7 +358,6 @@ export default function Screen() {
             <Text className="text-muted-foreground text-caption shrink" numberOfLines={1}>
               {`${missionLine} ·`}
             </Text>
-            {/* Link status in words: an antenna icon alone was not understood. */}
             <View className="flex-row items-center gap-1.5">
               <View
                 className={
@@ -417,7 +398,6 @@ export default function Screen() {
         </Button>
       ) : null}
 
-      {/* 1 · Verdict (Tonal title: big, bold, left) and the one main action. */}
       <TourAnchor step="verdict" fill>
         <View className="gap-4">
           <View className="gap-1.5">
@@ -441,7 +421,6 @@ export default function Screen() {
         </View>
       </TourAnchor>
 
-      {/* 2 · Needs attention, right under the verdict (WHOOP «Elevated HRV»): at most three rows. */}
       {alerts.length > 0 ? (
         <TourAnchor step="alerts" fill>
           <Section
@@ -474,9 +453,6 @@ export default function Screen() {
         </TourAnchor>
       ) : null}
 
-      {/* 3 · Your day (Calm «Your day», Withings «Today's Missions»): the next action leads, the
-          rings and streak sit under it. Progress, not health. Before the first reading «Getting
-          started» already offers the action, so only the rings show. */}
       <Section title={t.yourDay}>
         <View className="border-border bg-elevated overflow-hidden rounded-lg border">
           {noData ? null : next ? (
@@ -511,7 +487,6 @@ export default function Screen() {
             onPress={() => router.push('/routine')}
             className="active:bg-active h-auto justify-start gap-4 rounded-none px-4 py-3 sm:h-auto"
           >
-            {/* Reset Button's text classes: the row keeps its own type and colours. */}
             <TextClassContext.Provider value={undefined}>
               <ActivityRings
                 size={56}
@@ -538,8 +513,6 @@ export default function Screen() {
         </View>
       </Section>
 
-      {/* 4 · Front figure, zones filled with their level colour (Tonal aesthetic). Before the
-          first reading it is a quiet preview: every zone is pending, so no chips or coach mark. */}
       <View className={noData ? 'gap-3 opacity-60' : 'gap-6'}>
         <TourAnchor step="figure" fill>
           <BodyFigure
@@ -558,7 +531,6 @@ export default function Screen() {
         )}
       </View>
 
-      {/* 5 · Level sections with one chip per zone; a chip opens the zone in place. */}
       {noData ? null : (
         <LevelGroups
           groups={zoneGroups}

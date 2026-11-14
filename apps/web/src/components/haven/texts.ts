@@ -1,6 +1,5 @@
 import { defineTexts } from '@/lib/i18n';
 
-// Copy used by the design components. Features define their own in their i18n.ts.
 export const havenTexts = defineTexts({
   es: {
     app: 'Vista de Tierra',
@@ -31,7 +30,6 @@ export const havenTexts = defineTexts({
     delay: 'Retardo',
     oneWay: 'por trayecto',
     lastDataLabel: 'Último dato',
-    /** @deprecated No packet retention any more («Producto real»); kept until features stop reading it. */
     none: 'ninguno',
     ring: 'Acciones del día',
     ringSummary: '{n} de {total} acciones del día resueltas',

@@ -1,6 +1,5 @@
 import { defineTexts } from '@/shared/i18n';
 
-// Streak calendar. Interpolation with `format` ({n}, {goal}…).
 export const texts = defineTexts({
   es: {
     daysInARow: 'días seguidos',

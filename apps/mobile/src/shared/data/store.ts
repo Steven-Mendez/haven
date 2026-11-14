@@ -14,32 +14,20 @@ import { bus } from '@/shared/events';
 import { currentLanguage, onLanguageChange, setLanguage } from '@/shared/i18n';
 import { defaultPreferences, type Preferences, withoutRemovedSettings } from './preferences';
 
-// Local store (M00, contract B). Single source of readings, assessments, mission and preferences.
-// Everything lives in memory so it can be read synchronously, and is persisted in `@/shared/db`.
-// Features read through the hooks in `./hooks` and write only through `store.*`.
-
 export type Topic = 'readings' | 'assessments' | 'mission' | 'preferences' | 'queue' | 'ready';
 export type Baseline = NonNullable<Assessment['baseline']>;
 export type Zones = ReturnType<typeof evaluateZones>;
 export type ReadingFilter = {
   indicator?: string;
-  /** ISO 8601, inclusive. */
   since?: string;
-  /** ISO 8601, inclusive. */
   until?: string;
-  /** Defaults to the crew member in the preferences. */
   crewMember?: string;
 };
 
-/** Symptom readings (screen questionnaire, M03/M06); `activeSymptoms` keeps the last 6 h. */
 const SYMPTOM_INDICATOR = 'symptom';
 const MISSION_KEY = 'current';
 const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
 
-/**
- * Mission record on first launch (and after «Delete data»): Ares-1, a mission like any other that
- * Mission (M05) can replace by creating or joining one with its code. Data, not a generator.
- */
 const INITIAL_MISSION: Mission = {
   code: 'ARES01',
   environment: 'transit',
@@ -53,9 +41,8 @@ const INITIAL_MISSION: Mission = {
   ],
 };
 
-// ---- in-memory state ----
 let ready = false;
-let readings: Reading[] = []; // sorted by takenAt
+let readings: Reading[] = [];
 const ids = new Set<string>();
 let assessments: Assessment[] = [];
 let zones: Zones = [];
@@ -65,10 +52,8 @@ let preferences: Preferences = defaultPreferences();
 let pendingSends = 0;
 let queueCounter: (() => number | Promise<number>) | null = null;
 let assessmentsSignature = '';
-/** ISO time of the last successful evaluation (undefined until the first one). */
 let evaluatedAt: string | undefined;
 
-// ---- subscriptions (for useSyncExternalStore) ----
 const listeners = new Map<Topic, Set<() => void>>();
 const versions: Record<Topic, number> = {
   readings: 0,
@@ -91,7 +76,6 @@ function subscribe(topic: Topic, listener: () => void): () => void {
   return () => set.delete(listener);
 }
 
-// ---- serialized persistence (avoids concurrent transactions) ----
 let chain: Promise<unknown> = Promise.resolve();
 function serial<T>(task: () => Promise<T>): Promise<T> {
   const next = chain.then(task, task);
@@ -112,7 +96,6 @@ function persistReadings(items: Reading[]): Promise<void> {
   return flushing;
 }
 
-// ---- queries ----
 const queryCache = new Map<string, { version: number; result: Reading[] }>();
 
 function query(filter: ReadingFilter = {}): Reading[] {
@@ -137,14 +120,12 @@ function latestReading(indicator: string, crewMember?: string): Reading | undefi
   return list[list.length - 1];
 }
 
-// ---- evaluation ----
 function signature(list: Assessment[]) {
   return list
     .map((a) => `${a.indicator}:${a.level}:${a.value ?? ''}:${a.simulated ? 1 : 0}`)
     .join('|');
 }
 
-/** Re-evaluates with the engine (C01). Emits 'assessments:changed' when a level or value changed. */
 function reevaluate(now: Date = new Date()): Assessment[] {
   const own = query();
   const config = activeConfig();
@@ -183,10 +164,8 @@ function scheduleEvaluation(): Promise<void> {
   return scheduledEvaluation;
 }
 
-// ---- writing readings ----
 function insert(items: Reading[]): Reading[] {
   const accepted: Reading[] = [];
-  // The engine ignores future readings: a device with a wrong clock cannot write into the future.
   const now = new Date().toISOString();
   for (const r of items) {
     if (!r?.id || ids.has(r.id)) continue;
@@ -203,7 +182,6 @@ function insert(items: Reading[]): Reading[] {
   return accepted;
 }
 
-/** Persists, emits 'reading:new', re-evaluates and emits 'assessments:changed'. Skips known ids. */
 async function saveReadings(items: Reading[]): Promise<void> {
   const accepted = insert(items);
   if (accepted.length === 0) return;
@@ -211,10 +189,6 @@ async function saveReadings(items: Reading[]): Promise<void> {
   await Promise.all([persistReadings(accepted), scheduleEvaluation()]);
 }
 
-/**
- * Removes readings by id (e.g. HealthKit replacing a duplicate from the watch), persists and
- * re-evaluates. Unknown ids are ignored.
- */
 async function removeReadings(removeIds: string[]): Promise<void> {
   const gone = new Set(removeIds.filter((id) => ids.has(id)));
   if (gone.size === 0) return;
@@ -228,10 +202,6 @@ function saveReading(reading: Reading): Promise<void> {
   return saveReadings([reading]);
 }
 
-/**
- * Development only (`/dev` → «Load test data»): writes test readings as ordinary records, the same
- * way any real source does. Returns how many were new. The product never calls it.
- */
 async function loadTestData(items: Reading[]): Promise<number> {
   const accepted = insert(items.map((r) => ({ ...r, simulated: false })));
   if (accepted.length === 0) return 0;
@@ -239,7 +209,6 @@ async function loadTestData(items: Reading[]): Promise<number> {
   return accepted.length;
 }
 
-// ---- mission and preferences ----
 async function setMission(changes: Partial<Mission>): Promise<void> {
   mission = { ...mission, ...changes };
   notify('mission');
@@ -267,7 +236,6 @@ async function setPreferences(changes: Partial<Preferences>): Promise<void> {
   });
 }
 
-// ---- queued sends (fed by M09) ----
 async function refreshPendingSends(): Promise<void> {
   if (!queueCounter) return;
   try {
@@ -281,7 +249,6 @@ async function refreshPendingSends(): Promise<void> {
   }
 }
 
-/** M09 registers how to count pending packets; the mission header shows it. */
 export function registerQueueCounter(counter: () => number | Promise<number>) {
   queueCounter = counter;
   void refreshPendingSends();
@@ -295,7 +262,6 @@ bus.on('packet:queued', () => {
   }
 });
 
-// ---- startup ----
 let starting: Promise<void> | null = null;
 let timer: ReturnType<typeof setInterval> | null = null;
 
@@ -313,7 +279,6 @@ async function load() {
   notify('mission');
 }
 
-/** Opens the db, loads mission, preferences and readings, and evaluates. Idempotent. No seeding. */
 function start(): Promise<void> {
   starting ??= (async () => {
     try {
@@ -324,13 +289,11 @@ function start(): Promise<void> {
     reevaluate();
     ready = true;
     notify('ready');
-    // Age grows even without new readings: re-evaluate every minute.
     timer ??= setInterval(() => reevaluate(), 60_000);
   })();
   return starting;
 }
 
-// Rules received from Earth (M05 → `setActiveConfig`) change thresholds: re-evaluate at once.
 onConfigChange(() => {
   if (ready) reevaluate();
 });
@@ -339,7 +302,6 @@ onLanguageChange((language) => {
   if (preferences.language !== language) void setPreferences({ language });
 });
 
-/** Deletes all local data (readings, preferences, mission, collections). Keeps the language. */
 async function reset(): Promise<void> {
   await serial(() => db.reset());
   const { language } = preferences;
@@ -357,7 +319,6 @@ async function reset(): Promise<void> {
   await setPreferences({ language });
   reevaluate();
   void refreshPendingSends();
-  // Features with their own caches (M09 queue…) clear them.
   bus.emit('data:reset', {});
 }
 
@@ -372,12 +333,10 @@ export const store = {
   saveReadings,
   removeReadings,
   loadTestData,
-  /** Removes one reading (e.g. «Undo»): persists, re-evaluates and emits. */
   removeReading: (id: string) => removeReadings([id]),
   readings: query,
   latestReading,
   assessments: () => assessments,
-  /** ISO time of the last evaluation; Body shows it as «evaluated at». */
   evaluatedAt: () => evaluatedAt,
   assessment: (indicator: string) => assessments.find((a) => a.indicator === indicator),
   level: levelOf,
@@ -391,10 +350,8 @@ export const store = {
   pendingSends: () => pendingSends,
   refreshPendingSends,
   reset,
-  /** For hooks: notifies when a topic changes. Returns the unsubscribe function. */
   subscribe,
   version: (topic: Topic) => versions[topic],
-  /** Stops the re-evaluation timer (tests). */
   stop() {
     if (timer) clearInterval(timer);
     timer = null;

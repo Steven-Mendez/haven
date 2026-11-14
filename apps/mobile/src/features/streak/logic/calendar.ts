@@ -1,20 +1,14 @@
-// Streak calendar (Duolingo / Speak month view). Pure: no React, no @/shared.
-// Dates are UTC keys «YYYY-MM-DD» and months «YYYY-MM», like the rings and the streak.
-
 const DAY_MS = 86_400_000;
 
-/** Month key «YYYY-MM» of a date key or a timestamp. */
 export const monthOf = (date: string | number): string =>
   (typeof date === 'number' ? new Date(date).toISOString() : date).slice(0, 7);
 
-/** The month `delta` months away from `month`. */
 export function shiftMonth(month: string, delta: number): string {
   const [y, m] = month.split('-').map(Number);
   const d = new Date(Date.UTC(y, m - 1 + delta, 1));
   return d.toISOString().slice(0, 7);
 }
 
-/** Every date of `month`, in order. */
 export function daysOfMonth(month: string): string[] {
   const start = Date.parse(`${month}-01T00:00:00.000Z`);
   const next = Date.parse(`${shiftMonth(month, 1)}-01T00:00:00.000Z`);
@@ -23,10 +17,6 @@ export function daysOfMonth(month: string): string[] {
   );
 }
 
-/**
- * Weeks of `month` as rows of 7 cells (`null` = padding outside the month).
- * `weekStart`: 0 = Sunday (English), 1 = Monday (Spanish).
- */
 export function monthGrid(month: string, weekStart: 0 | 1): (string | null)[][] {
   const days = daysOfMonth(month);
   const first = new Date(`${days[0]}T00:00:00.000Z`).getUTCDay();
@@ -37,10 +27,6 @@ export function monthGrid(month: string, weekStart: 0 | 1): (string | null)[][] 
 
 export type DayStatus = 'complete' | 'protected' | 'missed' | 'open' | 'future' | 'none';
 
-/**
- * How a calendar day reads: complete (routine ring closed), protected (emergency or no link: never
- * breaks the streak), missed, open (today, not complete yet), future, or none (before any data).
- */
 export function dayStatus(
   date: string,
   today: string,
@@ -56,7 +42,6 @@ export function dayStatus(
   return 'missed';
 }
 
-/** The next streak milestone above `streak` and the days left to reach it. */
 export function nextMilestone(
   streak: number,
   milestones: readonly number[],

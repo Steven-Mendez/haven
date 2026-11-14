@@ -1,4 +1,3 @@
-// M03 · Routine: pure logic (no React, no clock). Time comes in as `now`.
 import {
   ACTION_SCREENS,
   type Assessment,
@@ -16,15 +15,9 @@ import {
 
 const HOUR_MS = 3_600_000;
 
-// ---------------------------------------------------------------------------------------------
-// Where each daily action leads
-// ---------------------------------------------------------------------------------------------
-
-/** Where a `dailyAction.opens` value leads in the app. */
 export type ActionTarget =
   | { kind: 'indicator'; indicator: string }
   | { kind: 'screen'; screen: 'cognition' | 'wellbeing' }
-  /** Marked done in place with a `daily-action` reading. */
   | { kind: 'mark' };
 
 export function actionTarget(zone: Zone, config: Config): ActionTarget {
@@ -34,10 +27,6 @@ export function actionTarget(zone: Zone, config: Config): ActionTarget {
   return { kind: 'mark' };
 }
 
-/**
- * Actions that can be ticked as done without a measurement (rest-module check, resistance session,
- * shelter plan). The tick is a `daily-action` reading: it fills the ring and never changes a level.
- */
 export function canMarkDone(zone: Zone, config: Config): boolean {
   const target = actionTarget(zone, config);
   if (target.kind === 'mark') return true;
@@ -46,7 +35,6 @@ export function canMarkDone(zone: Zone, config: Config): boolean {
   return indicator?.unit === 'min' || target.indicator === 'solar-event';
 }
 
-/** The manual tick of a zone's daily action. */
 export function dailyActionReading(
   zone: string,
   options: { id: string; crewMember: string; takenAt: string },
@@ -63,14 +51,8 @@ export function dailyActionReading(
   };
 }
 
-// ---------------------------------------------------------------------------------------------
-// Inline "How are you today?" check-in (DESIGN_SYSTEM.md 4.1b): mood and stress from Routine
-// ---------------------------------------------------------------------------------------------
-
-/** Seconds the inline check-in waits before saving, so "Undo" never has to delete a reading. */
 export const CHECKIN_UNDO_MS = 5_000;
 
-/** Mood and stress readings (`source: 'screen'`) of an inline check-in. */
 export function scaleReadings(
   mood: number,
   stress: number,
@@ -99,7 +81,6 @@ export function scaleReadings(
   ];
 }
 
-/** Latest mood and stress of today (UTC day `today`), if both exist. */
 export function todayCheckin(
   readings: Reading[],
   today: string,
@@ -111,20 +92,12 @@ export function todayCheckin(
   return mood && stress ? { mood, stress } : undefined;
 }
 
-// ---------------------------------------------------------------------------------------------
-// Skipped actions (`— Skip`): a local note for today, never a reading, never progress.
-// ---------------------------------------------------------------------------------------------
-
 export const SKIP_COLLECTION = 'routine_skips';
 export type SkipRecord = { id: string; date: string; zone: string; crewMember: string };
 
 export function skipId(date: string, zone: string, crewMember: string): string {
   return `${crewMember}:${date}:${zone}`;
 }
-
-// ---------------------------------------------------------------------------------------------
-// "Your next actions"
-// ---------------------------------------------------------------------------------------------
 
 export type DailyItem = {
   zone: string;
@@ -134,12 +107,10 @@ export type DailyItem = {
   target: ActionTarget;
 };
 
-/** Severity rank for sorting: red, amber, pending, green. */
 function rank(level: Level): number {
   return -LEVEL_ORDER[level];
 }
 
-/** The seven daily actions with their progress and the level of their zone, in config order. */
 export function dailyItems(
   config: Config,
   progress: ZoneProgress[],
@@ -154,10 +125,6 @@ export function dailyItems(
   }));
 }
 
-/**
- * At most `max` unfinished actions, worst zone first (red, amber, pending, green); stable.
- * `exclude`: zones already handled in place on the screen (skipped, or the inline check-in).
- */
 export function nextActions(items: DailyItem[], max = 3, exclude: string[] = []): DailyItem[] {
   return items
     .map((item, order) => ({ item, order }))
@@ -167,28 +134,16 @@ export function nextActions(items: DailyItem[], max = 3, exclude: string[] = [])
     .map(({ item }) => item);
 }
 
-// ---------------------------------------------------------------------------------------------
-// Due measurements (`everyHours`). Pure, so M08 can reuse the same rule for reminders.
-// ---------------------------------------------------------------------------------------------
-
 export type DueItem = {
-  /** Indicator id, or the screen id (`cognition`, `wellbeing`) that records a group of them. */
   key: string;
   target: ActionTarget;
   zone: string;
   everyHours: number;
-  /** When it fell due (ISO). Never measured: `undefined`. */
   dueSince?: string;
-  /** Minutes overdue (0 if never measured). */
   overdueMin: number;
   lastAt?: string;
 };
 
-/**
- * Measurements that are due now: indicators with `everyHours` whose latest reading is older than
- * that (or missing). Battery and wellbeing indicators collapse into one item for their screen.
- * Ship telemetry (`source: 'ship'`) is not a crew task and is skipped. Most overdue first.
- */
 export function dueMeasurements(readings: Reading[], config: Config, now: Date): DueItem[] {
   const end = now.getTime();
   const latest = new Map<string, Reading>();
@@ -231,11 +186,6 @@ export function dueMeasurements(readings: Reading[], config: Config, now: Date):
   );
 }
 
-// ---------------------------------------------------------------------------------------------
-// Week
-// ---------------------------------------------------------------------------------------------
-
-/** The last seven days (oldest first) from `dayHistory`, with today flagged. */
 export function lastSevenDays(
   history: DayRecord[],
   today: string,
@@ -243,17 +193,9 @@ export function lastSevenDays(
   return history.slice(-7).map((d) => ({ ...d, today: d.date === today }));
 }
 
-// ---------------------------------------------------------------------------------------------
-// Rest module atmosphere (lungs daily action)
-// ---------------------------------------------------------------------------------------------
-
 export const REST_MODULE_NOTE = 'module:rest';
 export const CABIN_INDICATORS = ['cabin-co2', 'cabin-noise'] as const;
 
-/**
- * Assessments of CO₂ and noise using only rest-module readings (`note: 'module:rest'`), with the
- * config rules of the current environment. Falls back to any cabin reading if none are tagged.
- */
 export function restModuleAtmosphere(
   readings: Reading[],
   config: Config,
@@ -275,10 +217,6 @@ export function restModuleAtmosphere(
   return evaluate(source, cfg, environment, {}, [], now);
 }
 
-// ---------------------------------------------------------------------------------------------
-// Guide "Actions and states": illustrative rings that never touch real data.
-// ---------------------------------------------------------------------------------------------
-
 export type GuideExample = {
   key: 'notStarted' | 'inProgress' | 'completeAmber' | 'reopenedRed' | 'pendingReading' | 'done';
   segments: ZoneProgress[];
@@ -298,7 +236,6 @@ export const GUIDE_EXAMPLES: GuideExample[] = [
   { key: 'done', segments: ring([1, 1, 1, 1, 1, 1, 1]), level: 'green' },
 ];
 
-/** "n/7" of an example ring: only actions at 100 % count. */
 export function doneCount(segments: ZoneProgress[]): number {
   return segments.filter((s) => s.progress >= 1).length;
 }

@@ -11,7 +11,6 @@ import {
 } from '@/components/ui/select';
 import { cn } from '@/lib/utils';
 
-/** Single trend indicator, stored in `?indicator=` (the server reads it). Ref. Google Health · weight. */
 export function IndicatorSelect({
   options,
   selected,

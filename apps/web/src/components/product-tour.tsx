@@ -7,10 +7,8 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { defineTexts, type Language } from '@/lib/i18n';
 
-/** Starts the tour from anywhere (the command menu). */
 export const START_TOUR_EVENT = 'haven:tour-start';
 
-/** Seen once per browser; the command menu runs it again. */
 const SEEN_KEY = 'haven.tour.crew.v1';
 
 const texts = defineTexts({
@@ -62,9 +60,7 @@ const texts = defineTexts({
 type Anchor = 'mission' | 'nav' | 'header' | 'stats' | 'crew' | 'search';
 const ORDER: Anchor[] = ['mission', 'nav', 'header', 'stats', 'crew', 'search'];
 
-/** Elements marked with `data-tour` that are on screen (the sidebar is hidden on phones). */
 function visible(anchor: Anchor): Element | undefined {
-  // Streaming can leave a hidden copy of a section in the DOM: take the one that has a size.
   return [...document.querySelectorAll(`[data-tour="${anchor}"]`)].find((el) => {
     const r = el.getBoundingClientRect();
     return r.width > 0 && r.height > 0;
@@ -82,9 +78,7 @@ function seen(): boolean {
 function markSeen() {
   try {
     localStorage.setItem(SEEN_KEY, '1');
-  } catch {
-    // Not persisted: the tour shows again next visit, which is harmless.
-  }
+  } catch {}
 }
 
 function start(lang: Language) {
@@ -115,16 +109,11 @@ function start(lang: Language) {
     stagePadding: 6,
     stageRadius: 8,
     smoothScroll: true,
-    // A stray click on the backdrop never ends or skips the tour.
     overlayClickBehavior: 'none',
     onDestroyed: markSeen,
   }).drive();
 }
 
-/**
- * Runs `fn` once the streamed crew page shows its mission header (every state with a mission has one), or
- * after ~5 s. Returns a cancel function.
- */
 function whenPageShows(fn: () => void): () => void {
   let tries = 0;
   const id = window.setInterval(() => {
@@ -137,11 +126,6 @@ function whenPageShows(fn: () => void): () => void {
   return () => window.clearInterval(id);
 }
 
-/**
- * First-visit tour of the crew page (driver.js): mission switcher, sections, mission header, summary,
- * crew list and ⌘K. Steps whose element is missing or hidden are left out. Runs once per browser; the
- * command menu's «Take the tour» runs it again (from the crew page).
- */
 export function ProductTour({ lang }: { lang: Language }) {
   const pathname = usePathname();
   const router = useRouter();

@@ -1,10 +1,6 @@
 import type { Reading } from '@haven/core';
 import type { Collection, Database, KeyValue, KeyValueTable } from './types';
 
-// Web build: expo-sqlite on web needs Metro to serve wasm with COOP/COEP headers (metro.config.js),
-// so this stores into localStorage behind the same API. No SQL: `sqlite()` is null and
-// `migrate()` is a no-op. If localStorage is full or missing, data stays in memory.
-
 const PREFIX = 'haven:';
 const memory = new Map<string, string>();
 
@@ -22,9 +18,7 @@ function write(key: string, value: unknown) {
   memory.set(key, text);
   try {
     globalThis.localStorage?.setItem(PREFIX + key, text);
-  } catch {
-    // Quota exceeded: keep it in memory for this session.
-  }
+  } catch {}
 }
 
 function keyValue(table: KeyValueTable): KeyValue {
@@ -110,8 +104,6 @@ export const db: Database = {
       for (const key of Object.keys(storage)) {
         if (key.startsWith(PREFIX)) storage.removeItem(key);
       }
-    } catch {
-      // nothing to delete
-    }
+    } catch {}
   },
 };

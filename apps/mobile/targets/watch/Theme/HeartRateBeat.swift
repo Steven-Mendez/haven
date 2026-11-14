@@ -1,21 +1,12 @@
 import SwiftUI
 
-// Heart rate with its age (W01, W04). The number is the hero (metric-xl 56 or metric 40, tabular) with a small grey
-// «lpm» on the baseline. The heart is grey, never red (red is reserved for emergencies), and the figure has no level
-// colour: the watch does not assess, the phone's engine does.
-// Subtle motion (SPEC §5): only while `live` (workout session delivering samples) the heart pulses softly next to
-// «En vivo»; figures change with a fade + rise. With Reduce Motion nothing pulses and figures only cross-fade.
-
 struct HeartRateBeat: View {
     enum Size { case large, medium }
 
     let heartRate: Double?
     let takenAt: Date?
     var size: Size = .large
-    /// Shows «En vivo» (workout session running, W04) instead of the age only.
     var live: Bool = false
-    /// «118 lpm  ♥ En vivo» on one baseline (saves a line on the monitor's first screen). Wrap it in a
-    /// `ViewThatFits` with a stacked fallback: it does not shrink to fit.
     var inline: Bool = false
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion

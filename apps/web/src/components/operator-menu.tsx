@@ -16,10 +16,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import type { Language } from '@/lib/i18n';
 
-/**
- * Operator row of the sidebar footer (Linear account row): portrait, name and role open a menu with
- * Profile, Settings and Keyboard shortcuts (all inside `/settings`).
- */
 export function OperatorMenu({ lang }: { lang: Language }) {
   const t = havenTexts[lang];
   const router = useRouter();

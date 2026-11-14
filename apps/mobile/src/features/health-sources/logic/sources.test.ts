@@ -99,9 +99,9 @@ describe('sleepNights', () => {
     const h = (d: number, hour: number) => new Date(2026, 10, d, hour);
     const nights = sleepNights([
       { start: h(1, 23), end: h(2, 3), value: 3 },
-      { start: h(2, 3), end: h(2, 4), value: 2 }, // awake
+      { start: h(2, 3), end: h(2, 4), value: 2 },
       { start: h(2, 4), end: h(2, 6), value: 4 },
-      { start: h(1, 22), end: h(2, 7), value: 0 }, // in bed
+      { start: h(1, 22), end: h(2, 7), value: 0 },
     ]);
     expect(nights).toEqual([{ day: '2026-11-02', hours: 6, end: h(2, 6) }]);
   });

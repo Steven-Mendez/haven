@@ -19,16 +19,10 @@ type Props = {
   indicator: Indicator;
   tab: GuideTab;
   onTabChange: (tab: GuideTab) => void;
-  /** Shown first in «What to do»: the engine explanation, the steps and «Why this level?». */
   whatToDoTop?: ReactNode;
-  /** Shown at the end of «How to measure»: where the data comes from. */
   howToMeasureBottom?: ReactNode;
 };
 
-/**
- * Three tabs (DESIGN_SYSTEM §8.6): What to do · How to measure · Why it matters, from
- * `indicator.guide` (P02) with its sources at the end of each tab.
- */
 export function GuideTabs({ indicator, tab, onTabChange, whatToDoTop, howToMeasureBottom }: Props) {
   const t = useTexts(texts);
   const tr = useTranslate();

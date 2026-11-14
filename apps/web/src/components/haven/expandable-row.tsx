@@ -6,34 +6,19 @@ import { Item, ItemActions, ItemContent, ItemMedia, ItemTitle } from '@/componen
 import { cn } from '@/lib/utils';
 
 type Props = {
-  /** Main text («Heart rate», «Mateo Ríos»). One line, truncated. */
   title: ReactNode;
-  /** Leading slot: a LevelBadge (symbolOnly), a portrait or an icon. */
   leading?: ReactNode;
-  /** Value shown right after the title («168 bpm», «4 alerts»). Tabular figures. */
   value?: ReactNode;
-  /** Right-aligned secondary text before the chevron («53 min ago»). */
   meta?: ReactNode;
-  /**
-   * Detail revealed in line when the row is expanded (engine explanation, actions, usual range…).
-   * Omit it and pass `href` for a navigation row instead.
-   */
   children?: ReactNode;
-  /** Navigation row: the whole row links here and shows ›. Ignored when `children` is set. */
   href?: string;
   defaultOpen?: boolean;
-  /** Full accessible name when the visible line is abbreviated (source, age…). */
   ariaLabel?: string;
   className?: string;
 };
 
 const ROW = 'min-h-9 w-full gap-3 rounded-md px-3 py-1.5 text-left hover:bg-hover';
 
-/**
- * One-line list row with progressive disclosure (DESIGN_SYSTEM.md §8.0.3–4): leading symbol · title ·
- * value · meta · chevron. The detail opens in line under the row (shadcn `Collapsible` + `Item`), or the
- * row navigates to `href`. Collapsed content stays in the DOM order for screen readers once opened.
- */
 export function ExpandableRow({
   title,
   leading,
@@ -87,7 +72,6 @@ export function ExpandableRow({
     );
   }
 
-  // Expandable: a real <button> (spans inside, so the markup stays valid) + the detail panel.
   return (
     <Collapsible defaultOpen={defaultOpen} className={cn('w-full', className)}>
       <CollapsibleTrigger

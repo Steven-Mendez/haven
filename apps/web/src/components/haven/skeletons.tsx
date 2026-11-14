@@ -2,9 +2,6 @@ import type { ComponentProps } from 'react';
 import { Skeleton as UiSkeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 
-// Loading placeholders with the same footprint as the real components (SPEC §6, Square skeleton): 8–10 px
-// bars, radius 4, real hairlines where the content has them. Never fake levels. Static: no pulse.
-
 export function Bar({ className, ...props }: ComponentProps<typeof UiSkeleton>) {
   return <UiSkeleton className={cn('h-2.5 animate-none rounded-sm', className)} {...props} />;
 }
@@ -18,7 +15,6 @@ export function MissionHeaderSkeleton({ className }: { className?: string }) {
   );
 }
 
-/** KPI strip placeholder: four tiles in one hairline box. */
 export function StatStripSkeleton({ className }: { className?: string }) {
   return (
     <div
@@ -38,7 +34,6 @@ export function StatStripSkeleton({ className }: { className?: string }) {
   );
 }
 
-/** Grouped list placeholder: column header, one group header and `rows` 36 px rows. */
 export function ListSkeleton({ rows = 3, className }: { rows?: number; className?: string }) {
   return (
     <div className={cn('overflow-hidden rounded-xl border', className)}>
@@ -95,7 +90,6 @@ export function AstronautCardSkeleton({ className }: { className?: string }) {
   );
 }
 
-/** Whole Crew page placeholder: title line, KPI strip and the grouped list. */
 export function CrewPageSkeleton() {
   return (
     <div className="flex flex-col gap-6" aria-busy="true">

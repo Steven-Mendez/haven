@@ -2,10 +2,6 @@ import { AppState } from 'react-native';
 import { bus } from '@/shared/events';
 import { syncCurrentMission } from './hooks/missions';
 
-// Keeps the mission state in step with Earth: «Start mission» on Earth turns a mission in
-// preparation into day 1 on the phone without joining again. Polls while the app is open and when
-// it comes back to the foreground or the link comes back.
-
 const POLL_MS = 15_000;
 let started = false;
 

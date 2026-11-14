@@ -4,7 +4,6 @@ import { EmptyState, havenTexts, PageContainer } from '@/components/haven';
 import { buttonVariants } from '@/components/ui/button';
 import { getLanguage } from '@/lib/language';
 
-/** 404 inside the shell, in the reader's language (minimal empty state, SPEC §6 «Estados»). */
 export async function NotFoundView() {
   const t = havenTexts[await getLanguage()];
   return (

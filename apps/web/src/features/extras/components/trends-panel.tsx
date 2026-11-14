@@ -11,7 +11,6 @@ import { getAggregates, listRules } from '../server';
 import { ExportCsvButton } from './export-buttons';
 import { IndicatorSelect } from './indicator-picker';
 
-/** Indicators offered for crew trends (vault T03: bone loss, variability, sleep, mood, CO₂ first). */
 export const TREND_OPTIONS = [
   'bone-loss',
   'hrv',
@@ -31,7 +30,6 @@ const DAY_MS = 86_400_000;
 
 type Point = { date: string; mean: number };
 
-/** Two decimals for small values (bone loss %, CO₂ mmHg), none for large ones (steps). */
 function decimalsFor(values: number[]) {
   const max = Math.max(0, ...values.map(Math.abs));
   return max < 10 ? 2 : max < 100 ? 1 : 0;

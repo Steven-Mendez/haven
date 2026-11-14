@@ -21,7 +21,6 @@ type Props = {
   onExit: () => void;
 };
 
-/** Go/No-Go, 20 s: circle = tap, square = do not tap. Shape, not colour, tells them apart. */
 export function GoNoGoTest({ t, random, onDone, onExit }: Props) {
   // biome-ignore lint/correctness/useExhaustiveDependencies: one sequence per mount
   const sequence = useMemo(() => goNoGoSequence(random), []);

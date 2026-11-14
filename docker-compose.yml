@@ -1,4 +1,3 @@
-# MongoDB local para la Vista de Tierra (funciona en la red de la demo, sin internet).
 services:
   mongo:
     image: mongo:8

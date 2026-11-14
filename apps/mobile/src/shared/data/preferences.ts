@@ -1,13 +1,9 @@
 import { type Language, systemLanguage } from '@/shared/i18n';
 
-/** Persisted local preferences (`preferences` table). */
 export type Preferences = {
   language: Language;
-  /** Earth API base URL (contract D). */
   apiUrl: string;
-  /** Crew member using this phone (an id of `Mission.crew`). */
   crewMember: string;
-  /** Colour scheme (Settings › Appearance). Dark by default on board (low light, OLED). */
   appearance: Appearance;
 };
 
@@ -22,7 +18,6 @@ export function defaultPreferences(): Preferences {
   };
 }
 
-/** Drops settings saved by old installs that no longer exist (time factor, simulation mode). */
 export function withoutRemovedSettings(p: Preferences): Preferences {
   const {
     demoFactor: _f,

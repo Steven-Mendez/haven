@@ -139,9 +139,9 @@ describe('due measurements', () => {
   const now = new Date('2026-11-01T12:00:00.000Z');
   it('lists overdue indicators, groups screens and skips ship telemetry', () => {
     const readings = [
-      reading('heart-rate', 70, '2026-11-01T11:00:00.000Z'), // every 4 h: not due
-      reading('spo2', 97, '2026-10-31T20:00:00.000Z'), // every 12 h: due 4 h ago
-      reading('reaction-time', 270, '2026-10-30T12:00:00.000Z'), // 24 h: due 24 h ago
+      reading('heart-rate', 70, '2026-11-01T11:00:00.000Z'),
+      reading('spo2', 97, '2026-10-31T20:00:00.000Z'),
+      reading('reaction-time', 270, '2026-10-30T12:00:00.000Z'),
       reading('mood', 4, '2026-11-01T08:00:00.000Z'),
       reading('cabin-co2', 2, '2026-10-30T08:00:00.000Z', { source: 'ship' }),
     ];
@@ -152,7 +152,7 @@ describe('due measurements', () => {
     expect(keys).not.toContain('reaction-time');
     expect(keys).toContain('cognition');
     expect(keys).toContain('spo2');
-    expect(keys).toContain('wellbeing'); // stress was never measured
+    expect(keys).toContain('wellbeing');
     const spo2 = due.find((d) => d.key === 'spo2');
     expect(spo2?.overdueMin).toBe(240);
     expect(spo2?.target).toEqual({ kind: 'indicator', indicator: 'spo2' });

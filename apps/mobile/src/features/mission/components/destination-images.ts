@@ -1,5 +1,3 @@
-// Destination images (obsidian/_adjuntos/destinos, AI-generated), keyed by `Destination.image`
-// from packages/core/config/environments.json. Metro needs static requires.
 export const DESTINATION_IMAGES: Record<string, number> = {
   'commercial-leo.webp': require('../../../../assets/images/destinations/commercial-leo.webp'),
   'equatorial-mining.webp': require('../../../../assets/images/destinations/equatorial-mining.webp'),

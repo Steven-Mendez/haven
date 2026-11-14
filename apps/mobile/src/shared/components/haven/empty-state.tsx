@@ -10,17 +10,11 @@ type Props = {
   icon?: LucideIcon;
   title: string;
   description?: string;
-  /** At most one next step ("Register a reading", "Open Mission"): a small white pill. */
   action?: { label: string; onPress: () => void };
-  /** Optional secondary step (text link). Errors use "Retry" here, never red. */
   secondaryAction?: { label: string; onPress: () => void };
   className?: string;
 };
 
-/**
- * Minimal empty / unavailable / error state (Linear · Grok, SPEC.md §6): 20 pt line icon, one
- * 17/600 title line, one grey help line and at most one action. No card, no fill.
- */
 export function EmptyState({
   icon,
   title,
@@ -62,7 +56,6 @@ export function EmptyState({
               onPress={secondaryAction.onPress}
               className="min-h-touch h-auto rounded-none px-4 py-0 sm:h-auto"
             >
-              {/* The link variant dims the label on press (was active:opacity-70 on the row). */}
               <Text className="text-link text-body-sm font-medium">{secondaryAction.label}</Text>
             </Button>
           ) : null}

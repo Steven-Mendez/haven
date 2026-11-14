@@ -2,8 +2,6 @@ const { hairlineWidth } = require('nativewind/theme');
 
 const v = (name) => `hsl(var(--${name}))`;
 
-// Tokens «Vela 3»: haven/design/tokens.json (platformMap.mobile) → global.css. Docs: design/redesign/SPEC.md, apps/mobile/DISENO.md.
-/** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class',
   content: ['./src/**/*.{ts,tsx}'],
@@ -28,11 +26,9 @@ module.exports = {
         accent: { DEFAULT: v('accent'), foreground: v('accent-foreground') },
         popover: { DEFAULT: v('popover'), foreground: v('popover-foreground') },
         card: { DEFAULT: v('card'), foreground: v('card-foreground') },
-        // «Ion» accent: focus, selection, links, progress, active tab. Never data or levels.
         brand: { DEFAULT: v('brand'), subtle: v('brand-subtle') },
         link: v('link'),
         elevated: v('elevated'),
-        // Levels: text-level-amber · bg-level-amber-bg (12 %) · border-level-amber-border (24 %)
         level: {
           green: {
             DEFAULT: v('level-green'),
@@ -64,8 +60,6 @@ module.exports = {
         'ring-done': v('ring-done'),
         'ring-track': v('ring-track'),
         'ring-partial': v('ring-partial'),
-        // DEPRECATED: zone identity colours were removed (zones = name + icon). Neutral alias so
-        // existing `*-zone-*` classes keep compiling; replace them with text-muted-foreground.
         zone: {
           heart: v('muted-foreground'),
           lungs: v('muted-foreground'),
@@ -76,21 +70,17 @@ module.exports = {
           mind: v('muted-foreground'),
         },
       },
-      // radius.*: xs 4 · sm 6 (chips) · md 8 (inputs) · lg 12 (groups) · xl 16 (sheets) · pill.
       borderRadius: {
         xs: '4px',
         sm: '6px',
         md: '8px',
         lg: '12px',
         xl: '16px',
-        // DEPRECATED alias: old cards used 2xl (16); groups are lg (12) now.
         '2xl': '12px',
         pill: '9999px',
       },
       borderWidth: { hairline: hairlineWidth() },
       fontFamily: { mono: ['SF Mono', 'Menlo', 'monospace'] },
-      // typography.scale.*.mobile — [size, line height]. Weights: 400/500/600; 700 only for
-      // title, display and hero figures. Figures: add `tabular-nums`.
       fontSize: {
         micro: ['11px', { lineHeight: '14px', letterSpacing: '0.6px' }],
         caption: ['13px', { lineHeight: '18px' }],
@@ -102,7 +92,6 @@ module.exports = {
         metric: ['44px', { lineHeight: '48px', letterSpacing: '-0.8px' }],
         'metric-xl': ['64px', { lineHeight: '68px', letterSpacing: '-1.4px' }],
         mono: ['12px', { lineHeight: '16px' }],
-        // DEPRECATED aliases (v1/v2) mapped onto the v3 scale.
         footnote: ['15px', { lineHeight: '20px' }],
         heading: ['17px', { lineHeight: '22px' }],
         'large-title': ['28px', { lineHeight: '34px', letterSpacing: '-0.4px' }],
@@ -111,7 +100,6 @@ module.exports = {
         label: ['13px', { lineHeight: '18px' }],
         subtitle: ['17px', { lineHeight: '22px' }],
       },
-      // touch.mobile: min 44 · row 52 · indicator row 60 · settings row 44 · primary pill 52 · SOS 72
       minHeight: {
         touch: '44px',
         row: '52px',
@@ -125,9 +113,7 @@ module.exports = {
       minWidth: { touch: '44px', row: '52px', 'touch-lg': '60px', sos: '72px' },
       height: { touch: '44px', row: '52px', button: '52px', 'touch-lg': '60px', sos: '72px' },
       width: { touch: '44px', 'touch-lg': '60px', sos: '72px' },
-      // space.layout.mobile: px-gutter (16) · gap-section (24) · pb-sos-inset (kept: 24)
       spacing: { gutter: '16px', section: '24px', 'sos-inset': '24px' },
-      // motion.duration (fast/base/slow/press/enter/expand kept as deprecated aliases)
       transitionDuration: {
         micro: '100ms',
         standard: '160ms',

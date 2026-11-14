@@ -1,7 +1,5 @@
 'use server';
 
-// T03 · Server actions of the Earth extras view (forms with useActionState).
-
 import type { I18n, MissionPhase } from '@haven/core';
 import { refresh } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -26,7 +24,6 @@ import type { JoinFormState, MissionField, MissionFormState, RulesFormState } fr
 const text = (v: FormDataEntryValue | null, max = 280) =>
   typeof v === 'string' ? v.trim().slice(0, max) : '';
 
-/** Creates a new rules version from the current config with one indicator edited, and sends it. */
 export async function sendRulesVersion(
   _previous: RulesFormState,
   form: FormData,
@@ -71,10 +68,6 @@ export async function sendRulesVersion(
   return { status: 'ok', version, at: Date.now() };
 }
 
-/**
- * «New mission»: only a name and, optionally, a base plan. It is created in preparation (days do not run) and
- * becomes the active mission; its page opens to set up the plan, the start and the crew.
- */
 export async function createMissionAction(
   _previous: MissionFormState,
   form: FormData,
@@ -84,16 +77,11 @@ export async function createMissionAction(
   const phases = templatePhases(text(form.get('template'), 80));
   const result = await createMission({ name, phases, awaitingStart: true });
   if (!result.ok) return { status: 'error', fields: [], message: 'create' };
-  // The new mission becomes the active one, so a packet with another code never takes its place.
   await setMission(result.data.code);
   refresh();
   redirect(`/missions/${result.data.code}`);
 }
 
-/**
- * Saves the plan of a mission in preparation: phases (JSON from the form), name and when it starts —
- * «when I start it» (waits for «Start mission»), «now» (day 1 is today) or «on a date».
- */
 export async function saveMissionPlanAction(
   code: string,
   _previous: MissionFormState,
@@ -125,7 +113,6 @@ export async function saveMissionPlanAction(
   redirect(`/missions/${code}`);
 }
 
-/** Renames a mission (until it is finished). */
 export async function renameMissionAction(
   code: string,
   _previous: { failed: boolean },
@@ -139,7 +126,6 @@ export async function renameMissionAction(
   return { failed: false };
 }
 
-/** «Start mission» from its page: day 1 is today. */
 export async function startMissionAction(code: string): Promise<{ failed: boolean }> {
   const result = await startMission(code);
   if (!result.ok) return { failed: true };
@@ -147,7 +133,6 @@ export async function startMissionAction(code: string): Promise<{ failed: boolea
   return { failed: false };
 }
 
-/** «Finish mission»: from now on it is a record. */
 export async function finishMissionAction(code: string): Promise<{ failed: boolean }> {
   const result = await finishMission(code);
   if (!result.ok) return { failed: true };
@@ -155,13 +140,11 @@ export async function finishMissionAction(code: string): Promise<{ failed: boole
   return { failed: false };
 }
 
-/** Opens one of the mission's pages (crew, rules…) with it as the active mission. */
 export async function openMissionAt(code: string, path: string) {
   await setMission(code);
   redirect(path.startsWith('/') ? path : '/');
 }
 
-/** The form's `phases` JSON, kept only when every phase has a known environment and whole days ≥ 1. */
 function parsePhases(value: FormDataEntryValue | null, known: Set<string>) {
   if (typeof value !== 'string' || value.length > 20_000) return undefined;
   let raw: unknown;
@@ -188,13 +171,11 @@ function parsePhases(value: FormDataEntryValue | null, known: Set<string>) {
   return phases;
 }
 
-/** Makes a mission the active one (same cookie as the sidebar switcher) and opens its crew view. */
 export async function openMission(code: string) {
   await setMission(code);
   redirect('/');
 }
 
-/** Merges a mission of unknown code into the chosen one, which becomes the active mission. */
 export async function mergeMissionAction(
   from: string,
   into: string,
@@ -207,7 +188,6 @@ export async function mergeMissionAction(
   return { failed: false };
 }
 
-/** «Join a mission» by code: the mission must exist; then it becomes the active one. */
 export async function joinMission(
   _previous: JoinFormState,
   form: FormData,
@@ -219,10 +199,6 @@ export async function joinMission(
   redirect('/');
 }
 
-/**
- * Full config of a version for «Export JSON». Reads through the server function, so exporting on
- * Earth never marks the version as received (only a phone's GET /api/rules does).
- */
 export async function exportRulesConfig(versionId: string): Promise<string | null> {
   const mission = await getMissionCode();
   if (!mission) return null;

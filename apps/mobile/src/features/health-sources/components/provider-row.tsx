@@ -6,20 +6,14 @@ import { cn } from '@/shared/lib/utils';
 
 type Props = {
   name: string;
-  /** Optional gray line (last sync). Descriptions go in a note under the group. */
   subtitle?: string;
-  /** Spoken extra (the reason it is unavailable). */
   accessibilityHint?: string;
-  /** Short state label ("Connected", "Not available"…). Neutral: a missing source is not an alert. */
   state: string;
   connected: boolean;
-  /** One action instead of the badge ("Grant permission"). */
   action?: { label: string; onPress: () => void };
-  /** Control instead of the badge (a Switch). */
   control?: ReactNode;
 };
 
-/** One provider per row: name · state, action or control on the right. */
 export function ProviderRow({
   name,
   subtitle,
@@ -56,7 +50,6 @@ export function ProviderRow({
             <Text className="text-body-sm font-semibold">{action.label}</Text>
           </Button>
         ) : (
-          // Status word + dot (Starlink): neutral, a missing source is not an alert.
           <View className="flex-row items-center gap-1.5">
             <View
               className={cn(

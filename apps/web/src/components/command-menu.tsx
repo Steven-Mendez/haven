@@ -38,7 +38,6 @@ import { Kbd } from '@/components/ui/kbd';
 import { LANGUAGES, type Language } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
-/** Opens the command menu from anywhere (e.g. the sidebar search field). */
 export const OPEN_COMMAND_EVENT = 'haven:command-open';
 
 export type CommandCrewMember = { id: string; name: string; level: VisualLevel };
@@ -48,7 +47,6 @@ type Props = {
   crew: CommandCrewMember[];
 };
 
-/** «⌘K» trigger shown in the header and the sidebar (a pseudo search field). */
 export function CommandTrigger({
   lang,
   variant = 'button',
@@ -99,10 +97,6 @@ export function CommandTrigger({
   );
 }
 
-/**
- * ⌘K command menu (SPEC §6, Mobbin incident.io palette): 640 px, 12vh from the top, 48 px input, groups with
- * 11 px headers, 36 px rows, keyboard hints in the footer. Jumps to astronauts and pages and runs a few actions.
- */
 export function CommandMenu({ lang, crew }: Props) {
   const t = havenTexts[lang];
   const router = useRouter();

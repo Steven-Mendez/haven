@@ -1,6 +1,5 @@
 import { defineTexts } from '@/shared/i18n';
 
-// Notification copy. Medical explanations come from the config (Assessment.explanation).
 export const texts = defineTexts({
   es: {
     title: 'Notificaciones accionables',

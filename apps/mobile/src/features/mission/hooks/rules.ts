@@ -12,21 +12,10 @@ import {
   withConfirmation,
 } from '../logic/rules';
 
-// Versioned rules from Earth (T03). When the link is up, polls
-// `GET {apiUrl}/api/rules?mission=CODE&crewMember=ID` (each download counts as received on board),
-// stores the newest version not yet on the phone in the `rules` collection and confirms it with
-// `POST {apiUrl}/api/rules?mission=CODE { apply, crewMember }`.
-// Never fails without network.
-//
-// Making the received config drive the evaluation needs an entry point in `@/shared/config` (owned
-// by Atlas / the orchestrator). Until it exists, the rules are stored and confirmed but the engine keeps
-// the bundled config; `activeLocally` says which one is the case.
-
 const collection = db.collection<ReceivedRules>('rules');
 const POLL_MS = 60_000;
 const TIMEOUT_MS = 4_000;
 
-/** `setActiveConfig(config)` if `@/shared/config` provides it (proposed to the orchestrator). */
 function activate(config: Config): boolean {
   const setter = (sharedConfig as Record<string, unknown>).setActiveConfig;
   if (typeof setter !== 'function') return false;
@@ -102,7 +91,6 @@ export function useEarthRules() {
     try {
       const known = await reload();
       let changed = false;
-      // Retry confirming versions received earlier (e.g. during a blackout).
       for (const pending of known.filter((r) => r.status === 'received')) {
         const next = await confirm(pending);
         if (next.status !== pending.status || next.audit.length !== pending.audit.length) {
@@ -144,7 +132,6 @@ export function useEarthRules() {
     }
   }, [base, code, crewMember, confirm, reload]);
 
-  // On mount, on link / mission / URL changes, and every minute while the screen is open.
   useEffect(() => {
     void reload();
     if (mission.linkDown) return;

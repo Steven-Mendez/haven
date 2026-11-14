@@ -1,12 +1,6 @@
 import type { Reading, WatchEnvelope, WatchMessages } from '../contracts';
 import { ACUTE_EPISODE_NOTE } from './baseline';
 
-/**
- * Readings the phone derives from a watch message (what the phone's watch service saves): `mood` → `mood`,
- * `monitor` → `heart-rate` (+ `spo2`) and `emergency` → the reading that fired the trigger, both with
- * `note: 'emergency-monitor'` (`ACUTE_EPISODE_NOTE`), so `computeBaseline` leaves acute episodes out. Other
- * messages produce no reading.
- */
 export function readingsFromEnvelope(envelope: WatchEnvelope): Reading[] {
   const base = {
     source: 'watch' as const,

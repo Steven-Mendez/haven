@@ -34,9 +34,7 @@ const VISIBLE_VERSIONS = 5;
 
 type AuditEvent = { id: string; at: string; actor: string; text: string };
 
-/** Earth sent it; each crew member's first download; each application. */
 function auditEvents(versions: RulesVersion[], crew: Member[], t: ExtrasTexts) {
-  // Downloads without `crewMember` are recorded as "phone" by the API: name them, never show the raw id.
   const nameOf = (id: string) =>
     crew.find((m) => m.id === id)?.name ?? (id === 'phone' ? t.unknownPhone : id);
   const firstPerMember = (marks: { crewMember: string; at: string }[] = []) => {
@@ -85,7 +83,6 @@ export async function RulesPanel({
   const nowIso = new Date().toISOString();
   const base = getBaseConfig();
   const crew: Member[] = (crewView?.crew ?? mission.crew).map((m) => ({ id: m.id, name: m.name }));
-  // Active: the latest version a crew member of the mission applied (anonymous marks do not count).
   const active =
     versions.find((v) => v.appliedBy.some((a) => crew.some((m) => m.id === a.crewMember))) ?? null;
   const environmentNames = Object.fromEntries(
@@ -261,7 +258,6 @@ export async function RulesPanel({
     </div>
   );
 
-  /** One line per version: name · Active · age · delivery n/total · export. */
   function versionRow(v: RulesVersion) {
     return (
       <li

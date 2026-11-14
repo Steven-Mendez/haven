@@ -10,9 +10,6 @@ import { createPedometerProvider } from './providers/pedometer';
 import type { SourceProvider } from './providers/types';
 import { createBleProvider, createHealthConnectProvider } from './providers/unavailable';
 
-// M07 · Starts the real health providers, registers them in `@/shared/health`, syncs them into `store.saveReadings` (deduplicated: HealthKit prevails over the
-// watch), and exposes their state to the "Data sources" screen.
-
 const SYNC_EVERY_MS = 15 * 60_000;
 const CHANGE_DEBOUNCE_MS = 5_000;
 
@@ -37,11 +34,6 @@ function publish() {
   for (const listener of [...listeners]) listener();
 }
 
-/**
- * Store hook for superseded readings. `store` has no delete yet (requested from Atlas): when it
- * gains `removeReadings(ids)`, the superseded watch twin is removed; until then it stays and the
- * HealthKit reading, being newer or equal, is the one the engine uses.
- */
 function removeReadings(ids: string[]) {
   if (ids.length === 0) return;
   const remove = (store as { removeReadings?: (ids: string[]) => Promise<void> }).removeReadings;
@@ -57,7 +49,6 @@ async function save(readings: Reading[]) {
   await store.saveReadings(toSave);
 }
 
-/** Pulls new data from every connected real provider. The pedometer only fills in for HealthKit. */
 export function syncNow(): Promise<void> {
   syncing ??= (async () => {
     const now = new Date();
@@ -94,7 +85,6 @@ export async function refreshSources(): Promise<SourceStatus[]> {
   return snapshot;
 }
 
-/** Explicit permission request from the screen (system prompt), then a first sync. */
 export async function requestPermission(id: SourceId): Promise<void> {
   const provider = providers.find((p) => p.id === id);
   if (!provider?.requestPermission) return;
@@ -104,10 +94,6 @@ export async function requestPermission(id: SourceId): Promise<void> {
   await syncNow();
 }
 
-/**
- * Development only (`__DEV__`): writes test records into the iOS simulator's HealthKit, then syncs
- * them through the normal provider path. Returns how many samples were written.
- */
 export async function writeHealthKitTestSamples(): Promise<number> {
   const written = (await healthkit.writeTestSamples?.(new Date())) ?? 0;
   await healthkit.refresh();
@@ -117,7 +103,6 @@ export async function writeHealthKitTestSamples(): Promise<number> {
   return written;
 }
 
-/** Registers the providers and syncs the ones already authorized. Never prompts by itself. */
 export async function startHealthSources(): Promise<void> {
   if (started) return;
   started = true;
@@ -127,14 +112,12 @@ export async function startHealthSources(): Promise<void> {
   void syncNow();
   setInterval(() => void syncNow(), SYNC_EVERY_MS);
 
-  // "Delete data" (M00): re-read HealthKit's history into the emptied store.
   bus.on('data:reset', () => {
     for (const p of providers) p.resetSync?.();
     publish();
     void syncNow();
   });
 
-  // A watch reading whose HealthKit twin is already stored is superseded (HealthKit prevails).
   bus.on('reading:new', (reading) => {
     if (reading.source !== 'watch') return;
     const since = new Date(Date.parse(reading.takenAt) - 5 * 60_000).toISOString();
@@ -150,7 +133,6 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
-/** State of HealthKit, pedometer, Health Connect and Bluetooth. */
 export function useSourceStatuses(): SourceStatus[] {
   return useSyncExternalStore(
     subscribe,

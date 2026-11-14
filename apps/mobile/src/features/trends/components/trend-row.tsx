@@ -23,10 +23,6 @@ import { aggregateSeries, rangeWindow } from '../logic/series';
 
 const formatNumber = (v: number) => String(Math.round(v * 10) / 10);
 
-/**
- * One indicator row (WHOOP / X): zone icon · name (one line) + age · last-week sparkline (grey,
- * coloured only when out of range) · 3-segment level meter · 22 pt value · chevron.
- */
 export function TrendRow({
   indicator,
   level,
@@ -38,13 +34,11 @@ export function TrendRow({
   level: Level;
   now: number;
   onPress: () => void;
-  /** Under a zone header: no zone icon, and the name gets two lines instead of being cut. */
   grouped?: boolean;
 }) {
   const t = useTexts(havenTexts);
   const unitText = useUnitLabel();
   const translate = useTranslate();
-  // Below Pro Max width a shorter sparkline and tighter gaps keep long names on one line.
   const { compact } = useLayout();
   const readings = useReadings(indicator.id);
   const week = useMemo(
@@ -90,7 +84,6 @@ export function TrendRow({
           {ageText(t, last ? ageMin : undefined)}
         </Text>
       </View>
-      {/* Sparkline styles its own labels: keep them out of the Button's text classes. */}
       <TextClassContext.Provider value={undefined}>
         <Sparkline data={week.data} level={level} width={compact ? 44 : 56} />
       </TextClassContext.Provider>

@@ -16,43 +16,25 @@ import { LevelBadge } from './level-badge';
 import { useUnitLabel } from './unit-label';
 
 type Props = {
-  /** Text field value (controlled). */
   value: string;
   onChangeText: (text: string) => void;
-  /** Save the reading. The screen updates in place (no confirmation screen). */
   onSave: () => void;
-  /** `Indicator.unit` id (or an already translated label): shown via `useUnitLabel`. */
   unit?: string;
-  /** Level the typed value would get (live, like Fitbit). Omit while the field is empty. */
   previewLevel?: Level;
-  /** Collapsed button label. Default «Log a value». */
   label?: string;
-  /** Grey line under the field (reference range, last value…). */
   hint?: string;
   placeholder?: string;
-  /** Disable «Save» (invalid or empty value). */
   canSave?: boolean;
   saving?: boolean;
-  /** Controlled open state. The «Measure» shortcut opens it with the field focused. */
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   keyboardType?: KeyboardTypeOptions;
-  /** Extra controls between the field and the hint (category picker, symptom chips…). */
   extra?: ReactNode;
-  /**
-   * pinned (default): sticky footer of the screen — elevated surface, top border and
-   * `insets.bottom + 16` bottom padding. Render it OUTSIDE the ScrollView. false: inline block.
-   */
   pinned?: boolean;
   className?: string;
 };
 
-/**
- * Collapsible register (DESIGN_SYSTEM.md §8.6.7): a 56 pt «Log a value» button that turns into
- * field + unit + «Save» in the same place (no sheet, no pop-up), with the live level badge.
- * Collapsed it costs one button instead of a 150 pt form.
- */
 export function RegisterEntry({
   value,
   onChangeText,

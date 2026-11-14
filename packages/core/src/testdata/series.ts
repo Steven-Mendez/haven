@@ -1,5 +1,3 @@
-// Test data: realistic series per indicator (C02), loaded only by seeds, tests and dev tools. Ranges are documented with their OSDR source (or marked
-// as invented) in packages/core/README.md.
 import type { Config, Indicator, Reading, ReadingSource } from '../contracts';
 import { contentConfig } from './config-source';
 import { DEMO_MISSION } from './demo';
@@ -8,7 +6,6 @@ import { gaussian, hashSeed, mulberry32 } from './prng';
 const HOUR_MS = 3_600_000;
 const DAY_MS = 86_400_000;
 
-/** Per-person profile: baselines and the slow reaction-time drift of one crew member. */
 export type CrewProfile = {
   heartRate: number;
   systolic: number;
@@ -17,7 +14,6 @@ export type CrewProfile = {
   sleep: number;
   weight: number;
   reaction: number;
-  /** ms per day of slow reaction-time drift (only Mateo drifts). */
   reactionDriftPerDay: number;
   glucose: number;
 };
@@ -61,19 +57,14 @@ export const CREW_PROFILES: Record<string, CrewProfile> = {
 function profileOf(crewMember: string): CrewProfile {
   const known = CREW_PROFILES[crewMember];
   if (known) return known;
-  // Unknown crew member: derive a stable profile from Elena's with a small seeded offset.
   const rng = mulberry32(hashSeed(crewMember));
   const base = CREW_PROFILES['elena-vega'] as CrewProfile;
   return { ...base, heartRate: base.heartRate + Math.round(rng() * 6 - 3) };
 }
 
-/** Context passed to a generator. */
 type Ctx = {
-  /** Instant of the reading (ms). */
   t: number;
-  /** Mission day (fractional) at `t`. */
   missionDay: number;
-  /** Hour of day (UTC) at `t`. */
   hour: number;
   rng: () => number;
   p: CrewProfile;
@@ -82,7 +73,6 @@ type Ctx = {
 export type SeriesDef = {
   indicator: string;
   unit: string;
-  /** Default cadence in hours when the config does not set `everyHours`. */
   everyHours: number;
   source: ReadingSource;
   decimals: number;
@@ -90,7 +80,6 @@ export type SeriesDef = {
   note?: (c: Ctx) => string | undefined;
 };
 
-/** Crew sleeps in the rest module 22:00–06:00 UTC and works in the lab otherwise. */
 const inRestModule = (hour: number) => hour >= 22 || hour < 6;
 const circadian = (hour: number) => Math.sin(((hour - 10) / 24) * 2 * Math.PI);
 
@@ -162,7 +151,6 @@ export const SERIES: SeriesDef[] = [
     note: (c) => (inRestModule(c.hour) ? 'module:rest' : 'module:lab'),
   },
   {
-    // Decimal acuity in tenths (10 = 20/20), weekly.
     indicator: 'visual-acuity',
     unit: 'tenths',
     everyHours: 168,
@@ -254,7 +242,6 @@ export const SERIES: SeriesDef[] = [
     value: (c) => 45 + Math.floor(c.rng() * 16),
   },
   {
-    // Estimated cumulative loss since launch, growing ~0.36 %/month with countermeasures.
     indicator: 'bone-loss',
     unit: '%',
     everyHours: 168,
@@ -328,12 +315,6 @@ export const SERIES: SeriesDef[] = [
   },
 ];
 
-/**
- * Realistic source of each test series: the device or person that would record it on board.
- * watch: heart rate, HRV, rhythm, sleep, SpO₂, wrist temperature · healthkit: steps, distance, floors
- * · manual: blood pressure, glucose, weight, body temperature, intake, exercise, bone loss
- * · screen: cognitive battery, visual acuity, mood, stress · ship: cabin, radiation, solar event.
- */
 export const SOURCE_BY_INDICATOR: Record<string, ReadingSource> = Object.fromEntries(
   SERIES.map((s) => [s.indicator, s.source]),
 );
@@ -342,7 +323,6 @@ export const SERIES_BY_INDICATOR: Record<string, SeriesDef> = Object.fromEntries
   SERIES.map((s) => [s.indicator, s]),
 );
 
-/** Clamps a nominal value inside the config green range (5 % margin) so nominal data stays green. */
 function clampToGreen(v: number, ind: Indicator | undefined): number {
   if (ind?.kind !== 'number') return v;
   const [lo, hi] = ind.green;
@@ -358,22 +338,15 @@ function roundTo(v: number, decimals: number): number {
 
 export type GenerateOptions = {
   config?: Config;
-  /** Mission day at `anchor` (default DEMO_MISSION.day). */
   missionDay?: number;
-  /** Instant that corresponds to `missionDay` (default `to`). */
   anchor?: number;
 };
 
-/** Cadence (hours) used to generate an indicator: config `everyHours` if set, else the series default. */
 export function cadenceHours(def: SeriesDef, config?: Config): number {
   const ind = config?.indicators.find((i) => i.id === def.indicator);
   return Math.max(0.25, ind?.everyHours ?? def.everyHours);
 }
 
-/**
- * Nominal readings of one indicator in (from, to], one every `cadence` hours counting back from `to`
- * (with a small deterministic offset). Deterministic per crew member, indicator and instant.
- */
 export function generateSeries(
   crewMember: string,
   indicator: string,
@@ -419,31 +392,18 @@ export function generateSeries(
 }
 
 export type DemoHistoryOptions = GenerateOptions & {
-  /** Days of history (default 30). */
   days?: number;
-  /** Indicators to generate (default: every series, or the config indicators that have a series). */
   indicators?: string[];
-  /**
-   * Add the `daily-action` marks of manual actions (zones whose `dailyAction.opens` is `routine`) on
-   * past days, skipping two seeded days so the demo streak starts at 5–10 days. Default true (only
-   * when `indicators` is not given).
-   */
   dailyActions?: boolean;
 };
 
-/** Zones with a manual daily action when no config is available. */
 const DEFAULT_ROUTINE_ZONES = ['lungs'];
 
-/**
- * Days ago (1 = yesterday) whose manual action was skipped: one 6–11 days ago (it ends the current
- * streak) and one 17–21 days ago. Seeded per crew member.
- */
 export function demoMissedDays(crewMember: string): number[] {
   const seed = hashSeed(`${crewMember}:missed`);
   return [6 + (seed % 6), 17 + ((seed >>> 8) % 5)];
 }
 
-/** `daily-action` marks (`source: 'screen'`) on past days, except the missed ones. Today stays open. */
 function dailyActionMarks(
   crewMember: string,
   from: number,
@@ -478,15 +438,6 @@ function dailyActionMarks(
   return result;
 }
 
-/**
- * 30 days of coherent demo series for one crew member, ending at `now` (C02): reaction time around
- * the baseline with a slow drift for Mateo Ríos, sleep ±0.3 h, growing bone loss, stable HRV, daily
- * dose with small oscillations, mood 4 and stress 2, and two habitat modules (rest at night, lab by
- * day). It also adds the `daily-action` marks of manual Routine actions on past days, with two
- * seeded missed days (`demoMissedDays`), so the demo streak starts at 5–10 days and today stays open.
- * Deterministic (seeded PRNG per crew member and indicator). Records look real: `simulated: false`
- * and the realistic `source` of `SOURCE_BY_INDICATOR`. Sorted by time.
- */
 export function demoHistory(
   crewMember: string,
   now: Date,

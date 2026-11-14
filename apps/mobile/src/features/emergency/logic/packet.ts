@@ -1,5 +1,3 @@
-// Pure builders for the emergency packet and symptom readings (M06). Imports only @haven/core.
-
 import {
   type Assessment,
   type Packet,
@@ -11,7 +9,6 @@ import {
 export type Symptom = (typeof SYMPTOMS)[number];
 export const SYMPTOM_LIST: readonly Symptom[] = SYMPTOMS;
 
-/** How far before the emergency opened we take readings (the video's chest pain starts 3 min before). */
 export const LOOKBACK_MIN = 30;
 
 export type EmergencyOrigin =
@@ -37,7 +34,6 @@ export function normalizeOrigin(value: unknown): EmergencyOrigin | undefined {
   return ORIGINS.includes(value as EmergencyOrigin) ? (value as EmergencyOrigin) : undefined;
 }
 
-/** A symptom marked on screen: `indicator: 'symptom'`, `source: 'screen'`, glossary value. */
 export function symptomReading(
   symptom: Symptom,
   crewMember: string,
@@ -57,7 +53,6 @@ export function symptomReading(
   };
 }
 
-/** Readings of the crew member from `LOOKBACK_MIN` before `since` up to `now`, deduplicated. */
 export function emergencyReadings(
   readings: Reading[],
   crewMember: string,
@@ -84,25 +79,17 @@ export type PacketInput = {
   crewMember: string;
   missionCode: string;
   assessments: Assessment[];
-  /** All readings available (the builder keeps the emergency window). */
   readings: Reading[];
-  /** Symptom readings marked during the emergency (merged and deduplicated with `readings`). */
   symptoms: Reading[];
-  /** When the emergency opened. */
   startedAt: Date;
   now: Date;
   notes: string;
   decisions: string[];
   originLabel?: string;
   photos: Photo[];
-  /** Only a real recorded ECG (HealthKit `HKElectrocardiogram`); never generated. */
   ecg?: Packet['ecg'];
 };
 
-/**
- * Builds the `type: 'emergency'` packet. No artificial delay: `visibleAt` = `sentAt`, and the Earth
- * API sets it to its receive time (EQUIPOS «Producto real»).
- */
 export function buildEmergencyPacket(input: PacketInput): Packet {
   const sentAt = input.now.toISOString();
   const readings = emergencyReadings(
@@ -134,7 +121,6 @@ export function buildEmergencyPacket(input: PacketInput): Packet {
   };
 }
 
-/** Counts shown on the packet screen. */
 export function packetSummary(packet: Packet): {
   measurements: number;
   symptoms: number;
@@ -145,7 +131,6 @@ export function packetSummary(packet: Packet): {
   const symptomReadings = packet.readings.filter((r) => r.indicator === SYMPTOM_INDICATOR);
   return {
     measurements: packet.readings.length - symptomReadings.length,
-    // Distinct symptoms: the same one marked twice (or by the scenario and on screen) counts once.
     symptoms: new Set(symptomReadings.map((r) => String(r.value))).size,
     photos: packet.photos?.length ?? 0,
     ecg: !!packet.ecg,

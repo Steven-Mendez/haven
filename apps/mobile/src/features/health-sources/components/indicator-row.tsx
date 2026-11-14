@@ -11,12 +11,10 @@ type Props = {
   name: string;
   level: Level;
   latest: Reading | undefined;
-  /** Replaces the source line when the indicator is pending for a missing permission. */
   pendingReason?: string;
   onPress: () => void;
 };
 
-/** One indicator per row: name and level; below, one line with source · age. */
 export function IndicatorRow({ name, level, latest, pendingReason, onPress }: Props) {
   return (
     <Button
@@ -35,7 +33,6 @@ export function IndicatorRow({ name, level, latest, pendingReason, onPress }: Pr
             {pendingReason}
           </Text>
         ) : (
-          // DataLabel styles its own text: keep it out of the Button's text classes.
           <TextClassContext.Provider value={undefined}>
             <ReadingSource reading={latest} />
           </TextClassContext.Provider>

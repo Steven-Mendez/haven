@@ -18,7 +18,6 @@ import { FormError } from './form-error';
 
 type Target = { code: string; name: string };
 
-/** One destination of the merge: a submit button that moves everything into that mission. */
 function MergeTarget({ from, target, lang }: { from: string; target: Target; lang: Language }) {
   const [state, action, pending] = useActionState(
     mergeMissionAction.bind(null, from, target.code),
@@ -41,10 +40,6 @@ function MergeTarget({ from, target, lang }: { from: string; target: Target; lan
   );
 }
 
-/**
- * «Merge…» on a mission that only exists because packets arrived with an unknown code: pick the right mission
- * and its packets and crew move there. Nothing is deleted except the empty mission left behind.
- */
 export function MergeMission({
   from,
   targets,

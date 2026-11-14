@@ -4,12 +4,6 @@ import { Platform } from 'react-native';
 import { dailyTotalReading, type SourceStatus } from '../logic/sources';
 import type { SourceProvider } from './types';
 
-// M07 · Step fallback with expo-sensors Pedometer (CoreMotion on iOS). Used when HealthKit cannot
-// deliver steps (Expo Go, no development build). Android only counts steps while the app is open,
-// which is not a daily total, so it is reported as unavailable there.
-// `Reading.source` is 'healthkit' on iOS: CoreMotion is the same phone motion data Apple Health
-// shows; the contract has no 'phone' source (requested in the M07 report).
-
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 
 function base(state: SourceStatus['state'], reason?: string): SourceStatus {

@@ -1,17 +1,11 @@
-// Internal engine helpers (only LEVEL_ORDER and worstLevel are re-exported).
 import type { Level, Reading } from '../contracts';
 
 export const MIN_MS = 60_000;
 export const HOUR_MS = 3_600_000;
 export const DAY_MS = 86_400_000;
 
-/**
- * Severity used to sort levels: red > amber > pending > green.
- * "Pending" ranks above green so a zone without data is never painted green.
- */
 export const LEVEL_ORDER: Record<Level, number> = { green: 0, pending: 1, amber: 2, red: 3 };
 
-/** Worst of several levels; with no levels, "pending". */
 export function worstLevel(levels: Level[]): Level {
   if (levels.length === 0) return 'pending';
   return levels.reduce((a, b) => (LEVEL_ORDER[b] > LEVEL_ORDER[a] ? b : a));
@@ -21,7 +15,6 @@ export function ms(iso: string): number {
   return new Date(iso).getTime();
 }
 
-/** Numeric value of a reading, or undefined if it is not a number. */
 export function numeric(r: Reading): number | undefined {
   if (typeof r.value === 'number') return Number.isFinite(r.value) ? r.value : undefined;
   if (r.value.trim() === '') return undefined;
@@ -29,7 +22,6 @@ export function numeric(r: Reading): number | undefined {
   return Number.isFinite(v) ? v : undefined;
 }
 
-/** Readings of one indicator taken up to `now`, oldest first. */
 export function series(readings: Reading[], indicator: string, now?: Date): Reading[] {
   const limit = now ? now.getTime() : Number.POSITIVE_INFINITY;
   return readings
@@ -37,7 +29,6 @@ export function series(readings: Reading[], indicator: string, now?: Date): Read
     .sort((a, b) => ms(a.takenAt) - ms(b.takenAt));
 }
 
-/** Percentile with linear interpolation (p in 0..1) over an already sorted array. */
 export function percentile(sorted: number[], p: number): number {
   if (sorted.length === 0) return Number.NaN;
   const pos = (sorted.length - 1) * p;
@@ -47,7 +38,6 @@ export function percentile(sorted: number[], p: number): number {
   return a + (b - a) * (pos - lo);
 }
 
-/** UTC date (YYYY-MM-DD) of an instant; `offsetMin` shifts the day boundary (ship local time). */
 export function dayKey(instant: Date | string, offsetMin = 0): string {
   const t = (typeof instant === 'string' ? ms(instant) : instant.getTime()) + offsetMin * MIN_MS;
   return new Date(t).toISOString().slice(0, 10);

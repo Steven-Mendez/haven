@@ -66,10 +66,6 @@ function PreflightRow({
   );
 }
 
-/**
- * Pre-flight baseline of the current crew member, editable, with the in-flight median and drift.
- * Mount with `key={crewMember}` so edits reset when the phone changes owner.
- */
 export function ProfileGroup() {
   const t = useTexts(texts);
   const language = useLanguage();

@@ -1,7 +1,3 @@
-// Where MongoDB lives. Atlas by default (`MONGODB_URI`, the same variable Vercel has);
-// `MONGODB_USE_LOCAL=true` switches to the Docker container (`pnpm db:up`).
-// Plain module (no `server-only`) so scripts/ can share it.
-
 export function mongoUri(): string {
   const useLocal = process.env.MONGODB_USE_LOCAL === 'true';
   const uri = useLocal

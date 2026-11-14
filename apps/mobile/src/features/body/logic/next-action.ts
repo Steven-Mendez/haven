@@ -1,18 +1,11 @@
 import type { Config, Level, Zone } from '@haven/core';
 import { SEVERITY } from './alerts';
 
-// «Today» card (M01, DESIGN_SYSTEM 4.1a): the next daily action still to do and where it opens.
-
 export type NextAction = {
   zone: Zone;
-  /** Where «Measure» goes: an indicator screen with the field focused, or another screen. */
   target: { kind: 'indicator'; id: string } | { kind: 'screen'; id: string };
 };
 
-/**
- * First zone whose daily action is below 100 %, worst zone level first (red, amber, pending,
- * green) and config order as tie-break. `undefined` when the day is complete.
- */
 export function nextDailyAction(
   progress: { zone: string; progress: number }[],
   zones: { zone: string; level: Level }[],
@@ -35,7 +28,6 @@ export function nextDailyAction(
   };
 }
 
-/** Most recent `takenAt` among readings (ISO), for «Latest data n min ago». */
 export function latestTakenAt(readings: { takenAt: string }[]): string | undefined {
   let latest: string | undefined;
   for (const r of readings) if (!latest || r.takenAt > latest) latest = r.takenAt;

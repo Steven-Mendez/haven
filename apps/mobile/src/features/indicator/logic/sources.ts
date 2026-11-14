@@ -1,5 +1,3 @@
-// Guide sources (P02) come as «Title: https://…». Split them so the screen shows a titled link.
-
 export type GuideSource = { title: string; url?: string };
 
 export function parseSource(source: string): GuideSource {

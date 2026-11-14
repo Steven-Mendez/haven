@@ -1,6 +1,5 @@
 import { defineTexts } from '@/shared/i18n';
 
-// Profile (crew member using this phone). Interpolation with `format` ({n}, {code}…).
 export const texts = defineTexts({
   es: {
     crewMember: 'Tripulante',

@@ -4,13 +4,8 @@ import Animated from 'react-native-reanimated';
 import { Icon } from '@/shared/components/ui/icon';
 import { cn } from '@/shared/lib/utils';
 
-/** Rotation keyframes for a CSS animation (Reanimated 4), the native twin of Tailwind's `animate-spin`. */
 const SPIN = { to: { transform: [{ rotate: '360deg' }] } };
 
-/**
- * shadcn/ui `Spinner` for React Native: lucide `Loader2` turning once per second. Inherits the text
- * colour of its parent (`TextClassContext`, e.g. inside a `Button`) unless `className` sets one.
- */
 function Spinner({
   className,
   size = 16,

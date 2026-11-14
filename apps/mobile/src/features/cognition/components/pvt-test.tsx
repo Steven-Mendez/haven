@@ -26,7 +26,6 @@ type Props = {
 
 const FEEDBACK_MS = 700;
 
-/** PVT: 5 trials; signal after a random 1.5–5 s; taps before it are false starts. */
 export function PvtTest({ t, random, onDone, onExit }: Props) {
   const [trial, setTrial] = useState(0);
   const [phase, setPhase] = useState<Phase>('waiting');

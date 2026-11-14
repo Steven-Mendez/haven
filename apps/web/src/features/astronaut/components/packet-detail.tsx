@@ -90,7 +90,6 @@ function RailRow({ label, children }: { label: React.ReactNode; children: React.
   );
 }
 
-/** Mono date + time (date dimmed, time bright, Vercel logs) with the full UTC time as tooltip. */
 function Stamp({ at, lang }: { at: string; lang: Language }) {
   return (
     <TimeAgo at={at} lang={lang} className="font-mono text-xs">
@@ -99,12 +98,6 @@ function Stamp({ at, lang }: { at: string; lang: Language }) {
   );
 }
 
-/**
- * A packet on its own page (SPEC §6, Sentry / incident.io detail): title + inline status line, a 2 px red rule
- * callout with the protocol for an emergency, then the payload (protocol · symptoms · monitor in one hairline
- * box), the assessments (one line each, in-range folded), ECG, photos and notes. Right rail: measured on
- * board, received on Earth, transit and data age.
- */
 export function PacketDetail({ crewMember, crewMemberName, packet, now, names, lang, t }: Props) {
   const h = havenTexts[lang];
   const emergency = packet.type === 'emergency';
@@ -417,10 +410,6 @@ export function PacketDetail({ crewMember, crewMemberName, packet, now, names, l
   );
 }
 
-/**
- * Callout on top of Summary while an emergency is open (incident.io summary): 2 px red rule on the left — the
- * only place besides emergency rows where the rule appears — the timing in one line and «View packet».
- */
 export function EmergencyBand({
   crewMember,
   packet,

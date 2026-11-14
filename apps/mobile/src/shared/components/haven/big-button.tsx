@@ -7,31 +7,23 @@ import { Spinner } from '@/shared/components/ui/spinner';
 import { Text } from '@/shared/components/ui/text';
 import { cn } from '@/shared/lib/utils';
 
-/** `emergency` is a deprecated alias of `destructive`. */
 type Variant = 'primary' | 'secondary' | 'destructive' | 'emergency' | 'outline' | 'ghost';
 
 type Props = {
   label: string;
   onPress: () => void;
-  /** primary: the one main action (light on dark) · destructive: SOS-level actions only
-   *  ("Open protocol") · secondary: elevated surface + border · outline · ghost: tertiary.
-   *  Inside the emergency flow the main action is `primary`, not red. */
   variant?: Variant;
-  /** md = 52 pt · lg = 60 pt (emergency steps, "Done", "Start"). */
   size?: 'md' | 'lg';
   icon?: LucideIcon;
-  /** Second line under the label (e.g. "< 4 min"). */
   detail?: string;
   disabled?: boolean;
   loading?: boolean;
-  /** Full width by default. */
   fullWidth?: boolean;
   accessibilityLabel?: string;
   accessibilityHint?: string;
   className?: string;
 };
 
-/** RNR `Button` variant used for each HAVEN variant. */
 const RNR_VARIANT = {
   primary: 'default',
   secondary: 'secondary',
@@ -41,22 +33,16 @@ const RNR_VARIANT = {
   ghost: 'ghost',
 } as const;
 
-/** Extra classes on top of RNR's variants. */
 const DESTRUCTIVE = 'bg-destructive dark:bg-destructive active:opacity-85';
 const EXTRA: Record<Variant, string> = {
   primary: 'active:opacity-85',
   secondary: 'bg-transparent border border-border-strong active:bg-active',
-  // RNR's destructive is 60 % opaque in dark mode: too weak for an emergency.
   destructive: DESTRUCTIVE,
   emergency: DESTRUCTIVE,
   outline: 'border border-border-strong bg-transparent dark:bg-transparent',
   ghost: 'bg-transparent active:bg-active',
 };
 
-/**
- * RNR `Button` as a pill (SPEC.md §4, X / Grok): 52 pt (60 lg), label 17/600, no shadow. Primary =
- * white fill with black text; secondary = hairline outline. One primary per screen.
- */
 export function BigButton({
   label,
   onPress,
@@ -86,7 +72,6 @@ export function BigButton({
         size === 'lg' ? 'min-h-touch-lg' : 'min-h-button',
         fullWidth ? 'self-stretch' : 'self-start',
         EXTRA[variant],
-        // A disabled primary must not look enabled: muted fill, disabled text, no dimmed white.
         inactive && !loading && variant === 'primary' && 'bg-muted opacity-100',
         className,
       )}

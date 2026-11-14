@@ -3,7 +3,6 @@ import { describe, expect, it } from 'vitest';
 import { bestStreak, currentStreak, pendingMilestone, type StreakDay } from './streak';
 
 const days = (spec: string, end = '2026-11-10'): StreakDay[] => {
-  // spec: one char per day, oldest first, ending at `end`: x = complete, . = incomplete.
   const endMs = Date.parse(`${end}T00:00:00.000Z`);
   return [...spec].map((c, i) => ({
     date: new Date(endMs - (spec.length - 1 - i) * 86_400_000).toISOString().slice(0, 10),
@@ -22,7 +21,6 @@ describe('currentStreak', () => {
   });
 
   it('an emergency (protected) day never breaks the streak', () => {
-    // 2026-11-08 had an emergency: incomplete but protected.
     expect(currentStreak(days('xx.x.'), '2026-11-10', ['2026-11-08'])).toBe(3);
   });
 

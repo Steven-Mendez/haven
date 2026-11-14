@@ -19,7 +19,6 @@ import { cn } from '@/shared/lib/utils';
 import { type EmergencyTexts, texts } from '../i18n';
 import { hasOptions, type StepPhase } from '../logic/protocol';
 
-/** Instructions longer than this read better one size down (CPR, AED steps). */
 const LONG_TEXT = 120;
 
 const PHASE_LABEL: Record<StepPhase, keyof EmergencyTexts> = {
@@ -33,7 +32,6 @@ type Props = {
   step: Step;
   phase: StepPhase;
   index: number;
-  /** Label of the main button when it is not "Done" (e.g. the packet step). */
   doneLabel?: string;
   onDone: (option?: number) => void;
   canGoBack: boolean;
@@ -43,7 +41,6 @@ type Props = {
   photoFailed: boolean;
   say: (text: string | undefined, force?: boolean) => void;
   buzz: (kind: 'tap' | 'alert') => void;
-  /** Extra block under the instruction (crew alert, symptoms). */
   children?: ReactNode;
 };
 
@@ -72,10 +69,6 @@ function SecondaryButton({
   );
 }
 
-/**
- * One protocol step per screen (C). Steps with options are one-tap triage (B): a large question
- * and stacked ≥ 96 pt answers. Keyed by visit so the timer restarts on every entry.
- */
 export function StepView({
   step,
   phase,
@@ -104,14 +97,11 @@ export function StepView({
   const audio = tr(step.audio) || instruction;
   const options = step.options ?? [];
 
-  // Read the step aloud on entry (the screen decides whether audio is on).
   // biome-ignore lint/correctness/useExhaustiveDependencies: once per visit (the view is keyed)
   useEffect(() => {
     say(audio);
   }, []);
 
-  // No total: the remaining path depends on the answers, and a changing "of N" misleads (QA).
-  // So no segmented bar here: a big step numeral (Mobbin «one numbered step per screen») instead.
   return (
     <View className="gap-6">
       <View
@@ -173,8 +163,6 @@ export function StepView({
       {children}
 
       {triage ? (
-        // alias questionnaire: answers as tall rows inside ONE hairline box (glove-sized, 88 pt).
-        // The last answer is the safe default «if in doubt»: it carries a white leading bar.
         <View className="gap-3">
           <View className="border-border rounded-lg border">
             {options.map((option, i) => {

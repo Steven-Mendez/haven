@@ -1,16 +1,3 @@
-// T01 backend · Seeds the Ares-1 mission (ARES01) so the Earth view has records without a phone.
-//
-//   pnpm --filter web seed
-//
-// Deletes and recreates ARES01 (packets, mission, rules, access log); other missions are untouched.
-// Test records come from `@haven/core/testdata` (demoHistory, scenario readings, ECG strip) and are
-// stored as plain data (`simulated: false`). Assessments are the engine's real output (evaluate).
-// Every packet is already received (no artificial delay, nothing in transit):
-//   · ~30 daily routine packets per astronaut
-//   · Elena Vega: latest packet 40 min ago, with a private note
-//   · Mateo Ríos: emergency packet 45 min ago (scenario "video", chest pain) with its ECG strip
-//   · Samira Chen: latest packet 8 h ago → "no recent data" (threshold NO_RECENT_DATA_HOURS = 6)
-
 import { fileURLToPath } from 'node:url';
 import {
   type Assessment,
@@ -44,7 +31,6 @@ import { mongoDbName, mongoUri } from '../src/server/mongo-env';
 const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
-/** Ares-1 follows the conjunction-class Mars plan: on day 142 it is in the cruise to Mars. */
 const PHASES = missionTemplates.find((t) => t.id === 'mars-conjunction')?.phases ?? [];
 
 process.loadEnvFile(fileURLToPath(new URL('../.env.local', import.meta.url)));
@@ -56,10 +42,8 @@ const config = baseConfig();
 const mission = DEMO_MISSION;
 
 const iso = (ms: number) => new Date(ms).toISOString();
-/** Records are plain data: the frozen `simulated` field is always false. */
 const asRecord = (r: Reading): Reading => ({ ...r, simulated: false });
 
-/** Assessments exactly as the phone would compute them at instant `at` with the readings it had. */
 function assess(readings: Reading[], at: number): Assessment[] {
   const known = readings.filter((r) => Date.parse(r.takenAt) <= at);
   const baselines: Record<string, Assessment['baseline']> = {};
@@ -74,7 +58,7 @@ function assess(readings: Reading[], at: number): Assessment[] {
 
 type Plan = {
   crewMember: string;
-  at: number; // createdAt = sentAt = receivedAt
+  at: number;
   type: Packet['type'];
   notes?: string;
   extraReadings?: Reading[];
@@ -105,7 +89,6 @@ function buildPacket(plan: Plan, history: Reading[], previousAt: number, n: numb
   return packetDoc(packet, new Date(plan.at));
 }
 
-/** Chest-pain records (scenario "video") starting at `start`. */
 function chestPainReadings(crewMember: string, start: number): Reading[] {
   const scenario = scenarios.find((s) => s.id === 'video');
   return scenario ? scenarioReadings(scenario, crewMember, new Date(start)) : [];
@@ -146,7 +129,6 @@ function plansFor(crewMember: string): Plan[] {
       },
     ];
   }
-  // samira-chen and anyone else: the latest packet is 8 h old.
   return daily(now.getTime() - 8 * HOUR);
 }
 
@@ -164,9 +146,7 @@ async function main() {
       db.collection(COLLECTIONS.rules).deleteMany({ mission: mission.code }),
     ]);
 
-    // `crew[].role` is stored with the mission: the API reads roles from here.
     const histories = new Map(mission.crew.map((m) => [m.id, demoHistory(m.id, now)]));
-    // A crew member wears a watch when their records include readings from it.
     const crew = mission.crew.map((m) => ({
       ...m,
       hasWatch: (histories.get(m.id) ?? []).some((r) => r.source === 'watch'),

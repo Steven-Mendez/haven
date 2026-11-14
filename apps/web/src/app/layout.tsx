@@ -28,7 +28,6 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // Edge to edge on iPhone; the shell pads itself with env(safe-area-inset-*) (EQUIPOS.md · Safe areas).
   viewportFit: 'cover',
   colorScheme: 'dark',
   themeColor: [
@@ -37,8 +36,6 @@ export const viewport: Viewport = {
   ],
 };
 
-// One read per request, shared by the sidebar and the header. Errors (e.g. MongoDB down) degrade to
-// "no data" instead of breaking the shell.
 const loadShell = cache(async () => {
   const [lang, code] = await Promise.all([getLanguage(), getMissionCode()]);
   const [crew, missions] = await Promise.all([
@@ -98,9 +95,6 @@ async function HeaderWithData() {
   );
 }
 
-// Dashboard shell: SidebarProvider + AppSidebar (inset variant) + SidebarInset (the bordered content panel).
-// Language, mission and crew come from cookies and the database (request time), so the sidebar and the
-// header stream inside <Suspense> with a default-language fallback. Pages read the language with getLanguage().
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html

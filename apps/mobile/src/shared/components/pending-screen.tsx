@@ -10,10 +10,6 @@ import { commonTexts } from '@/shared/i18n/common';
 
 type Props = { id: string; title: string; description?: string };
 
-/**
- * Placeholder for screens their feature has not built yet. Also shows the latest stored reading
- * with source and age, so the data pipeline can be checked from any empty screen (M00).
- */
 export function PendingScreen({ id, title, description }: Props) {
   const t = useTexts(commonTexts);
   const readings = useReadings();

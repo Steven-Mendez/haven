@@ -11,34 +11,21 @@ import { cn } from '@/shared/lib/utils';
 
 type Props = {
   label: string;
-  /** Grey value on the right (current language, count…), tabular digits. */
   value?: string;
-  /** One grey line under the label. */
   hint?: string;
-  /** Outline lucide icon at the leading edge (20 pt, secondary). */
   icon?: LucideIcon;
-  /** Makes the row a button and shows a chevron (unless `chevron={false}`). */
   onPress?: () => void;
   chevron?: boolean;
-  /** Control on the right (switch, segmented control). Replaces `value`. */
   trailing?: ReactNode;
-  /** Label in the destructive colour («Delete local data»). */
   destructive?: boolean;
-  /** Value in mono (ids, versions). */
   mono?: boolean;
   accessibilityLabel?: string;
   className?: string;
 };
 
-/** Ghost `Button` reset to a plain full-width row wrapper (the row draws its own layout). */
 const ROW_BUTTON =
   'h-auto flex-col items-stretch justify-start gap-0 rounded-none px-0 py-0 sm:h-auto';
 
-/**
- * Settings row (SPEC.md §4: 44 pt settings rows, X / Linear grouped list): label 15/400 on the left,
- * grey value and chevron on the right. Put rows inside a `ListGroup` (hairline box, 16 pt inset
- * dividers). Presentational only.
- */
 export function SettingsRow({
   label,
   value,
@@ -112,13 +99,11 @@ export function SettingsRow({
       accessibilityLabel={accessibilityLabel ?? [label, value].filter(Boolean).join(', ')}
       className={ROW_BUTTON}
     >
-      {/* The row (and any trailing control) keeps its own type styles. */}
       <TextClassContext.Provider value={undefined}>{body}</TextClassContext.Provider>
     </Button>
   );
 }
 
-/** Settings row with a switch; the whole row toggles (gloves: the switch alone is small). */
 export function SettingsSwitchRow({
   label,
   hint,

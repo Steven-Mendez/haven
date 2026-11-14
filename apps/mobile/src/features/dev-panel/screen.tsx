@@ -1,5 +1,4 @@
 import type { EnvironmentId } from '@haven/core';
-// Development tool only (EQUIPOS.md «Producto real» §4–5): test data enters as records.
 import { demoHistory } from '@haven/core/testdata';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -21,7 +20,6 @@ import { useWatch } from '@/shared/watch';
 import { Code, Group, Picker, Row } from './components/rows';
 import { texts } from './i18n';
 
-/** Used when the config has no environments yet (ids from GLOSSARY.md). */
 const FALLBACK_ENVIRONMENTS: EnvironmentId[] = ['transit', 'station', 'moon', 'mars', 'rover'];
 const LANGUAGES: { value: Language; label: string }[] = [
   { value: 'es', label: 'Español' },
@@ -231,7 +229,6 @@ export default function DevPanelScreen() {
         </Row>
       </Group>
 
-      {/* Destructive action on its own, far from «Load test data». */}
       <Group title={t.dangerZone}>
         <Row label={t.deleteData} hint={deleted ? t.deleted : t.deleteHint} stacked>
           <Button

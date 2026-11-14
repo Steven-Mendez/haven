@@ -5,7 +5,6 @@ export const texts = defineTexts({
     title: 'Misión',
     subtitle: 'Destino, tripulación y enlace con la Tierra',
 
-    // Mission
     missionGroup: 'Misión',
     missionCode: 'Código de misión',
     codeHint: 'Identifica tu misión ante la Tierra. No necesitas cuenta.',
@@ -40,7 +39,6 @@ export const texts = defineTexts({
       'Si control de misión te añade después con este mismo nombre, tus paquetes ya aparecerán a tu nombre.',
     whoChosen: 'Este teléfono es de {name}.',
 
-    // QR invite (haven://join)
     inviteTitle: 'Invitación a una misión',
     inviteJoining: 'Uniéndote a {code}…',
     inviteDone: 'Te uniste a {mission} como {name}',
@@ -70,7 +68,6 @@ export const texts = defineTexts({
     errorDuration: 'Duración entre 1 y 3650 días.',
     errorEnvironment: 'Elige un entorno.',
 
-    // Environment
     environmentGroup: 'Entorno',
     environmentHint: 'Define umbrales, protocolos y retardo.',
     environmentAndDestination: 'Entorno y destino',
@@ -95,7 +92,6 @@ export const texts = defineTexts({
     aiImage: 'Imágenes generadas con IA',
     selected: 'Seleccionado',
 
-    // Link
     linkGroup: 'Enlace con Tierra',
     linkDown: 'Sin enlace con la Tierra',
     linkOn: 'Enlace con la Tierra',
@@ -107,14 +103,12 @@ export const texts = defineTexts({
 
     linkDownHint: 'Las decisiones se toman a bordo; lo enviado sale al volver el enlace.',
 
-    // Crew
     crewGroup: 'Tripulación vinculada',
     crewHint: 'Reciben el aviso de emergencia. Toca para usar este teléfono como esa persona.',
     you: 'Tú',
     hasWatch: 'Con reloj',
     noWatch: 'Sin reloj',
 
-    // Profile
     profileGroup: 'Línea base previa',
     profileHint:
       'Medidos en Tierra antes del lanzamiento. Sirven para comparar; tus niveles usan la línea base en vuelo.',
@@ -125,7 +119,6 @@ export const texts = defineTexts({
     savePreflight: 'Guardar valores',
     savedPreflight: 'Guardada en este teléfono.',
 
-    // Settings
     settingsGroup: 'Ajustes',
     language: 'Idioma',
     apiUrl: 'URL de la API de Tierra',

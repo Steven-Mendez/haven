@@ -1,7 +1,5 @@
 'use server';
 
-// T01 · Server actions of the crew roster (forms with useActionState).
-
 import { refresh } from 'next/cache';
 import { addCrewMember, removeCrewMember, startMission, updateCrewMember } from './server';
 
@@ -19,7 +17,6 @@ function readInput(form: FormData) {
   return { name, ...(role ? { role } : {}) };
 }
 
-/** «Add astronaut»: a roster entry with no packets yet, shown as invited. */
 export async function addCrewAction(
   mission: string,
   _previous: RosterFormState,
@@ -30,11 +27,9 @@ export async function addCrewAction(
   const result = await addCrewMember(mission, input);
   if (!result.ok) return { status: 'error', code: 'save' };
   refresh();
-  // The new id lets the page open their QR right away (add → invite in one go).
   return { status: 'ok', at: Date.now(), id: result.data.id };
 }
 
-/** Renames an astronaut or changes their role; the id the phone sends stays. */
 export async function updateCrewAction(
   mission: string,
   id: string,
@@ -49,7 +44,6 @@ export async function updateCrewAction(
   return { status: 'ok', at: Date.now() };
 }
 
-/** Deletes an astronaut and their packets (the page confirms first). */
 export async function removeCrewAction(mission: string, id: string): Promise<RosterFormState> {
   const result = await removeCrewMember(mission, id);
   if (!result.ok) return { status: 'error', code: 'save' };
@@ -57,7 +51,6 @@ export async function removeCrewAction(mission: string, id: string): Promise<Ros
   return { status: 'ok', at: Date.now() };
 }
 
-/** «Start mission»: days run from today. */
 export async function startMissionAction(mission: string): Promise<{ failed: boolean }> {
   const result = await startMission(mission);
   if (!result.ok) return { failed: true };

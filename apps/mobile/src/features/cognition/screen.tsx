@@ -77,7 +77,6 @@ export default function Screen() {
     setPhase('interrupted');
   }, []);
 
-  // Leaving the app (background, call) or running past 225 s interrupts: nothing is saved.
   useEffect(() => {
     if (!running) return;
     const sub = AppState.addEventListener('change', (state) => {
@@ -131,8 +130,6 @@ export default function Screen() {
 
   const exit = () => interrupt(false);
 
-  // From Routine ("Start", DESIGN_SYSTEM.md 4.1b) go straight to the tests once the crew member has
-  // already seen "how it works" (any previous on-screen battery); the first time, show it.
   // biome-ignore lint/correctness/useExhaustiveDependencies: decided once on mount
   useEffect(() => {
     const seen = readings.some((r) => r.indicator === 'reaction-time' && r.source === 'screen');
@@ -260,7 +257,6 @@ export default function Screen() {
           </>
         )}
       </ScrollView>
-      {/* Main action fixed at the foot, above the home indicator (8.12, safe areas) */}
       {phase === 'intro' || phase === 'interrupted' ? (
         <Footer>
           <BigButton size="lg" label={phase === 'intro' ? t.start : t.repeat} onPress={start} />

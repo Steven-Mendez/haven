@@ -16,10 +16,6 @@ import { useMission } from '@/shared/data';
 import { currentLanguage, defineTexts, useLanguage, useTexts } from '@/shared/i18n';
 import { cn } from '@/shared/lib/utils';
 
-// One reusable «explain in place» layer (user request: not everyone is a doctor). Plain-language
-// texts come from the core glossary (`explainTerm`, packages/core/config/glossary.json); this file
-// only holds UI copy. A tap opens a bottom sheet; nothing is added permanently to the screen.
-
 const texts = defineTexts({
   es: {
     close: 'Cerrar',
@@ -54,27 +50,20 @@ export type InfoAction = { label: string; onPress: () => void };
 export type InfoContent = {
   title: string;
   body?: string;
-  /** Unit explanation («mmHg: millimetres of mercury»). */
   unitHint?: string;
-  /** Level line (shape + coloured label + what it means). */
   level?: Level;
-  /** Key / value rows (tabular), e.g. crew time · Earth time · delay. */
   rows?: { label: string; value: string }[];
-  /** Up to three actions (context menu on long press). */
   actions?: InfoAction[];
-  /** Extra content under the text. */
   children?: ReactNode;
 };
 
 let open: ((content: InfoContent) => void) | null = null;
 
-/** Opens the info sheet with any content. */
 export function showInfo(content: InfoContent) {
   if (Platform.OS !== 'web') void Haptics.selectionAsync();
   open?.(content);
 }
 
-/** Opens the glossary entry `id` (indicator id, zone id or term id). Returns false when missing. */
 export function explain(id: string, extra: Partial<InfoContent> = {}): boolean {
   const entry = explainTerm(id, currentLanguage());
   if (!entry && !extra.title) return false;
@@ -87,7 +76,6 @@ export function explain(id: string, extra: Partial<InfoContent> = {}): boolean {
   return true;
 }
 
-/** Popover for a level shape or meter: «Check · outside your personal range». */
 export function explainLevel(level: Level) {
   const lang = currentLanguage();
   const t = havenTexts[lang];
@@ -99,7 +87,6 @@ export function explainLevel(level: Level) {
   });
 }
 
-/** Popover for a data-age label: crew time, Earth time and the one-way light-time delay. */
 export function explainAge(takenAt: string | undefined, delayMin: number) {
   const lang = currentLanguage();
   const t = texts[lang];
@@ -131,10 +118,6 @@ export function explainAge(takenAt: string | undefined, delayMin: number) {
   });
 }
 
-/**
- * The sheet itself (mount once, in the tabs layout): `elevated` bottom sheet, hairline top,
- * radius 16, 17/600 title, 15 pt plain explanation, unit hint, level line, rows and actions.
- */
 export function InfoSheetHost() {
   const t = useTexts(texts);
   const h = useTexts(havenTexts);
@@ -225,10 +208,6 @@ export function InfoSheetHost() {
   );
 }
 
-/**
- * A term that explains itself: the label with a dotted underline; a tap opens the glossary entry.
- * `id` = indicator id, zone id or glossary term id. Without a glossary entry it renders plain text.
- */
 export function Term({
   id,
   children,
@@ -256,7 +235,6 @@ export function Term({
   );
 }
 
-/** Small ⓘ (14 pt, tertiary, 44 pt hit area) that opens the glossary entry `id`. */
 export function InfoTip({
   id,
   label,
@@ -287,15 +265,10 @@ export function InfoTip({
   );
 }
 
-/** Mission delay for age popovers, from the shared store. */
 export function useMissionDelay(): number {
   return useMission().currentDelayMin;
 }
 
-/**
- * Long-press context sheet for an indicator row: plain explanation from the glossary plus the
- * actions that exist (see details · log a value).
- */
 export function indicatorContext(id: string, level: Level | undefined, actions: InfoAction[]) {
   explain(id, { level, actions });
 }

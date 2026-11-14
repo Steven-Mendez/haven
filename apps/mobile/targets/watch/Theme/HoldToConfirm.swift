@@ -1,18 +1,10 @@
 import SwiftUI
 import WatchKit
 
-// Hold-to-confirm SOS (W03; SPEC.md §5 «El SOS se activa manteniendo pulsado 3 s»). A red disc with «SOS» inside a
-// ring. Pressing starts a linear fill of the ring and one haptic click per second, and the centre counts the seconds
-// left; at `duration` it plays `.success` and calls `onConfirm` once. Lifting the finger (or sliding off) before that
-// cancels: the ring empties and nothing is sent. With Reduce Motion the ring steps once per second.
-// VoiceOver: one button «SOS»; its default action confirms (focus + double tap is already deliberate), and «double
-// tap and hold» also works.
-
 struct HoldToConfirm: View {
     var duration: Int = 3
     var title: String = "SOS"
     var haptics: Bool = true
-    /// The press started (true) or ended without confirming (false), e.g. to show «Suelta para cancelar».
     var onPressingChanged: ((Bool) -> Void)?
     let onConfirm: () -> Void
 
@@ -99,8 +91,6 @@ struct HoldToConfirm: View {
         reset(animated: false)
     }
 
-    /// The finger lifted before `duration`, or the view went away. SwiftUI may report «not pressing» just before
-    /// `perform` on a completed hold: that case is left to `confirm`, so it never reads as a cancel.
     private func cancel() {
         guard remaining != nil else { return }
         if let pressStartedAt, Date.now.timeIntervalSince(pressStartedAt) >= Double(duration) - 0.1 { return }

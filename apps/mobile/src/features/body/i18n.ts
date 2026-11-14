@@ -1,8 +1,5 @@
 import { defineTexts } from '@/shared/i18n';
 
-// UI copy of the Body screen (M01). Medical copy (explanations, actions, zone purpose) comes
-// from the config. "{n}" placeholders are filled with `format` from `@/shared/components/haven`.
-
 export const texts = defineTexts({
   es: {
     verdictGreen: 'Todo en rango',

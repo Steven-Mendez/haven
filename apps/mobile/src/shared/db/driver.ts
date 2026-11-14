@@ -2,18 +2,11 @@ import type { Reading } from '@haven/core';
 import { openDatabaseAsync, type SQLiteDatabase } from 'expo-sqlite';
 import type { Collection, Database, KeyValue, KeyValueTable } from './types';
 
-// iOS and Android: expo-sqlite. The web uses driver.web.ts (localStorage), because expo-sqlite on
-// web needs Metro to serve wasm with COOP/COEP headers (metro.config.js).
-
 const NAME = 'haven.db';
 
 let database: SQLiteDatabase | null = null;
 let queued: SQLiteDatabase | null = null;
 
-// Single write queue: every write (run, exec, transaction, migration) goes through it, one at a
-// time, on the one connection. `withExclusiveTransactionAsync` opens a second connection and,
-// with concurrent writers, ends in «database is locked»; inside this queue a plain
-// `withTransactionAsync` is safe because nothing else writes meanwhile. Reads are not queued.
 let writes: Promise<unknown> = Promise.resolve();
 function write<T>(task: () => Promise<T>): Promise<T> {
   const next = writes.then(task, task);
@@ -28,14 +21,12 @@ const WRITE_METHODS = new Set([
   'withExclusiveTransactionAsync',
 ]);
 
-/** `db.sqlite()` for features: same object, but its async writes go through the write queue. */
 function queuedDatabase(sql: SQLiteDatabase): SQLiteDatabase {
   return new Proxy(sql, {
     get(target, key, receiver) {
       const value = Reflect.get(target, key, receiver);
       if (typeof value !== 'function') return value;
       if (key === 'withExclusiveTransactionAsync' || key === 'withTransactionAsync') {
-        // Inside the queue the transaction is already exclusive for writers: use the same connection.
         return (task: (txn: SQLiteDatabase) => Promise<void>) =>
           write(() => target.withTransactionAsync(() => task(target)));
       }

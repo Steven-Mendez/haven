@@ -72,8 +72,6 @@ function KeepAwake() {
 export default function Screen() {
   const t = useTexts(texts);
   const navigation = useNavigation();
-  // Own close button inside the monitor strip: nothing sits above it (DESIGN_SYSTEM 8.10).
-  // If the navigator keeps its header (iOS 26 overlays it), the screen pads below it instead.
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
@@ -94,12 +92,8 @@ export default function Screen() {
   return <Episodes protocol={protocol} originParam={params.origin} />;
 }
 
-/** Keys the emergency on its episode: a new open after the packet was sent starts from scratch. */
 function Episodes({ protocol, originParam }: { protocol: Protocol; originParam?: string }) {
   const [episode, setEpisode] = useState<Episode>(() => firstEpisode(takeOrigin(originParam)));
-  // Only the SOS button needs the 3 s hold (SPEC.md §5); the watch, a notification and a red
-  // assessment are already a confirmation. Nothing is sent or alerted before the hold completes.
-  // A completed 3 s hold on the header SOS arrives already confirmed (`takeArmedEmergency`).
   const [armed, setArmed] = useState<number | null>(() => (takeArmedEmergency() ? 1 : null));
   const [armedPending, setArmedPending] = useState(false);
   useEvent('emergency:open', ({ origin }) => {
@@ -112,8 +106,6 @@ function Episodes({ protocol, originParam }: { protocol: Protocol; originParam?:
     setArmedPending(false);
   }, [armedPending, episode.number]);
   if (episode.origin === 'button' && armed !== episode.number && !armedPending) {
-    // A tap on the SOS only navigates here: nothing is emitted (no watch monitor, no chart
-    // marker) until the hold completes.
     return (
       <ArmView
         onConfirm={() => {
@@ -149,33 +141,26 @@ function Emergency({
   const [startedAt] = useState(() => new Date());
   const crewName =
     mission.crew.find((c) => c.id === preferences.crewMember)?.name ?? t.crewMemberFallback;
-  // "Alert the crew" is done by the app with crewHaptic, once per emergency. Only a send the watch
-  // bridge accepted counts: without a connected watch the step stays on screen (Producto real).
   const [crewAlerted] = useState(() =>
     watch.send(watch.envelope('crewHaptic', { message: format(t.crewMessage, { n: crewName }) })),
   );
-  // Fixed when the emergency opens: the protocol variant must not change mid-way. With the crew
-  // alerted, it opens straight on the first question.
   const [run, setRun] = useState<ProtocolRun>(() =>
     startRun(protocol, mission.environment, startedAt, crewAlerted ? AUTO_STEP_IDS : []),
   );
   const [view, setView] = useState<'protocol' | 'packet'>('protocol');
   const [packetFrom, setPacketFrom] = useState<'step' | 'end'>('end');
   const [confirmEnd, setConfirmEnd] = useState(false);
-  // The in-line end confirmation sits at the end of the list: scroll it into view when it appears.
   const revealConfirm = useRef(false);
   const [audioOn, setAudioOn] = useState(true);
   const [marked, setMarked] = useState<Symptom[]>([]);
   const [symptoms, setSymptoms] = useState<Reading[]>([]);
   const [vitalsCount, setVitalsCount] = useState(0);
   const [notes, setNotes] = useState('');
-  // One packet per emergency: re-sending (note added, end after follow-up) reuses the id.
   const [packetId] = useState(() => randomUUID());
   const [queued, setQueued] = useState<Packet | undefined>();
   const { photos, attach, failed } = usePhotos();
   const { say, buzz } = useVoice(audioOn, language);
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
-  // Full-screen modal without a native header: content stays inside the island and home indicator.
   const insets = useScreenInsets({ header: false });
   const headerHeight = useHeaderHeight();
   const top = Math.max(insets.top, headerHeight);
@@ -204,7 +189,6 @@ function Emergency({
   }, []);
 
   function buildPacket(currentNotes = notes, now = new Date()): Packet {
-    // `now` stays injectable for the packet timestamps.
     return buildEmergencyPacket({
       id: packetId,
       crewMember: preferences.crewMember,
@@ -218,15 +202,9 @@ function Emergency({
       decisions: decisionLog(protocol, run, language),
       originLabel: `${t.originLabel}: ${originText}`,
       photos,
-      // `ecg` only when a real recorded ECG exists (HealthKit HKElectrocardiogram via M07): none yet.
     });
   }
 
-  /**
-   * Queues the complete packet (M09 listens to 'emergency:close'; M04 marks the charts). Only called
-   * from explicit actions (end, packet step, note, close button), never from an effect cleanup:
-   * Fast Refresh or a remount must not send a half-built packet.
-   */
   function enqueue(currentNotes = notes) {
     const packet = buildPacket(currentNotes);
     bus.emit('emergency:close', { packet });
@@ -242,7 +220,6 @@ function Emergency({
     void store.saveReading(reading);
   }
 
-  /** Manual pressure / SpO₂ / pulse typed during the emergency: they travel in the packet. */
   function saveVitals(values: Partial<Record<VitalId, string>>): number {
     const units = Object.fromEntries(config.indicators.map((i) => [i.id, i.unit]));
     const readings = manualVitalReadings(values, units, preferences.crewMember, new Date(), () =>
@@ -283,8 +260,6 @@ function Emergency({
   }
 
   function close() {
-    // Closing without ending never loses the record: if the protocol was used, queue it first. An alert the
-    // watch raised, or watch readings during the emergency (live pulse), are a record too.
     const watchData = store
       .readings({ since: startedAt.toISOString() })
       .some((r) => r.source === 'watch');
@@ -296,8 +271,6 @@ function Emergency({
       photos.length > 0 ||
       vitalsCount > 0;
     if (!queued && used) enqueue();
-    // Queueing already ends the watch monitor ('emergency:close'); otherwise end it here, or the watch keeps
-    // measuring an emergency the phone no longer shows.
     else if (!queued)
       watch.send(watch.envelope('emergencyEnd', { endedAt: new Date().toISOString() }));
     if (router.canGoBack()) router.back();
@@ -332,7 +305,6 @@ function Emergency({
       <ScrollView
         ref={scroll}
         onContentSizeChange={() => {
-          // The confirmation is laid out after the state change: finish the scroll once it exists.
           if (!revealConfirm.current) return;
           revealConfirm.current = false;
           scroll.current?.scrollToEnd({ animated: false });
@@ -342,7 +314,6 @@ function Emergency({
         contentContainerStyle={{ paddingBottom: insets.bottom }}
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive"
-        // iOS: keeps the focused vital-sign field above the keyboard.
         automaticallyAdjustKeyboardInsets
       >
         {view === 'packet' && queued ? (

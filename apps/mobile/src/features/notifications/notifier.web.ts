@@ -1,9 +1,6 @@
 import type { NotificationTexts } from './i18n';
 import type { NotificationData } from './logic/reminders';
 
-// M08 · Web: expo-notifications does not support the web. Same API as notifier.ts, no-ops,
-// so the rest of the app behaves the same (alerts are visible in the app itself).
-
 export type PermissionState = 'granted' | 'denied' | 'undetermined' | 'unsupported';
 export type Response = { actionIdentifier: string; data: unknown; userText?: string };
 export type Content = { title: string; body: string; data: NotificationData; category: string };

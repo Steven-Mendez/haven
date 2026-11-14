@@ -1,6 +1,5 @@
 import { defineTexts } from './index';
 
-// Tab and header titles. Owned by M00.
 export const navigationTexts = defineTexts({
   es: {
     body: 'Cuerpo',

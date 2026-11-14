@@ -19,17 +19,12 @@ import { havenTexts } from './texts';
 import type { CrewCard, Now } from './types';
 
 type RowProps = {
-  /** One entry of `CrewResponse.crew`. */
   member: CrewCard;
   now: Now;
   lang: Language;
-  /** Role on board, already translated. */
   role?: string;
-  /** Zone id → display name (translated), for the zone symbols' title and accessible label. */
   zoneNames?: Record<string, string>;
-  /** Detail link, usually `/astronaut/${id}`; the whole row becomes clickable. */
   href?: string;
-  /** Overrides the built-in portrait; `null` shows initials. */
   portrait?: string | null;
   className?: string;
 };
@@ -39,7 +34,6 @@ const zonePos = (z: string) => {
   return i === -1 ? ZONE_ORDER.length : i;
 };
 
-/** Column headers matching AstronautRow. */
 export function AstronautTableHeader({ lang }: { lang: Language }) {
   const t = havenTexts[lang];
   return (
@@ -58,12 +52,6 @@ export function AstronautTableHeader({ lang }: { lang: Language }) {
   );
 }
 
-/**
- * One crew member as a table row (DESIGN_SYSTEM.md §4.2a, ref. Linear/Attio), on shadcn `Table`:
- * portrait 28 + name + role · LevelBadge · seven 8 px zone symbols · «5/7» · last data · alert count.
- * 56 px tall; the whole row links to `href`. Use inside <Table> after <AstronautTableHeader>, or use
- * <AstronautTable>. For narrow screens (< md) keep AstronautCard.
- */
 export function AstronautRow({
   member,
   now,
@@ -77,7 +65,6 @@ export function AstronautRow({
   const t = havenTexts[lang];
   const stale = member.noRecentData;
   const zones = [...member.zones].sort((a, b) => zonePos(a.zone) - zonePos(b.zone));
-  // With no recent data the dots are the last status received, not the current one: say so first.
   const staleLabel =
     stale && member.lastDataAt
       ? `${format(t.staleWarning, { t: formatDuration(minutesBetween(member.lastDataAt, now)) })} `
@@ -156,15 +143,12 @@ type TableProps = {
   members: CrewCard[];
   now: Now;
   lang: Language;
-  /** Crew id → role, already translated. */
   roles?: Record<string, string>;
   zoneNames?: Record<string, string>;
-  /** Builds the row link; defaults to `/astronaut/${id}`. */
   hrefFor?: (id: string) => string;
   className?: string;
 };
 
-/** Ready-made crew table: header + one AstronautRow per member, fixed order by name. */
 export function AstronautTable({
   members,
   now,

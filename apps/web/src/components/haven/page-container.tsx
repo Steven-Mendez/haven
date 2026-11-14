@@ -1,8 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
-/** Page frame shared by every view: same width and gutters as the app header. Renders a <div>: the
- * landmark <main> is SidebarInset in the root layout, and nesting a second <main> breaks landmark navigation. */
 export function PageContainer({
   children,
   className,
@@ -22,7 +20,6 @@ export function PageContainer({
   );
 }
 
-/** Titled section inside a page. */
 export function Section({
   title,
   description,

@@ -6,25 +6,16 @@ import { cn } from '@/lib/utils';
 import type { TrendOption } from './trends-panel';
 
 type Props = {
-  /** Up to four indicators, already chosen on the server (flagged first). */
   options: TrendOption[];
-  /** Link of a tile: the Trends tab with that indicator selected. */
   hrefFor: (indicator: string) => string;
-  /** No recent data: shapes and figures go grey (last known values, never shown as current). */
   stale?: boolean;
   lang: Language;
   texts: { title: string; vsMedian: string; openTrend: string };
 };
 
-/**
- * Metric tiles of the Summary tab (n8n / Hotjar overview tiles): name, latest value (28 px, tabular), delta
- * vs. the personal median and a 48 px trend. Each tile opens the Trends tab with that indicator, so the
- * full chart lives in one place only.
- */
 export function VitalTiles({ options, hrefFor, stale, lang, texts }: Props) {
   if (!options.length) return null;
   return (
-    // Container query: four across only when the main column (not the viewport) has room.
     <section aria-label={texts.title} className="@container">
       <ul className="bg-border grid grid-cols-2 gap-px overflow-hidden rounded-xl border @2xl:grid-cols-4">
         {options.map((o) => {

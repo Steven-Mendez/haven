@@ -1,6 +1,5 @@
 import { defineTexts } from '@/shared/i18n';
 
-// First-run tour: what the app needs to work. Interpolation with `format` ({n}, {total}).
 export const tourTexts = defineTexts({
   es: {
     verdictTitle: 'Tu estado',

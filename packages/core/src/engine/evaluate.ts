@@ -4,27 +4,17 @@ import { type Baseline, baselineWidth } from './baseline';
 import { LEVEL_ORDER, MIN_MS, ms, numeric, series } from './util';
 
 const SYMPTOM_INDICATOR = 'symptom';
-/** Symptom values meaning "none"; they never activate `withSymptoms` rules. */
 const NO_SYMPTOM = new Set(['', 'none', 'no', 'ninguno']);
 
 export type EvaluateOptions = {
-  /** Action catalog; defaults to the one exported by `src/config` (Content) when present. */
   actions?: Action[];
-  /** A symptom is active if recorded in the last N minutes (default 360 = 6 h). */
   symptomWindowMin?: number;
-  /** Freshness of an indicator without `everyHours`, in hours, before the factor (default 24). */
   defaultEveryHours?: number;
-  /** A reading is current if its age ≤ everyHours × factor (default 1.5). */
   freshnessFactor?: number;
 };
 
-/** `ageMin` returned when there is no reading at all for the indicator. */
 export const NO_DATA_AGE_MIN = -1;
 
-/**
- * Applies `environmentOverrides`: for the given environment, the override's `green` and `rules`
- * **replace** (they are not appended to) the base reference. Whatever the override omits is inherited.
- */
 export function configForEnvironment(config: Config, environment: string): Config {
   return {
     ...config,
@@ -36,10 +26,6 @@ export function configForEnvironment(config: Config, environment: string): Confi
   };
 }
 
-/**
- * Display label of a category value (`heart-rhythm` `sinus` → «Sinusal» / «Sinus») from
- * `indicator.categoryLabels`; without a label, the raw value.
- */
 export function categoryLabel(
   indicator: Pick<Indicator, 'categoryLabels'>,
   value: number | string,
@@ -49,7 +35,6 @@ export function categoryLabel(
   return indicator.categoryLabels?.[key]?.[lang] ?? key;
 }
 
-/** Active symptoms at `now`: `indicator: 'symptom'` readings inside the window, deduplicated by id. */
 export function activeSymptoms(symptoms: Reading[], now: Date, windowMin = 360): Reading[] {
   const end = now.getTime();
   const start = end - windowMin * MIN_MS;
@@ -64,26 +49,6 @@ export function activeSymptoms(symptoms: Reading[], now: Date, windowMin = 360):
   });
 }
 
-/**
- * Evaluates every indicator of the config and returns one `Assessment` per indicator.
- *
- * - Applies `configForEnvironment(config, environment)` first.
- * - Only readings with `takenAt <= now` count. The most recent one is the current value.
- * - **Freshness:** without readings, or if the last one is older than `everyHours × 1.5` hours
- *   (24 h × 1.5 when the indicator has no `everyHours`), the level is "pending", never green.
- * - **Rules:** all are checked; the matching rule with the most severe level wins and, on a tie, the
- *   first one in config order. A rule's conditions are ANDed: `outside` (value outside [a, b]),
- *   `baselineDeviation: k` (|value − median| > k × p10–p90 width), `categories` (category value in
- *   the list), `withSymptoms` (an active symptom; on numeric indicators `categories` filters which
- *   symptoms count). `repetitions: N` requires the last N readings to meet the value condition;
- *   `sustainedMin: M`, that every reading of at least the last M minutes meets it. With both, either
- *   is enough.
- * - **Closing rule:** if no rule matches and the value is outside `green`, amber with the action
- *   "repeat measurement". Exception: if a rule whose value condition already holds is only waiting for
- *   `repetitions` or `sustainedMin`, the level stays green with a "being watched" explanation (so two
- *   high-stress check-ins do not turn amber and the third does; M10).
- * - `symptoms` and any `symptom` readings inside `readings` are merged.
- */
 export function evaluate(
   readings: Reading[],
   config: Config,
@@ -257,7 +222,6 @@ function matchRule(
   return repsOk || sustainedOk ? 'yes' : 'waiting';
 }
 
-/** Condition on a reading's value (no symptoms, no memory). */
 function valueCondition(rule: Rule, ind: Indicator, r: Reading, b: Baseline | undefined): boolean {
   if (ind.kind === 'category') {
     if (rule.categories?.length) return rule.categories.includes(String(r.value));

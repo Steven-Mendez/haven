@@ -23,12 +23,6 @@ import {
 } from './logic/reminders';
 import * as notifier from './notifier';
 
-// M08 · Local actionable notifications (no push, works without network):
-// - alert when an indicator turns red ("Open emergency" · "Register");
-// - reminders of the Routine's pending measurements, planned from `everyHours` of the config;
-// - responses: "Open emergency" brings the app forward and opens /emergency (via the bus);
-//   "Register" opens /indicator/[id] or saves the typed value in the background.
-
 const REPLAN_DEBOUNCE_MS = 10_000;
 const REPLAN_EVERY_MS = 30 * 60_000;
 const targets = reminderTargets(config);
@@ -97,7 +91,6 @@ function reminderContent(p: PlannedReminder): notifier.Content {
   };
 }
 
-/** Plans the reminders again; only touches the system schedule when the plan changed. */
 export async function replanReminders(force = false): Promise<void> {
   if (permissionState !== 'granted') return;
   const plan = planReminders(targets, lastTakenAt(), new Date());
@@ -127,7 +120,6 @@ function scheduleReplan() {
 async function perform(action: ResponseAction) {
   switch (action.kind) {
     case 'openEmergency':
-      // The root layout's listener opens /emergency (M06).
       bus.emit('emergency:open', { origin: 'notification' });
       return;
     case 'navigate':
@@ -158,7 +150,6 @@ function handle(response: notifier.Response) {
   ).catch((e) => console.warn('[notifications] response failed', e));
 }
 
-/** Asks for permission (system prompt) and schedules the reminders. */
 export async function requestNotificationPermission(): Promise<notifier.PermissionState> {
   try {
     setPermission(await notifier.requestPermission());
@@ -169,7 +160,6 @@ export async function requestNotificationPermission(): Promise<notifier.Permissi
   return permissionState;
 }
 
-/** Sets categories, asks for permission once, listens to responses, alerts and readings. */
 export async function startNotifications(): Promise<void> {
   if (started) return;
   started = true;
@@ -197,7 +187,6 @@ export async function startNotifications(): Promise<void> {
   setInterval(() => void replanReminders(), REPLAN_EVERY_MS);
 }
 
-/** Permission state: 'unsupported' on the web. */
 export function useNotificationPermission(): notifier.PermissionState {
   return useSyncExternalStore(
     (listener) => {

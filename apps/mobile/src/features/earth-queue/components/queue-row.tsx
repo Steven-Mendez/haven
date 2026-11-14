@@ -19,7 +19,6 @@ import { displayStatus, type QueueEntry } from '../logic/queue';
 
 type Props = { entry: QueueEntry; sending: boolean; onDiscard: (id: string) => void };
 
-/** Status as coloured text (real states only): sending = accent, received = foreground. */
 const STATUS_TONE = {
   queued: 'text-muted-foreground',
   sending: 'text-brand',
@@ -34,10 +33,6 @@ const STATUS_ICON = {
   rejected: CircleAlert,
 } as const;
 
-/**
- * One line per packet: type icon · "Routine · 14:02" · real state on the right ("Queued",
- * "Sending", "Received by Earth 14:03"). Tapping shows what it carries.
- */
 export function QueueRow({ entry, sending, onDiscard }: Props) {
   const t = useTexts(texts);
   const language = useLanguage();
@@ -62,7 +57,6 @@ export function QueueRow({ entry, sending, onDiscard }: Props) {
         accessibilityLabel={`${title}. ${statusText}`}
         className="min-h-row active:bg-active justify-center gap-2 px-4 py-2.5"
       >
-        {/* Emergency packets: a 2 pt red rule on the left (Sentry / Vercel logs). */}
         {packet.type === 'emergency' ? (
           <View className="bg-level-red absolute top-0 bottom-0 left-0 w-0.5" />
         ) : null}

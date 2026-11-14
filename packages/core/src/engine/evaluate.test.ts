@@ -136,7 +136,6 @@ describe('evaluate', () => {
   });
 
   it('most severe matching rule wins regardless of order', () => {
-    // glucose 65 with symptom matches both the red and the amber rule.
     const r = run([reading('glucose', 65)], { symptoms: [reading('symptom', 'confusion')] });
     expect(r.glucose?.level).toBe('red');
   });

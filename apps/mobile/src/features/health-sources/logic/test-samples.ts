@@ -1,10 +1,5 @@
-// M07 · Development only (`__DEV__`): the records written into the iOS simulator's HealthKit by
-// "Write test samples to HealthKit". They are data, not product logic: the app then reads them
-// through the normal HealthKit provider. Deterministic (no randomness), so tests can check them.
-
 export type QuantityPlan = {
   kind: 'quantity';
-  /** HealthKit quantity type identifier. */
   type: string;
   unit: string;
   value: number;
@@ -16,7 +11,6 @@ export type SleepPlan = { kind: 'sleep'; start: Date; end: Date };
 
 export type SamplePlan = QuantityPlan | SleepPlan;
 
-/** Quantity types the tool writes (write permission is asked for these and sleep). */
 export const TEST_QUANTITY_TYPES = [
   'HKQuantityTypeIdentifierStepCount',
   'HKQuantityTypeIdentifierDistanceWalkingRunning',
@@ -30,22 +24,12 @@ export const TEST_SLEEP_TYPE = 'HKCategoryTypeIdentifierSleepAnalysis' as const;
 const HOUR = 3_600_000;
 const MIN = 60_000;
 
-/** Small deterministic wobble in [-1, 1] per day and series. */
 function wobble(day: number, series: number): number {
   return Math.sin(day * 1.7 + series * 2.3);
 }
 
 const at = (dayStart: Date, hours: number) => new Date(dayStart.getTime() + hours * HOUR);
 
-/**
- * `days` days of records ending today (today only up to `now`):
- * - steps: four walks of ~1,400 steps (08, 12, 16, 19 h); distance 0.72 m per step; floors 2–4;
- * - heart rate: resting samples at 07, 13 and 21 h (60–70 bpm);
- * - HRV (SDNN) at 07 h (45–55 ms); SpO₂ at 07 and 21 h (96–98 %, written as a fraction);
- * - sleep: one night 23:00 → 06:30 (7–7.5 h asleep) ending that morning;
- * - plus one recent record of each quantity 10 min before `now`, so the latest value of each
- *   indicator comes from HealthKit whatever the time of day.
- */
 export function planTestSamples(now: Date, days = 7): SamplePlan[] {
   const out: SamplePlan[] = [];
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -57,7 +41,6 @@ export function planTestSamples(now: Date, days = 7): SamplePlan[] {
       const end = new Date(start.getTime() + minutes * MIN);
       if (end <= now) out.push({ kind: 'quantity', type, unit, value, start, end });
     };
-    // Sleep that ends this morning (started the evening before).
     const sleepStart = at(dayStart, -1);
     const sleepEnd = new Date(sleepStart.getTime() + (7.5 + 0.25 * wobble(n, 5)) * HOUR);
     if (sleepEnd <= now) out.push({ kind: 'sleep', start: sleepStart, end: sleepEnd });

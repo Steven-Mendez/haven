@@ -42,9 +42,6 @@ function findDestination(id: string | undefined) {
   return undefined;
 }
 
-// ---- Main list: the label of the «Environment and destination» row ----
-
-/** Value and one grey line for the «Environment and destination» row of the Mission list. */
 export function useEnvironmentLabel(mission: Mission, destination?: string) {
   const t = useTexts(texts);
   const translate = useTranslate();
@@ -68,7 +65,6 @@ export function useEnvironmentLabel(mission: Mission, destination?: string) {
   };
 }
 
-/** Communication delay with Earth (one way), shown as mission data. */
 function DelayGroup({ mission }: { mission: Mission }) {
   const t = useTexts(texts);
   const language = useLanguage();
@@ -84,8 +80,6 @@ function DelayGroup({ mission }: { mission: Mission }) {
     </Group>
   );
 }
-
-// ---- Picker view: environments (radio rows) and destinations (thumbnail rows) ----
 
 function EnvironmentRow({
   environment,
@@ -114,7 +108,6 @@ function EnvironmentRow({
   ];
 
   return (
-    // The whole row selects (large hit target); the RadioGroupItem is the visible control.
     <Button
       variant="ghost"
       onPress={onSelect}
@@ -167,7 +160,6 @@ function DestinationRow({
         accessibilityLabel={`${translate(destination.name)}. ${translate(environment.name)}. ${detail}`}
         className="active:bg-muted h-auto min-h-16 justify-start gap-3 bg-transparent px-4 py-2 sm:h-auto sm:min-w-0 sm:px-4"
       >
-        {/* Sober thumbnail: cropped, rounded, no effects (DESIGN_SYSTEM). */}
         <View className="bg-muted size-14 overflow-hidden rounded-md">
           {source ? (
             <Image
@@ -195,10 +187,6 @@ function DestinationRow({
   );
 }
 
-/**
- * «Environment and destination» view (DESIGN_SYSTEM 4.1d): choosing an environment or a destination
- * saves it and goes back; the communication delay is shown at the top as data. Rendered in place of the Mission list.
- */
 export function EnvironmentPicker({
   mission,
   destination,
@@ -269,11 +257,9 @@ export function EnvironmentPicker({
       </Group>
 
       <Group title={t.destinationsGroup} hint={`${t.destinationsHint} ${t.aiImage}.`}>
-        {/* One ToggleGroup child: the separators `Group` adds between rows are drawn per row. */}
         <ToggleGroup
           type="single"
           value={selectedDestination}
-          // Tapping the chosen row clears the value (`undefined`): it is still a selection.
           onValueChange={(id) => {
             const hit = destinations.find(({ item }) => item.id === (id ?? selectedDestination));
             if (hit) selectDestination(hit.environment, hit.item);

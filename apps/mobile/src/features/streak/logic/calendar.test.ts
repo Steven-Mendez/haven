@@ -18,7 +18,6 @@ describe('daysOfMonth', () => {
 });
 
 describe('monthGrid', () => {
-  // 2026-11-01 is a Sunday.
   it('starts on Sunday in English', () => {
     const grid = monthGrid('2026-11', 0);
     expect(grid[0][0]).toBe('2026-11-01');

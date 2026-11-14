@@ -32,9 +32,7 @@ type Props = {
   environment: string;
   linkDown: boolean;
   now: number;
-  /** Latest reaction-time reading (false starts live in its note). */
   reaction?: Reading;
-  /** Shown when the battery cannot be retaken yet. */
   onRepeat?: () => void;
 };
 
@@ -50,7 +48,6 @@ function falseStarts(note?: string): number | undefined {
   return m ? Number(m[1]) : undefined;
 }
 
-/** Result: verdict, gauges vs. baseline, on-board decision notice, "Why?" with thresholds and version. */
 export function ResultView({
   t,
   verdict,
@@ -82,7 +79,6 @@ export function ResultView({
 
   return (
     <View className="gap-6">
-      {/* Verdict first */}
       <ScreenHeader
         title={t.result}
         subtitle={translate(verdict.explanation)}
@@ -103,7 +99,6 @@ export function ResultView({
         <BigButton label={t.repeat} variant="ghost" onPress={onRepeat} />
       ) : null}
 
-      {/* Detail, folded: gauges vs. baseline, what to do, why, source */}
       <More label={t.detail}>
         {BATTERY_INDICATORS.map((id) => {
           const a = verdict.assessments.find((x) => x.indicator === id);

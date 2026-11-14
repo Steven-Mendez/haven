@@ -30,12 +30,6 @@ function ContextRow({ label, value, dot }: { label: string; value: string; dot?:
   );
 }
 
-/**
- * SOS entry (Me+ hold-to-confirm + inDrive context rows, SPEC.md §5–6): the SOS in the tab bar
- * opens this screen; holding the ring for 3 s starts the emergency (crew alert + protocol).
- * Releasing cancels; «Cancel» goes back. Emergencies from the watch, a notification or a red
- * assessment skip this step (they are already confirmed).
- */
 export function ArmView({ onConfirm }: { onConfirm: () => void }) {
   const t = useTexts(texts);
   const insets = useScreenInsets({ header: false });

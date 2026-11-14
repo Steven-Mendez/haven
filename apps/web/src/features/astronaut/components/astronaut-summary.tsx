@@ -24,23 +24,15 @@ import { IndicatorRow } from './indicator-row';
 type Props = {
   data: AstronautResponse;
   assessed: ReceivedPacket | undefined;
-  /** Level shown for the crew member (open emergency first). */
   level: VisualLevel;
-  /** Metric tiles (VitalTiles), rendered first in the main column. */
   vitals?: ReactNode;
   names: Names;
   lang: Language;
   t: AstronautTexts;
 };
 
-/** Rows of «Needs attention» shown in Summary; the rest are one click away in the States tab. */
 const ATTENTION_ROWS = 5;
 
-/**
- * Summary tab (DESIGN_SYSTEM.md §8.2, SPEC §6): main column = metric tiles driving one chart, then «Needs
- * attention» (red and amber only, one 36 px line each, expandable) and one grouped «What HAVEN prompted on
- * board» block; right rail = properties (received, transit, data age…).
- */
 export function AstronautSummary({ data, assessed, level, vitals, names, lang, t }: Props) {
   const now = data.generatedAt;
   const member = data.crewMember;

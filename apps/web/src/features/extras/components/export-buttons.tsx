@@ -14,7 +14,6 @@ function download(filename: string, content: string, type: string) {
   URL.revokeObjectURL(url);
 }
 
-/** Downloads the full config of a rules version (to load it on a phone by hand). */
 export function ExportJsonButton({
   versionId,
   filename,
@@ -24,7 +23,6 @@ export function ExportJsonButton({
   versionId: string;
   filename: string;
   labels: { idle: string; busy: string; failed: string };
-  /** Icon button (label kept as accessible name and tooltip). */
   iconOnly?: boolean;
 }) {
   const [state, setState] = useState<'idle' | 'busy' | 'failed'>('idle');
@@ -53,7 +51,6 @@ export function ExportJsonButton({
   );
 }
 
-/** Downloads rows as CSV (header first). */
 export function ExportCsvButton({
   filename,
   header,

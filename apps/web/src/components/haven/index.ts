@@ -1,7 +1,3 @@
-// HAVEN design components for the Ground View, composed on shadcn/ui (`components/ui`).
-// Pure presentation: no data access. Safe to import from server and client components.
-// App chrome (sidebar, header, actions, fonts) is imported directly by the root layout. API in apps/web/DISENO.md.
-
 export { type ActivityItem, ActivityList } from './activity-list';
 export { ActivityRings } from './activity-rings';
 export { AgeLabel, NO_RECENT_DATA_MIN, TimeAgo } from './age-label';
@@ -64,7 +60,6 @@ export {
 export { MiniTrend, Sparkline } from './sparkline';
 export { type Stat, StatStrip } from './stat-strip';
 export { type TermExplanation, TermTip } from './term-tip';
-// `Term` / `explain` resolve the glossary from @haven/core: import them from './term' in server files only.
 export { type HavenTexts, havenTexts } from './texts';
 export { THEME_COOKIE } from './theme';
 export { Timeline } from './timeline';

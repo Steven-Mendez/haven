@@ -16,24 +16,15 @@ export function formatClock(seconds: number): string {
 }
 
 type Props = {
-  /** Total seconds of the step (`Step.seconds`). */
   total: number;
-  /** Seconds left (from `useCountdown` or your own clock). */
   remaining: number;
-  /** Diameter in pt. 240 on an emergency step; 120 in compact places. */
   size?: number;
-  /** Line under the time ("Compressions", "Cycle 2 of 5"). */
   label?: string;
   paused?: boolean;
-  /** Ring colour. Default: text colour (keep it; no level or zone colours). */
   color?: string;
   className?: string;
 };
 
-/**
- * Circular step timer: remaining arc in the text colour on a muted track + big mm:ss (500).
- * Presentational: the screen owns the clock (see `useCountdown`). No pulsing or animation.
- */
 export function StepTimer({
   total,
   remaining,
@@ -94,11 +85,6 @@ export function StepTimer({
   );
 }
 
-/**
- * Drift-free countdown for StepTimer. Runs while `running` is true; pausing keeps the remainder.
- * `reset()` restarts from `total` (or a given number of seconds), also while running.
- * `onDone` fires once when it reaches 0 (e.g. haptic or speech in the feature).
- */
 export function useCountdown(total: number, running: boolean, onDone?: () => void) {
   const [remaining, setRemaining] = useState(total);
   const [epoch, setEpoch] = useState(0);

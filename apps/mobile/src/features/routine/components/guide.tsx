@@ -16,10 +16,6 @@ const CAPTION: Record<GuideExample['key'], keyof (typeof texts)['es']> = {
   done: 'guideDone',
 };
 
-/**
- * "How to read the ring": six illustrative rings (never real data), unfolded in place from the ring,
- * so progress is not read as health.
- */
 export function ActionsGuide() {
   const t = useTexts(texts);
   return (

@@ -13,17 +13,11 @@ import { cn } from '@/shared/lib/utils';
 import { havenTexts } from './i18n';
 
 type Props = {
-  /** Called once the hold completes (3 s by default). */
   onConfirm: () => void;
-  /** Label inside the ring while idle ("SOS"). */
   label: string;
-  /** Line under the ring while idle ("Hold to start"). */
   hint?: string;
-  /** Accessible name ("Start emergency"). Screen-reader activation confirms directly. */
   accessibilityLabel: string;
-  /** Hold duration in ms (tokens.json → motion.holdToConfirm). */
   duration?: number;
-  /** Ring diameter in pt. */
   size?: number;
   className?: string;
 };
@@ -32,11 +26,6 @@ const tick = () => {
   if (Platform.OS !== 'web') void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 };
 
-/**
- * Hold-to-confirm ring (Me+ pattern, SPEC.md §5): press and hold; the red ring fills linearly over
- * 3 s with a 72 pt countdown and a haptic tick each second; release cancels. With Reduce Motion
- * the ring steps once per second. VoiceOver / TalkBack activation confirms directly (deliberate).
- */
 export function HoldToConfirm({
   onConfirm,
   label,

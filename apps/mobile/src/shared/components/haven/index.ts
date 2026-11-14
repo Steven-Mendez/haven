@@ -1,7 +1,3 @@
-// HAVEN design components (owner: mobile UX/UI designer). Presentational only:
-// they receive data through props and never import features or `@/shared/data`.
-// Source of truth: haven/DESIGN_SYSTEM.md + design/tokens.json. Mobile notes: apps/mobile/DISENO.md.
-
 export { ActionRow, ListGroup } from './action-row';
 export { ActivityRings, type RingDatum, RingLegend, RingSpark } from './activity-rings';
 export { BigButton } from './big-button';

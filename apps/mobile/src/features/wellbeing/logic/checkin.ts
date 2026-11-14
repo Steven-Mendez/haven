@@ -1,29 +1,22 @@
-// M10 · Wellbeing check-in: pure logic. Mood and stress are readings; contact and the private journal
-// are stored apart and never go into a Reading, an Assessment or a routine packet.
 import type { Reading } from '@haven/core';
 
 export const JOURNAL_MAX = 3000;
 export const CONTACT_OPTIONS = ['crew', 'family', 'mission-control', 'nobody'] as const;
 export type Contact = (typeof CONTACT_OPTIONS)[number];
 
-/** Local collections (`db.collection`). */
 export const CHECKIN_COLLECTION = 'wellbeing_checkins';
 export const JOURNAL_COLLECTION = 'private_journal';
 
-/** Non-clinical context of a check-in (stays on the phone). */
 export type CheckinRecord = {
   id: string;
   crewMember: string;
   takenAt: string;
   contact: Contact[];
-  /** Ids of the mood and stress readings it belongs to. */
   readingIds: string[];
 };
 
-/** Private journal entry: only on this device. */
 export type JournalEntry = { id: string; crewMember: string; takenAt: string; text: string };
 
-/** "Nobody" excludes every other option, and picking any other option clears "nobody". */
 export function toggleContact(previous: Contact[], next: string[]): Contact[] {
   const valid = next.filter((c): c is Contact =>
     (CONTACT_OPTIONS as readonly string[]).includes(c),
@@ -34,12 +27,10 @@ export function toggleContact(previous: Contact[], next: string[]): Contact[] {
   return valid;
 }
 
-/** Trims and caps the journal at 3000 characters. */
 export function cleanJournal(text: string): string {
   return text.trim().slice(0, JOURNAL_MAX);
 }
 
-/** Mood and stress go together (both or neither). */
 export function hasScales(
   mood: number | null | undefined,
   stress: number | null | undefined,
@@ -47,10 +38,6 @@ export function hasScales(
   return isScale(mood) && isScale(stress);
 }
 
-/**
- * Something to save: both scales, or only the optional part (contact or journal) when today's mood
- * and stress were already recorded (inline card in Routine, DESIGN_SYSTEM.md 4.1b).
- */
 export function canSave(input: {
   mood?: number | null;
   stress?: number | null;
@@ -69,7 +56,6 @@ function isScale(v: number | null | undefined): v is number {
 }
 
 export type CheckinInput = {
-  /** Omit both when they were already recorded today. */
   mood?: number | null;
   stress?: number | null;
   contact: Contact[];
@@ -80,10 +66,6 @@ export type CheckinInput = {
   unitOf: (indicator: string) => string;
 };
 
-/**
- * Splits a check-in into what may be evaluated (two `source: 'screen'` readings, no note) and what
- * stays local (contact record and, if written, the journal entry).
- */
 export function buildCheckin(input: CheckinInput): {
   readings: Reading[];
   record: CheckinRecord;

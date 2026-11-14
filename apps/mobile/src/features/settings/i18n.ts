@@ -1,6 +1,5 @@
 import { defineTexts } from '@/shared/i18n';
 
-// Settings. Language names are shown in their own language (not translated).
 export const texts = defineTexts({
   es: {
     general: 'General',

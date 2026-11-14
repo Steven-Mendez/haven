@@ -7,10 +7,6 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 
 type Theme = 'dark' | 'light';
 
-/**
- * Dark / light segmented choice (the only theme control): the `dark` class on <html>
- * plus the `haven-theme` cookie read by THEME_SCRIPT before first paint.
- */
 export function ThemeChoice({
   labels,
 }: {
@@ -22,7 +18,6 @@ export function ThemeChoice({
     const read = () =>
       setTheme(document.documentElement.classList.contains('dark') ? 'dark' : 'light');
     read();
-    // Other switches (sidebar toggle, ⌘K) flip the class directly: follow them.
     const observer = new MutationObserver(read);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     return () => observer.disconnect();

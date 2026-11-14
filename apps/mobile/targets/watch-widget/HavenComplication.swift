@@ -1,19 +1,12 @@
 import SwiftUI
 import WidgetKit
 
-// W01 · Status complication (targets/watch/DISENO.md §4 W01, «Complicación»).
-// Every family shows the level shape (● ◐ ▲ ○) and label; colour is secondary and the shape is `.widgetAccentable()`
-// so it survives tinted faces. The rectangular family adds the 3-segment level meter. Past 60 min the status gets a
-// `clock`. Never a coloured ring.
-// The watch app reloads the timelines whenever a new `status` arrives (Status/ComplicationStore.swift).
-
 struct StatusEntry: TimelineEntry {
     let date: Date
     let snapshot: ComplicationSnapshot?
 }
 
 struct StatusProvider: TimelineProvider {
-    /// Entries refresh the age («hace 20 min») every 10 min for 3 h, then wait for the next reload.
     private static let step: TimeInterval = 10 * 60
     private static let horizon: TimeInterval = 3 * 60 * 60
 
@@ -85,7 +78,6 @@ struct StatusComplicationView: View {
         symbol
             .font(.system(size: 22, weight: .semibold))
             .widgetLabel {
-                // The curved label truncates past ~15 characters («HAVEN · EMERGEN…»): long labels go alone.
                 Text(label.count > 8 ? label : "HAVEN · \(label)")
             }
     }
@@ -140,7 +132,6 @@ struct StatusComplicationView: View {
         return snapshot.nextPending ?? language.pick("Nada pendiente hoy", "Nothing pending today")
     }
 
-    /// «hace 12 min», same wording as `Strings.ago` in the watch app.
     private var ageText: String {
         guard let snapshot = entry.snapshot else { return language.pick("sin dato", "no data") }
         let minutes = Int(max(0, entry.date.timeIntervalSince(snapshot.evaluatedAt)) / 60)

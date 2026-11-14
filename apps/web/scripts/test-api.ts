@@ -1,11 +1,3 @@
-// T01 backend · End-to-end checks of the Earth API (contract D) against a running server.
-//
-//   cd apps/web && pnpm dev            # in another terminal
-//   pnpm --filter web seed      # optional: enables the ARES01 checks
-//   pnpm --filter web test:api  # API_URL=http://host:3000 to target another server
-//
-// Uses throwaway mission codes and deletes them from MongoDB at the end.
-
 import { fileURLToPath } from 'node:url';
 import { MongoClient } from 'mongodb';
 import { COLLECTIONS } from '../src/server/model';
@@ -112,7 +104,6 @@ async function testInstantAndIdempotency() {
   const mission = code();
   missionCodes.push(mission);
   const takenAt = new Date(Date.now() - 5 * 60_000).toISOString();
-  // The phone may still send an old-style future visibleAt: the server ignores it.
   const sentAt = new Date().toISOString();
   const a = packet(mission, 'tester-a', {
     sentAt,
@@ -196,7 +187,6 @@ async function testInstantAndIdempotency() {
     astro.data,
   );
 
-  // A packet whose newest reading is 7 h old (e.g. it waited in the offline queue).
   const old = new Date(Date.now() - 7 * 3600_000).toISOString();
   const b = packet(mission, 'tester-b', {
     createdAt: old,

@@ -1,7 +1,5 @@
 import { defineTexts } from '@/lib/i18n';
 
-// T02 · Interface copy for the astronaut detail. Medical texts (explanations, actions, protocol names,
-// indicator names and units) come from packages/core/config, never from here.
 export const texts = defineTexts({
   es: {
     title: 'Detalle por astronauta',
@@ -61,7 +59,6 @@ export const texts = defineTexts({
     normalRangeText: 'Rango normal de referencia: {min}–{max} {unit}',
     pointsCount: '{n} lecturas',
     noTrends: 'Todavía no hay lecturas numéricas para dibujar tendencias.',
-    // Notes and diary
     notesTitle: 'Notas y diario',
     notesDescription:
       'Lo que el astronauta escribió y decidió enviar a la Tierra: notas de los paquetes, notas en lecturas y fotos, y su diario.',
@@ -71,7 +68,6 @@ export const texts = defineTexts({
     notes: 'Notas',
     readingNote: 'Nota en una lectura',
     photoNote: 'Nota en una foto',
-    // Reading sources
     'source.watch': 'Apple Watch',
     'source.healthkit': 'HealthKit',
     'source.healthconnect': 'Health Connect',
@@ -79,7 +75,6 @@ export const texts = defineTexts({
     'source.manual': 'Manual',
     'source.screen': 'Pantalla',
     'source.ship': 'Telemetría de la nave',
-    // Tabs and simplified layout (DESIGN_SYSTEM.md §8.2)
     tabsLabel: 'Secciones del astronauta',
     tabSummary: 'Resumen',
     tabStates: 'Estados',
@@ -205,10 +200,6 @@ export const texts = defineTexts({
 
 export type AstronautTexts = (typeof texts)['es'];
 
-/**
- * Reading source named for what it is (Apple Watch, HealthKit, Manual…). Sources without a real-world name
- * (the frozen `simulator` id of old records) give an empty string, so they are not shown.
- */
 export function dynamicText(t: AstronautTexts, prefix: 'source', id: string): string {
   return (t as Record<string, string>)[`${prefix}.${id}`] ?? '';
 }

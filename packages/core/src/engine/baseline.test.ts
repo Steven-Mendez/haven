@@ -33,7 +33,6 @@ describe('computeBaseline', () => {
   });
 
   it('leaves acute episodes out: flagged monitor readings, bursts and MAD outliers', () => {
-    // 30 hourly readings around 68 bpm, then a 10-minute emergency with a monitor stream.
     const daily = Array.from({ length: 30 }, (_, i) =>
       reading('heart-rate', 66 + (i % 5), (40 - i) * 60),
     );

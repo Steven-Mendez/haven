@@ -1,19 +1,15 @@
 import { CATEGORY_CODES, type Indicator, type Reading } from '@haven/core';
 
-// Trend of the indicator screen (M02): range selector and readings → chart points.
-
 export type ChartRange = 'day' | 'week' | 'month';
 export const CHART_RANGES: readonly ChartRange[] = ['day', 'week', 'month'];
 
 const DAY_MS = 86_400_000;
 const RANGE_MS: Record<ChartRange, number> = { day: DAY_MS, week: 7 * DAY_MS, month: 30 * DAY_MS };
 
-/** `[from, to]` in epoch ms ending at `now`. */
 export function rangeDomain(range: ChartRange, now: number): [number, number] {
   return [now - RANGE_MS[range], now];
 }
 
-/** Category values the chart can place on the y axis (index in the known list). */
 export function categoriesOf(indicator: Indicator): readonly string[] {
   const known = CATEGORY_CODES[indicator.id];
   if (known) return known;
@@ -21,7 +17,6 @@ export function categoriesOf(indicator: Indicator): readonly string[] {
   return [...new Set(fromRules)];
 }
 
-/** Numeric value of a reading for the chart; categories map to their index. */
 export function chartValue(indicator: Indicator, value: Reading['value']): number | undefined {
   if (indicator.kind === 'category') {
     const index = categoriesOf(indicator).indexOf(String(value));
@@ -31,7 +26,6 @@ export function chartValue(indicator: Indicator, value: Reading['value']): numbe
   return Number.isFinite(n) ? n : undefined;
 }
 
-/** `[t, v][]` of the readings inside the domain, ready for `SeriesChart`. */
 export function chartPoints(
   indicator: Indicator,
   readings: Reading[],

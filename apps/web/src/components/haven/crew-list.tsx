@@ -24,17 +24,11 @@ type Props = {
   members: CrewCard[];
   now: Now;
   lang: Language;
-  /** Crew id → role, already translated. */
   roles?: Record<string, string>;
-  /** Zone id → display name (translated), for the zone strip's labels. */
   zoneNames?: Record<string, string>;
-  /** Builds the row link; defaults to `/astronaut/${id}`. */
   hrefFor?: (id: string) => string;
-  /** Mission one-way delay (minutes), for the data-age tooltip. */
   delayMin?: number;
-  /** Indicator id → translated name and unit, for the hover card. */
   indicators?: Record<string, { name: string; unit: string }>;
-  /** id of the list, used by the j/k keyboard navigation. */
   id?: string;
   className?: string;
 };
@@ -44,7 +38,6 @@ const zonePos = (z: string) => {
   return i === -1 ? ZONE_ORDER.length : i;
 };
 
-/** «12 min», «8 h», «3 d» (exact UTC time stays in the tooltip). */
 export function compactAgo(at: string, now: Now): string {
   const min = Math.max(0, Math.floor(minutesBetween(at, now)));
   if (min < 60) return `${min} min`;
@@ -52,7 +45,6 @@ export function compactAgo(at: string, now: Now): string {
   return h < 48 ? `${h} h` : `${Math.floor(h / 24)} d`;
 }
 
-/** Groups in severity order (SPEC §6: Emergency → Check → [No recent data] → Pending → In range). */
 function groupByLevel(members: CrewCard[]) {
   const groups = new Map<VisualLevel, CrewCard[]>();
   for (const m of members) {
@@ -62,7 +54,6 @@ function groupByLevel(members: CrewCard[]) {
   return [...groups.entries()].sort(([a], [b]) => LEVEL_ORDER[a] - LEVEL_ORDER[b]);
 }
 
-/** Alerts of the latest packet counted by level: «▲ 2  ◐ 3». */
 function AlertCounts({ member, lang }: { member: CrewCard; lang: Language }) {
   const t = havenTexts[lang];
   const red = member.alerts.filter((a) => a.level === 'red').length;
@@ -96,7 +87,6 @@ type CardInfo = {
   indicators?: Record<string, { name: string; unit: string }>;
 };
 
-/** Text of the level-shape tooltip: «Check · 2 indicators outside your range». */
 export function levelTip(member: CrewCard, lang: Language) {
   const t = havenTexts[lang];
   const level = levelLabel(crewDisplayLevel(member), lang);
@@ -105,10 +95,6 @@ export function levelTip(member: CrewCard, lang: Language) {
   return format(n === 0 ? t.levelTipNone : n === 1 ? t.levelTipOne : t.levelTipMany, { level, n });
 }
 
-/**
- * Hover card on an astronaut name (Linear/X profile preview): portrait, role, level, last data age, up to
- * three out-of-range readings and «Open ↵». Hover-only inside a row link; the row itself carries the facts.
- */
 export function CrewHoverCard({
   member,
   now,
@@ -176,7 +162,6 @@ export function CrewHoverCard({
   );
 }
 
-/** One 36 px row (Linear issue row): shape · name · role · zone strip · today · alerts · data age. */
 function CrewRow({
   member,
   now,
@@ -273,7 +258,6 @@ function CrewRow({
             </span>
           ) : null}
 
-          {/* Body zones that need a look, by name (red first); the full list is in the tooltip. */}
           <Tooltip>
             <TooltipTrigger
               render={
@@ -326,8 +310,6 @@ function CrewRow({
           <span className="hidden w-16 shrink-0 items-center justify-end gap-2 text-xs tabular-nums md:flex">
             <Tooltip>
               <TooltipTrigger render={<span className="inline-flex" />}>
-                {/* Routine sector only, so the disc matches «n/7» and the «Daily actions» KPI; the three
-                    categories are in the tooltip, the quick view and the profile. */}
                 <ActivityRings
                   rings={crewRings(member).filter((r) => r.id === 'routine')}
                   size={20}
@@ -396,10 +378,6 @@ function CrewRow({
   );
 }
 
-/**
- * Crew grouped by overall level (SPEC §6 «Tripulación», Linear grouped list): 32 px group headers with shape,
- * label and count, then 36 px rows. j / k move between rows, ↵ opens. Fixed order by name inside a group.
- */
 export function CrewList({
   members,
   now,

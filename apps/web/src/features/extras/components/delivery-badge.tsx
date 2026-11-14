@@ -8,18 +8,12 @@ import type { ExtrasTexts } from '../i18n';
 
 export type CrewDelivery = {
   status: DeliveryStatus;
-  /** Crew members at this stage (received counts those who applied too); `undefined` if unknown. */
   count?: number;
   total: number;
 };
 
 type Mark = { crewMember: string };
 
-/**
- * Delivery of a version across the crew: sent (created on Earth) → received on board n/total (each
- * phone downloaded it, `receivedBy`) → applied n/total (`appliedBy`). Only crew members of the
- * mission count; anonymous or unknown marks are ignored here (the audit log still lists them).
- */
 export function crewDelivery(
   v: Pick<RulesVersion, 'receivedBy' | 'appliedBy'>,
   crew: string[],
@@ -29,14 +23,11 @@ export function crewDelivery(
     new Set(marks.map((m) => m.crewMember).filter((id) => crew.includes(id)));
   const applied = known(v.appliedBy);
   const received = new Set([...known(v.receivedBy), ...applied]);
-  // Only crew members of the mission move the stage: an anonymous download ("phone") or an unknown
-  // id never turns «Sent» into «Received».
   if (applied.size) return { status: 'applied', count: applied.size, total };
   if (received.size) return { status: 'received', count: received.size, total };
   return { status: 'sent', total };
 }
 
-/** One crew member's stage for a version. */
 export function memberDelivery(v: Pick<RulesVersion, 'receivedBy' | 'appliedBy'>, id: string) {
   const applied = (v.appliedBy ?? []).find((m) => m.crewMember === id);
   if (applied) return { status: 'applied' as const, at: applied.at };
@@ -45,10 +36,6 @@ export function memberDelivery(v: Pick<RulesVersion, 'receivedBy' | 'appliedBy'>
   return { status: 'sent' as const, at: null };
 }
 
-/**
- * Delivery badge. «Applied» is green (●) only when every crew member applied it; partial stages are
- * neutral with their count. Not a health level, so only full application uses LevelBadge.
- */
 export function DeliveryBadge({
   status,
   count,

@@ -6,10 +6,6 @@ import {
   type Rule,
 } from '@haven/core';
 
-// «Why?» (M02): which config rule produced the assessment, and its conditions as data so the
-// screen can phrase them in the current language. Thresholds always come from the config.
-
-/** Indicator as it applies in the current environment (`environmentOverrides`). */
 export function indicatorForEnvironment(
   config: Config,
   indicatorId: string,
@@ -18,10 +14,6 @@ export function indicatorForEnvironment(
   return configForEnvironment(config, environment).indicators.find((i) => i.id === indicatorId);
 }
 
-/**
- * The rule whose explanation is the assessment's. `undefined` when the level comes from the
- * engine's closing rule (outside green without a rule, "watching", pending) or when green.
- */
 export function appliedRule(indicator: Indicator, assessment: Assessment): Rule | undefined {
   if (assessment.level !== 'amber' && assessment.level !== 'red') return undefined;
   const { es, en } = assessment.explanation;
@@ -38,7 +30,6 @@ export type RuleCondition =
   | { kind: 'repetitions'; count: number }
   | { kind: 'sustained'; minutes: number };
 
-/** Conditions of a rule, in reading order. On numeric indicators `categories` are symptoms. */
 export function ruleConditions(rule: Rule, kind: Indicator['kind']): RuleCondition[] {
   const out: RuleCondition[] = [];
   if (rule.outside) out.push({ kind: 'outside', range: rule.outside });

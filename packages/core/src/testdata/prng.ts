@@ -1,4 +1,3 @@
-/** Deterministic PRNG (mulberry32). Same seed → same sequence on every platform. */
 export function mulberry32(seed: number): () => number {
   let a = seed >>> 0;
   return () => {
@@ -10,7 +9,6 @@ export function mulberry32(seed: number): () => number {
   };
 }
 
-/** 32-bit FNV-1a hash of a string, used as a seed (e.g. crew member + indicator). */
 export function hashSeed(text: string): number {
   let h = 0x811c9dc5;
   for (let i = 0; i < text.length; i++) {
@@ -20,7 +18,6 @@ export function hashSeed(text: string): number {
   return h >>> 0;
 }
 
-/** Approximately normal noise (sum of 3 uniforms), mean 0 and standard deviation `sd`. */
 export function gaussian(rng: () => number, sd: number): number {
   return (rng() + rng() + rng() - 1.5) * 2 * sd;
 }

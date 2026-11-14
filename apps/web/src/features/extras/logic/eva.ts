@@ -1,5 +1,3 @@
-// T03 · EVA readiness: a support label derived ONLY from the assessments the phone computed on board
-// (DISENO.md principle 6: Earth does not evaluate). It groups those levels; it never recomputes them.
 import {
   type Assessment,
   BATTERY_INDICATORS,
@@ -11,7 +9,6 @@ import {
 export type EvaCategory = 'heart' | 'lungs' | 'cognition' | 'sleep';
 export const EVA_CATEGORIES: EvaCategory[] = ['heart', 'lungs', 'cognition', 'sleep'];
 
-/** apto · revisar · no apto · sin datos (rendered with LevelBadge + its own label). */
 export type EvaReadiness = 'fit' | 'review' | 'unfit' | 'no-data';
 
 export type EvaRow = {
@@ -19,14 +16,11 @@ export type EvaRow = {
   name: string;
   lastDataAt: string | null;
   noRecentData: boolean;
-  /** Level per category from the received assessments; `pending` when none of them arrived. */
   categories: Record<EvaCategory, Level>;
   readiness: EvaReadiness;
-  /** Categories that are not green (what drives «review» or «unfit»). */
   reasons: EvaCategory[];
 };
 
-/** Indicator ids per category: heart and lungs zones from the config, the cognitive battery, sleep. */
 export function categoryIndicators(config: Config): Record<EvaCategory, string[]> {
   const zone = (id: string) => config.zones.find((z) => z.id === id)?.indicators ?? [];
   return {
@@ -62,7 +56,6 @@ export function evaRow(
   return { ...member, categories, readiness, reasons };
 }
 
-/** Visual level for LevelBadge: fit ● · review ○ · unfit ◆ · no data — (⊘ when data stopped arriving). */
 export function readinessLevel(row: Pick<EvaRow, 'readiness' | 'noRecentData'>) {
   switch (row.readiness) {
     case 'fit':

@@ -11,23 +11,14 @@ import { OriginLink, sourceLabel } from './data-label';
 import { ageText, havenTexts } from './i18n';
 
 type Props = {
-  /** Sources of the items in the list (duplicates are removed): «Apple Watch and HealthKit». */
   sources: (ReadingSource | (string & {}))[];
-  /** Age of the newest (or the oldest, if you prefer the worst case) reading, in minutes. */
   ageMin?: number;
-  /** @deprecated Ignored: the product never labels data as simulated. */
   simulated?: boolean | 'some';
-  /** Old data somewhere in the list: clock icon. */
   stale?: boolean;
-  /** Opens the sources screen. */
   onPressOrigin?: () => void;
   className?: string;
 };
 
-/**
- * Source · age ONCE per list (DESIGN_SYSTEM.md §8.0.5), above or below a list of
- * `IndicatorCard variant="row"`. The rows keep the same data in their accessible label.
- */
 export function ListDataLabel({ sources, ageMin, stale, onPressOrigin, className }: Props) {
   const t = useTexts(havenTexts);
   const names = [...new Set(sources.map((s) => sourceLabel(t, s)))];

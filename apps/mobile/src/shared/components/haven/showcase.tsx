@@ -26,10 +26,6 @@ import {
   WeekDots,
 } from './index';
 
-// Design showcase with fixed sample data. NOT a route: to preview it, temporarily point a
-// route to it (e.g. `export { DesignShowcase as default } from '@/shared/components/haven/showcase'`
-// in src/app/dev.tsx) and revert. Not exported from index.ts on purpose.
-
 const NOW = Date.UTC(2026, 9, 31, 12);
 const DAY = 86_400_000;
 const HR_SERIES: [number, number][] = Array.from({ length: 30 }, (_, i) => [

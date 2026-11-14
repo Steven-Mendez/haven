@@ -48,29 +48,24 @@ import {
 } from '../actions';
 import { texts } from '../i18n';
 
-/** One roster entry as the page shows it: `waiting` until the first packet from their phone arrives. */
 export type RosterMember = {
   id: string;
   name: string;
   role?: string;
   waiting: boolean;
-  /** Data time of their latest packet, `null` while invited. */
   lastPacketAt: string | null;
   hasWatch: boolean;
-  /** Their personal join link (`haven://join?…`) and its QR as SVG markup, made on the server. */
   invite: { link: string; qr: string };
 };
 
 type Texts = (typeof texts)[Language];
 type Filter = 'all' | 'sending' | 'invited';
-/** The right sheet: add, edit or invite one astronaut (Linear / Square: the table never moves). */
 type Panel = { kind: 'add' } | { kind: 'edit' | 'invite' | 'remove'; id: string } | null;
 
 const IDLE: RosterFormState = { status: 'idle' };
 
 const isLoopback = (url: string) => /\/\/(localhost|127\.0\.0\.1|\[::1\])(:|\/|$)/.test(url);
 
-/** Validation message without red (red means health): alert icon + primary text. */
 function RosterError({ state, t }: { state: RosterFormState; t: Texts }) {
   if (state.status !== 'error') return null;
   const message = state.code === 'name' ? t.rosterErrName : t.rosterErrSave;
@@ -82,7 +77,6 @@ function RosterError({ state, t }: { state: RosterFormState; t: Texts }) {
   );
 }
 
-/** Status pill: dashed while invited, solid once data arrives. Neutral on purpose: green and red mean health. */
 function StatusBadge({ waiting, t }: { waiting: boolean; t: Texts }) {
   return (
     <span
@@ -103,7 +97,6 @@ function StatusBadge({ waiting, t }: { waiting: boolean; t: Texts }) {
   );
 }
 
-/** Name + role inputs shared by «Add astronaut» and «Edit». */
 function MemberFields({
   t,
   member,
@@ -144,7 +137,6 @@ function MemberFields({
   );
 }
 
-/** «Add astronaut»: on success the sheet turns into their QR (GoPay / Wrangle: add, then share). */
 function AddPanel({
   mission,
   t,
@@ -188,7 +180,6 @@ function AddPanel({
   );
 }
 
-/** «Edit»: name and role, with the id the phone sends shown read-only (Faire member detail). */
 function EditPanel({
   mission,
   member,
@@ -236,11 +227,6 @@ function EditPanel({
   );
 }
 
-/**
- * «Join their phone» (WhatsApp / Slack device linking, GoPay «Joined members»): a live status at the top that
- * flips when their first packet arrives, the QR naming who it is for, three numbered steps, the link to copy,
- * the code to type when there is no camera, and the Earth address the phone will use.
- */
 function InvitePanel({
   mission,
   earthUrl,
@@ -313,9 +299,7 @@ function InvitePanel({
             try {
               await navigator.clipboard.writeText(member.invite.link);
               toast.success(t.toastLinkCopied, { description: member.name });
-            } catch {
-              // Clipboard blocked (insecure origin): the QR and the code still work.
-            }
+            } catch {}
           }}
         >
           <Link2 data-icon="inline-start" />
@@ -350,10 +334,6 @@ function InvitePanel({
   );
 }
 
-/**
- * «Delete» (GitHub danger zone): says what is lost and, when they already sent data, asks to type their id.
- * Deleting removes the roster entry and every packet they sent; it cannot be undone.
- */
 function RemovePanel({
   mission,
   member,
@@ -423,7 +403,6 @@ function RemovePanel({
   );
 }
 
-/** Row menu (Figma / Linear «⋯»): edit, copy the invite link, delete. */
 function RowMenu({
   member,
   lang,
@@ -459,9 +438,7 @@ function RowMenu({
             try {
               await navigator.clipboard.writeText(member.invite.link);
               toast.success(t.toastLinkCopied, { description: member.name });
-            } catch {
-              // Clipboard blocked: the QR is still one click away.
-            }
+            } catch {}
           }}
         >
           <Link2 />
@@ -477,12 +454,6 @@ function RowMenu({
   );
 }
 
-/**
- * Crew management (Linear / Square members, Qatalog filters): filter tabs with counts and a search, one row per
- * astronaut with role, status, last packet and watch, «QR» and «⋯» per row, and «Add astronaut» on top. Add,
- * edit and invite open in a right sheet; the table never moves. Status is not health: it only says whether
- * their phone has sent anything yet.
- */
 export function RosterManager({
   mission,
   earthUrl,
@@ -492,13 +463,10 @@ export function RosterManager({
   readOnly = false,
 }: {
   mission: string;
-  /** Earth address phones will use (in each QR). */
   earthUrl: string;
   members: RosterMember[];
-  /** Server time of this render, for «2 min ago». */
   now: string;
   lang: Language;
-  /** A finished mission is a record: no adding, inviting, editing or deleting. */
   readOnly?: boolean;
 }) {
   const t = texts[lang];
@@ -725,7 +693,6 @@ export function RosterManager({
               onClose={close}
             />
           ) : panel ? (
-            // The new astronaut is saved; their row arrives with the next server render.
             <div className="text-muted-foreground flex items-center gap-2 pt-8 text-sm">
               <LoaderCircle
                 aria-hidden="true"
@@ -740,7 +707,6 @@ export function RosterManager({
   );
 }
 
-/** Invited astronauts whose phone has not sent anything yet: listed apart, never counted as data. */
 export function WaitingCrew({ members, lang }: { members: RosterMember[]; lang: Language }) {
   const t = texts[lang];
   if (!members.length) return null;

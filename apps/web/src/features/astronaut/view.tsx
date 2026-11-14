@@ -43,7 +43,6 @@ import {
 } from './logic';
 import { getAstronaut } from './server';
 
-/** An emergency newer than this is pinned at the top; older ones stay in the timeline. */
 export const EMERGENCY_PIN_HOURS = 24;
 
 type RouteProps = {
@@ -55,7 +54,6 @@ type PacketRouteProps = {
   params: Promise<{ id: string; packetId: string }>;
 };
 
-/** Trend options: numeric indicators with readings, in zone order, with baseline and normal range. */
 function trendOptions(data: AstronautResponse, names: Names, lang: Language): TrendOption[] {
   const byIndicator = new Map(data.assessments.map((a) => [a.indicator, a]));
   const zoneOrder = Object.keys(names.zones);
@@ -102,10 +100,8 @@ function defaultTrend(options: TrendOption[]): string {
   return options.find((o) => o.id === 'heart-rate')?.id ?? options[0]?.id ?? '';
 }
 
-/** Indicators shown as tiles first when nothing is flagged. */
 const PREFERRED_VITALS = ['heart-rate', 'spo2', 'systolic-bp', 'body-temperature', 'hrv'];
 
-/** Up to four tiles: flagged (red, then amber) first, then the usual vitals, then the rest. */
 function vitalOptions(options: TrendOption[]): TrendOption[] {
   const rank = (o: TrendOption) => {
     const severity = SEVERITY[o.level ?? 'pending'];
@@ -134,7 +130,6 @@ function AstronautDetail({
 }: {
   data: AstronautResponse;
   tab: Tab;
-  /** `?indicator=` of the Trends tab (from a Summary tile). */
   indicator?: string;
   showAllPackets: boolean;
   lang: Language;
@@ -147,7 +142,6 @@ function AstronautDetail({
   const emergency = latestEmergency(data);
   const pinEmergency =
     emergency && minutesBetween(emergency.dataAt, now) < EMERGENCY_PIN_HOURS * 60;
-  // Presentation only: an open emergency has priority over the zone assessment in the header and rail.
   const level: VisualLevel = pinEmergency && !member.noRecentData ? 'red' : crewMemberLevel(member);
 
   let content: React.ReactNode;
@@ -343,7 +337,6 @@ async function PacketContent({ params }: PacketRouteProps) {
   );
 }
 
-/** Same footprint as the Summary tab: header, tabs, tiles + chart, list, and the 300 px rail. */
 function AstronautSkeleton() {
   return (
     <div className="flex flex-col gap-6" aria-busy="true">
@@ -393,7 +386,6 @@ function AstronautSkeleton() {
   );
 }
 
-/** T02 · `/astronaut/[id]?tab=`: static frame plus a Suspense boundary with the request-time content. */
 export function View(props: RouteProps) {
   return (
     <PageContainer className="gap-6">
@@ -404,7 +396,6 @@ export function View(props: RouteProps) {
   );
 }
 
-/** T02 · `/astronaut/[id]/packet/[packetId]`: one received packet on its own page. */
 export function PacketView(props: PacketRouteProps) {
   return (
     <PageContainer className="gap-6">

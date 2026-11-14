@@ -30,9 +30,7 @@ type Props = {
   currentVersion: string;
   environmentNames: Record<string, string>;
   defaultAuthor: string;
-  /** Indicator selected when the editor opens (e.g. the table row that opened the sheet). */
   initialIndicator?: string;
-  /** Inside a sheet: no card frame, the header is the sheet's. */
   bare?: boolean;
 };
 
@@ -51,11 +49,6 @@ function initialValues(indicator: EditableIndicator | undefined): Record<string,
   return values;
 }
 
-/**
- * Threshold editor (DESIGN_SYSTEM.md §8.3, ref. Tally settings): «Normal range» always visible, each
- * rule as a one-line row that expands to edit, the medical explanation behind «?», and a single
- * sticky «Create version and send». Collapsed inputs stay mounted so they are always submitted.
- */
 export function RulesEditor({
   lang,
   indicators,
@@ -319,7 +312,6 @@ export function RulesEditor({
   );
 }
 
-/** Tally-style settings section: title + one line, then bordered rows. */
 function SettingsGroup({
   title,
   hint,

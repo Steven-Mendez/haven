@@ -27,19 +27,13 @@ import { havenTexts } from './texts';
 import type { CrewCard, Now, VisualLevel } from './types';
 
 type Props = {
-  /** One entry of `CrewResponse.crew`. */
   member: CrewCard;
   now: Now;
   lang: Language;
-  /** Role on board («Commander», «Flight engineer»…), already translated. */
   role?: string;
-  /** Zone id → display name (config `Zone.name`, translated). Falls back to the id. */
   zoneNames?: Record<string, string>;
-  /** Indicator id → display name (config `Indicator.name`, translated). Falls back to the id. */
   indicatorNames?: Record<string, string>;
-  /** Detail link, usually `/astronaut/${id}`. */
   href?: string;
-  /** Overrides the built-in portrait; `null` shows initials. */
   portrait?: string | null;
   maxAlerts?: number;
   className?: string;
@@ -50,31 +44,20 @@ const zonePos = (z: string) => {
   return i === -1 ? ZONE_ORDER.length : i;
 };
 
-/** Overall visual level of a crew card: «no recent data» wins, then the worst zone. */
 export function crewMemberLevel(member: Pick<CrewCard, 'noRecentData' | 'zones'>) {
   return member.noRecentData ? ('no-data' as const) : worstLevel(member.zones.map((z) => z.level));
 }
 
-/** The latest received packet is an emergency and the data is recent: an emergency is open. */
 export function hasOpenEmergency(member: Pick<CrewCard, 'noRecentData' | 'lastPacket'>) {
   return !member.noRecentData && member.lastPacket?.type === 'emergency';
 }
 
-/**
- * Level to show for a crew member (presentation only, the data is unchanged): an open emergency takes
- * priority over the zone assessment, so «Check» is never shown next to an open emergency.
- */
 export function crewDisplayLevel(
   member: Pick<CrewCard, 'noRecentData' | 'zones' | 'lastPacket'>,
 ): VisualLevel {
   return hasOpenEmergency(member) ? 'red' : crewMemberLevel(member);
 }
 
-/**
- * One card per astronaut on shadcn `Card` + `Item` (ref. Deel, Sentry): portrait, name, role, day ring,
- * status per zone with symbol + label, active alerts and data age. With `noRecentData` the card is
- * dashed, its levels are greyed out and it says the status is the last one received.
- */
 export function AstronautCard({
   member,
   now,

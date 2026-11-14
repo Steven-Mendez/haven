@@ -1,12 +1,7 @@
 import { defineTexts } from '@/shared/i18n';
 
-// UI copy for the HAVEN design components. Medical copy (explanations, guides,
-// protocols) does NOT live here: it comes from the config (@haven/core).
-// Interpolation: "{n}" is replaced with `format`.
-
 export const havenTexts = defineTexts({
   es: {
-    // Traffic light: short label (badge) and phrase (screen readers, legends)
     levelGreen: 'En rango',
     levelAmber: 'Revisar',
     levelRed: 'Emergencia',
@@ -17,13 +12,11 @@ export const havenTexts = defineTexts({
     phrasePending: 'No hay lectura vigente',
     level: 'Nivel',
 
-    // Age and source
     now: 'ahora',
     minAgo: 'hace {n} min',
     hoursAgo: 'hace {n} h',
     daysAgo: 'hace {n} d',
     noReading: 'sin lectura',
-    /** @deprecated Always empty: the product never labels data as simulated (EQUIPOS.md). */
     simulated: '',
     whereFrom: '¿De dónde sale este dato?',
     sourceWatch: 'Apple Watch',
@@ -35,12 +28,10 @@ export const havenTexts = defineTexts({
     sourceRecord: 'Registro',
     sourceShip: 'Telemetría de la nave',
 
-    // Indicator
     yourBaseline: 'Tu línea base',
     noCurrentValue: 'Sin lectura vigente',
     openDetails: 'Abrir detalle',
 
-    // Zones (fallback: the config provides Zone.name)
     zoneHeart: 'Corazón',
     zoneLungs: 'Pulmones',
     zoneHead: 'Cabeza y ojos',
@@ -50,7 +41,6 @@ export const havenTexts = defineTexts({
     zoneMind: 'Mente',
     bodyFigure: 'Figura humana con siete zonas',
 
-    // Ring and week
     actionsDone: 'acciones resueltas',
     ringSummary: '{n} de 7 acciones del día. Mide lo hecho, no la salud.',
     actions: 'acciones',
@@ -58,13 +48,11 @@ export const havenTexts = defineTexts({
     dayIncomplete: 'día incompleto',
     today: 'hoy',
 
-    // Chart
     chartEmpty: 'Sin lecturas en este periodo',
     chartLegend: 'Banda: tu rango habitual · Discontinua: tu línea base',
     baselineBand: 'Banda de tu línea base',
     latestReading: 'Última lectura',
 
-    // Timer and scale
     timer: 'Temporizador',
     timeLeft: 'Quedan {n}',
     paused: 'En pausa',
@@ -81,7 +69,6 @@ export const havenTexts = defineTexts({
     stress5: 'Muy alto',
     pickValue: 'Elige un valor del 1 al 5',
 
-    // Mission strip and SOS
     day: 'Día {n}',
     phasePreparing: 'En preparación',
     phaseStartsOn: 'Empieza el {date}',
@@ -101,7 +88,6 @@ export const havenTexts = defineTexts({
       'Mantén pulsado 3 segundos para enviar la alerta, o toca para abrir la pantalla de emergencia',
     sosHoldToast: 'Mantén 3 s para pedir ayuda',
 
-    // Action row
     start: 'Empezar',
     measure: 'Medir',
     done: 'Hecho',
@@ -109,39 +95,32 @@ export const havenTexts = defineTexts({
     skipped: 'Omitido',
     undo: 'Deshacer',
 
-    // Delta against the personal baseline (always neutral grey)
     deltaAbove: '{n} sobre tu línea base ({b})',
     deltaBelow: '{n} bajo tu línea base ({b})',
     deltaWithin: 'En tu rango habitual',
 
-    // Zone list
     zoneToReview: '{n} por revisar',
     zoneEmergency: '{n} en emergencia',
     zoneInRange: 'Todo en rango',
     zoneNoReadings: 'Sin lecturas vigentes',
 
-    // Inline confirmation
     confirm: 'Confirmar',
     cancel: 'Cancelar',
 
-    // Progressive disclosure (DESIGN_SYSTEM.md §8.0)
     more: 'Más',
     less: 'Menos',
     seeAll: 'Ver todas ({n})',
     inRangeGroup: '{n} en rango',
     and: 'y',
 
-    // Collapsible register (indicator screen)
     registerValue: 'Registrar valor',
     save: 'Guardar',
     willBe: 'Quedará',
     valueLabel: 'Valor',
 
-    // Compact mission strip (accessibility)
     delayShort: '{n} min',
     queuedShort: '{n} en cola',
 
-    // Hold to confirm (SOS), segmented control, ranges
     holdToStart: 'Mantén pulsado para empezar',
     holdRelease: 'Suelta para cancelar',
     holdHint: 'Mantén pulsado 3 segundos',
@@ -295,12 +274,10 @@ export const havenTexts = defineTexts({
 
 export type HavenTexts = (typeof havenTexts)['es'];
 
-/** Replaces "{n}" (and other keys) in a string. */
 export function format(text: string, values: Record<string, string | number>): string {
   return text.replace(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? `{${key}}`));
 }
 
-/** "12 min ago", "3 h ago", "2 d ago"; `undefined` → "no reading". */
 export function ageText(t: HavenTexts, ageMin: number | undefined): string {
   if (ageMin === undefined || !Number.isFinite(ageMin)) return t.noReading;
   const min = Math.max(0, Math.round(ageMin));
@@ -310,11 +287,6 @@ export function ageText(t: HavenTexts, ageMin: number | undefined): string {
   return format(t.daysAgo, { n: Math.round(min / 1440) });
 }
 
-/**
- * Number for a metric, legible at a glance and unambiguous in es and en:
- * ≥ 100 → integer; 10–100 → up to 1 decimal; < 10 → up to 2 decimals. Locale decimal separator.
- * Thousands are grouped only from 10 000, with a thin space (no "2.265" that reads as a decimal).
- */
 export function formatMetric(value: number, language = 'es'): string {
   if (!Number.isFinite(value)) return '—';
   const abs = Math.abs(value);

@@ -1,18 +1,9 @@
 import SwiftUI
 import WidgetKit
 
-// Minimal copy of targets/watch/Theme for the complication (level colors, symbols, labels and texts).
-//
-// Why a copy and not the Theme files themselves: @bacons/apple-targets 5 only shares sources through `_shared/`
-// folders (`targets/<target>/_shared/*` and `targets/_shared/*`), and both also add the files to the **iPhone**
-// app target. Theme/ imports WatchKit (Countdown) and depends on `Level` from Contract/, so it cannot compile there.
-// Keep these values in sync with Theme/Theme.swift and Theme/Level.swift (source: haven/design/redesign/SPEC.md).
-
-/// Level as sent by the phone (`Level` in Contract.swift).
 enum ComplicationLevel: String {
     case green, amber, red, pending
 
-    /// `Theme.green` … `Theme.pending` (SPEC §2 «Niveles», dark; Apple system colours since v3.1).
     var color: Color {
         switch self {
         case .green: WidgetTheme.color(0x30D158)
@@ -22,7 +13,6 @@ enum ComplicationLevel: String {
         }
     }
 
-    /// Same SF Symbols as `Level.symbol`: ● ◐ ▲ ○ (dashed).
     var symbol: String {
         switch self {
         case .green: "circle.fill"
@@ -41,7 +31,6 @@ enum ComplicationLevel: String {
         }
     }
 
-    /// Same as `Level.meterSegments`: lit segments of the 3-segment meter.
     var meterSegments: Int {
         switch self {
         case .green: 1
@@ -61,13 +50,12 @@ enum ComplicationLevel: String {
     }
 }
 
-/// `Theme` subset: text and track colours.
 enum WidgetTheme {
-    static let foreground = color(0xECECEE)  // Theme.foreground
-    static let mutedForeground = color(0x9B9BA3)  // Theme.mutedForeground
-    static let tertiary = color(0x80808A)  // Theme.tertiary (SPEC v3.1)
-    static let muted = color(0x1C1C20)  // Theme.muted (meter track)
-    static let borderStrong = color(0x2F3336)  // Theme.borderStrong (pending dashes)
+    static let foreground = color(0xECECEE)
+    static let mutedForeground = color(0x9B9BA3)
+    static let tertiary = color(0x80808A)
+    static let muted = color(0x1C1C20)
+    static let borderStrong = color(0x2F3336)
 
     static func color(_ hex: UInt32) -> Color {
         Color(
@@ -78,8 +66,6 @@ enum WidgetTheme {
     }
 }
 
-/// `LevelMeter` of the watch app, for the rectangular complication. Lit segments are `.widgetAccentable()` so they
-/// survive tinted faces; pending dashes all three.
 struct WidgetLevelMeter: View {
     let level: ComplicationLevel
     var height: CGFloat = 3
@@ -102,7 +88,6 @@ struct WidgetLevelMeter: View {
     }
 }
 
-/// `Language` of the watch app, resolved from the snapshot (the phone's language) or the system.
 enum WidgetLanguage: String {
     case es, en
 

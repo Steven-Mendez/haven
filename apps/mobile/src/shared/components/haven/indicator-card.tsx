@@ -18,50 +18,30 @@ import { TrendDelta } from './trend-delta';
 import { useUnitLabel } from './unit-label';
 
 type Props = {
-  /** Indicator name in the current language (`Indicator.name[lang]`). */
   name: string;
-  /** Current value; omit (or pass `undefined`) when there is no current reading. */
   value?: number | string;
-  /** `Indicator.unit` id (or an already translated label): shown via `useUnitLabel`. */
   unit?: string;
   level: Level;
-  /** Personal baseline (`Assessment.baseline`): drives the grey delta line. */
   baseline?: { median: number; range: [number, number] };
-  /** Engine explanation (`Assessment.explanation[lang]`); shown under the delta in amber and red. */
   explanation?: string;
   source?: ReadingSource | (string & {});
   ageMin?: number;
-  /** @deprecated Ignored: the product never labels data as simulated. */
   simulated?: boolean;
-  /** Old data: clock icon in the data line. */
   stale?: boolean;
-  /** Opens the indicator screen. Makes the whole card pressable. */
   onPress?: () => void;
-  /** Long press on a row: context sheet (explanation + actions). */
   onLongPress?: () => void;
   onPressOrigin?: () => void;
-  /** Number formatting (decimals). Default: as given. */
   formatValue?: (value: number) => string;
-  /** compact: the 60 pt indicator row (same as `variant="row"`). */
   compact?: boolean;
-  /** Leading 20 pt line icon in rows (zone icon). */
   icon?: LucideIcon;
-  /**
-   * row: one line «Heart rate · 169 bpm · ◆ ›» (DESIGN_SYSTEM.md §8.0.3). No explanation and no
-   * data line: put a `ListDataLabel` once above the list. Source and age stay in the
-   * accessible label. Default: card.
-   */
   variant?: 'card' | 'row';
-  /** With variant row: render a bare row for `ListGroup` (no own card). */
   grouped?: boolean;
   className?: string;
 };
 
-/** Ghost `Button` reset to a plain full-width wrapper (column, no padding, no fixed height). */
 const WRAPPER =
   'h-auto flex-col items-stretch justify-start gap-0 rounded-none px-0 py-0 sm:h-auto';
 
-/** Metric card on RNR `Card` (DESIGN_SYSTEM.md §3.1). Same footprint when pending: «—». */
 export function IndicatorCard({
   name,
   value,
@@ -103,8 +83,6 @@ export function IndicatorCard({
     .join(', ');
 
   if (variant === 'row' || compact) {
-    // WHOOP / X indicator row (SPEC.md §6 «Móvil · Cuerpo»): icon · label + age · 3-segment
-    // meter · 22 pt value with the baseline in grey underneath and a delta arrow · chevron.
     const numeric = typeof value === 'number' && Number.isFinite(value);
     const outside =
       numeric && baseline ? value < baseline.range[0] || value > baseline.range[1] : false;
@@ -175,7 +153,6 @@ export function IndicatorCard({
         delayLongPress={350}
         className={WRAPPER}
       >
-        {/* The row keeps its own type styles, not the button's text defaults. */}
         <TextClassContext.Provider value={undefined}>{line}</TextClassContext.Provider>
       </Button>
     ) : (
@@ -236,7 +213,6 @@ export function IndicatorCard({
           onPress={onPress}
           className={cn(WRAPPER, 'rounded-lg')}
         >
-          {/* The card keeps its own type styles, not the button's text defaults. */}
           <TextClassContext.Provider value={undefined}>{body}</TextClassContext.Provider>
         </Button>
       ) : (
@@ -244,7 +220,6 @@ export function IndicatorCard({
           {body}
         </View>
       )}
-      {/* Outside the grouped (accessible) area so screen readers reach it. */}
       {onPressOrigin ? <OriginLink onPress={onPressOrigin} className="-mt-2 px-4" /> : null}
     </View>
   );

@@ -106,10 +106,6 @@ function ExtrasPage({ section, searchParams }: { section: ExtrasTab; searchParam
 
 type PageProps = { searchParams: SearchParams };
 
-/**
- * T03 · Earth tools, one page each (Vapi / Klaviyo sidebar tools): versioned threshold rules (`/rules`), crew
- * trends (`/trends`) and EVA readiness (`/eva`). DESIGN_SYSTEM.md 4.2 b.
- */
 export const RulesView = ({ searchParams }: PageProps) => (
   <ExtrasPage section="rules" searchParams={searchParams} />
 );
@@ -120,7 +116,6 @@ export const EvaView = ({ searchParams }: PageProps) => (
   <ExtrasPage section="eva" searchParams={searchParams} />
 );
 
-/** Old `/extras?tab=` links go to the page of that tool (rules by default). */
 export function extrasRedirect(tab: unknown): `/${ExtrasTab}` {
   return `/${(EXTRAS_TABS as readonly unknown[]).includes(tab) ? (tab as ExtrasTab) : 'rules'}`;
 }

@@ -89,11 +89,6 @@ function duration(t: T, minutes: number): string {
   return format(t.days, { n: Math.round(minutes / 1440) });
 }
 
-/**
- * Routine (M03), DESIGN_SYSTEM.md 4.1b and 8.7: summary row (ring + done today + streak, week),
- * inline check-in, "Today" as one-line rows (worst zone first, done ones folded), due measurements,
- * and secondary detail behind "More".
- */
 export default function Screen() {
   const t = useTexts(texts);
   const { scale } = useLayout();
@@ -109,7 +104,6 @@ export default function Screen() {
   const [guideOpen, setGuideOpen] = useState(false);
   const g = useGamification();
   const scroll = useRef<ScrollViewInstance>(null);
-  // First-run tour: lets it scroll Routine to each target.
   const onTourScroll = useTourScroll('routine', scroll);
   const { milestone: preview } = useLocalSearchParams<{ milestone?: string }>();
   const [milestone, setMilestone] = useState<{
@@ -117,7 +111,6 @@ export default function Screen() {
     value: number;
     key: string;
   } | null>(null);
-  // Celebrate a reached milestone once (or preview one with `?milestone=7` for QA).
   useEffect(() => {
     if (preview && Number(preview) > 0) {
       setMilestone({ kind: 'streak', value: Number(preview), key: `preview-${preview}` });
@@ -171,7 +164,6 @@ export default function Screen() {
     today: d.today,
   }));
 
-  // Up to three engine actions from indicators that need attention (guidance only, folded).
   const engineActions = useMemo(() => {
     const seen = new Set<string>();
     const out: { action: Action; indicator: string }[] = [];
@@ -214,7 +206,6 @@ export default function Screen() {
     await skips.remove(id).catch((e) => console.warn('[routine] skip not removed', e));
   };
 
-  // Short one-line titles (8.7); the zone icon says which part of the body.
   const titleOf = (item: DailyItem) => {
     const target = item.target;
     if (item.zone === 'mind') return t.wellbeing;
@@ -225,7 +216,6 @@ export default function Screen() {
     return t.restModule;
   };
 
-  // Open actions first, worst zone first; Mind is the inline card above; done ones fold.
   const open = nextActions(items, 7, ['mind']);
   const done = items.filter((i) => i.progress >= 1);
 
@@ -310,7 +300,6 @@ export default function Screen() {
       />
       <MilestoneSheet milestone={milestone} onClose={closeMilestone} />
 
-      {/* Hero: HAVEN's rings (Activity-style) + legend; then the streak and the week. */}
       <Collapsible open={guideOpen} onOpenChange={setGuideOpen} className="gap-8">
         <CollapsibleTrigger
           accessibilityHint={t.howToRead}
@@ -334,8 +323,6 @@ export default function Screen() {
         </CollapsibleContent>
       </Collapsible>
 
-      {/* Streak («racha»): big tabular number, spark glyph, best streak, week of mini rings.
-          Opens the month calendar. */}
       <Button
         variant="ghost"
         accessibilityRole="button"
@@ -390,12 +377,10 @@ export default function Screen() {
         </TextClassContext.Provider>
       </Button>
 
-      {/* How are you today? One question at a time; one row when done. */}
       <TourAnchor step="routine-checkin" fill>
         <CheckinCard crewMember={crewMember} today={checkin} />
       </TourAnchor>
 
-      {/* Today: open actions first, then the done ones (struck through), all visible. */}
       <TourAnchor step="routine-today" fill>
         <Section title={t.today} count={open.length > 0 ? open.length : undefined}>
           {open.length === 0 && doneCount === 7 ? (
@@ -423,7 +408,6 @@ export default function Screen() {
         </Section>
       </TourAnchor>
 
-      {/* Measurements due by `everyHours`: one line each */}
       {due.length > 0 ? (
         <Section title={t.due} count={due.length}>
           <ListGroup inset={52}>
@@ -452,7 +436,6 @@ export default function Screen() {
         </Section>
       ) : null}
 
-      {/* Engine suggestions, visible (no accordion) when there are any. */}
       {engineActions.length > 0 ? (
         <Section title={t.engine}>
           <ListGroup>

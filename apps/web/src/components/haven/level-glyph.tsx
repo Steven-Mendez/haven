@@ -6,21 +6,13 @@ import type { VisualLevel } from './types';
 
 type Props = {
   level: VisualLevel;
-  /** Pixel size of the square glyph (default 10). */
   size?: number;
-  /** When given, the glyph carries an accessible name («Level: Check»); otherwise it is decorative. */
   lang?: Language;
-  /** Greys the glyph out (last known level of a stale crew member). */
   muted?: boolean;
-  /** Slow pulse, only for an unacknowledged emergency (SPEC §1.6). Off with Reduce Motion. */
   pulse?: boolean;
   className?: string;
 };
 
-/**
- * Level shape (SPEC §2 «Niveles»): ● in range · ◐ check · ▲ emergency · ○ pending (dashed) ·
- * ◷ no recent data. Drawn as SVG so the shape is identical in every font and never relies on colour.
- */
 export function LevelGlyph({ level, size = 10, lang, muted, pulse, className }: Props) {
   const label = lang ? `${havenTexts[lang].levelPrefix}: ${levelLabel(level, lang)}` : undefined;
   return (

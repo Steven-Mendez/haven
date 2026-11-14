@@ -1,14 +1,5 @@
 import SwiftUI
 
-// W03 (Deneb) · Emergency button, the watch app's only screen (SPEC.md §5, §6 «Emergencia»).
-//   Idle → press and hold the SOS ring for 3 s (linear red fill, one haptic click per second, the seconds left in the
-//   centre) → `EmergencyCenter.send(.button)` → `bridge.startEmergency` (sends `emergency { origin: 'button' }` and
-//   ContentView opens the monitor, W04, full screen).
-//   Lifting the finger before 3 s cancels: nothing is sent and «Cancelado · sin enviar» shows for a moment.
-//   While holding, the line under the ring says «Suelta para cancelar».
-//   Below the fold: offline notice, last alert and the automatic triggers, each with its toggle.
-// One step per screen: hold → (sent) → monitor. Red is only the SOS disc, its ring and level shapes.
-
 struct EmergencyView: View {
     @Environment(WatchBridge.self) private var bridge
     @State private var center = EmergencyCenter.shared
@@ -19,11 +10,8 @@ struct EmergencyView: View {
         case idle, holding, cancelled
     }
 
-    /// Seconds the SOS ring must be held (SPEC §5).
     static let holdSeconds = 3
-    /// A release earlier than this is a stray touch, not a cancel: no notice.
     static let minimumHeldForNotice: TimeInterval = 0.5
-    /// How long «Cancelado» stays before going back to idle.
     static let cancelledNoticeSeconds = 3
 
     var body: some View {
@@ -37,15 +25,12 @@ struct EmergencyView: View {
                 .havenScreen()
             }
         }
-        // Language.current is not observable: rebuild the texts when the phone's language changes (as Altair does).
         .id(bridge.status?.payload.language ?? Language.current.rawValue)
         .background(Theme.background)
         .onChange(of: bridge.isEmergencyActive) { _, isActive in
             if isActive { phase = .idle }
         }
     }
-
-    // MARK: First screen
 
     @ViewBuilder private func firstScreen(width: CGFloat) -> some View {
         VStack(spacing: Spacing.m) {
@@ -59,7 +44,6 @@ struct EmergencyView: View {
                             holdStartedAt = .now
                             phase = .holding
                         } else {
-                            // A brief touch (scrolling past the ring) is not worth a «Cancelado».
                             let held = holdStartedAt.map { Date.now.timeIntervalSince($0) } ?? 0
                             phase = held >= Self.minimumHeldForNotice ? .cancelled : .idle
                             holdStartedAt = nil
@@ -70,7 +54,6 @@ struct EmergencyView: View {
                         center.send(.button)
                     }
                 )
-                // ≈ 62 % of the width: a big target, with room for the hint line above the fold.
                 .frame(width: min(width * 0.62, 132))
                 .accessibilityHint(EmergencyTexts.accessibilityHint)
                 hint
@@ -79,7 +62,6 @@ struct EmergencyView: View {
         .frame(maxWidth: .infinity)
     }
 
-    /// One line under the ring: how to send, how to cancel, or that it was cancelled.
     @ViewBuilder private var hint: some View {
         switch phase {
         case .idle:
@@ -102,8 +84,6 @@ struct EmergencyView: View {
         }
     }
 
-    // MARK: Below the fold
-
     private var belowTheFold: some View {
         VStack(alignment: .leading, spacing: Spacing.l) {
             if !bridge.isReachable {
@@ -113,13 +93,11 @@ struct EmergencyView: View {
                 AgeLabel(since: alert.at, prefix: L("Último aviso", "Last alert"))
             }
             AutoTriggerSettings()
-                // Clear of the TabView page dots on the right edge.
                 .padding(.trailing, Spacing.s)
         }
     }
 }
 
-/// Visible texts of the SOS page (es/en).
 enum EmergencyTexts {
     static var holdHint: String { L("Mantén 3 s para avisar", "Hold 3 s to alert") }
     static var releaseToCancel: String { L("Suelta para cancelar", "Release to cancel") }
@@ -132,10 +110,6 @@ enum EmergencyTexts {
     }
 }
 
-// MARK: - Sent / queued summary (also used by the monitor)
-
-/// «◆ Aviso enviado · 12:03 · Sigue el protocolo en el iPhone», or the queued version without iPhone
-/// («Aviso en cola · se enviará al reconectar. Pide ayuda en voz alta.»). Never says «enviado» without iPhone.
 struct SentAlertSummary: View {
     let alert: EmergencyCenter.SentAlert
     var compact = false
@@ -183,8 +157,6 @@ struct SentAlertSummary: View {
     }
 }
 
-// MARK: - Automatic trigger settings
-
 private struct AutoTriggerSettings: View {
     @State private var center = EmergencyCenter.shared
 
@@ -209,7 +181,6 @@ private struct AutoTriggerSettings: View {
                     .tint(Theme.accent)
                     .frame(minHeight: Theme.tapTarget)
                 } else {
-                    // No source (fall detection needs an entitlement): a plain row, not a switch that cannot move.
                     triggerLabel(origin)
                         .frame(maxWidth: .infinity, minHeight: Theme.tapTarget, alignment: .leading)
                         .accessibilityElement(children: .combine)

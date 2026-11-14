@@ -19,7 +19,6 @@ import { readMissions } from './server';
 
 const LANGUAGE_NAMES: Record<Language, string> = { es: 'Español', en: 'English' };
 
-/** Section heading + description above a bordered group of rows (Linear settings). */
 function Group({
   id,
   title,
@@ -44,7 +43,6 @@ function Group({
   );
 }
 
-/** 52 px settings row: label (and grey hint) on the left, value or control on the right. */
 function Row({
   label,
   hint,
@@ -67,7 +65,6 @@ function Row({
   );
 }
 
-/** Real shortcuts only (same list as the `?` dialog in components/keyboard-shortcuts.tsx). */
 function shortcutRows(h: HavenTexts): { keys: string[][]; label: string }[] {
   return [
     { keys: [['⌘', 'K']], label: h.shortcutOpenMenu },
@@ -89,7 +86,6 @@ async function MissionRows({ lang, t }: { lang: Language; t: SettingsTexts }) {
   if (missions === null) return <Row label={t.missionsError} />;
   if (missions.length === 0) return <Row label={t.missionsEmpty} />;
   const environments = loadConfig().environments;
-  // Active first, then newest.
   const sorted = [...missions].sort(
     (a, b) => Number(b.code === active) - Number(a.code === active),
   );
@@ -225,7 +221,6 @@ function SettingsSkeleton() {
   );
 }
 
-/** Settings (`/settings`, opened from the operator row in the sidebar footer and from ⌘K). */
 export function View() {
   return (
     <PageContainer className="max-w-[960px] gap-8">

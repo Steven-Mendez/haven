@@ -13,16 +13,11 @@ import { havenTexts } from './i18n';
 export type ScaleValue = 1 | 2 | 3 | 4 | 5;
 
 type Props = {
-  /** Selected value, or null/undefined when nothing is chosen yet. */
   value?: ScaleValue | null;
   onChange: (value: ScaleValue) => void;
-  /** mood: 1 = very bad … 5 = very good · stress: 1 = very low … 5 = very high. */
   kind: 'mood' | 'stress';
-  /** Question above the scale ("How do you feel right now?"), 22/700. */
   title?: string;
-  /** Override the five option labels. */
   labels?: [string, string, string, string, string];
-  /** Giant numeral echoing the chosen value (Life Reset). Default true. */
   echo?: boolean;
   disabled?: boolean;
   className?: string;
@@ -30,11 +25,6 @@ type Props = {
 
 const VALUES: ScaleValue[] = [1, 2, 3, 4, 5];
 
-/**
- * 1–5 scale (alias stepped questionnaire, SPEC.md §6): a giant 64 pt numeral echoes the choice, and
- * the options are full-width rows inside ONE hairline box, divided by hairlines, no radio dots.
- * The selected row gets the accent tint and a check. Neutral on purpose: an answer is not a level.
- */
 export function ScaleInput({
   value,
   onChange,
@@ -51,7 +41,6 @@ export function ScaleInput({
     (kind === 'mood'
       ? [t.mood1, t.mood2, t.mood3, t.mood4, t.mood5]
       : [t.stress1, t.stress2, t.stress3, t.stress4, t.stress5]);
-  // Mood reads best from good to bad (top = best), stress from low to high.
   const order = kind === 'mood' ? [...VALUES].reverse() : VALUES;
 
   return (
@@ -87,7 +76,6 @@ export function ScaleInput({
       <ToggleGroup
         type="single"
         value={value ? String(value) : undefined}
-        // Tapping the chosen row again re-confirms it (never clears the answer).
         onValueChange={(next) => {
           const v = next ? (Number(next) as ScaleValue) : value;
           if (v) onChange(v);

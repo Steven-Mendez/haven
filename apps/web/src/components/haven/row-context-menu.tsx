@@ -14,10 +14,6 @@ import type { Language } from '@/lib/i18n';
 import { copyText } from './copy-id';
 import { havenTexts } from './texts';
 
-/**
- * Right-click menu for list rows (crew, packets): Open · Open in a new tab · Copy ID. Wraps the row; the
- * left-click behaviour of the row stays a normal link.
- */
 export function RowContextMenu({
   href,
   id,
@@ -25,7 +21,6 @@ export function RowContextMenu({
   children,
 }: {
   href: string;
-  /** Value copied by «Copy ID». */
   id: string;
   lang: Language;
   children: ReactNode;

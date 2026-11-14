@@ -50,7 +50,6 @@ type Props = {
   children: ReactNode;
 };
 
-/** Same order as the crew list: by level (emergency first), then by name. */
 function peekOrder(members: CrewCard[], lang: Language) {
   return [...members]
     .sort(
@@ -66,11 +65,6 @@ const zonePos = (z: string) => {
   return i === -1 ? ZONE_ORDER.length : i;
 };
 
-/**
- * Quick view of a crew member in a right-hand sheet (Time2book / Contra side panel): the crew page stays in
- * place while the operator reads level, emergency, out-of-range readings, zones and today's rings. j / k (or
- * ↑ / ↓) step through the crew, ↵ opens the full profile. Rows opt in with `PeekLink`.
- */
 export function CrewPeekProvider({
   members,
   now,
@@ -82,7 +76,6 @@ export function CrewPeekProvider({
 }: Props) {
   const router = useRouter();
   const [openId, setOpenId] = useState<string | null>(null);
-  // Focus lands on the body (not the first header button) so ↵ opens the full profile right away.
   const bodyRef = useRef<HTMLDivElement>(null);
   const order = useMemo(() => peekOrder(members, lang), [members, lang]);
   const index = openId ? order.indexOf(openId) : -1;
@@ -158,7 +151,6 @@ function PeekBody({
   const level = crewDisplayLevel(member);
   const stale = member.noRecentData;
   const packet = member.lastPacket;
-  // Same rule as the crew page's emergency inbox: the latest received packet is an emergency.
   const emergency = packet?.type === 'emergency' ? packet : null;
   const zones = [...member.zones].sort((a, b) => zonePos(a.zone) - zonePos(b.zone));
   const rings = crewRings(member);
@@ -214,7 +206,6 @@ function PeekBody({
           <div className="border-level-red flex items-center gap-3 rounded-lg border border-l-2 py-2 pr-2 pl-3">
             <LevelGlyph level="red" size={10} lang={lang} />
             <span className="flex-1 text-sm">
-              {/* Stale data: the packet is shown, but never called an open emergency (hasOpenEmergency). */}
               {stale ? (
                 <span className="font-medium">{t.emergencyPacket}</span>
               ) : (
@@ -317,10 +308,6 @@ function PeekBody({
   );
 }
 
-/**
- * A row link that opens the crew quick view on a plain click (↵ on a focused row too). ⌘/Ctrl/Shift/middle
- * click keep the native link (new tab), and outside a `CrewPeekProvider` it is a normal link.
- */
 export function PeekLink({
   peekId,
   onClick,

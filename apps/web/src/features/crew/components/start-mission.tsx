@@ -8,17 +8,12 @@ import type { Language } from '@/lib/i18n';
 import { startMissionAction } from '../actions';
 import { texts } from '../i18n';
 
-/**
- * «Start mission» on a mission that is being prepared (or scheduled for later): day 1 becomes today and the
- * days start to run. Until then the header says «Being prepared» and no day is counted.
- */
 export function StartMission({
   mission,
   scheduled,
   lang,
 }: {
   mission: string;
-  /** The mission has a future start date: the button starts it today instead. */
   scheduled: boolean;
   lang: Language;
 }) {

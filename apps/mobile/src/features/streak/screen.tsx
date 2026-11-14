@@ -21,7 +21,6 @@ import {
   shiftMonth,
 } from './logic/calendar';
 
-/** One stat cell: bold figure over a grey label (Profile status grid). */
 function Stat({ value, label, first }: { value: number; label: string; first?: boolean }) {
   return (
     <View
@@ -37,11 +36,6 @@ function Stat({ value, label, first }: { value: number; label: string; first?: b
   );
 }
 
-/**
- * Streak calendar (Duolingo / Speak / Noom month view, in HAVEN's sober style): the streak and the
- * next goal, best / complete / protected counts, and the month as mini rings. Protected days carry a
- * shield: they never break the streak. Months go back to the first reading, never past today.
- */
 export default function StreakScreen() {
   const t = useTexts(texts);
   const language = useLanguage();
@@ -71,7 +65,6 @@ export default function StreakScreen() {
     year: 'numeric',
     timeZone: 'UTC',
   });
-  // 2026-11-01 is a Sunday: weekday initials in the grid's order.
   const weekdays = Array.from({ length: 7 }, (_, i) =>
     new Date(Date.UTC(2026, 10, 1 + ((i + weekStart) % 7), 12)).toLocaleDateString(locale, {
       weekday: 'narrow',
@@ -82,7 +75,6 @@ export default function StreakScreen() {
   const canBack = !!firstDay && shiftMonth(month, -1) >= monthOf(firstDay);
   const canForward = month < monthOf(today);
 
-  // Screen and card padding (16 + 16 on each side), then 7 equal columns.
   const cell = Math.floor((width - 64) / 7);
   const ring = Math.min(36, cell - 10);
 
@@ -98,7 +90,6 @@ export default function StreakScreen() {
 
   return (
     <Screen contentClassName="gap-6">
-      {/* The streak and the next goal */}
       <View className="gap-1">
         <View className="flex-row items-baseline gap-2">
           <RingSpark size={24} />
@@ -123,7 +114,6 @@ export default function StreakScreen() {
         <Stat value={protectedCount} label={t.protectedMonth} />
       </View>
 
-      {/* Month calendar */}
       <View className="border-border gap-3 rounded-lg border p-4">
         <View className="flex-row items-center justify-between">
           <Text role="heading" aria-level="2" className="text-body font-semibold capitalize">
@@ -186,7 +176,6 @@ export default function StreakScreen() {
                     className="items-center gap-1"
                     style={{ width: cell }}
                   >
-                    {/* Missed days fade so the run of closed rings reads at a glance. */}
                     <View
                       className={cn(
                         'items-center justify-center',
@@ -217,7 +206,6 @@ export default function StreakScreen() {
                           />
                         </View>
                       ) : (
-                        // Days to come or before any data: a faint outline keeps the grid's rhythm.
                         <View
                           className="border-border rounded-full border"
                           style={{ width: ring - 4, height: ring - 4 }}
@@ -250,7 +238,6 @@ export default function StreakScreen() {
           ))}
         </View>
 
-        {/* Legend */}
         <View className="border-border gap-2 border-t pt-3">
           <View className="flex-row items-center gap-2">
             <ActivityRings

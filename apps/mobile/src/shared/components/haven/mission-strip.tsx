@@ -19,29 +19,16 @@ import { cn } from '@/shared/lib/utils';
 import { format, havenTexts } from './i18n';
 
 type Props = {
-  /** Mission code (`Mission.code`, e.g. "ARES01"), shown in mono. */
   code: string;
-  /** Mission name: shown instead of the code when present (the code is not the way in any more). */
   name?: string;
   day: number;
-  /** Replaces «Day n» when the mission is not running («Being prepared», «Starts on …», «Finished · day n»). */
   dayLabel?: string;
-  /** Environment name in the current language (`Environment.name[lang]`). */
   environment: string;
-  /** One-way delay in minutes (`Mission.currentDelayMin`). One decimal under 1. */
   delayMin: number;
-  /** `Mission.linkDown`. */
   linkDown: boolean;
-  /** Packets waiting to be sent (`usePendingSends()`). */
   queued: number;
-  /** Opens the queue screen (the "n queued" chip becomes a link). */
   onPressQueue?: () => void;
-  /** Opens Mission with the Link group in view (shortcut, DESIGN_SYSTEM.md §4.1d). */
   onPressLink?: () => void;
-  /**
-   * compact (default, §8.0.6): a round 44 pt link button with a status dot and the queue count, only on Body.
-   * full: the two-line version with chips.
-   */
   variant?: 'compact' | 'full';
   className?: string;
 };
@@ -101,17 +88,11 @@ function Chip({
       hitSlop={{ top: 10, bottom: 10, left: 4, right: 4 }}
       className="h-auto flex-col items-stretch justify-start gap-0 rounded-none px-0 py-0 active:opacity-70 sm:h-auto"
     >
-      {/* The chip keeps its own type styles, not the link's text defaults. */}
       <TextClassContext.Provider value={undefined}>{body}</TextClassContext.Provider>
     </Button>
   );
 }
 
-/**
- * Mission header. Default compact: a round link button beside SOS (§8.0.6). `variant="full"`: mission line +
- * delay/link/queue chips (DESIGN_SYSTEM.md §3.7), ~52 pt tall. M00's
- * `MissionHeader` feeds it. Link down is neutral (elevated chip, primary text), never amber.
- */
 export function MissionStrip({
   code,
   name,
@@ -143,8 +124,6 @@ export function MissionStrip({
     ]
       .filter(Boolean)
       .join(', ');
-    // Garmin's watch icon with a status dot: one round button beside SOS. The mission name and day
-    // live in Body's greeting; link down or a queue shows as a strip in Body, not here.
     return (
       <Button
         variant="ghost"

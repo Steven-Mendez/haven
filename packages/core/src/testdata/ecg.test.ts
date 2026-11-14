@@ -3,7 +3,6 @@ import type { Reading, Scenario } from '../contracts';
 import { ecgFromReadings, simulatedEcg } from './ecg';
 import { createSimulator, type Timers } from './provider';
 
-/** R peaks: samples above 600 µV that are a local maximum. */
 function rPeaks({ hz, microvolts }: { hz: number; microvolts: number[] }): number[] {
   const peaks: number[] = [];
   microvolts.forEach((v, i) => {

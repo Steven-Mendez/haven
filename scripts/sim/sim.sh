@@ -1,35 +1,13 @@
 #!/usr/bin/env bash
-# Simulator test harness for HAVEN (iOS + watchOS), used instead of the browser.
-# Devices are visible in Xcode 27 DeviceHub (Xcode.app/Contents/Applications/DeviceHub.app).
-#
-#   scripts/sim/sim.sh acquire [mobile|watch]   → prints the UDID of a free simulator you now own (lock)
-#   scripts/sim/sim.sh release <udid>
-#   scripts/sim/sim.sh open <udid> <path>       → deep link haven://<path>, e.g. "indicator/heart-rate", "dev"
-#   scripts/sim/sim.sh reload <udid>            → relaunch the app connected to the shared Metro (:8081)
-#   scripts/sim/sim.sh tree <udid>              → accessibility tree (idb) as JSON: labels + frames to tap
-#   scripts/sim/sim.sh find <udid> <text>       → elements whose label contains <text> (center x y + label)
-#   scripts/sim/sim.sh tap <udid> <x> <y>       → tap in points
-#   scripts/sim/sim.sh tapText <udid> <text>    → tap the first element whose label contains <text>
-#   scripts/sim/sim.sh type <udid> <text>       → type into the focused field
-#   scripts/sim/sim.sh swipe <udid> <x1> <y1> <x2> <y2>
-#   scripts/sim/sim.sh shot <udid> <file.png>   → screenshot (read images via /private/tmp/... paths)
-#   scripts/sim/sim.sh record <udid> <file.mp4> → starts recording in background; stop with: sim.sh stoprec
-#   scripts/sim/sim.sh logs <udid> [seconds]    → app logs (JS console goes to Metro: /tmp/haven-metro.log)
-#   scripts/sim/sim.sh status                   → simulators, locks and Metro
-#   scripts/sim/wait-bundle.sh                  → waits until the shared iOS bundle builds (someone else broke it)
-#
-# Rules: always acquire before use and release when done (locks expire after 20 min). Never erase or
-# delete simulators. Native changes need a rebuild (only the watch team / orchestrator does that).
-
 set -euo pipefail
 
 BUNDLE_ID="app.haven.mobile"
 METRO_URL="http://localhost:8081"
 LOCKS="/tmp/haven-sim-locks"
 APP="${HAVEN_APP:-/tmp/haven-builds/HAVEN.app}"
-MOBILE_SIMS=("53A6A8F9-C4EA-435C-BF5B-A9F3EC6D66AD" "0984741E-D240-4477-B36E-9C3748FE9AF9") # HAVEN Mobile 1, 2
-WATCH_PAIR_PHONE="C6DA5066-E604-4CC2-9DB8-FECFEF25F486" # iPhone 17 Pro Max paired with the watch
-WATCH_PAIR_WATCH="127F97CC-BC90-4A81-AE4E-530E66B8B1D8" # Apple Watch Ultra 4 (49mm) HAVEN
+MOBILE_SIMS=("53A6A8F9-C4EA-435C-BF5B-A9F3EC6D66AD" "0984741E-D240-4477-B36E-9C3748FE9AF9")
+WATCH_PAIR_PHONE="C6DA5066-E604-4CC2-9DB8-FECFEF25F486"
+WATCH_PAIR_WATCH="127F97CC-BC90-4A81-AE4E-530E66B8B1D8"
 LOCK_TTL_MIN=20
 
 mkdir -p "$LOCKS"
@@ -40,7 +18,6 @@ boot() {
   open /Applications/Xcode.app/Contents/Applications/DeviceHub.app >/dev/null 2>&1 || true
 }
 
-# Installs the app, and reinstalls it whenever /tmp/haven-builds/HAVEN.app is newer than the installed copy.
 ensure_app() {
   [ -d "$APP" ] || { echo "missing build $APP" >&2; exit 1; }
   local stamp="$LOCKS/.installed-$1" build
@@ -50,10 +27,8 @@ ensure_app() {
   fi
 }
 
-# iOS asks "Open in HAVEN?" for haven:// links opened from outside: tap "Open" (iPhone 17 Pro Max, points).
 accept_open() {
   sleep 1.5
-  # Only tap when the system dialog is really there (otherwise the tap would hit the app).
   if idb ui describe-all --udid "$1" 2>/dev/null | grep -q 'Open in'; then
     idb ui tap --udid "$1" 294 515 >/dev/null 2>&1 || true
   fi
@@ -75,7 +50,7 @@ try_lock() {
   mkdir "$dir" 2>/dev/null && echo "${AGENT_NAME:-agent} $(date +%H:%M:%S)" >"$dir/owner"
 }
 
-center_of() { # stdin: idb describe-all JSON; $1: text → "x y label"
+center_of() {
   python3 -c '
 import json,sys
 needle=sys.argv[1].lower()
@@ -123,5 +98,5 @@ case "$cmd" in
     xcrun simctl list devices | grep -E "HAVEN|17 Pro Max" || true
     echo "locks:"; for d in "$LOCKS"/*; do [ -d "$d" ] && echo "  $(basename "$d") $(cat "$d/owner")"; done
     lsof -nP -iTCP:8081 -sTCP:LISTEN >/dev/null && echo "metro: up on 8081" || echo "metro: DOWN (orchestrator starts it)" ;;
-  *) sed -n '2,22p' "$0"; exit 1 ;;
+  *) echo "usage: sim.sh acquire|release|open|reload|tree|find|tap|tapText|type|swipe|shot|record|stoprec|logs|status" >&2; exit 1 ;;
 esac

@@ -1,14 +1,9 @@
-// Monotone cubic interpolation (Fritsch–Carlson, same as d3.curveMonotoneX) for SVG paths:
-// smooth like a spline but never overshoots between points, so a chart never shows values that
-// were not measured. Points must be sorted by x.
-
 type Pt = [number, number];
 
 function sign(n: number) {
   return n < 0 ? -1 : 1;
 }
 
-/** Tangent slopes per point (Steffen-style limiter used by d3's monotoneX). */
 function slopes(p: Pt[]): number[] {
   const n = p.length;
   const m = new Array<number>(n).fill(0);
@@ -25,10 +20,8 @@ function slopes(p: Pt[]): number[] {
     const pp = (s0 * h[i] + s1 * h[i - 1]) / (h[i - 1] + h[i]);
     m[i] = (sign(s0) + sign(s1)) * Math.min(Math.abs(s0), Math.abs(s1), 0.5 * Math.abs(pp)) || 0;
   }
-  // Ends: one-sided estimate.
   m[0] = n > 2 ? (3 * d[0] - m[1]) / 2 : d[0];
   m[n - 1] = n > 2 ? (3 * d[n - 2] - m[n - 2]) / 2 : d[n - 2];
-  // Keep the end tangents from overshooting.
   if (sign(m[0]) !== sign(d[0])) m[0] = 0;
   else if (Math.abs(m[0]) > 3 * Math.abs(d[0])) m[0] = 3 * d[0];
   if (sign(m[n - 1]) !== sign(d[n - 2])) m[n - 1] = 0;
@@ -36,7 +29,6 @@ function slopes(p: Pt[]): number[] {
   return m;
 }
 
-/** SVG path data ("M … C …") through the points, monotone between neighbours. */
 export function monotonePath(points: Pt[]): string {
   const n = points.length;
   if (n === 0) return '';

@@ -18,16 +18,10 @@ import {
   toApiBody,
 } from '../logic/mission-record';
 
-// Missions known on this phone (`missions` collection). Local first: create and join work without
-// network; when the link is up, `GET/POST {apiUrl}/api/missions` (contract D) is tried with a
-// short timeout and any failure is silent.
-
 const collection = db.collection<MissionRecord>('missions');
 const TIMEOUT_MS = 4_000;
-/** Duration used when a mission is joined offline and Earth has not sent its details yet. */
 const DEFAULT_DURATION_DAYS = 540;
 
-/** `fetch` with a timeout. Throws on network error, timeout or non-2xx. */
 async function request(url: string, init?: RequestInit): Promise<unknown> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -45,7 +39,6 @@ function apiBase(): string | undefined {
   return url ? url : undefined;
 }
 
-/** `GET {apiUrl}/api/health`. `'skipped'` when there is no Earth address. */
 export async function testEarthApi(): Promise<'ok' | 'fail' | 'skipped'> {
   const base = apiBase();
   if (!base) return 'skipped';
@@ -59,13 +52,10 @@ export async function testEarthApi(): Promise<'ok' | 'fail' | 'skipped'> {
 
 export type JoinResult =
   | { record: MissionRecord; from: 'local' | 'earth' | 'offline' }
-  /** Earth answered and has no mission with that code. */
   | { from: 'unknown' }
-  /** Earth could not be reached and the caller asked not to join offline (QR invite). */
   | { from: 'unreachable' };
 export type CreateResult = { record: MissionRecord; registered: boolean };
 
-/** Asks Earth for a code. `unreachable` covers no URL, network error and timeout. */
 async function lookUp(code: string): Promise<EarthLookup> {
   const base = apiBase();
   if (!base) return { status: 'unreachable' };
@@ -79,12 +69,10 @@ async function lookUp(code: string): Promise<EarthLookup> {
   return record ? { status: 'found', record } : { status: 'missing' };
 }
 
-/** The current crew as roster entries (for a mission without a stored record). */
 function missionCrewOptions(): CrewOption[] {
   return store.mission().crew.map(({ id, name, hasWatch }) => ({ id, name, hasWatch }));
 }
 
-/** Mission fields that come from the record (the rest, such as the link, stay on the phone). */
 const synced = (m: Mission) =>
   JSON.stringify([
     m.code,
@@ -97,11 +85,6 @@ const synced = (m: Mission) =>
     m.crew,
   ]);
 
-/**
- * Brings the current mission up to date: Earth's copy when the link is up (status, day, crew,
- * phases), otherwise the stored record recomputed for today (a scheduled start or the end of the
- * mission still happen on time). Writes only what changed. `true` if the mission changed.
- */
 export async function syncCurrentMission(): Promise<boolean> {
   const current = store.mission();
   const local = await collection.get(current.code).catch(() => undefined);
@@ -117,7 +100,6 @@ export async function syncCurrentMission(): Promise<boolean> {
     }
   }
   if (!record) return false;
-  // The mission may have changed while Earth was answering (joined another one): leave it.
   if (store.mission().code !== record.code) return false;
   const next = missionFromRecord(record, store.mission(), new Date());
   if (synced(next) === synced(store.mission())) return false;
@@ -140,8 +122,6 @@ export function useMissionRecords() {
     void refresh();
   }, [refresh]);
 
-  // Earth can start, schedule or finish the mission at any time; `startMissionSync` polls it and
-  // updates the mission state. The list follows that state (and asks once more when opened).
   const mission = useMission();
   // biome-ignore lint/correctness/useExhaustiveDependencies: reload when the mission state changes
   useEffect(() => {
@@ -151,7 +131,6 @@ export function useMissionRecords() {
     void syncCurrentMission().then(() => refresh());
   }, [refresh]);
 
-  /** Local record of a mission by code, if this phone has one. */
   const recordFor = useCallback(
     (code: string): MissionRecord | undefined => records.find((r) => r.code === code),
     [records],
@@ -166,11 +145,6 @@ export function useMissionRecords() {
     await store.setMission(missionFromRecord(record, store.mission(), new Date()));
   }
 
-  /**
-   * Joins by code: asks Earth first, then this phone. A code Earth does not know is an error; only
-   * when Earth cannot be reached is an unknown code joined offline with the current environment
-   * (unless `allowOffline: false`, then the result is `unreachable`).
-   */
   async function join(code: string, { allowOffline = true } = {}): Promise<JoinResult> {
     const known = recordFor(code) ?? (await collection.get(code).catch(() => undefined));
     const decision = decideJoin(known, await lookUp(code));
@@ -193,7 +167,6 @@ export function useMissionRecords() {
       currentDelayMin: environment ? defaultDelay(environment) : current.currentDelayMin,
       createdAt: now.toISOString(),
       origin: 'local',
-      // Nobody is known yet: the person types their name after joining.
       crew: [],
     };
     await save(offline);
@@ -201,15 +174,10 @@ export function useMissionRecords() {
     return { record: offline, from: 'offline' };
   }
 
-  /** Makes this phone the given roster member: packets carry this id as `crewMember`. */
   async function chooseCrewMember(id: string) {
     await store.setPreferences({ crewMember: id });
   }
 
-  /**
-   * Continues with a typed name when mission control has not added this person yet. The name is
-   * kept in the mission's roster on this phone and its id (Earth's rule) is used for packets.
-   */
   async function addTypedCrewMember(code: string, name: string): Promise<string> {
     const record = recordFor(code) ?? (await collection.get(code).catch(() => undefined));
     const { crew, id } = withTypedCrewMember(record?.crew ?? missionCrewOptions(), name);
@@ -219,7 +187,6 @@ export function useMissionRecords() {
     return id;
   }
 
-  /** Creates a mission with a new six-character code; registers it on Earth if reachable. */
   async function create(draft: MissionDraft): Promise<CreateResult> {
     const environment = config.environments.find((e) => e.id === draft.environment);
     if (!environment) throw new Error(`Unknown environment ${draft.environment}`);
@@ -251,7 +218,6 @@ export function useMissionRecords() {
     return { record, registered };
   }
 
-  /** Keeps the stored record in step when environment or delay change from this screen. */
   async function update(code: string, changes: Partial<MissionRecord>) {
     const record = recordFor(code);
     if (!record) return;

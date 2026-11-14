@@ -22,13 +22,6 @@ import {
   sortEntries,
 } from './logic/queue';
 
-// M09 · Persistent Earth queue. Entries live in `db.collection('queue')` (SQLite on the phone,
-// localStorage on the web), so they survive closing the app. Packets leave with
-// `POST {apiUrl}/api/packets` when the link is up; failures are retried with backoff, and a resend
-// answered with `duplicate: true` counts as delivered. The link is detected, never switched by hand:
-// `GET {apiUrl}/api/health` every 15 s (and on network, foreground and address changes) sets
-// `Mission.linkDown`, and coming back up sends what waited.
-
 const collection = db.collection<QueueEntry>('queue');
 const TICK_MS = 2_000;
 const REQUEST_TIMEOUT_MS = 10_000;
@@ -41,10 +34,8 @@ let online = true;
 let started = false;
 let flushing: Promise<void> | null = null;
 let flushAgain = false;
-/** Earth checks in a row without an answer (reset by any answer or delivered packet). */
 let misses = 0;
 let probing = false;
-/** Bumped by `data:reset`: a flush that started before the reset stops sending old entries. */
 let generation = 0;
 const listeners = new Set<() => void>();
 
@@ -54,7 +45,6 @@ function publish() {
   void store.refreshPendingSends();
 }
 
-/** Ids being posted right now ("Sending"); not persisted. */
 let sending = new Set<string>();
 let sendingSnapshot: ReadonlySet<string> = sending;
 
@@ -78,11 +68,6 @@ async function save(entry: QueueEntry) {
   }
 }
 
-/**
- * Adds a packet to the queue (stamped now) and tries to send it. Emits `packet:queued`.
- * Same id again: replaces it if it has not left, ignores it if it left unchanged, or queues a new
- * version `<id>~v<n>` if it left and changed (`mergeIncoming` in logic/queue.ts).
- */
 export async function enqueue(packet: Packet): Promise<QueueEntry> {
   const result = mergeIncoming(entries, packet, new Date());
   if (result.action === 'ignored') return result.entry;
@@ -93,19 +78,16 @@ export async function enqueue(packet: Packet): Promise<QueueEntry> {
   return entry;
 }
 
-/** Composes-side helper: applies the crew member's exclusions to a routine packet, then enqueues. */
 export function enqueueRoutine(packet: Packet, exclusions: Exclusions): Promise<QueueEntry> {
   return enqueue(applyExclusions(packet, exclusions));
 }
 
-/** Removes an entry (only offered for packets Earth rejected). */
 export async function discard(id: string): Promise<void> {
   entries = entries.filter((e) => e.packet.id !== id);
   publish();
   await collection.remove(id).catch(() => undefined);
 }
 
-/** Retry now, ignoring the backoff (the "Retry now" button). */
 export function retryNow(): Promise<void> {
   entries = entries.map((e) => (e.status === 'pending' ? { ...e, nextAttemptAt: undefined } : e));
   publish();
@@ -119,7 +101,6 @@ async function post(apiUrl: string, packet: Packet): Promise<SendOutcome> {
     const response = await fetch(`${apiUrl.replace(/\/+$/, '')}/api/packets`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      // `currentMission` (optional extra of T01) lets Earth update the mission data.
       body: JSON.stringify({ ...packet, currentMission: store.mission() }),
       signal: controller.signal,
     });
@@ -132,13 +113,11 @@ async function post(apiUrl: string, packet: Packet): Promise<SendOutcome> {
   }
 }
 
-/** Sets `Mission.linkDown` from what was detected; only writes when it changes. */
 function updateLink() {
   const down = linkIsDown({ online, apiUrl: store.preferences().apiUrl, misses });
   if (down !== store.mission().linkDown) void store.setMission({ linkDown: down });
 }
 
-/** Asks Earth whether it is there (`GET /api/health`) and updates the link. */
 async function probe(): Promise<void> {
   const base = store.preferences().apiUrl.trim().replace(/\/+$/, '');
   if (probing) return;
@@ -163,7 +142,6 @@ export function linkState() {
   return { linkDown: store.mission().linkDown, online, apiUrl };
 }
 
-/** Sends every due entry, one at a time, oldest first. Re-entrant calls are coalesced. */
 export function flush(): Promise<void> {
   if (flushing) {
     flushAgain = true;
@@ -191,8 +169,6 @@ export function flush(): Promise<void> {
         if (!current) continue;
         const replacedInFlight = current.packet !== entry.packet;
         if (replacedInFlight && outcome.kind === 'ok') {
-          // Earth got the old content under this id: record it as sent and queue the new content
-          // as the next version.
           await save(applyOutcome(entry, sent, outcome, new Date()));
           await enqueue(current.packet);
           continue;
@@ -202,7 +178,7 @@ export function flush(): Promise<void> {
           updateLink();
         }
         await save(applyOutcome(current, sent, outcome, new Date()));
-        if (outcome.kind === 'retry') break; // the link is probably down: wait for the backoff
+        if (outcome.kind === 'retry') break;
       }
     } while (flushAgain);
     const pruned = pruneSent(entries);
@@ -228,7 +204,6 @@ function fromBus(packet: Packet) {
   void enqueue(normalized);
 }
 
-/** Empties the queue: in-memory cache, in-flight marks and the persisted collection. */
 export async function resetQueue(): Promise<void> {
   generation++;
   entries = [];
@@ -242,7 +217,6 @@ export async function resetQueue(): Promise<void> {
   }
 }
 
-/** Loads the persisted queue, listens to the bus, network and mission, and retries on a timer. */
 export async function startEarthQueue(): Promise<void> {
   if (started) return;
   started = true;
@@ -255,19 +229,15 @@ export async function startEarthQueue(): Promise<void> {
   registerQueueCounter(() => pendingCount(entries));
   publish();
 
-  // "Delete data" (M00): forget every packet, in memory and on disk, without reloading the app.
   bus.on('data:reset', () => void resetQueue());
 
-  // Emergency packets (M06) travel complete; requests from M04/M10 arrive already composed.
   bus.on('emergency:close', ({ packet }) => fromBus(packet));
   bus.on('packet:enqueue', ({ packet }) => fromBus(packet));
-  // The link coming back sends right away.
   let wasDown = store.mission().linkDown;
   bus.on('mission:changed', (mission) => {
     if (wasDown && !mission.linkDown) void retryNow();
     wasDown = mission.linkDown;
   });
-  // A new Earth address is checked at once.
   let apiUrl = store.preferences().apiUrl;
   store.subscribe('preferences', () => {
     if (store.preferences().apiUrl !== apiUrl) {
@@ -292,9 +262,7 @@ export async function startEarthQueue(): Promise<void> {
       publish();
       void probe();
     });
-  } catch {
-    // No network events on this platform: the timer below still retries.
-  }
+  } catch {}
   setInterval(() => {
     if (entries.some((e) => isDue(e, new Date()))) void flush();
   }, TICK_MS);
@@ -311,7 +279,6 @@ function subscribe(listener: () => void) {
   return () => listeners.delete(listener);
 }
 
-/** Queue entries, pending first. Re-renders on every change. */
 export function useQueue(): QueueEntry[] {
   return useSyncExternalStore(
     subscribe,
@@ -320,7 +287,6 @@ export function useQueue(): QueueEntry[] {
   );
 }
 
-/** Ids being posted right now. */
 export function useSending(): ReadonlySet<string> {
   return useSyncExternalStore(
     subscribe,
@@ -329,7 +295,6 @@ export function useSending(): ReadonlySet<string> {
   );
 }
 
-/** Whether the phone currently has network (from expo-network). */
 export function useOnline(): boolean {
   return useSyncExternalStore(
     subscribe,

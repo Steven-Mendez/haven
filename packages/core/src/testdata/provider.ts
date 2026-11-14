@@ -13,7 +13,6 @@ import { type EcgOptions, type EcgStrip, ecgFromReadings } from './ecg';
 import { scenarioTimeline, type TimelineItem } from './scenario';
 import { demoHistory } from './series';
 
-/** Injectable timers (tests pass fakes; default: global setTimeout/clearTimeout). */
 export type Timers = {
   setTimeout(fn: () => void, ms: number): unknown;
   clearTimeout(handle: unknown): void;
@@ -21,65 +20,40 @@ export type Timers = {
 
 export type SimulatorOptions = {
   crewMember: string;
-  /** Scenario to start playing right away. */
   scenario?: string;
-  /** Speed: 1 = real time, 60 = one simulated minute per real second. Default 1. */
   factor?: number;
-  /** Simulated instant at creation (default: now). History ends here. */
   start?: Date;
-  /** Config used for units, cadences and nominal ranges (default: Content's `loadConfig()`). */
   config?: Config;
-  /** Scenario catalog (default: Content's `scenarios`). */
   scenarios?: Scenario[];
   timers?: Timers;
-  /** Real clock in ms (default Date.now); only used to derive the simulated time. */
   clock?: () => number;
-  /** Include 30 days of `demoHistory` in `read()` (default true). */
   history?: boolean;
 };
 
 export type PlaybackState = {
   scenario?: string;
   playing: boolean;
-  /** Last simulated minute emitted. */
   minute: number;
   durationMin: number;
 };
 
 export interface SimulatorProvider extends HealthProvider {
-  /** Plays a scenario from the current simulated time (stops the previous one). */
   play(scenarioId: string): void;
   stop(): void;
-  /** Watch → phone messages from the watch simulator. Returns the unsubscribe function. */
   onWatchMessage(cb: (envelope: WatchEnvelope) => void): () => void;
-  /** Phone → watch message; the simulator stores it (and the last `status`). */
   sendToWatch(envelope: WatchEnvelope): void;
-  /** Simulated watch SOS button: emits `emergency { origin: 'button' }`. */
   pressEmergency(): void;
-  /** Sends any watch → phone message from the simulated watch (dev panel). */
   sendFromWatch<T extends WatchMessageType>(type: T, payload: WatchMessages[T]): void;
   lastWatchStatus(): WatchEnvelope<'status'> | undefined;
-  /** Messages the phone sent to the simulated watch, oldest first. */
   watchInbox(): WatchEnvelope[];
   playback(): PlaybackState;
-  /** Current simulated time. */
   now(): Date;
   scenarios(): Scenario[];
-  /**
-   * Simulated ECG strip for the emergency packet, using the rhythm and heart rate of the active
-   * scenario (latest emitted readings, else the demo history) at the current simulated time.
-   */
   latestSimulatedEcg(options?: Omit<EcgOptions, 'rhythm' | 'heartRate'>): EcgStrip;
 }
 
 const MIN_MS = 60_000;
 
-/**
- * Simulated `HealthProvider` (C02). Serves 30 days of `demoHistory` plus whatever the playing
- * scenario has emitted; `subscribe(indicator | '*', cb)` delivers scenario readings live. Includes the
- * watch simulator: scenario watch events and `pressEmergency()` arrive through `onWatchMessage`,
- * with `simulated: false`: every record looks like a real one (test data, dev tools only).
- */
 export function createSimulator(options: SimulatorOptions): SimulatorProvider {
   const crewMember = options.crewMember;
   const factor = options.factor && options.factor > 0 ? options.factor : 1;
@@ -102,7 +76,6 @@ export function createSimulator(options: SimulatorOptions): SimulatorProvider {
   let handle: unknown;
   let state: PlaybackState = { playing: false, minute: 0, durationMin: 0 };
   let playStart = 0;
-  /** Simulated offset added by scenario playback when the real clock is not advanced (fake timers). */
   let simulatedFloor = simStart;
 
   const now = () => new Date(Math.max(simStart + (clock() - createdReal) * factor, simulatedFloor));

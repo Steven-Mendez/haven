@@ -21,7 +21,6 @@ const chestPain = loadConfig().protocols.find((p) => p.id === 'chest-pain') as P
 const t0 = new Date('2026-11-01T10:00:00Z');
 const at = (s: number) => new Date(t0.getTime() + s * 1000);
 
-/** Walks the run choosing an option by step id (default: "done"). */
 function walk(env: string, choices: Record<string, number>, max = 60): ProtocolRun {
   let run = startRun(chestPain, env, t0);
   for (let i = 1; i <= max && !run.finishedAt; i++) {
@@ -33,7 +32,6 @@ function walk(env: string, choices: Record<string, number>, max = 60): ProtocolR
   return run;
 }
 
-// "No response → not breathing → CPR → AED shock → signs of life → stable".
 const CPR_BRANCH = {
   'check-response': 1,
   'check-breathing': 1,
@@ -41,7 +39,6 @@ const CPR_BRANCH = {
   'signs-of-life': 0,
   'patient-status': 0,
 };
-// "Responds → measurements → symptoms → stable".
 const RESPONSIVE_BRANCH = { 'check-response': 0, 'patient-status': 0 };
 
 describe('chest-pain protocol in transit', () => {
@@ -93,8 +90,8 @@ describe('chest-pain protocol in transit', () => {
     let run = walk('transit', { 'check-response': 1, 'check-breathing': 1, 'aed-analyze': 1 }, 7);
     expect(currentStep(chestPain, run)?.id).toBe('cpr-after-shock');
     expect(path(run)).not.toContain('aed-shock');
-    run = advance(chestPain, run, at(20)); // cpr-after-shock → signs-of-life
-    run = advance(chestPain, run, at(21), 1); // no signs of life
+    run = advance(chestPain, run, at(20));
+    run = advance(chestPain, run, at(21), 1);
     expect(currentStep(chestPain, run)?.id).toBe('aed-analyze');
   });
 });
@@ -156,7 +153,6 @@ describe('state machine', () => {
     expect(decisionLog(chestPain, run, 'en')[0]).toBe(
       '10:00:00 · Alert the crew. Have someone bring the medical kit and the defibrillator (AED). ✓',
     );
-    // An auto step with options is never skipped.
     expect(currentStep(chestPain, startRun(chestPain, 'mars', t0, ['check-response']))?.id).toBe(
       'call-for-help',
     );
@@ -172,7 +168,6 @@ describe('state machine', () => {
     const run = startRun(chestPain, 'transit', t0);
     const p = progress(chestPain, run);
     expect(p.index).toBe(1);
-    // call-for-help → check-response → secure → measure → ecg → symptoms → meds → status → us → packet → follow-up
     expect(p.total).toBe(11);
     expect(remainingSteps(chestPain, 'follow-up', 'transit')).toBe(1);
     expect(progress(chestPain, walk('transit', CPR_BRANCH)).fraction).toBe(1);

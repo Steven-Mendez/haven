@@ -40,9 +40,6 @@ import type {
   StoredMission,
 } from './types';
 
-// T01 backend · Queries. Packets are visible as soon as they are received (no artificial delay).
-// Public functions for views and routes are in features/<x>/server.ts.
-
 export type Result<T> =
   | { ok: true; status: number; data: T }
   | { ok: false; status: number; error: string; details?: string[] };
@@ -54,9 +51,6 @@ const NO_ID = { projection: { _id: 0 } } as const;
 const DUPLICATE_KEY = 11000;
 const isDuplicateKey = (error: unknown) => (error as { code?: number }).code === DUPLICATE_KEY;
 
-// ─── Packets ───────────────────────────────────────────────────────────────────
-
-/** POST /api/packets. Idempotent by `id`: a resend returns the original record (200). */
 export async function receivePacket(
   body: unknown,
   now = new Date(),
@@ -75,7 +69,6 @@ export async function receivePacket(
   try {
     await col.insertOne({ ...doc });
   } catch (error) {
-    // Race between two simultaneous resends: the unique index decides.
     if (isDuplicateKey(error)) {
       const other = await col.findOne({ id: packet.id }, NO_ID);
       if (other) return duplicate(other);
@@ -98,8 +91,6 @@ function duplicate(doc: PacketDoc): Result<PacketReceipt> {
   };
 }
 
-/** Creates the mission if missing and adds the crew member if new. The optional body extra
- * `currentMission` (a Mission) updates environment and delay as the phone sees them. */
 async function registerMission(
   packet: PacketDoc,
   currentMission: Partial<Mission> | undefined,
@@ -130,7 +121,6 @@ async function registerMission(
     { code: packet.mission, 'crew.id': { $ne: packet.crewMember } },
     { $push: { crew: { id: packet.crewMember, name: packet.crewMember, hasWatch: false } } },
   );
-  // Readings measured by the Apple Watch prove this crew member wears one.
   if (packet.readings.some((r) => r.source === 'watch'))
     await col.updateOne(
       {
@@ -141,14 +131,11 @@ async function registerMission(
     );
 }
 
-// ─── Crew and astronaut ────────────────────────────────────────────────────────
-
 async function findMission(code: string, now: Date): Promise<StoredMission | null> {
   const doc = await (await missions()).findOne({ code }, NO_ID);
   return doc ? missionForApi(doc, now) : null;
 }
 
-/** GET /api/crew. `null` when the mission does not exist. */
 export async function getCrew(code: string, now = new Date()): Promise<CrewResponse | null> {
   const mission = await findMission(code, now);
   if (!mission) return null;
@@ -168,7 +155,6 @@ export async function getCrew(code: string, now = new Date()): Promise<CrewRespo
   return {
     generatedAt: now.toISOString(),
     mission: missionHeader(mission, cards),
-    // Invited crew with no packet yet have no data to add up.
     summary: missionSummary(
       cards.filter((c) => c.lastPacket !== null),
       mission,
@@ -177,7 +163,6 @@ export async function getCrew(code: string, now = new Date()): Promise<CrewRespo
   };
 }
 
-/** GET /api/astronaut/[id]: every received packet as sent, notes and diary included. */
 export async function getAstronaut(
   code: string,
   crewMember: string,
@@ -207,8 +192,6 @@ export async function getAstronaut(
   };
 }
 
-// ─── Missions ──────────────────────────────────────────────────────────────────
-
 export async function listMissions(now = new Date()): Promise<MissionsResponse> {
   const docs = await (await missions()).find({}, NO_ID).sort({ createdAt: -1 }).toArray();
   return { missions: docs.map((d) => missionForApi(d, now)) };
@@ -218,10 +201,6 @@ export async function getMission(code: string, now = new Date()) {
   return findMission(code, now);
 }
 
-/**
- * «Start mission»: day 1 becomes today (UTC) and days start to run. Only for a mission not started yet
- * (planned, or scheduled for a later date); an active mission keeps its start.
- */
 export async function startMission(code: string, now = new Date()): Promise<Result<StoredMission>> {
   const col = await missions();
   const mission = await col.findOne({ code }, NO_ID);
@@ -237,7 +216,6 @@ export async function startMission(code: string, now = new Date()): Promise<Resu
   return { ok: true, status: 200, data: missionForApi(updated ?? mission, now) };
 }
 
-/** «Finish mission»: it stays as a record from now on (only a running mission can be finished). */
 export async function finishMission(
   code: string,
   now = new Date(),
@@ -252,16 +230,13 @@ export async function finishMission(
   return { ok: true, status: 200, data: missionForApi(updated ?? mission, now) };
 }
 
-/** What can change: the name until it is finished; plan and start only while in preparation. */
 export type MissionEdit = {
   name?: string;
   phases?: MissionPhase[];
-  /** Day 1 (ISO). With `awaitingStart`, only the planned date. */
   start?: string;
   awaitingStart?: boolean;
 };
 
-/** Edits a mission within what its status allows (see `MissionEdit`). */
 export async function updateMission(
   code: string,
   edit: MissionEdit,
@@ -294,7 +269,6 @@ export async function updateMission(
   return { ok: true, status: 200, data: missionForApi(updated ?? mission, now) };
 }
 
-/** A finished mission is a record: its crew no longer changes. */
 async function editableMission(code: string, now = new Date()) {
   const mission = await (await missions()).findOne({ code }, NO_ID);
   if (!mission) return fail(404, `Mission ${code} does not exist`);
@@ -303,14 +277,10 @@ async function editableMission(code: string, now = new Date()) {
   return null;
 }
 
-// ─── Crew roster ───────────────────────────────────────────────────────────────
-
-/** Name and role typed on Earth. The role is one free text, stored in both languages. */
 export type CrewInput = { name: string; role?: string };
 
 const roleOf = (role?: string) => (role ? { role: { es: role, en: role } } : {});
 
-/** Adds a crew member to the roster before their phone sends anything; the id comes from the name. */
 export async function addCrewMember(code: string, input: CrewInput): Promise<Result<CrewEntry>> {
   const locked = await editableMission(code);
   if (locked) return locked;
@@ -330,7 +300,6 @@ export async function addCrewMember(code: string, input: CrewInput): Promise<Res
   return { ok: true, status: 201, data: entry };
 }
 
-/** Renames a crew member or changes their role. The id (what the phone sends) never changes. */
 export async function updateCrewMember(
   code: string,
   id: string,
@@ -352,10 +321,6 @@ export async function updateCrewMember(
   return { ok: true, status: 200, data: entry };
 }
 
-/**
- * Deletes a crew member from the mission: their roster entry AND every packet they sent (otherwise the packets
- * would bring them back to the crew list). Cannot be undone; the page asks for confirmation first.
- */
 export async function removeCrewMember(
   code: string,
   id: string,
@@ -368,10 +333,6 @@ export async function removeCrewMember(
   return { ok: true, status: 200, data: { id, packets: removed.deletedCount } };
 }
 
-/**
- * Moves everything of a mission that only exists because packets arrived with an unknown code (a typo on a
- * phone) into the right mission: packets and crew. Then the unknown mission is deleted.
- */
 export async function mergeMission(from: string, into: string): Promise<Result<{ code: string }>> {
   if (from === into) return fail(400, 'Cannot merge a mission into itself');
   const col = await missions();
@@ -393,10 +354,8 @@ export async function mergeMission(from: string, into: string): Promise<Result<{
 
 const FALLBACK_ENVIRONMENTS = ['transit', 'station', 'moon', 'mars', 'rover'];
 
-/** Longest phase or plan accepted (days): a conjunction-class Mars mission is ~900. */
 const MAX_MISSION_DAYS = 3000;
 
-/** Checks a `phases` body field; returns the clean plan or pushes errors. */
 function parsePhases(value: unknown, environments: string[], errors: string[]) {
   if (!Array.isArray(value) || value.length === 0) {
     errors.push('phases: non-empty array');
@@ -431,8 +390,6 @@ function parsePhases(value: unknown, environments: string[], errors: string[]) {
   return phases;
 }
 
-/** POST /api/missions: name and a phase plan (or a single environment and duration), start; generates the
- * six-character code. */
 export async function createMission(
   body: unknown,
   now = new Date(),
@@ -494,14 +451,6 @@ export async function createMission(
   return fail(500, 'Could not generate a unique code');
 }
 
-// ─── Versioned rules (closed decision 5) ───────────────────────────────────────
-
-/**
- * Rule versions of a mission. With `downloadedBy` (the HTTP GET from a phone) every version is marked
- * received by that crew member at `now`, but ONLY if `downloadedBy` is in the mission crew: anonymous
- * downloads or unknown ids change nothing. Earth views call it without `downloadedBy`: reading on
- * Earth never changes the delivery status.
- */
 export async function listRules(
   code: string,
   options: { downloadedBy?: string } = {},
@@ -519,7 +468,6 @@ export async function listRules(
   return { mission: code, versions: docs.map((d) => rulesForApi(d)) };
 }
 
-/** POST /api/rules: creates a version (body with `config`) or marks one as applied (`apply`). */
 export async function saveRules(
   code: string,
   body: unknown,
@@ -544,7 +492,6 @@ export async function saveRules(
     await col.updateOne(
       { id: doc.id },
       {
-        // Applying implies the phone has it: mark it received too if no download was recorded.
         $set: { appliedAt: doc.appliedAt ?? at, receivedAt: doc.receivedAt ?? at },
         $push: { appliedBy: { crewMember, at } },
       },
@@ -580,9 +527,6 @@ export async function saveRules(
   return { ok: true, status: 201, data: rulesForApi(doc) };
 }
 
-// ─── Aggregates (T03, closed decision 4) ───────────────────────────────────────
-
-/** Daily crew means per indicator from received readings, with any crew size; `null` when nobody measured it. */
 export async function missionAggregates(
   code: string,
   indicators: string[],

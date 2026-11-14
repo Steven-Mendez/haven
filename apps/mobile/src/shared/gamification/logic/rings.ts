@@ -1,14 +1,7 @@
-// Activity-style rings from real data (SPEC.md v3.1 «Anillos»). Pure: imports only @haven/core.
-//   routine      = today's daily actions done / zones (7)
-//   measurements = scheduled indicators (everyHours ≤ 24) with a reading that day / scheduled
-//   wellbeing    = check-in (mood + stress) + cognitive battery (reaction time) that day / 2
-// Rings show progress, never health.
-
 import { type Config, dailyProgress, type Reading } from '@haven/core';
 
 export type RingValue = { done: number; total: number };
 export type DayRings = {
-  /** UTC date «YYYY-MM-DD». */
   date: string;
   routine: RingValue;
   measurements: RingValue;
@@ -17,7 +10,6 @@ export type DayRings = {
 
 const DAY_MS = 86_400_000;
 
-/** Indicators that belong to the wellbeing ring, not to «measurements». */
 const WELLBEING_IDS = new Set([
   'mood',
   'stress',
@@ -31,14 +23,12 @@ const WELLBEING_IDS = new Set([
 export const dateKey = (iso: string | number | Date): string =>
   new Date(iso).toISOString().slice(0, 10);
 
-/** Indicators expected at least once a day for the measurements ring. */
 export function scheduledIndicators(config: Config): string[] {
   return config.indicators
     .filter((i) => (i.everyHours ?? 0) > 0 && (i.everyHours ?? 0) <= 24 && !WELLBEING_IDS.has(i.id))
     .map((i) => i.id);
 }
 
-/** The three rings of one UTC day (`now` cuts «today» at the current time). */
 export function ringsForDay(
   readings: Reading[],
   config: Config,
@@ -63,7 +53,6 @@ export function ringsForDay(
   };
 }
 
-/** The last `count` days (oldest first), today included. */
 export function ringHistory(readings: Reading[], config: Config, now: Date, count = 7): DayRings[] {
   const today = Date.parse(`${dateKey(now)}T00:00:00.000Z`);
   return Array.from({ length: count }, (_, i) =>

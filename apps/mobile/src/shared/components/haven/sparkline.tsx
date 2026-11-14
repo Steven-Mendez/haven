@@ -9,20 +9,13 @@ import { cn } from '@/shared/lib/utils';
 import { monotonePath } from './logic/monotone';
 
 type SparklineProps = {
-  /** `[epoch ms, value][]`, any order. */
   data: [number, number][];
-  /** Level of the latest value: the line and end dot take its colour only when amber or red. */
   level?: Level;
   width?: number;
   height?: number;
   className?: string;
 };
 
-/**
- * Row sparkline (shared chart spec): ~56 × 20, 1.25 pt monotone line in the secondary grey with an
- * end dot; coloured only when the latest value is out of range. Decorative (the row carries the
- * value and level in text).
- */
 export function Sparkline({ data, level, width = 56, height = 20, className }: SparklineProps) {
   const colors = useColors();
   const pts = [...data].filter(([, v]) => Number.isFinite(v)).sort((a, b) => a[0] - b[0]);
@@ -68,17 +61,12 @@ type Bar = { label: string; value: number; accessibilityLabel?: string };
 
 type BarChartProps = {
   bars: Bar[];
-  /** Highlighted bar (current day). Default: the last one. */
   selected?: number;
   height?: number;
   formatValue?: (v: number) => string;
   className?: string;
 };
 
-/**
- * Weekly bars (shared chart spec): bars in foreground 18 %, the current / selected one at 100 %,
- * 2 pt top radius, ~40 % gap, labels under each bar. No axes or grid.
- */
 export function BarChart({
   bars,
   selected,

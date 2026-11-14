@@ -20,7 +20,6 @@ import { byNewest, type Names } from '../logic';
 
 type Props = {
   data: AstronautResponse;
-  /** Level shown in the header (an open emergency has priority over the zone assessment). */
   level: VisualLevel;
   names: Names;
   lang: Language;
@@ -36,7 +35,6 @@ function Row({ label, children }: { label: ReactNode; children: ReactNode }) {
   );
 }
 
-/** Mono date + time: date dimmed, time bright (Vercel logs). */
 function Stamp({ at, lang }: { at: string; lang: Language }) {
   return (
     <TimeAgo at={at} lang={lang} className="font-mono text-xs">
@@ -45,11 +43,6 @@ function Stamp({ at, lang }: { at: string; lang: Language }) {
   );
 }
 
-/**
- * Right rail (SPEC §6, Linear properties / incident.io key-values, 300 px): status, when the last packet was
- * measured on board and received on Earth, transit time, data age, environment and watch. Notes and diary
- * live in the Access tab only.
- */
 export function AstronautProperties({ data, level, names, lang, t }: Props) {
   const h = havenTexts[lang];
   const { crewMember: member, generatedAt: now } = data;

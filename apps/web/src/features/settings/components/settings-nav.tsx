@@ -6,11 +6,6 @@ import { cn } from '@/lib/utils';
 
 export type SettingsSection = { id: string; label: string };
 
-/**
- * Linear-style settings sub-nav (sticks below the 44 px app header, `top-16`): 28 px items, the section in view marked with the active fill. shadcn
- * `Button`s rendered as plain anchors (work without JavaScript); the active item follows the scroll
- * with an IntersectionObserver.
- */
 export function SettingsNav({ label, sections }: { label: string; sections: SettingsSection[] }) {
   const [active, setActive] = useState(sections[0]?.id);
 
@@ -18,8 +13,6 @@ export function SettingsNav({ label, sections }: { label: string; sections: Sett
     const targets = sections
       .map((s) => document.getElementById(s.id))
       .filter((el): el is HTMLElement => el !== null);
-    // The callback only receives the sections whose visibility changed, so keep every section's state and
-    // mark the topmost visible one (not the topmost of the batch).
     const inView = new Map<string, boolean>();
     const observer = new IntersectionObserver(
       (entries) => {
@@ -27,7 +20,6 @@ export function SettingsNav({ label, sections }: { label: string; sections: Sett
         const first = sections.find((s) => inView.get(s.id));
         if (first) setActive(first.id);
       },
-      // Top margin = the 44 px sticky app header: a section hidden under it is not «in view» (anchors land at 64 px).
       { rootMargin: '-48px 0px -60% 0px' },
     );
     for (const el of targets) observer.observe(el);

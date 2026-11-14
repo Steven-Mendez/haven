@@ -12,7 +12,6 @@ const KIND_LABEL = {
   photoNote: 'photoNote',
 } as const;
 
-/** Notes, diary entries and reading/photo notes the astronaut sent, newest first. */
 export function NotesList({
   packets,
   lang,

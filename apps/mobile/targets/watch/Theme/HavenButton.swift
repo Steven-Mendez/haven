@@ -1,22 +1,11 @@
 import SwiftUI
 
-// Watch buttons (SPEC.md §1.2, §4). Usage: `.buttonStyle(.haven(.sos))`.
-// Full-width pills of 44 pt (Theme.tapTargetLarge). One primary per screen: the white pill with black text.
-// Inside an emergency the main action is `.default` (white), never red; red is only SOS and «Open protocol».
-
 enum HavenButtonVariant {
-    /// Primary: white pill, black text (X / Grok). One per screen.
     case `default`
-    /// Secondary: `Theme.elevated` fill with a strong hairline («End», «No»). Filled because a hairline alone is too
-    /// thin an affordance on the watch.
     case secondary
-    /// Red fill: «Open protocol» from a red status. The only red fill besides SOS.
     case destructive
-    /// Hairline only: cancel, close.
     case outline
-    /// No background: tertiary actions.
     case ghost
-    /// SOS pill: red fill, 56 pt (Theme.tapTargetSOS). The SOS page uses the hold ring (`HoldToConfirm`) instead.
     case sos
 }
 
@@ -50,7 +39,6 @@ private struct HavenButtonBody: View {
                 }
             }
             .contentShape(Capsule())
-            // Round ends off the display corners (Ultra); the tap target stays ≥ 44 pt tall.
             .padding(.horizontal, Theme.capsuleInset)
             .opacity(configuration.isPressed ? 0.8 : 1)
             .scaleEffect(configuration.isPressed ? 0.98 : 1)
@@ -66,7 +54,6 @@ private struct HavenButtonBody: View {
         }
     }
 
-    /// Disabled: no white or red fill, so a disabled primary never reads as the action.
     private var disabledFill: Color {
         switch variant {
         case .outline, .ghost: .clear

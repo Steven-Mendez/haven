@@ -5,27 +5,16 @@ export type EcgStrip = NonNullable<Packet['ecg']>;
 export type EcgRhythm = 'sinus' | 'irregular';
 
 export type EcgOptions = {
-  /** Strip length in seconds (default 10). */
   seconds?: number;
-  /** Sampling rate (default 250 Hz). */
   hz?: number;
-  /** `irregular` = atrial-fibrillation-like: no P wave, irregular RR, fibrillatory baseline. */
   rhythm?: EcgRhythm;
-  /** Mean heart rate in bpm (default 72, clamped to 30–220). */
   heartRate?: number;
-  /** PRNG seed (default 1): same options → same strip. */
   seed?: number;
 };
 
 const wave = (t: number, center: number, width: number, height: number) =>
   height * Math.exp(-(((t - center) / width) ** 2));
 
-/**
- * Deterministic simulated single-lead ECG in microvolts (C02). Each beat is a sum of Gaussians around
- * the R peak: P (−160 ms, sinus only), Q, R (~1.1 mV), S and T (QT scaled with √RR). Sinus rhythm has
- * ±3 % RR variability; `irregular` draws RR from ±35 % around the mean, drops the P wave and adds a
- * fibrillatory baseline. Both add slow baseline wander and small noise. Always simulated data.
- */
 export function simulatedEcg(opts?: EcgOptions): EcgStrip {
   const seconds = Math.max(1, opts?.seconds ?? 10);
   const hz = Math.max(50, Math.round(opts?.hz ?? 250));
@@ -34,7 +23,6 @@ export function simulatedEcg(opts?: EcgOptions): EcgStrip {
   const rng = mulberry32(opts?.seed ?? 1);
   const meanRr = 60 / heartRate;
 
-  // R-peak times, starting a little into the strip.
   const beats: { r: number; rr: number }[] = [];
   let t = meanRr * (0.3 + rng() * 0.4);
   while (t < seconds + meanRr) {
@@ -69,10 +57,6 @@ export function simulatedEcg(opts?: EcgOptions): EcgStrip {
   return { hz, microvolts };
 }
 
-/**
- * ECG matching the latest `heart-rhythm` and `heart-rate` readings at `now` (default: latest reading).
- * Seeded by crew member and minute so the same moment always gives the same strip.
- */
 export function ecgFromReadings(
   readings: Reading[],
   options?: Omit<EcgOptions, 'rhythm' | 'heartRate'> & { now?: Date; crewMember?: string },

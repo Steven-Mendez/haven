@@ -14,39 +14,21 @@ import { havenTexts } from './i18n';
 import { zoneIcon } from './level';
 
 type Props = {
-  /** Action text (`Zone.dailyAction.text[lang]`, `Action.text[lang]`). */
   title: string;
-  /** Time estimate or due info ("< 4 min", "due 2 h ago"). */
   detail?: string;
-  /** Zone it belongs to: shows its line icon. */
   zone?: string;
-  /** 0–1. At 1 the row shows "Done". */
   progress?: number;
-  /** Start / open the action ("Measure" by default). Hidden when done or when onDone is set. */
   onStart?: () => void;
-  /** Button label override ("Start", "Register"). Default "Measure". */
   startLabel?: string;
-  /** Actions without a reading: inline "✓ Done · — Skip" control (each target ≥ 44 pt). */
   onDone?: () => void;
   onSkip?: () => void;
-  /**
-   * Undo the current choice: called when the selected control (✓ or —) is pressed again.
-   * Without it, pressing «— Skipped» again calls `onSkip` (toggle handled by the feature).
-   */
   onUndo?: () => void;
-  /** Shown state for the inline control. `done` is also implied by progress ≥ 1. */
   state?: 'open' | 'done' | 'skipped';
-  /** The next due item: 2 pt accent leading bar (Tiimo / X). */
   next?: boolean;
-  /** Render as a bare row for a `ListGroup`. Default: its own hairline box. */
   grouped?: boolean;
   className?: string;
 };
 
-/**
- * Today's list row (SPEC.md §6, routine): flat 52 pt row, zone line icon, 15/500 title, 13 pt grey
- * detail and a trailing text action («Measure») or a ✓ / — pair. No fills.
- */
 export function ActionRow({
   title,
   detail,
@@ -136,7 +118,6 @@ export function ActionRow({
       hitSlop={8}
       className="min-h-touch h-auto rounded-full px-1 py-0 sm:h-auto"
     >
-      {/* The link variant dims the label on press (was active:opacity-70 on the button). */}
       <Text className="text-link text-body-sm font-semibold">{startLabel ?? t.measure}</Text>
     </Button>
   ) : null;
@@ -176,10 +157,6 @@ export function ActionRow({
   return <ListGroup>{row}</ListGroup>;
 }
 
-/**
- * Grouped list (alias / X settings): rows inside ONE 1 px hairline box with no fill, divided by
- * hairlines inset 16 pt. `flat`: no outer box, only the dividers (full-bleed X list).
- */
 export function ListGroup({
   children,
   flat = false,
@@ -188,7 +165,6 @@ export function ListGroup({
 }: {
   children: ReactNode;
   flat?: boolean;
-  /** Divider inset from the leading edge (16 by default; 52 to start at the text column). */
   inset?: number;
   className?: string;
 }) {

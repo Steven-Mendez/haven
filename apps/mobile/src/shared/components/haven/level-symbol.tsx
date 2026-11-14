@@ -7,11 +7,6 @@ import { cn } from '@/shared/lib/utils';
 
 type ShapeProps = { level: Level; cx: number; cy: number; size: number; color: string };
 
-/**
- * Level shape as raw SVG, to draw inside another <Svg> (BodyFigure, charts). Same shapes on phone,
- * watch and Earth (tokens.json → level.symbol): green ● filled circle · amber ◐ half-filled ring ·
- * red ▲ filled triangle · pending ○ dashed ring. Never a hollow ring that reads as a radio button.
- */
 export function LevelShape({ level, cx, cy, size, color }: ShapeProps) {
   const r = size / 2;
   if (level === 'green') return <Circle cx={cx} cy={cy} r={r * 0.9} fill={color} />;
@@ -32,7 +27,6 @@ export function LevelShape({ level, cx, cy, size, color }: ShapeProps) {
     );
   }
   if (level === 'red') {
-    // Equilateral triangle, optically centred (the centroid sits a little low).
     const h = size * 0.88;
     const w = h * 1.1547;
     const top = cy - h * 0.58;
@@ -62,12 +56,10 @@ export function LevelShape({ level, cx, cy, size, color }: ShapeProps) {
 
 type Props = {
   level: Level;
-  /** 6 dot · 8 inline · 10 badge · 12 header (tokens.json → level.symbolSize). Other values work too. */
   size?: number;
   color?: string;
 };
 
-/** Standalone level symbol. Decorative: the label next to it carries the meaning. */
 export function LevelSymbol({ level, size = 10, color }: Props) {
   const colors = useColors();
   return (
@@ -83,13 +75,8 @@ export function LevelSymbol({ level, size = 10, color }: Props) {
   );
 }
 
-/** Active segment per level (tokens.json → level.meter.activeSegment). Pending: none. */
 const METER_SEGMENT: Record<Level, number> = { green: 0, amber: 1, red: 2, pending: -1 };
 
-/**
- * WHOOP-style 3-segment level meter (tokens.json → level.meter): three 14×3 bars, only the active
- * one coloured (in range · check · emergency). Pending: three dim segments. Decorative.
- */
 export function LevelMeter({ level, className }: { level: Level; className?: string }) {
   const active = METER_SEGMENT[level];
   const tone = {

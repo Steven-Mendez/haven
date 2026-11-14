@@ -24,13 +24,11 @@ const texts = defineTexts({
 });
 
 type Props = {
-  /** `CrewResponse.summary`. */
   summary: MissionTotals;
   lang: Language;
   className?: string;
 };
 
-/** The four figures at the top of the Crew page (ref. Productboard, Supabase), computed only from what arrived. */
 export function MissionStats({ summary, lang, className }: Props) {
   const t = texts[lang];
   return (

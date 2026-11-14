@@ -7,7 +7,6 @@ import { havenTexts } from './texts';
 
 const TOKEN: Record<RingId, 1 | 2 | 3> = { routine: 1, measurements: 2, wellbeing: 3 };
 
-/** Ring names in the current language. */
 export function ringName(id: RingId, lang: Language) {
   const t = havenTexts[lang];
   return { routine: t.ringRoutine, measurements: t.ringMeasurements, wellbeing: t.ringWellbeing }[
@@ -15,12 +14,10 @@ export function ringName(id: RingId, lang: Language) {
   ];
 }
 
-/** Accessible one-line summary: «Routine 3/7, Measurements 7/7, Wellbeing 1/1». */
 export function ringsSummary(rings: RingDatum[], lang: Language) {
   return rings.map((r) => `${ringName(r.id, lang)} ${ringCount(r)}`).join(', ');
 }
 
-/** Legend next to the rings: colour dot, name (explained by the glossary) and count («3/4»). */
 export function RingsLegend({
   rings,
   lang,
@@ -51,7 +48,6 @@ export function RingsLegend({
   );
 }
 
-/** A week of mini rings (24 px) with narrow weekday labels; today is highlighted. */
 export function WeekRings({ days, lang }: { days: DayRings[]; lang: Language }) {
   const weekday = new Intl.DateTimeFormat(localeOf(lang), { weekday: 'narrow', timeZone: 'UTC' });
   const date = new Intl.DateTimeFormat(localeOf(lang), {

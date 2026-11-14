@@ -1,6 +1,3 @@
-// Pure chart helpers for SeriesChart: «nice» ticks and per-bucket aggregation (median + range).
-
-/** Up to `max` round tick values covering [lo, hi] (steps of 1, 2, 2.5 or 5 × 10ⁿ). */
 export function niceTicks(lo: number, hi: number, max = 3): number[] {
   if (!Number.isFinite(lo) || !Number.isFinite(hi)) return [];
   if (hi < lo) [lo, hi] = [hi, lo];
@@ -24,10 +21,6 @@ const median = (xs: number[]) => {
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 };
 
-/**
- * One point per `bucketMs` window (median, with min–max), placed at the bucket's mean time.
- * Keeps a 7-day or 4-week line calm: it never invents values, only summarises them.
- */
 export function bucketSeries(points: [number, number][], bucketMs: number): Bucket[] {
   if (!(bucketMs > 0)) return points.map(([t, v]) => ({ t, median: v, min: v, max: v, n: 1 }));
   const groups = new Map<number, [number, number][]>();
@@ -54,12 +47,6 @@ export function bucketSeries(points: [number, number][], bucketMs: number): Buck
 export type FlagLevel = 'amber' | 'red';
 export type FlaggedPoint = { t: number; v: number; level: FlagLevel };
 
-/**
- * Safety rule: aggregation must never hide a reading that needs attention. Returns every RAW
- * point whose level is amber/red, or (when the engine gives no level for it) that falls outside
- * the reference range — the personal range is used only when there is no reference range. The
- * dot colour is the reading's level: a reading the engine rates green/pending is never flagged.
- */
 export function flaggedPoints(
   raw: [number, number][],
   options: {
@@ -75,7 +62,6 @@ export function flaggedPoints(
       out.push({ t, v, level: given });
       continue;
     }
-    // The engine says this reading is fine (or still pending): no warning dot.
     if (given !== undefined) continue;
     const range = options.referenceRange ?? options.personalRange;
     if (range && (v < range[0] || v > range[1])) out.push({ t, v, level: 'amber' });

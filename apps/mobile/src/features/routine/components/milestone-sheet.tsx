@@ -11,10 +11,6 @@ import { texts } from '../i18n';
 
 type Milestone = { kind: 'streak' | 'mission'; value: number };
 
-/**
- * Sober celebration (SPEC.md v3.1 «Gamificación»): a bottom sheet where the routine ring closes
- * (draw-in) with a success haptic. No confetti. Shown once per milestone by the screen.
- */
 export function MilestoneSheet({
   milestone,
   onClose,

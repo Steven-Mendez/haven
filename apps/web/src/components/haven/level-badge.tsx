@@ -9,19 +9,14 @@ import type { VisualLevel } from './types';
 type Props = {
   level: VisualLevel;
   lang: Language;
-  /** Overrides the default label («Check»…), e.g. EVA categories. The shape always stays. */
   label?: string;
   size?: 'sm' | 'md' | 'lg';
-  /** Shape only (label kept for screen readers and as tooltip). Use only next to text that names the thing. */
   symbolOnly?: boolean;
-  /** Greys the badge out (shape and label stay): last known level of a stale crew member. */
   muted?: boolean;
-  /** Reads «Level: …» to screen readers (default). Turn off when the badge is not a health level (e.g. rule delivery). */
   prefix?: boolean;
   className?: string;
 };
 
-// Heights 20 · 22 · 26, radius 6 (SPEC §4: chips).
 const SIZES = {
   sm: 'h-5 gap-1 px-1.5 text-xs',
   md: 'h-[22px] gap-1.5 px-2 text-xs',
@@ -30,11 +25,6 @@ const SIZES = {
 const GLYPH = { sm: 10, md: 10, lg: 11 };
 const SQUARE = { sm: 'size-5', md: 'size-[22px]', lg: 'size-[26px]' };
 
-/**
- * Level chip (SPEC §2 «Niveles»): shape + label in the level colour, 12 % tint, 24 % border, radius 6.
- * ● In range · ◐ Check · ▲ Emergency · ○ Pending (dashed) · ◷ No recent data (dashed).
- * `symbolOnly` drops the chip and shows the bare shape (the label stays for screen readers).
- */
 export function LevelBadge({
   level,
   lang,
@@ -80,7 +70,6 @@ export function LevelBadge({
         className,
       )}
     >
-      {/* Wrapped: Badge forces direct svg children to 12 px. */}
       <span className="inline-flex">
         <LevelGlyph level={level} size={GLYPH[size]} muted={muted} />
       </span>

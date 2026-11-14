@@ -25,7 +25,6 @@ import {
 } from '../logic/series';
 import { useCategoryText } from './use-category-text';
 
-/** Readings shown in the history timeline. */
 const HISTORY = 6;
 
 function Stat({ label, value, unit }: { label: string; value: string; unit?: string }) {
@@ -46,11 +45,6 @@ function Stat({ label, value, unit }: { label: string; value: string; unit?: str
   );
 }
 
-/**
- * Trend (Garmin HRV status + Oura): 1d / 7d / 4w segmented control, the chart with dashed baseline,
- * personal band and out-of-range points in their level colour, two stat columns under a hairline,
- * and the latest readings as a Linear-style timeline.
- */
 export function TrendSection({
   indicator,
   assessment,
@@ -58,7 +52,6 @@ export function TrendSection({
 }: {
   indicator: Indicator;
   assessment: Assessment | undefined;
-  /** The point under the finger while scrubbing (null on release): the screen's hero follows it. */
   onScrub?: (point: [number, number] | null) => void;
 }) {
   const t = useTexts(texts);
@@ -70,7 +63,6 @@ export function TrendSection({
   const readings = useReadings(indicator.id);
   const [range, setRange] = useState<ChartRange>('week');
 
-  // `readings` changes with every new reading, which also moves the window to "now".
   const domain = rangeDomain(range, Date.now());
   const data = chartPoints(indicator, readings, domain);
   const isCategory = indicator.kind === 'category';
@@ -118,13 +110,11 @@ export function TrendSection({
         data={data}
         baseline={isCategory ? undefined : assessment?.baseline}
         referenceRange={isCategory ? undefined : indicator.green}
-        // Per-point level from the (environment-adjusted) config rules: red readings show red.
         levelAt={isCategory ? undefined : (_, v) => pointLevel(indicator, v)}
         lastLevel={assessment?.level}
         unit={isCategory ? undefined : indicator.unit}
         timeDomain={domain}
         height={200}
-        // 1 d raw · 7 d and 4 w one median per day (calm line, no invented values).
         bucketMs={range === 'day' ? 0 : 86_400_000}
         onScrub={onScrub}
         className="-mx-4"

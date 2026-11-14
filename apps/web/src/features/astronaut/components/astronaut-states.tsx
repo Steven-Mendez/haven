@@ -11,11 +11,8 @@ import { IndicatorRow, InRangeGroup } from './indicator-row';
 type Props = {
   assessments: Assessment[];
   assessedAt: string | undefined;
-  /** Indicator → source of its latest reading. */
   sources: Record<string, string>;
-  /** Indicator → latest category value. */
   categories: Record<string, string>;
-  /** `AstronautResponse.series`, for the row sparklines. */
   series?: Record<string, [number, number][]>;
   now: string;
   stale: boolean;
@@ -26,10 +23,6 @@ type Props = {
 
 const COUNT_ORDER = ['red', 'amber', 'pending', 'green'] as const;
 
-/**
- * States tab (DESIGN_SYSTEM.md §8.2): one folded group per zone with its counts («Heart · ◆ 3 · ● 2»); zones
- * with something to look at open by default. Inside, one-line rows; green ones folded as «N in range».
- */
 export function AstronautStates({
   assessments,
   assessedAt,

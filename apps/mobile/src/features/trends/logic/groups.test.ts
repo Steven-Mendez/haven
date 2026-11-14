@@ -28,7 +28,6 @@ describe('trend groups', () => {
     const groups = groupByZone(items, levelOf, ['head', 'lungs', 'heart']);
     expect(groups.map((g) => g.zone)).toEqual(['heart', 'lungs', 'head']);
     expect(groups[0]?.items.map((i) => i.id)).toEqual(['hrv', 'hr']);
-    // Pending ranks above green, so the lung group leads with CO₂.
     expect(groups[1]?.items.map((i) => i.id)).toEqual(['co2', 'spo2']);
   });
 

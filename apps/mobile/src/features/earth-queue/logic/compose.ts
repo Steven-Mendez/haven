@@ -1,26 +1,16 @@
 import type { Assessment, Mission, Packet, Reading } from '@haven/core';
 
-// M09 · Routine packet composition and privacy exclusions (objective 6, closed decision 3).
-// Emergency packets always travel complete: exclusions only apply to `type: 'routine'`.
-
-/** Wellbeing answers the crew member may keep on board (M10 `ScaleInput`). */
 export const MOOD_INDICATORS = ['mood', 'stress'] as const;
-/** Diary of M10: kept on board unless the astronaut includes it; once sent, Earth shows it. */
 export const DIARY_INDICATOR = 'diary';
-/** Readings from the last 24 h go in a routine packet… */
 export const RECENT_HOURS = 24;
-/** …at most this many per indicator (the most recent). */
 export const MAX_PER_INDICATOR = 24;
 
-/** `true` = left out of the packet. */
 export type Exclusions = { notes: boolean; mood: boolean; diary: boolean };
 
-/** The diary is excluded by default and only travels if the crew member includes it. */
 export const DEFAULT_EXCLUSIONS: Exclusions = { notes: false, mood: false, diary: true };
 
 const isMood = (indicator: string) => (MOOD_INDICATORS as readonly string[]).includes(indicator);
 
-/** Recent readings: last `RECENT_HOURS` up to `now`, capped per indicator, sorted by `takenAt`. */
 export function recentReadings(readings: Reading[], now: Date, hours = RECENT_HOURS): Reading[] {
   const from = new Date(now.getTime() - hours * 3_600_000).toISOString();
   const to = now.toISOString();
@@ -39,7 +29,6 @@ export function recentReadings(readings: Reading[], now: Date, hours = RECENT_HO
   return out.sort((a, b) => a.takenAt.localeCompare(b.takenAt));
 }
 
-/** Removes what the crew member excluded. Emergency packets are returned untouched. */
 export function applyExclusions(packet: Packet, exclusions: Exclusions): Packet {
   if (packet.type === 'emergency') return packet;
   let readings = packet.readings;
@@ -64,17 +53,12 @@ export type RoutineInput = {
   mission: Pick<Mission, 'code'>;
   crewMember: string;
   assessments: Assessment[];
-  /** All readings of the crew member; only recent ones are kept. */
   readings: Reading[];
   dailyProgress: { zone: string; progress: number }[];
   notes?: string;
   now: Date;
 };
 
-/**
- * Routine packet before exclusions: assessments, recent readings, `dailyProgress` and mission code.
- * `sentAt`/`visibleAt` are provisional; the queue stamps them (`stampPacket`).
- */
 export function composeRoutinePacket(input: RoutineInput): Packet {
   const createdAt = input.now.toISOString();
   return {
@@ -98,7 +82,6 @@ export function composeRoutinePacket(input: RoutineInput): Packet {
 export type PacketSummary = {
   assessments: number;
   readings: number;
-  /** Packet note plus reading and photo notes. */
   notes: number;
   mood: number;
   diary: number;
@@ -122,10 +105,6 @@ export function summarize(packet: Packet): PacketSummary {
   };
 }
 
-/**
- * Normalizes a packet coming from another feature (`emergency:close`, `packet:enqueue`): fills a
- * missing id, crew member, mission code, notes and dates. Never removes content.
- */
 export function normalizeIncoming(
   packet: Partial<Packet> & Pick<Packet, 'type'>,
   defaults: { id: string; crewMember: string; mission: string; now: Date },

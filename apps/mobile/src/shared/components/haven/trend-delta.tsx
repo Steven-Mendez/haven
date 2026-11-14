@@ -9,20 +9,12 @@ import { cn } from '@/shared/lib/utils';
 import { format, formatMetric, havenTexts } from './i18n';
 
 type TrendDeltaProps = {
-  /** Current value. Nothing is rendered without a numeric value or a baseline. */
   value?: number | string;
-  /** Personal baseline (`Assessment.baseline`). */
   baseline?: { median: number; range: [number, number] };
-  /** Number formatting for the delta and the median (decimals). */
   formatValue?: (value: number) => string;
   className?: string;
 };
 
-/**
- * Delta against the personal baseline (DESIGN_SYSTEM.md §3.1): "↑ 14 above your baseline (78)",
- * "↓ 3 below your baseline (78)" or "Within your usual range". Always neutral grey: the level
- * badge carries the severity, never the delta.
- */
 export function TrendDelta({ value, baseline, formatValue, className }: TrendDeltaProps) {
   const t = useTexts(havenTexts);
   const language = useLanguage();

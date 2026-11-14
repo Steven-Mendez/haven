@@ -38,7 +38,6 @@ function ToggleRow({
 }) {
   return (
     <View className="min-h-row flex-row items-center gap-3 px-4 py-2">
-      {/* Label's Root has no flex: without this wrapper it takes the whole row and pushes the switch off screen. */}
       <View className="min-w-0 flex-1">
         <Label nativeID={id} onPress={() => onChange(!checked)} className="text-body-sm flex-1">
           {label}
@@ -55,10 +54,6 @@ function ToggleRow({
   );
 }
 
-/**
- * Routine packet (`/send`): a one-line summary of what goes and three switches to keep notes, mood
- * answers or the private diary on board (the diary is off by default), then «Enviar».
- */
 export function RoutineComposer({ onDone }: Props) {
   const t = useTexts(texts);
   const mission = useMission();

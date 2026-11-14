@@ -16,7 +16,6 @@ import { texts } from './i18n';
 import { rosterOf } from './roster';
 import { earthUrlForPhones, getCrew } from './server';
 
-/** Seconds between refreshes: an open QR flips to «sending data» within this time of their first packet. */
 const ROSTER_REFRESH_SEC = 5;
 
 async function RosterContent() {
@@ -65,7 +64,6 @@ async function RosterContent() {
   );
 }
 
-/** T01 · Crew management (`/crew`): who is in the mission, their role and status, and their QR invite. */
 export function RosterView() {
   return (
     <PageContainer>

@@ -3,7 +3,6 @@ import { useLanguage, useTexts } from '@/shared/i18n';
 import { havenTexts } from './i18n';
 import { missionPhase, missionPhaseText } from './logic/mission-phase';
 
-/** «Day 12», «Being prepared», «Starts on 3 Dec 2026» or «Finished · day 540» for the mission. */
 export function useMissionPhaseText(): (
   mission: Pick<Mission, 'status' | 'day' | 'start'>,
 ) => string {

@@ -9,11 +9,9 @@ import { texts } from '../i18n';
 
 type Props = {
   atmosphere: Assessment[];
-  /** The `✓ Done · — Skip` row for the lungs action. */
   children: ReactNode;
 };
 
-/** Rest module check, unfolded in place: CO₂ and noise where the crew sleeps, then the mark. */
 export function RestModuleCheck({ atmosphere, children }: Props) {
   const t = useTexts(texts);
   const translate = useTranslate();

@@ -52,7 +52,6 @@ function AuditRow({ record }: { record: ReceivedRules }) {
   );
 }
 
-/** Rules received from Earth (T03): latest version, its state and the audit history. */
 export function RulesGroup({ rules }: { rules: ReturnType<typeof useEarthRules> }) {
   const t = useTexts(texts);
   const { records, latest, check, checking, lastCheck } = rules;

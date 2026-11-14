@@ -22,7 +22,6 @@ describe('planTestSamples', () => {
         .reduce((s, p) => s + p.value, 0);
     expect(steps(31)).toBeGreaterThan(4000);
     expect(steps(31)).toBeLessThan(7500);
-    // Today at 14:00 only the 08 and 12 h walks exist, plus the recent record ending 13:50.
     const today = quantities.filter(
       (p) => p.type === 'HKQuantityTypeIdentifierStepCount' && p.start.getDate() === 1,
     );

@@ -1,7 +1,3 @@
-// Gamification shared by Routine, Body and Profile (features never import each other).
-// Rings and streak are computed from the store; «protected» days (an emergency or link-down)
-// are remembered locally so they never break the streak.
-
 import { dayHistory } from '@haven/core';
 import Storage from 'expo-sqlite/kv-store';
 import { useEffect, useMemo, useState } from 'react';
@@ -35,7 +31,6 @@ function protect(reason: ProtectedDay['reason']) {
     .catch((e) => console.warn('[gamification] protected day not saved', e));
 }
 
-// An emergency or a mission without a link never breaks the streak.
 bus.on('emergency:open', () => protect('emergency'));
 bus.on('mission:changed', (mission) => {
   if (mission.linkDown) protect('link-down');
@@ -56,21 +51,17 @@ function useProtectedDays(): string[] {
       listeners.delete(load);
     };
   }, []);
-  // Today is protected while the mission is without a link.
   return mission.linkDown ? [...dates, dateKey(Date.now())] : dates;
 }
 
 export type Gamification = {
   today: DayRings;
-  /** Last 7 days, oldest first (today last). */
   week: DayRings[];
   streak: number;
   best: number;
-  /** Dates (UTC keys) that never break the streak: an emergency, or the mission without a link. */
   protectedDays: string[];
 };
 
-/** Today's rings, the week of mini rings and the streak (current and best). */
 export function useGamification(): Gamification {
   const readings = useReadings();
   const safe = useProtectedDays();
@@ -89,10 +80,6 @@ export function useGamification(): Gamification {
   }, [readings, safe]);
 }
 
-/**
- * The rings of every day of `dates` up to today (later days are left out), and the first day with
- * any reading. For the streak calendar.
- */
 export function useRingDays(dates: string[]): { days: DayRings[]; firstDay: string | undefined } {
   const readings = useReadings();
   return useMemo(() => {
@@ -109,7 +96,6 @@ export function useRingDays(dates: string[]): { days: DayRings[]; firstDay: stri
   }, [readings, dates]);
 }
 
-/** Celebrated milestone keys (kept once per milestone). */
 const MILESTONES_KEY = 'haven.milestones.v1';
 export function seenMilestones(): string[] {
   try {
@@ -121,20 +107,16 @@ export function seenMilestones(): string[] {
 export function markMilestoneSeen(key: string) {
   try {
     Storage.setItemSync(MILESTONES_KEY, JSON.stringify([...new Set([...seenMilestones(), key])]));
-  } catch {
-    // Not persisted: shown again next launch at most.
-  }
+  } catch {}
 }
 
 type MilestonePreview = (value: number) => void;
 const previewListeners = new Set<MilestonePreview>();
 
-/** QA: shows the milestone sheet for `value` days (dev panel). Not persisted. */
 export function previewMilestone(value: number) {
   for (const l of previewListeners) l(value);
 }
 
-/** Routine subscribes to previews. */
 export function onMilestonePreview(listener: MilestonePreview): () => void {
   previewListeners.add(listener);
   return () => {

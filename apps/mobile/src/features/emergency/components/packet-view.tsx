@@ -12,20 +12,13 @@ import { texts } from '../i18n';
 import { packetSummary } from '../logic/packet';
 
 type Props = {
-  /** The packet already emitted with 'emergency:close' (the app sends it on its own). */
   packet: Packet;
   linkDown: boolean;
   delayMin: number;
-  /** Primary action: continue the follow-up, or close the emergency. */
   primary: { label: string; onPress: () => void };
   onSaveNote: (note: string) => void;
 };
 
-/**
- * D · Packet to Earth (DESIGN_SYSTEM 4.1c): real send state (sent / sending / waiting for the link),
- * the mission delay as data, a one-line summary, and the secondary action "Add note". The queue
- * behind it stays internal. No countdown: there is no artificial delay.
- */
 export function PacketView({ packet, linkDown, delayMin, primary, onSaveNote }: Props) {
   const t = useTexts(texts);
   const language = useLanguage();
@@ -47,7 +40,6 @@ export function PacketView({ packet, linkDown, delayMin, primary, onSaveNote }: 
   const time = (iso: string) =>
     new Date(iso).toLocaleTimeString(language, { hour: '2-digit', minute: '2-digit' });
   const sent = !linkDown && pending === 0;
-  // Flighty-style log: created → sent / waiting for the link. Real states only.
   const log: { label: string; detail?: string; state: 'done' | 'current' | 'next' }[] = [
     { label: t.logCreated, detail: `${time(packet.createdAt)} · ${contents}`, state: 'done' },
     {

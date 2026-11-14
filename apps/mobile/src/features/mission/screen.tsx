@@ -33,35 +33,24 @@ import { texts } from './i18n';
 
 type MissionView = 'list' | 'mission' | 'environment' | 'crew' | 'profile' | 'rules' | 'settings';
 
-/**
- * M05 · Mission (DESIGN_SYSTEM §8.9, X settings / Apple Health sources): no mission strip (the first
- * group is the mission), one-line rows (title + value), a grey note under the group only where
- * behaviour changes (no link). The link with Earth is detected, and the communication delay is
- * mission data: neither is adjustable here.
- * Each row opens its detail in place. `/mission?focus=link` scrolls to the link group.
- */
 export default function Screen() {
   const t = useTexts(texts);
   const translate = useTranslate();
   const language = useLanguage();
-  // The tabs layout already reserves the top safe area (§8.0.6: no mission strip here).
   const insets = useScreenInsets();
   const mission = useMission();
   const preferences = usePreferences();
   const { crewMember } = preferences;
   const records = useMissionRecords();
   const record = records.recordFor(mission.code);
-  // Rules from Earth are polled while the Mission tab is mounted, whatever view is open.
   const rules = useEarthRules();
   const { focus } = useLocalSearchParams<{ focus?: string }>();
   const scroll = useRef<ComponentRef<typeof ScrollView>>(null);
-  // First-run tour: lets it scroll Mission to its target.
   const onTourScroll = useTourScroll('mission', scroll);
   const [linkY, setLinkY] = useState<number | undefined>();
   const [view, setView] = useState<MissionView>('list');
   const { baseline } = usePreflightBaseline(crewMember, view);
   const phaseText = useMissionPhaseText();
-  // A mission without a stored record still remembers the chosen destination for this session.
   const [destination, setDestination] = useState<string | undefined>(record?.destination);
   const chosenDestination = destination ?? record?.destination;
 
@@ -175,7 +164,6 @@ export default function Screen() {
         <>
           <ScreenHeader title={t.title} right={<ProfileButton />} />
 
-          {/* Flighty: the big day number on the left, mission and link status on the right. */}
           <Button
             variant="outline"
             accessibilityRole="button"
@@ -257,7 +245,6 @@ export default function Screen() {
           </Group>
 
           <Group title={t.linkGroup} hint={t.linkOnHint} onLayout={setLinkY}>
-            {/* Detected, not switched: the earth queue checks Earth and sets `linkDown`. */}
             <TourAnchor step="mission-link" fill>
               <Row label={t.linkOn}>
                 <View

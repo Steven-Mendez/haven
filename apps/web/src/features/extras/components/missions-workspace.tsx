@@ -13,11 +13,6 @@ import { JoinMissionForm } from './join-mission-form';
 type Open = 'none' | 'join';
 const JOIN_HASHES = ['#join', '#join-code'];
 
-/**
- * Missions page (DESIGN_SYSTEM.md §8.4): the missions table first; «New mission» (primary) opens its own page
- * (`/missions/new`) and «Join with code» (secondary) a right sheet, so the table never moves.
- * `/missions#join` or `#join-code` opens the join form and focuses the code field.
- */
 export function MissionsWorkspace({ lang, table }: { lang: Language; table: ReactNode }) {
   const t = textsFor(texts, lang);
   const [open, setOpen] = useState<Open>('none');

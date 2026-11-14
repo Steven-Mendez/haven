@@ -4,10 +4,6 @@ import type { CrewResponse } from '@/server/types';
 import type { RosterMember } from './components/crew-roster';
 import { joinLink, joinQrSvg } from './server';
 
-/**
- * The roster as Earth manages it: everyone in the mission, `waiting` until their first packet arrives, each
- * with their personal join link and QR (mission + who they are + where Earth is).
- */
 export async function rosterOf(
   crew: CrewResponse['crew'],
   mission: string,

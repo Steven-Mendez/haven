@@ -21,18 +21,15 @@ import type { Language } from '@/lib/i18n';
 export type MissionOption = {
   code: string;
   name: string;
-  /** Environment display name, already translated. */
   environment?: string;
 };
 
 type Props = {
   lang: Language;
   missions: MissionOption[];
-  /** Active mission code; `null` before the first mission exists. */
   active: string | null;
 };
 
-/** Sidebar header (Linear workspace switcher): HAVEN mark + active mission, dropdown to switch missions. */
 export function MissionSwitcher({ lang, missions, active }: Props) {
   const t = havenTexts[lang];
   const router = useRouter();

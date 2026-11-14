@@ -3,7 +3,6 @@ import { OriginLink } from '@/shared/components/haven';
 import { Card, CardContent } from '@/shared/components/ui/card';
 import { Text } from '@/shared/components/ui/text';
 
-/** «¿De dónde sale este dato?» link that unfolds its answer in place (no modal). */
 export function WhereFrom({ text }: { text: string }) {
   const [open, setOpen] = useState(false);
   return (

@@ -1,4 +1,3 @@
-// Test-only fixtures: a small config built from the indicator table (not the Content config).
 import type { Config, Indicator, Reading, Rule } from '../contracts';
 
 const t = (es: string, en = es) => ({ es, en });
@@ -239,7 +238,6 @@ export const TEST_CONFIG: Config = {
 export const NOW = new Date('2026-11-14T12:00:00.000Z');
 let seq = 0;
 
-/** Builds a reading `minutesAgo` before `NOW`. */
 export function reading(
   indicator: string,
   value: number | string,

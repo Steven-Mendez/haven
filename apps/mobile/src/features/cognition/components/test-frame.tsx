@@ -8,27 +8,18 @@ import { Icon } from '@/shared/components/ui/icon';
 import { Text } from '@/shared/components/ui/text';
 import { MONO_FONT } from '@/shared/lib/theme';
 
-/** Monotonic clock in ms for reaction times. */
 export const clock = (): number => globalThis.performance?.now?.() ?? Date.now();
 
 type Props = {
-  /** "Test 1 of 3 · Trial 2 of 5". */
   label: string;
-  /** 0–1. */
   progress: number;
   exitLabel: string;
   onExit: () => void;
   children: ReactNode;
 };
 
-/** Segments of the progress row (Opal): enough to see it move, few enough to stay calm. */
 const SEGMENTS = 10;
 
-/**
- * Full-screen test frame (Opal focus quiz): black background, a 44 pt round ✕ to exit, the counter
- * in mono and a segmented progress row. Stimuli sit inside a hairline box (each test). No
- * animation, no level colours.
- */
 export function TestFrame({ label, progress, exitLabel, onExit, children }: Props) {
   const insets = useSafeAreaInsets();
   return (

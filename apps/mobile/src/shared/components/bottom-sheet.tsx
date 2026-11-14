@@ -6,11 +6,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Dialog, DialogOverlay, DialogPortal } from '@/shared/components/ui/dialog';
 import { cn } from '@/shared/lib/utils';
 
-/**
- * Bottom sheet on the RNR `Dialog` (the RN twin of shadcn's `Sheet side="bottom"`): 60 % scrim that
- * closes on tap, Android back and Escape (web), `elevated` surface with a hairline top, radius 16,
- * grabber and the bottom safe-area inset. Taps inside the sheet never reach the scrim.
- */
 export function BottomSheet({
   open,
   onClose,

@@ -2,30 +2,19 @@ import type { Packet } from '@haven/core';
 import { cn } from '@/lib/utils';
 
 type Props = {
-  /** `Packet.ecg`: sampling rate and voltages. */
   ecg: NonNullable<Packet['ecg']>;
-  /** Accessible name («ECG attached»). */
   label: string;
-  /** Scale caption under the strip («25 mm/s · large box 0.2 s»); omitted when empty. */
   scale?: string;
-  /** How many seconds of the trace to draw (default 6). */
   seconds?: number;
-  /** @deprecated The height follows the paper scale (1 large box = 0.2 s, square boxes). */
   height?: number;
   className?: string;
 };
 
-// Paper scale: 125 units per second → large box (0.2 s) = 25 units, small box (0.04 s) = 5 units.
 const PER_SECOND = 125;
 const MAJOR = 25;
 const MINOR = 5;
-const ROWS = 4; // 4 large boxes tall
+const ROWS = 4;
 
-/**
- * ECG strip (chart spec): a 1.25 px trace in the foreground over an ultra-subtle monitor grid (small boxes
- * `ecg-minor`, large boxes `ecg-major`), square boxes at 25 mm/s, no labels except the scale caption. The SVG
- * scales uniformly so the grid stays square and the time scale stays true.
- */
 export function EcgStrip({ ecg, label, scale, seconds = 6, className }: Props) {
   const samples = ecg.microvolts.slice(0, Math.max(2, Math.round(ecg.hz * seconds)));
   if (samples.length < 2) return null;

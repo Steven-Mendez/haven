@@ -3,7 +3,6 @@ import { ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { RoutineComposer } from './components/routine-composer';
 
-/** Send to Earth (`/send`): what goes, then «Enviar». Queueing and retries stay inside the app. */
 export default function SendScreen() {
   const insets = useSafeAreaInsets();
   return (

@@ -197,7 +197,6 @@ describe('mergeIncoming (same packet id again)', () => {
 
   it('an already sent packet with identical content is ignored', () => {
     const sent = sentEntry(emergency('x'));
-    // Different transport stamps do not count as a change.
     const again = {
       ...emergency('x'),
       sentAt: at(99).toISOString(),
@@ -220,11 +219,9 @@ describe('mergeIncoming (same packet id again)', () => {
     const v2 = mergeIncoming([v1], emergency('after follow-up'), at(100));
     expect(v2).toMatchObject({ action: 'versioned', entry: { status: 'pending' } });
     expect(v2.entry.packet.id).toBe('e1~v2');
-    // While v2 waits, a newer close replaces v2 (not v1).
     const v2b = mergeIncoming([v1, v2.entry], emergency('final'), at(110));
     expect(v2b.action).toBe('replaced');
     expect(v2b.entry.packet.id).toBe('e1~v2');
-    // Once v2 is sent, the next change becomes v3.
     const v3 = mergeIncoming([v1, { ...v2b.entry, status: 'sent' }], emergency('closed'), at(200));
     expect(v3.entry.packet.id).toBe('e1~v3');
   });

@@ -1,33 +1,20 @@
-// Versioned rules from Earth (T03 → M05). Pure: only `@haven/core` types and relative modules.
-// `GET {apiUrl}/api/rules?mission=CODE&crewMember=ID` → `{ mission, versions: RulesVersion[] }`: the
-// versions Earth published for the mission. Each download counts as «received on board» for that
-// crew member; they arrive when the phone downloads them. The phone keeps what it received in the `rules` collection.
-
 import type { Config } from '@haven/core';
 
-/** One version as sent by the Earth API (fields the phone uses). */
 export type EarthRulesVersion = {
   id: string;
   version: string;
   note: string;
   author: string;
   config: Config;
-  /** Created on Earth. */
   sentAt: string;
 };
 
-export type RulesStatus =
-  /** Stored and confirmed to Earth (`POST … { apply }` answered 2xx). */
-  | 'applied'
-  /** Stored; confirmation pending (no link or network error). */
-  | 'received';
+export type RulesStatus = 'applied' | 'received';
 
-/** A version received on this phone, with its audit trail. */
 export type ReceivedRules = EarthRulesVersion & {
   receivedAt: string;
   status: RulesStatus;
   appliedAt?: string;
-  /** Whether the shared app config took it (needs `setActiveConfig` in `@/shared/config`). */
   activeLocally: boolean;
   audit: { at: string; event: RulesAuditEvent; detail?: string }[];
 };
@@ -36,7 +23,6 @@ export type RulesAuditEvent = 'received' | 'confirmed' | 'confirm-failed' | 'act
 
 const isString = (v: unknown): v is string => typeof v === 'string' && v.length > 0;
 
-/** Minimal shape check of a full `Config`. */
 export function isConfig(value: unknown): value is Config {
   if (!value || typeof value !== 'object') return false;
   const c = value as Record<string, unknown>;
@@ -48,7 +34,6 @@ export function isConfig(value: unknown): value is Config {
   );
 }
 
-/** Valid versions of a `GET /api/rules` response (invalid entries are skipped). */
 export function parseRulesResponse(response: unknown): EarthRulesVersion[] {
   const list =
     response &&
@@ -73,7 +58,6 @@ export function parseRulesResponse(response: unknown): EarthRulesVersion[] {
   return out;
 }
 
-/** The most recent version (latest `sentAt`, then id) that the phone does not have yet. */
 export function pickNewVersion(
   versions: EarthRulesVersion[],
   knownIds: Iterable<string>,
@@ -86,7 +70,6 @@ export function pickNewVersion(
   return known.has(latest.id) ? undefined : latest;
 }
 
-/** New record for a received version. */
 export function receive(version: EarthRulesVersion, now: Date): ReceivedRules {
   return {
     ...version,
@@ -97,7 +80,6 @@ export function receive(version: EarthRulesVersion, now: Date): ReceivedRules {
   };
 }
 
-/** Records the result of `POST … { apply }`: 2xx → applied, anything else → retried later. */
 export function withConfirmation(
   record: ReceivedRules,
   httpStatus: number | 'offline',
@@ -118,7 +100,6 @@ export function withConfirmation(
   };
 }
 
-/** Latest received record (by `receivedAt`). */
 export function latestReceived(records: ReceivedRules[]): ReceivedRules | undefined {
   return [...records].sort((a, b) => a.receivedAt.localeCompare(b.receivedAt)).at(-1);
 }

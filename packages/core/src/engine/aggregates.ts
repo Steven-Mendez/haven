@@ -3,12 +3,6 @@ import { dayKey, mean, numeric, round } from './util';
 
 export const MIN_CREW_FOR_AGGREGATE = 3;
 
-/**
- * Daily crew mean of an indicator (T03). Each astronaut is averaged per day first and those means
- * are then averaged, so nobody weighs more for measuring more often. Returns `null` with fewer than
- * 3 astronauts with data, and omits days with fewer than 3 (privacy: no individual value can be
- * inferred). Dates are UTC (YYYY-MM-DD), sorted.
- */
 export function crewAggregates(
   readingsByCrewMember: Record<string, Reading[]>,
   indicator: string,

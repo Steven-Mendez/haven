@@ -1,4 +1,3 @@
-// M10 · Notice to Earth after the second failed battery in a row (the engine sets `notifyEarth`).
 import type { Assessment, Packet, Reading } from '@haven/core';
 
 export type NoticeInput = {
@@ -8,13 +7,9 @@ export type NoticeInput = {
   now: Date;
   assessments: Assessment[];
   readings: Reading[];
-  /** Plain-language note for Earth (already in the crew member's language). */
   notes: string;
 };
 
-/**
- * Routine packet for M09 (`bus.emit('packet:enqueue', { packet })`). `sentAt` is the request time. Never carries the private journal.
- */
 export function cognitiveNoticePacket(input: NoticeInput): Packet {
   const at = input.now.toISOString();
   return {
@@ -27,7 +22,6 @@ export function cognitiveNoticePacket(input: NoticeInput): Packet {
     mission: input.mission,
     createdAt: at,
     sentAt: at,
-    // No artificial delay: Earth sees it when it receives it (EQUIPOS.md «Producto real»).
     visibleAt: at,
   };
 }

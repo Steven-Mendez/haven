@@ -10,7 +10,6 @@ function normalise(points: SeriesPoint[]) {
     .sort((a, b) => a.at - b.at);
 }
 
-/** Monotone cubic path (Fritsch–Carlson), the same curve recharts draws with `type="monotone"`. */
 function monotonePath(xy: [number, number][]): string {
   const n = xy.length;
   if (n < 2) return '';
@@ -49,11 +48,6 @@ const isFlagged = (level?: VisualLevel) => level === 'red' || level === 'amber';
 const levelVar = (level?: VisualLevel) =>
   level === 'red' ? 'var(--level-red)' : 'var(--level-amber)';
 
-/**
- * Table sparkline (chart spec): 60 × 16, 1.25 px line in the secondary colour with a Ø2 end dot. It takes the
- * level colour only when the indicator is out of range (`level` red or amber). Decorative: the row text carries
- * the value.
- */
 export function Sparkline({
   points,
   level,
@@ -105,10 +99,6 @@ export function Sparkline({
   );
 }
 
-/**
- * Tile chart (chart spec: 48 px): the same line + 8 % area as the main chart, no axes. Width follows the
- * container; the end dot is an HTML element so it stays round while the SVG stretches.
- */
 export function MiniTrend({
   points,
   level,

@@ -1,8 +1,5 @@
 import { defineTexts } from '@/shared/i18n';
 
-// UI copy of the indicator screen (M02). Medical copy (explanations, actions, guides, thresholds)
-// comes from the config. "{n}" placeholders are filled with `format` from `@/shared/components/haven`.
-
 export const texts = defineTexts({
   es: {
     title: 'Ficha de indicador',
@@ -12,7 +9,6 @@ export const texts = defineTexts({
     whatToDo: 'Qué hacer',
     openProtocol: 'Abrir protocolo',
 
-    // Register
     register: 'Registrar',
     registerValue: 'Registrar valor',
     cancel: 'Cancelar',
@@ -27,7 +23,6 @@ export const texts = defineTexts({
     insideReference: 'En el rango de referencia',
     dailyActionDone: 'Acción del día de {n}: hecha',
 
-    // Why?
     why: '¿Por qué este nivel?',
     whyValue: 'Valor',
     whyBaseline: 'Tu línea base',
@@ -50,7 +45,6 @@ export const texts = defineTexts({
     levelRed: 'Nivel rojo (emergencia)',
     levelAmber: 'Nivel ámbar (revisar)',
 
-    // Trend
     trend: 'Tendencia',
     explainLevelHint: 'Toca para ver qué significa',
     noReadingYet: 'Aún sin lecturas',
@@ -60,7 +54,6 @@ export const texts = defineTexts({
     chartLegend: 'Puntos: rango de referencia {n}',
     chartCategory: 'Abajo: {a} · arriba: {b}',
 
-    // Guide
     howToMeasure: 'Cómo medir',
     whyItMatters: 'Por qué importa',
     guideWhatToDo: 'Qué hacer',
@@ -68,7 +61,6 @@ export const texts = defineTexts({
     openSource: 'Abre la fuente en el navegador',
     guideEmpty: 'Esta guía aún no tiene texto.',
 
-    // Origin
     originTitle: '¿De dónde sale este dato?',
     originLatest: 'Última lectura: {n}',
     originNone: 'Aún no hay lecturas de este indicador.',
@@ -79,8 +71,6 @@ export const texts = defineTexts({
     originHealthconnect: 'Health Connect: lo mide tu teléfono Android.',
     originBle: 'Bluetooth: un aparato de a bordo (brazalete, glucómetro) lo envía al medir.',
     originScreen: 'Prueba en pantalla: la haces tú en el teléfono.',
-
-    // Categories and symptoms (labels only; rules come from the config)
   },
   en: {
     title: 'Indicator detail',

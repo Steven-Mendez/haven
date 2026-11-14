@@ -21,7 +21,6 @@ import { getMission } from './server';
 
 const isPreparing = (s: MissionStatus) => s === 'planned' || s === 'scheduled';
 
-/** Preparation / Running / Finished: the three states of a mission, as a neutral badge (not a health level). */
 function StatusBadge({ status, t }: { status: MissionStatus; t: ExtrasTexts }) {
   const label = isPreparing(status)
     ? t.statusPreparation
@@ -205,7 +204,6 @@ async function MissionContent({ params }: { params: Promise<{ code: string }> })
   );
 }
 
-/** T03 · One mission (`/missions/[code]`): its state, what can still change, and the action to move it on. */
 export function MissionView({ params }: { params: Promise<{ code: string }> }) {
   return (
     <PageContainer>
@@ -217,7 +215,6 @@ export function MissionView({ params }: { params: Promise<{ code: string }> }) {
 }
 
 async function MissionPlanContent({ params }: { params: Promise<{ code: string }> }) {
-  // Request-time page: «today» is the default start date.
   await connection();
   const [{ code: raw }, { lang, t }] = await Promise.all([params, getTexts(texts)]);
   const code = decodeURIComponent(raw).toUpperCase();
@@ -266,7 +263,6 @@ async function MissionPlanContent({ params }: { params: Promise<{ code: string }
   );
 }
 
-/** T03 · Plan of a mission in preparation (`/missions/[code]/plan`): base plan, phases, name and start. */
 export function MissionPlanView({ params }: { params: Promise<{ code: string }> }) {
   return (
     <PageContainer>

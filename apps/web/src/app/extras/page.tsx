@@ -4,9 +4,7 @@ import { extrasRedirect } from '@/features/extras';
 
 type Props = PageProps<'/extras'>;
 
-/** Extras was split into /rules, /trends and /eva; old links keep working. */
 export default function Page({ searchParams }: Props) {
-  // The query is request data: reading it inside Suspense keeps the shell prerenderable.
   return (
     <Suspense fallback={null}>
       <Redirect searchParams={searchParams} />

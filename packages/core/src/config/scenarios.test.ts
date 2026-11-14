@@ -4,9 +4,6 @@ import { computeBaselines, evaluate, evaluateZones } from '../engine';
 import { actions, loadConfig, SYMPTOM_INDICATOR } from './index';
 import { scenarios } from './testdata';
 
-// Plays each scenario as plain readings (series, categorical extras and monitor events, the way the
-// phone stores them) and checks the engine reaches the expected level per zone at the end of the script.
-
 type WithCategorical = Scenario & {
   categorical?: { indicator: string; points: [number, string][] }[];
 };

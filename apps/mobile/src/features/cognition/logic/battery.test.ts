@@ -20,7 +20,6 @@ import {
 } from './battery';
 import { cognitiveNoticePacket } from './notice';
 
-/** Deterministic PRNG (mulberry32). */
 function seeded(seed: number) {
   let a = seed;
   return () => {
@@ -126,13 +125,12 @@ describe('readings and verdict', () => {
   const config = loadConfig();
   const unitOf = (id: string) => config.indicators.find((i) => i.id === id)?.unit ?? '';
 
-  /** 10 daily batteries around 270 ms, then today's. */
   function history(now: Date): Reading[] {
     const out: Reading[] = [];
     let n = 0;
     for (let d = 10; d >= 1; d--) {
       const takenAt = new Date(now.getTime() - d * 86_400_000).toISOString();
-      const rt = 262 + (d % 4) * 6; // 262..280
+      const rt = 262 + (d % 4) * 6;
       out.push(
         ...batteryReadings(
           { pvt: { reactionMs: rt, lapses: 0, falseStarts: 0, trials: [] }, memory: 5, goNoGo: 96 },

@@ -20,30 +20,18 @@ import { arcPath } from './geometry';
 export type RingDatum = { id: RingId; done: number; total: number; label?: string };
 
 type Props = {
-  /** Sectors, clockwise from 12 o'clock. */
   rings: RingDatum[];
-  /** Diameter in pt (≈200 hero, 64 compact, 28 week). */
   size?: number;
-  /** Centre content (tabular count). */
   children?: ReactNode;
-  /** Segments light up in order (600 ms ease-out). Reduce Motion: no animation. Default true. */
   animate?: boolean;
   accessibilityLabel?: string;
   className?: string;
 };
 
-/** Below this diameter a sector is one continuous arc (segment gaps would be sub-pixel). */
 const SEGMENTED_FROM = 32;
 
-/** Gap in degrees for a gap of `pt` on a circle of radius `r`. */
 const gapDeg = (pt: number, r: number) => (pt / r) * (180 / Math.PI);
 
-/**
- * HAVEN's mission disc (same geometry as Earth's `ActivityRings`): one ring split into a sector per category
- * (routine, measurements, wellbeing), each cut into one segment per action — 4 of 7 = four lit pieces. Flat
- * colours with butt ends; unlit segments are the same hue at low opacity. Under 32 pt each sector is a single
- * proportional arc. The draw-in lights the segments in order. Shows progress, never health.
- */
 export function ActivityRings({
   rings,
   size = 200,
@@ -74,7 +62,6 @@ export function ActivityRings({
     return () => anim.removeListener(id);
   }, [animate, reduce, anim]);
 
-  // A little thinner on the hero so the centre content fits.
   const stroke = Math.max(2.5, size * (size >= 120 ? 0.1 : 0.12));
   const c = size / 2;
   const r = c - stroke / 2;
@@ -99,7 +86,6 @@ export function ActivityRings({
           const done = Math.min(Math.max(0, ring.done), total) * k;
           const step = total > 0 ? (end - start) / total : 0;
 
-          // Continuous sector: track + proportional lit arc (small sizes, or too many actions to cut).
           if (size < SEGMENTED_FROM || total <= 1 || step < segmentGap * 2.5) {
             const to = total > 0 ? start + ((end - start) * done) / total : start;
             return (
@@ -151,7 +137,6 @@ export function ActivityRings({
   );
 }
 
-/** Legend row: dot · name · «3/4» (tabular). */
 export function RingLegend({ rings, className }: { rings: RingDatum[]; className?: string }) {
   const colors = useColors();
   const scheme = colors.background === '#000000' ? 'dark' : 'light';
@@ -178,7 +163,6 @@ export function RingLegend({ rings, className }: { rings: RingDatum[]; className
   );
 }
 
-/** Streak / milestone flame, in the routine sector's colour (orange is the «check» level). */
 export function RingSpark({ size, strokeWidth = 1.75 }: { size: number; strokeWidth?: number }) {
   return <Icon as={Flame} size={size} strokeWidth={strokeWidth} color={useRingColor('routine')} />;
 }

@@ -1,15 +1,9 @@
-// Who uses this phone: the crew roster mission control creates on Earth (`missions.crew`).
-// Packets are matched to a person only by `crewMember`, so the phone must send a roster id.
-// Pure: only `@haven/core` types.
-
 import type { I18n, Mission } from '@haven/core';
 
-/** A roster entry as `GET /api/missions` sends it; `role` is optional display data. */
 export type CrewOption = { id: string; name: string; hasWatch: boolean; role?: I18n };
 
 export const CREW_NAME_MAX = 40;
 
-/** Reads `mission.crew` of an Earth response. Drops malformed entries and repeated ids. */
 export function crewFromApi(value: unknown): CrewOption[] {
   if (!Array.isArray(value)) return [];
   const crew: CrewOption[] = [];
@@ -30,12 +24,10 @@ export function crewFromApi(value: unknown): CrewOption[] {
   return crew;
 }
 
-/** The `Mission.crew` shape (contract §7): roster entries without the display role. */
 export function missionCrew(crew: CrewOption[]): Mission['crew'] {
   return crew.map(({ id, name, hasWatch }) => ({ id, name, hasWatch }));
 }
 
-/** A typed name, trimmed and with single spaces. */
 export function cleanCrewName(input: string): string {
   return input.trim().replace(/\s+/g, ' ');
 }
@@ -45,7 +37,6 @@ export function isValidCrewName(input: string): boolean {
   return name.length >= 2 && name.length <= CREW_NAME_MAX;
 }
 
-/** Same rule as Earth (`crewIdFor`): «Ana Ruíz» → `ana-ruiz`, unique among `taken`. */
 export function crewIdFor(name: string, taken: string[]): string {
   const base =
     name
@@ -60,10 +51,6 @@ export function crewIdFor(name: string, taken: string[]): string {
   return id;
 }
 
-/**
- * Adds a typed name to the roster when mission control has not added this person yet. A name
- * already on the roster (same id Earth would give it) is reused instead of creating a second entry.
- */
 export function withTypedCrewMember(
   crew: CrewOption[],
   input: string,
@@ -78,7 +65,6 @@ export function withTypedCrewMember(
   return { crew: [...crew, { id, name, hasWatch: false }], id };
 }
 
-/** Earth's roster first; names typed on this phone that Earth does not have yet are kept after it. */
 export function mergeCrew(earth: CrewOption[], local: CrewOption[] | undefined): CrewOption[] {
   return [...earth, ...(local ?? []).filter((l) => !earth.some((e) => e.id === l.id))];
 }

@@ -13,10 +13,6 @@ const BAR: Record<Level, string> = {
   pending: 'bg-level-pending',
 };
 
-/**
- * Level summary above the list (Superpower «Biomarkers»): total, one bar split by level and a
- * count per level with its symbol, so colour is never the only cue.
- */
 export function LevelSummary({ counts, title }: { counts: LevelCounts; title: string }) {
   const h = useTexts(havenTexts);
   const shown = LEVEL_ORDER.filter((level) => counts[level] > 0);

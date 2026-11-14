@@ -7,12 +7,10 @@ import { cn } from '@/lib/utils';
 import type { EditableIndicator } from '../logic/rules';
 
 type ScaleLevel = 'green' | 'amber' | 'red';
-/** A stretch of values: `from`/`to` are the thresholds around it (`undefined` = open-ended). */
 type Segment = { level: ScaleLevel; withSymptoms: ScaleLevel; from?: number; to?: number };
 
 const RANK: Record<ScaleLevel, number> = { green: 0, amber: 1, red: 2 };
 
-/** Level of a value as the engine resolves it: green range, then the rules in order (first match), else amber. */
 function levelAt(v: number, indicator: EditableIndicator, symptoms: boolean): ScaleLevel {
   const [lo, hi] = indicator.green;
   if (v >= lo && v <= hi) return 'green';
@@ -23,10 +21,6 @@ function levelAt(v: number, indicator: EditableIndicator, symptoms: boolean): Sc
   return 'amber';
 }
 
-/**
- * The value axis cut at every threshold, each stretch with the level it gets with and without symptoms.
- * Adjacent stretches with the same levels are merged, so only the thresholds that change something remain.
- */
 export function scaleOf(indicator: EditableIndicator) {
   const bounds = [
     ...new Set([...indicator.green, ...indicator.rules.flatMap((r) => r.outside)]),
@@ -49,12 +43,10 @@ export function scaleOf(indicator: EditableIndicator) {
     s.from = cuts[i - 1];
     s.to = cuts[i];
   });
-  // A lower bound of 0 is a placeholder (no reading is negative): drop the stretch below it and its cut.
   if ((bounds[0] ?? 1) <= 0 && cuts[0] === bounds[0] && segments.length > 1) {
     segments.shift();
     cuts.shift();
   }
-  // Same at the top for percentages: nothing reads above 100 %.
   const top = bounds.at(-1);
   if (
     indicator.unit === '%' &&
@@ -79,7 +71,6 @@ export type ScaleTexts = {
   levels: Record<ScaleLevel, string>;
 };
 
-/** «De 40 a 50 lpm», «Menos de 40 lpm», «Más de 150 lpm». */
 function rangeText(s: Segment, unit: string, t: ScaleTexts) {
   const u = unit ? ` ${unit}` : '';
   if (s.from === undefined && s.to !== undefined) return format(t.below, { v: `${fmt(s.to)}${u}` });
@@ -88,12 +79,6 @@ function rangeText(s: Segment, unit: string, t: ScaleTexts) {
   return format(t.between, { a: fmt(s.from ?? 0), b: `${fmt(s.to ?? 0)}${u}` });
 }
 
-/**
- * Level scale of one indicator (replaces the «outside X → level» list): stretches of equal width in value
- * order — red, amber, green… — with the thresholds under the cuts. A stretch that turns red only with an
- * active symptom is amber with red stripes. Ordinal, not proportional, so close thresholds stay legible.
- * Hovering a stretch says it in words: its values, its level and, when it differs, the level with symptoms.
- */
 export function RangeScale({
   indicator,
   label,
@@ -115,7 +100,6 @@ export function RangeScale({
               // biome-ignore lint/suspicious/noArrayIndexKey: stretches are positional
               key={i}
             >
-              {/* Taller hit area than the 8 px bar so the stretch is easy to hover. */}
               <TooltipTrigger
                 render={<span className="group/seg flex flex-1 cursor-default items-center py-1" />}
               >

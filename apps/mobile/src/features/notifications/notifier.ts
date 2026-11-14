@@ -3,10 +3,6 @@ import { Platform } from 'react-native';
 import type { NotificationTexts } from './i18n';
 import { ACTION, CATEGORY, type NotificationData } from './logic/reminders';
 
-// M08 · Thin wrapper over expo-notifications (iOS and Android). The web uses notifier.web.ts.
-// Categories: "Open emergency" opens the app to the foreground; "Register" on a value reminder is a
-// text action that stays in the background (the typed number is saved without opening the app).
-
 export type PermissionState = 'granted' | 'denied' | 'undetermined' | 'unsupported';
 export type Response = { actionIdentifier: string; data: unknown; userText?: string };
 export type Content = { title: string; body: string; data: NotificationData; category: string };
@@ -92,7 +88,6 @@ function content(c: Content): Notifications.NotificationContentInput {
   };
 }
 
-/** Shows a notification now (red alert). */
 export async function present(c: Content): Promise<void> {
   await Notifications.scheduleNotificationAsync({
     content: content(c),
@@ -136,7 +131,6 @@ export function onResponse(listener: (r: Response) => void): () => void {
   return () => subscription.remove();
 }
 
-/** The response that launched the app (cold start), consumed once. */
 export function takeLaunchResponse(): Response | null {
   const last = Notifications.getLastNotificationResponse();
   if (!last) return null;

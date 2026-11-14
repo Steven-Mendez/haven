@@ -47,20 +47,14 @@ export function sourceLabel(t: HavenTexts, source: ReadingSource | (string & {})
 }
 
 type Props = {
-  /** Where the reading came from (`Reading.source`). Unknown strings are shown as-is. */
   source?: ReadingSource | (string & {});
-  /** Minutes since the reading (`Assessment.ageMin`). `undefined` → "no reading". */
   ageMin?: number;
-  /** @deprecated Ignored: the product never labels data as simulated (EQUIPOS.md «Producto real»). */
   simulated?: boolean;
-  /** Old data (threshold per indicator, decided by the feature): adds a clock, text turns primary. */
   stale?: boolean;
-  /** Opens the "Where does this data come from?" screen. Hidden when omitted. */
   onPressOrigin?: () => void;
   className?: string;
 };
 
-/** One caption line: source · age (DESIGN_SYSTEM.md §3.11), plus the origin link. */
 export function DataLabel({ source, ageMin, stale, onPressOrigin, className }: Props) {
   const t = useTexts(havenTexts);
   const SourceIcon = source ? (SOURCE_ICON[source as ReadingSource] ?? CircleHelp) : CircleHelp;
@@ -82,7 +76,6 @@ export function DataLabel({ source, ageMin, stale, onPressOrigin, className }: P
   );
 }
 
-/** "Where does this data come from?" — accent link on RNR `Button` (link), 48 pt tall. */
 export function OriginLink({ onPress, className }: { onPress: () => void; className?: string }) {
   const t = useTexts(havenTexts);
   return (

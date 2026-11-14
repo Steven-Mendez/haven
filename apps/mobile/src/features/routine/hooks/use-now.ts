@@ -1,10 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 
-/**
- * Current time, refreshed every `everyMs` (default 1 min) and whenever `deps` change. Pass the
- * readings as a dependency: a reading just saved is stamped "now", and the engine ignores readings
- * newer than the `now` it receives.
- */
 export function useNow(deps: unknown[] = [], everyMs = 60_000): Date {
   const [tick, setTick] = useState(0);
   useEffect(() => {

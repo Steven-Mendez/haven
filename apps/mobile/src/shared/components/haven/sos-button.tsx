@@ -13,32 +13,20 @@ import { cn } from '@/shared/lib/utils';
 import { havenTexts } from './i18n';
 
 type Props = {
-  /** Short tap: open the emergency screen (it has its own hold-to-confirm). */
   onPress: () => void;
-  /** Completed 3 s hold on the button itself: start the emergency directly. */
   onHoldComplete?: () => void;
-  /** Released between a tap and the 3 s: e.g. a toast «Hold 3 s to ask for help». */
   onHoldCancel?: () => void;
   className?: string;
 };
 
 const SIZE = 44;
 const STROKE = 2;
-/** Shorter than this is a tap (opens the screen); longer and released early is a cancelled hold. */
 const TAP_MS = 350;
 
 const tick = () => {
   if (Platform.OS !== 'web') void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 };
 
-/**
- * Round SOS (44 pt, 48 pt hit area) for the top-right of every tab header. Idle: elevated fill, a
- * 1.5 pt red ring at 60 % and «SOS» 11/700 in red — no shadow, no glow, never over content.
- * Gesture: hold to fill the ring clockwise over 3 s (haptic tick each second); at 3 s it starts the
- * emergency. Releasing early rewinds the ring (160 ms). A short tap opens the emergency screen,
- * where the large hold-to-confirm lives. Reduce Motion: the ring fills in 1 s steps.
- * Screen readers: activating opens the screen (never triggers the alert by accident).
- */
 export function SosButton({ onPress, onHoldComplete, onHoldCancel, className }: Props) {
   const t = useTexts(havenTexts);
   const colors = useColors();
@@ -76,7 +64,6 @@ export function SosButton({ onPress, onHoldComplete, onHoldCancel, className }: 
       if (Platform.OS !== 'web')
         void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       (onHoldComplete ?? onPress)();
-      // Back to idle once the emergency screen is on top.
       setTimeout(() => {
         fired.current = false;
         setProgress(0);

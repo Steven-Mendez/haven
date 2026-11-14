@@ -9,24 +9,17 @@ import { decimalsFor, type Names } from '../logic';
 
 type Props = {
   a: Assessment;
-  /** Minutes since the reading, on the server clock; undefined when unknown. */
   ageMin: number | undefined;
-  /** Greys the level out (last known status of a stale crew member). */
   muted?: boolean;
-  /** Source of the latest reading (`Reading.source`), shown in the expanded metadata line. */
   source?: string;
-  /** Latest category value for `kind: 'category'` indicators (`sinus`), shown translated as the value. */
   category?: string;
-  /** Show this indicator's own suggested actions when expanded (off in Summary, where they are grouped). */
   showActions?: boolean;
-  /** `AstronautResponse.series[indicator]`: drawn as a 60 × 16 sparkline before the value. */
   points?: [number, number][];
   names: Names;
   lang: Language;
   t: AstronautTexts;
 };
 
-/** Value + unit of an assessment, or undefined (category indicators carry no number). */
 export function assessmentValue(a: Assessment, names: Names, lang: Language) {
   if (typeof a.value !== 'number') return undefined;
   const info = names.indicators[a.indicator];
@@ -34,10 +27,6 @@ export function assessmentValue(a: Assessment, names: Names, lang: Language) {
   return { text: formatNumber(a.value, lang, decimalsFor([a.value])), unit };
 }
 
-/**
- * One-line indicator row (DESIGN_SYSTEM.md §8.0.3): level symbol · name · value · age · chevron.
- * Expanding shows the engine's explanation, the usual range, source and age, and (optionally) the actions.
- */
 export function IndicatorRow({
   a,
   ageMin,
@@ -96,7 +85,6 @@ export function IndicatorRow({
             {ago}
           </span>
         ) : null}
-        {/* The row's accessible name is its own content (level, name, value, age; WCAG 2.5.3) plus the source. */}
         {sourceText ? <span className="sr-only">, {sourceText}</span> : null}
         <ChevronRight
           aria-hidden="true"
@@ -132,7 +120,6 @@ export function IndicatorRow({
   );
 }
 
-/** «24 in range ›» folded group of green rows (DESIGN_SYSTEM.md §8.0.4). */
 export function InRangeGroup({
   count,
   label,

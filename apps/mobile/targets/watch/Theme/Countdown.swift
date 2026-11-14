@@ -1,12 +1,6 @@
 import SwiftUI
 import WatchKit
 
-// Circular countdown for the automatic triggers (W03, «Caída detectada», 15 s with «Estoy bien»): a red ring of
-// `Theme.ringWidth` on a `Theme.muted` track that empties linearly, the seconds in the centre (metric 40, tabular)
-// and one haptic click per second, so it can be felt without looking. With Reduce Motion the ring steps once per
-// second instead of sweeping. At zero it calls `onFinish` exactly once. Cancel = remove the view: its task is
-// cancelled and `onFinish` is never called.
-
 struct Countdown: View {
     var seconds: Int = 5
     var color: Color = Theme.red

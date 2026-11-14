@@ -33,19 +33,12 @@ type Props = {
   currentVersion: string;
   environmentNames: Record<string, string>;
   defaultAuthor: string;
-  /** Indicator id → glossary explanation (resolved on the server). */
   explanations?: Record<string, TermExplanation | undefined>;
-  /** Glossary explanation of «normal range». */
   rangeExplain?: TermExplanation;
 };
 
 const range = (r: [number, number], unit: string) => `${r[0]}–${r[1]}${unit ? ` ${unit}` : ''}`;
 
-/**
- * Thresholds in force as one compact table (SPEC §6 «Reglas de umbral», Mercury rules): Metric · Normal
- * range · level scale by value (RangeScale) · Scope. Opening a row shows the editor in a 480 px right sheet (incident.io
- * expression builder) that sends a new version. Same editor and server action as before.
- */
 export function RulesTable({
   lang,
   indicators,

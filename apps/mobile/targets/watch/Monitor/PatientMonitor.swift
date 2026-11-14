@@ -3,45 +3,20 @@ import HealthKit
 import Observation
 import os
 
-// W04 (Deneb) · Patient monitor engine: heart rate + latest SpO₂ from HealthKit, sent to the phone with
-// `bridge.sendMonitor(heartRate:spo2:spo2TakenAt:)` while the emergency lasts.
-//
-// Heart rate, two real sources (whichever sample is newer wins):
-//   • `HKWorkoutSession` + `HKLiveWorkoutBuilder`: the only way an app gets high-frequency heart rate on watchOS.
-//     While it delivers data the UI says «En vivo». The workout is discarded when the monitor stops.
-//   • An anchored query on HealthKit heart-rate samples (latest sample and every new one), for when the session
-//     gives nothing (no permission, or no sensor). The UI then shows the sample's age instead of «En vivo».
-// SpO₂: no app can request a measurement, so it is the latest HealthKit sample (anchored query, kept up to date).
-// Nothing is generated here. On the simulator there is no sensor: write test samples into the watch's HealthKit
-// (DEBUG `SIMCTL_CHILD_HAVEN_TEST_HR_STREAM=1`, Monitor/TestSamples.swift) and the anchored queries pick them up like
-// any other sample.
-//
-// Sending: every `sendInterval` the newest heart-rate sample is sent if it is new (each sample once) and not older
-// than `maxHeartRateAge`. Haptics: `bridge.mutesHaptics = true` while running (the haptic engine interrupts
-// heart-rate readings); `bridge.endEmergency()` turns them back on.
-//
-// Lifecycle (the session lives here, not in the bridge: only the monitor uses it): MonitorView calls `start` when it
-// appears and `stop` when it disappears or the emergency ends.
-
 @Observable
 @MainActor
 final class PatientMonitor: NSObject {
-    /// How often the newest sample is checked and sent to the phone.
     static let sendInterval: Duration = .seconds(5)
-    /// A heart-rate sample older than this is not sent (the sensor lost contact).
     static let maxHeartRateAge: TimeInterval = 2 * 60
-    /// The workout counts as «live» while it delivered a value within this time.
     static let liveWindow: TimeInterval = 15
 
     private(set) var heartRate: Double?
     private(set) var heartRateAt: Date?
-    /// Last time the workout session delivered heart rate.
     private(set) var liveAt: Date?
     private(set) var spo2: Double?
     private(set) var spo2At: Date?
     private(set) var lastSentAt: Date?
     private(set) var isRunning = false
-    /// HealthKit is not available or the workout session could not start.
     private(set) var sessionUnavailable = false
 
     var isLive: Bool { liveAt.map { Date.now.timeIntervalSince($0) <= Self.liveWindow } ?? false }
@@ -89,8 +64,6 @@ final class PatientMonitor: NSObject {
         log.info("Monitor stopped")
     }
 
-    // MARK: Sending
-
     private func sendLoop() async {
         while !Task.isCancelled {
             sendLatest()
@@ -121,14 +94,11 @@ final class PatientMonitor: NSObject {
         spo2At = date
     }
 
-    // MARK: HealthKit samples (anchored queries)
-
     private func observeSamples() {
         guard let store = HealthAccess.store else {
             sessionUnavailable = true
             return
         }
-        // Latest sample of each type (limit 1, newest first), then every new one through an anchored query.
         for type in [HealthAccess.heartRateType, HealthAccess.spo2Type] {
             let latest = HKSampleQuery(
                 sampleType: type, predicate: nil, limit: 1,
@@ -164,8 +134,6 @@ final class PatientMonitor: NSObject {
             }
         }
     }
-
-    // MARK: Workout session
 
     private func startWorkout() async {
         guard let store = HealthAccess.store else {

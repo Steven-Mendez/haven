@@ -1,7 +1,3 @@
-// T01 backend · Data model and pure computations of the Earth API.
-// No 'server-only' and no MongoDB: used by server queries and by scripts/seed.ts.
-// Earth never evaluates: it only aggregates the `assessments` each packet already carries.
-
 import {
   type Assessment,
   type Config,
@@ -32,7 +28,6 @@ export const COLLECTIONS = {
   rules: 'rules',
 } as const;
 
-/** Document stored in `packets`: the phone's Packet plus receive metadata. */
 export type PacketDoc = Packet & {
   receivedAt: string;
   dataAt: string;
@@ -40,7 +35,6 @@ export type PacketDoc = Packet & {
 export type MissionDoc = StoredMission;
 export type RulesDoc = Omit<RulesVersion, 'status'>;
 
-/** Indexes per collection (created by collections.ts on first use and by scripts/seed.ts). */
 export const INDEXES: Record<
   keyof typeof COLLECTIONS,
   { key: Record<string, 1 | -1>; unique?: boolean }[]
@@ -59,14 +53,11 @@ export function baseConfig(): Config {
   return cachedConfig;
 }
 
-// ─── Validation ────────────────────────────────────────────────────────────────
-
 const isText = (v: unknown): v is string => typeof v === 'string' && v.length > 0;
 const isDate = (v: unknown): v is string => isText(v) && !Number.isNaN(Date.parse(v));
 const isObject = (v: unknown): v is Record<string, unknown> =>
   typeof v === 'object' && v !== null && !Array.isArray(v);
 
-/** Checks the minimal shape of a Packet (shared contracts §6). */
 export function validatePacket(
   body: unknown,
 ): { ok: true; packet: Packet } | { ok: false; errors: string[] } {
@@ -88,7 +79,6 @@ export function validatePacket(
   if (body.dailyProgress !== undefined && !Array.isArray(body.dailyProgress))
     errors.push('dailyProgress: array');
   if (errors.length) return { ok: false, errors };
-  // `sentAt` and `visibleAt` from the phone are optional: the server sets `visibleAt` on receipt.
   const sentAt = (body.sentAt as string | undefined) ?? new Date().toISOString();
   const packet = {
     ...body,
@@ -100,17 +90,12 @@ export function validatePacket(
   return { ok: true, packet };
 }
 
-// ─── Receiving ─────────────────────────────────────────────────────────────────
-
-/** Time of the data in the packet: its newest reading (`takenAt`), or `createdAt` when it has no
- * readings. Never later than the receive time. The age shown on Earth is `now − dataAt`. */
 export function computeDataAt(packet: Packet, receivedAt: Date): string {
   const times = packet.readings.map((r) => Date.parse(r.takenAt)).filter((t) => !Number.isNaN(t));
   const latest = times.length ? Math.max(...times) : Date.parse(packet.createdAt);
   return new Date(Math.min(latest, receivedAt.getTime())).toISOString();
 }
 
-/** Stored packet. Nothing is held back: `visibleAt` = receive time, so it is visible at once. */
 export function packetDoc(packet: Packet, receivedAt: Date): PacketDoc {
   const { _id: _ignored, ...clean } = packet as Packet & { _id?: unknown };
   return {
@@ -121,7 +106,6 @@ export function packetDoc(packet: Packet, receivedAt: Date): PacketDoc {
   };
 }
 
-/** Mission created when the first packet of an unknown code arrives. */
 export function missionFromPacket(packet: Packet, receivedAt: Date): MissionDoc {
   return {
     code: packet.mission,
@@ -138,28 +122,17 @@ export function missionFromPacket(packet: Packet, receivedAt: Date): MissionDoc 
   };
 }
 
-// ─── Packets for the API ───────────────────────────────────────────────────────
-
-/** Turns a document into a ReceivedPacket: the phone's packet as sent, notes and diary included (everything
- * the astronaut chose to send is visible on Earth). */
 export function packetForApi(doc: PacketDoc): ReceivedPacket {
   const { _id: _i, ...p } = doc as PacketDoc & { _id?: unknown; phoneVisibleAt?: string };
   delete (p as { phoneVisibleAt?: string }).phoneVisibleAt;
   return p;
 }
 
-// ─── Aggregation (visible packets only) ────────────────────────────────────────
-
-/** Day of the mission (day 1 = `start`); 0 before `start`. */
 export function missionDay(start: string, now: Date): number {
   const day = Math.floor((now.getTime() - Date.parse(start)) / DAY_MS) + 1;
   return day < 1 ? 0 : day;
 }
 
-/**
- * `planned` until «Start mission», `scheduled` before a future start date, `finished` once finished by hand or
- * past the last day of its plan, `active` otherwise.
- */
 export function missionStatus(
   m: Pick<MissionDoc, 'awaitingStart' | 'start' | 'finishedAt' | 'durationDays'>,
   now: Date,
@@ -170,7 +143,6 @@ export function missionStatus(
   return m.durationDays > 0 && missionDay(m.start, now) > m.durationDays ? 'finished' : 'active';
 }
 
-/** Last day of a finished mission: the day it was finished on, never past the end of its plan. */
 function finalDay(m: Pick<MissionDoc, 'start' | 'finishedAt' | 'durationDays'>, now: Date): number {
   const day = Math.max(1, missionDay(m.start, m.finishedAt ? new Date(m.finishedAt) : now));
   return m.durationDays > 0 ? Math.min(day, m.durationDays) : day;
@@ -180,8 +152,6 @@ export function missionForApi(doc: MissionDoc, now: Date): StoredMission {
   const { _id: _i, ...stored } = doc as MissionDoc & { _id?: unknown };
   const status = missionStatus(stored, now);
   const m = { ...stored, status };
-  // Days only run once the mission has started; before that it sits at day 0, in its first phase. A finished
-  // mission stays on its last day.
   const day =
     status === 'active' ? missionDay(m.start, now) : status === 'finished' ? finalDay(m, now) : 0;
   const current = m.phases?.length ? phaseAt(m.phases, Math.max(1, day)) : undefined;
@@ -196,7 +166,6 @@ export function missionForApi(doc: MissionDoc, now: Date): StoredMission {
       durationDays: missionDays(m.phases),
     };
   }
-  // A phased mission takes today's environment and delay from its plan.
   const environment = baseConfig().environments.find((e) => e.id === current.phase.environment);
   return {
     ...m,
@@ -207,7 +176,6 @@ export function missionForApi(doc: MissionDoc, now: Date): StoredMission {
   };
 }
 
-/** Today's phase of a phased mission (header «Phase 3 of 8 · Cruise to Mars»). */
 export function currentPhase(mission: StoredMission): CurrentPhase | undefined {
   const phases = mission.phases;
   const current = phases?.length ? phaseAt(phases, mission.day) : undefined;
@@ -241,17 +209,11 @@ export function missionHeader(mission: StoredMission, cards: CrewCard[]): Missio
   };
 }
 
-/** A crew entry as stored in `missions.crew`; `role` is data (written by the seed or a mission editor). */
 export type CrewEntry = StoredMission['crew'][number];
 
 const byDataAtDesc = (a: { dataAt: string }, b: { dataAt: string }) =>
   b.dataAt.localeCompare(a.dataAt);
 
-/**
- * Current assessments of one crew member: those of their newest packet with assessments, where every
- * indicator that packet left `pending` (an emergency packet only measures a few) keeps the last known level
- * from an older packet whose data is at most `NO_RECENT_DATA_MS` older. A short packet never hides a red.
- */
 export function currentAssessments(
   packets: Pick<PacketDoc, 'assessments' | 'dataAt'>[],
 ): Assessment[] {
@@ -277,7 +239,6 @@ export function currentAssessments(
   return merged;
 }
 
-/** Card of one crew member built from their received packets. */
 export function crewCard(
   member: CrewEntry,
   visible: Pick<
@@ -332,7 +293,6 @@ export function missionSummary(cards: CrewCard[], mission: StoredMission): Missi
   };
 }
 
-/** Crew id from a display name, as the phone will send it: «Ana Ruíz» → `ana-ruiz`, unique among `taken`. */
 export function crewIdFor(name: string, taken: string[]): string {
   const base =
     name
@@ -347,7 +307,6 @@ export function crewIdFor(name: string, taken: string[]): string {
   return id;
 }
 
-/** Crew members: those of the mission plus anyone who has sent packets. */
 export function crewMembers(mission: StoredMission, ids: string[]): CrewEntry[] {
   const list = [...mission.crew];
   for (const id of ids) {
@@ -356,7 +315,6 @@ export function crewMembers(mission: StoredMission, ids: string[]): CrewEntry[] 
   return list;
 }
 
-/** Numeric `[t, value]` series per indicator, de-duplicated by reading id. */
 export function seriesOf(packets: ReceivedPacket[]): Record<string, [number, number][]> {
   const seen = new Set<string>();
   const series: Record<string, [number, number][]> = {};
@@ -376,16 +334,13 @@ export function seriesOf(packets: ReceivedPacket[]): Record<string, [number, num
   return series;
 }
 
-// ─── Missions and rules ────────────────────────────────────────────────────────
-
-const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no 0/O or 1/I
+const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
 export function generateCode(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(6));
   return Array.from(bytes, (b) => CODE_ALPHABET[b % CODE_ALPHABET.length]).join('');
 }
 
-/** sent: created on Earth · received: a phone downloaded it (GET /api/rules) · applied: a phone applied it. */
 export function deliveryStatus(doc: RulesDoc): DeliveryStatus {
   if (doc.appliedAt) return 'applied';
   return doc.receivedAt ? 'received' : 'sent';
@@ -402,7 +357,6 @@ export function rulesForApi(doc: RulesDoc): RulesVersion {
     visibleAt?: string;
     demoFactor?: number;
   };
-  // Older documents may lack the download fields or still carry visibleAt/demoFactor (dropped above).
   const out: RulesDoc = { ...r, receivedAt: r.receivedAt ?? null, receivedBy: r.receivedBy ?? [] };
   return { ...out, status: deliveryStatus(out) };
 }

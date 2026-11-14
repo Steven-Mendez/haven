@@ -20,7 +20,6 @@ describe('firstRunSteps', () => {
   it('asks who uses the phone when the crew member is not on the roster', () => {
     const steps = firstRunSteps({ readings: 0, next, crew, crewMember: 'elena-vega' });
     expect(steps.map((s) => s.id)).toEqual(['measure', 'sources', 'who']);
-    // An empty roster (made on the phone, offline) has no one to pick.
     expect(
       firstRunSteps({ readings: 0, next, crew: [], crewMember: 'x' }).map((s) => s.id),
     ).toEqual(['measure', 'sources']);

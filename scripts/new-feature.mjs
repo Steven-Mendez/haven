@@ -1,10 +1,4 @@
 #!/usr/bin/env node
-// Creates a feature folder with the standard structure.
-//
-//   pnpm feature <mobile|earth> <folder> <ID> "<es title>" "<en title>" [--no-screen]
-//   pnpm feature mobile body M01 "Cuerpo" "Body"
-//
-// Never touches existing files: when done it prints the route line to add.
 
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
@@ -32,7 +26,6 @@ if (existsSync(target)) {
   process.exit(1);
 }
 
-// Finds the feature note in the vault to link it.
 function findNote(dir) {
   if (!existsSync(dir)) return null;
   for (const entry of readdirSync(dir, { withFileTypes: true })) {

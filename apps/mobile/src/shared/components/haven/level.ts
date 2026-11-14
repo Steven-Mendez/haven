@@ -15,9 +15,6 @@ import type { ThemeZone } from '@/shared/lib/theme';
 
 import { format, type HavenTexts } from './i18n';
 
-// Literal class maps (NativeWind only picks up classes written in full).
-// Each level is a solid trio: text (fg), fill (bg) and 1 px border. Pending: no fill, dashed.
-
 export const LEVEL_TEXT_CLASS: Record<Level, string> = {
   green: 'text-level-green',
   amber: 'text-level-amber',
@@ -39,10 +36,6 @@ export const LEVEL_BORDER_CLASS: Record<Level, string> = {
   pending: 'border-level-pending-border border-dashed',
 };
 
-/**
- * @deprecated Cards no longer carry a level-tinted bar (DESIGN_SYSTEM.md §1.2 #10): the badge
- * and symbol say the level. Kept as a neutral border colour so old imports still compile.
- */
 export const LEVEL_BAR_CLASS: Record<Level, string> = {
   green: 'bg-border',
   amber: 'bg-border',
@@ -65,9 +58,6 @@ export function levelPhrase(t: HavenTexts, level: Level): string {
   }[level];
 }
 
-// Zones are identified by name and line icon, never by colour (DESIGN_SYSTEM.md §1.2 #3).
-
-/** Line icon per zone: zones are identified by name and icon, never by colour. */
 export const ZONE_ICON: Record<ThemeZone, LucideIcon> = {
   heart: Heart,
   lungs: Wind,
@@ -95,7 +85,6 @@ export function zoneName(t: HavenTexts, zone: string): string {
   return names[zone as ThemeZone] ?? zone;
 }
 
-/** Grey summary line for a zone row from its indicators' levels: "2 to check", "All in range"… */
 export function zoneSummary(t: HavenTexts, levels: Level[]): string {
   const red = levels.filter((l) => l === 'red').length;
   const amber = levels.filter((l) => l === 'amber').length;

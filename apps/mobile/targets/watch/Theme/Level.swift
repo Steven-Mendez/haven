@@ -1,12 +1,6 @@
 import SwiftUI
 
-// Three levels plus pending (SPEC.md §2 «Niveles»). Rule: never colour alone. Each level has a shape and a label, the
-// same on phone, web and watch: ● In range · ◐ Check · ▲ Emergency · ○ Pending (dashed).
-// The text carries the colour; a background is at most a 12 % tint and an outline 24 %. «Pending» never looks green.
-// `Level` is defined in Contract/Contract.swift (W00); this file only styles it.
-
 extension Level {
-    /// Text, icon and stroke color (`level.X.fg`).
     var color: Color {
         switch self {
         case .green: Theme.green
@@ -16,7 +10,6 @@ extension Level {
         }
     }
 
-    /// 12 % tint (`level.X.bg`). Pending has no fill.
     var background: Color {
         switch self {
         case .green: Theme.greenBackground
@@ -26,7 +19,6 @@ extension Level {
         }
     }
 
-    /// 24 % outline (`level.X.border`). Pending's is drawn dashed (`isDashed`).
     var border: Color {
         switch self {
         case .green: Theme.greenBorder
@@ -36,10 +28,8 @@ extension Level {
         }
     }
 
-    /// Only pending uses a dashed outline (and «no recent data», which reuses it).
     var isDashed: Bool { self == .pending }
 
-    /// SF Symbol for the level (`level.symbol.X.sfSymbol`).
     var symbol: String {
         switch self {
         case .green: "circle.fill"
@@ -49,7 +39,6 @@ extension Level {
         }
     }
 
-    /// Text glyph equivalent, for strings and accessibility.
     var glyph: String {
         switch self {
         case .green: "●"
@@ -59,7 +48,6 @@ extension Level {
         }
     }
 
-    /// Unified label (`level.label`), identical on the three platforms.
     var label: String {
         switch self {
         case .green: L("En rango", "In range")
@@ -69,7 +57,6 @@ extension Level {
         }
     }
 
-    /// What to do, in one line (status hero).
     var action: String {
         switch self {
         case .green: L("Sigue con tu rutina", "Keep your routine")
@@ -79,7 +66,6 @@ extension Level {
         }
     }
 
-    /// Lit segments of the 3-segment meter: in range 1, check 2, emergency 3, pending 0 (dashed, unlit).
     var meterSegments: Int {
         switch self {
         case .green: 1
@@ -89,7 +75,6 @@ extension Level {
         }
     }
 
-    /// Severity (`level.severity`): green 0 < pending 1 < amber 2 < red 3. Pending is never treated as «fine».
     var severity: Int {
         switch self {
         case .green: 0
@@ -99,17 +84,11 @@ extension Level {
         }
     }
 
-    /// «Nivel: Revisar. Repite la medición o avisa a Tierra.»
     var accessibilityDescription: String {
         "\(L("Nivel", "Level")): \(label). \(action)."
     }
 }
 
-// MARK: - Badge
-
-/// Capsule badge: sentence case, weight 500, 12 % level tint and 24 % outline; pending has no fill and a dashed
-/// outline. With a `level` it shows the shape and label (`text` replaces the label, never the shape); without one it
-/// is a neutral hairline chip (`LevelBadge(text: "Tripulación")`).
 struct LevelBadge: View {
     var level: Level?
     var text: String?
@@ -155,11 +134,6 @@ struct LevelBadge: View {
     }
 }
 
-// MARK: - Level meter
-
-/// 3-segment level meter (SPEC §1.4, §6 «Reloj»): the segments light up to the level in its colour (in range 1,
-/// check 2, emergency 3) over the `Theme.muted` track; pending lights none and dashes all three. Decorative: the
-/// label next to it carries the meaning, so it is hidden from VoiceOver.
 struct LevelMeter: View {
     let level: Level
     var height: CGFloat = Theme.meterHeight
@@ -185,18 +159,12 @@ struct LevelMeter: View {
     }
 }
 
-// MARK: - Status hero
-
-/// Status hero: shape + level word (title, in the level colour), the 3-segment meter and the action in one grey
-/// line. Replaces any ring as the main element of the status screen (W01).
 struct LevelHero: View {
     let level: Level
-    /// Replaces `level.action` (e.g. a message from the phone). The label and shape never change.
     var detail: String?
     var showsMeter = true
 
     var body: some View {
-        // Tight (4 pt): with a two-line action (amber) the Status pill must still fit above the fold (Ultra 49 mm QA).
         VStack(alignment: .leading, spacing: Spacing.s) {
             HStack(alignment: .firstTextBaseline, spacing: Spacing.s + Spacing.xs) {
                 Image(systemName: level.symbol)
@@ -227,11 +195,6 @@ struct LevelHero: View {
     }
 }
 
-// MARK: - Progress ring
-
-/// Monochrome progress ring (§3.4): the done part uses the text color and the track `Theme.muted`. Rings measure
-/// progress only (day actions, a gauge), never health: the level is shown with `LevelHero` or `LevelBadge`.
-/// `level` is kept for source compatibility and ignored. The default center shows the percentage.
 struct LevelRing<Center: View>: View {
     var level: Level?
     var progress: Double = 1
@@ -262,7 +225,6 @@ extension LevelRing where Center == LevelRingCenter {
     }
 }
 
-/// Default ring center: the progress as a percentage (`level` is ignored, kept for compatibility).
 struct LevelRingCenter: View {
     var level: Level?
     var progress: Double = 1

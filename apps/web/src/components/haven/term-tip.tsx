@@ -2,29 +2,17 @@ import type { ReactNode } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 
-/** A glossary entry resolved to one language (`explainTerm` from @haven/core). */
 export type TermExplanation = { term: string; short: string; unitHint?: string };
 
 type TipProps = {
   explanation: TermExplanation | undefined;
   children: ReactNode;
-  /**
-   * Inside a link or button: hover-only, no extra tab stop (nested interactive elements are invalid). The
-   * explanation is not the only carrier of essential information.
-   */
   nested?: boolean;
-  /** Hide the dotted underline (e.g. on headings already styled as labels). */
   plain?: boolean;
   side?: 'top' | 'bottom' | 'left' | 'right';
   className?: string;
 };
 
-/**
- * Plain-language explanation of a medical or mission term, in place and without clutter: a dotted underline
- * opens a tooltip on hover or keyboard focus with the plain term (13/600), one sentence (12, secondary) and
- * the unit hint. Presentational (takes an already-resolved explanation), so client components can use it
- * without bundling the config. Renders the children untouched when there is no glossary entry.
- */
 export function TermTip({
   explanation,
   children,

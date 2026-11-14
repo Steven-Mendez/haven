@@ -16,7 +16,6 @@ const MIN_MS = 60_000;
 const WATCH_TYPES: readonly string[] = ['status', 'mood', 'emergency', 'monitor', 'crewHaptic'];
 
 export type TimelineItem = {
-  /** Minute since the scenario start. */
   minute: number;
   reading?: Reading;
   envelope?: WatchEnvelope;
@@ -24,10 +23,6 @@ export type TimelineItem = {
 
 export type TimelineOptions = {
   config?: Config;
-  /**
-   * Fill indicators that the scenario does not script with nominal readings at their cadence
-   * (default true), so they stay current during long scenarios.
-   */
   fill?: boolean;
 };
 
@@ -35,17 +30,6 @@ function isWatchType(message: string): message is WatchMessageType {
   return WATCH_TYPES.includes(message);
 }
 
-/**
- * Builds the whole timeline of a scenario starting at `start`:
- * - optional extra `categorical` array (`[minute, string]` points) → category readings.
- * - `series` points → readings (`simulated: false`, realistic source from `SOURCE_BY_INDICATOR`);
- *   category indicators decode their numeric value with `CATEGORY_CODES`).
- * - `events` whose `message` is a watch message type → `WatchEnvelope` (`simulated: false`); the
- *   payload gets `takenAt` (and `spo2TakenAt` when `spo2` is set) if it lacks them.
- * - `events` with `message: 'symptom'` (`payload.value`) or `'reading'` (`payload.indicator`,
- *   `value`, `unit?`) → readings.
- * - optional nominal fill for unscripted indicators.
- */
 export function scenarioTimeline(
   scenario: Scenario,
   crewMember: string,
@@ -77,7 +61,6 @@ export function scenarioTimeline(
   });
 
   const items: TimelineItem[] = [];
-  // Optional extra `categorical` array (string points) that Content uses for rhythm and symptoms.
   const categorical =
     ((scenario as Scenario & { categorical?: unknown }).categorical as
       | { indicator: string; points: [number, string | number][] }[]
@@ -153,10 +136,6 @@ export function scenarioTimeline(
   return items.sort((a, b) => a.minute - b.minute);
 }
 
-/**
- * Every reading a fully played scenario produces, including the ones derived from watch messages.
- * Handy for tests and for seeding.
- */
 export function scenarioReadings(
   scenario: Scenario,
   crewMember: string,

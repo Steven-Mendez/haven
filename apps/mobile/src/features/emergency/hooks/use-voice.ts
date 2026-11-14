@@ -6,7 +6,6 @@ import type { Language } from '@/shared/i18n';
 
 const VOICE_LANGUAGE: Record<Language, string> = { es: 'es-ES', en: 'en-US' };
 
-/** Speech (expo-speech) and haptics (expo-haptics) for hands-busy use. Stops on unmount. */
 export function useVoice(enabled: boolean, language: Language) {
   const enabledRef = useRef(enabled);
   enabledRef.current = enabled;
@@ -35,9 +34,7 @@ export function useVoice(enabled: boolean, language: Language) {
       if (kind === 'alert')
         void Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
       else void Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    } catch {
-      // Haptics are a bonus; never block the protocol.
-    }
+    } catch {}
   }, []);
 
   return { say, buzz };

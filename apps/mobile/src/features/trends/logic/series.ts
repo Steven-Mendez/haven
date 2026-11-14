@@ -1,5 +1,3 @@
-// Series aggregation for M04 Trends. Pure: only `@haven/core` and relative modules.
-
 import type { Reading } from '@haven/core';
 
 export type TrendRange = 'day' | 'week' | 'mission';
@@ -9,20 +7,14 @@ export const TREND_RANGES: readonly TrendRange[] = ['day', 'week', 'mission'];
 const HOUR_MS = 3_600_000;
 const DAY_MS = 24 * HOUR_MS;
 
-/** Bucket width per range: raw-ish points for a day, hourly for a week, 6 h for the mission. */
 export const BUCKET_MS: Record<TrendRange, number> = {
   day: 15 * 60_000,
   week: 2 * HOUR_MS,
   mission: 6 * HOUR_MS,
 };
 
-/** Default mission window when no readings exist yet. */
 export const DEFAULT_MISSION_DAYS = 30;
 
-/**
- * Time window `[from, to]` (epoch ms) of a range. `mission` starts at `missionStartMs` (or the first
- * reading if later than it would be, or 30 days back without data).
- */
 export function rangeWindow(
   range: TrendRange,
   nowMs: number,
@@ -35,22 +27,14 @@ export function rangeWindow(
 }
 
 export type AggregatedSeries = {
-  /** `[epoch ms, mean]` per bucket, sorted (bucket centre, last bucket at the latest reading). */
   data: [number, number][];
-  /** Latest numeric reading inside the window. */
   last?: Reading;
-  /** Number of readings in the window. */
   count: number;
 };
 
 const numeric = (r: Reading): number | undefined =>
   typeof r.value === 'number' && Number.isFinite(r.value) ? r.value : undefined;
 
-/**
- * Averages numeric readings into fixed buckets of the range so 30 days at a 5-minute cadence draw
- * as ≤ ~120 points. The bucket that contains the latest reading is pinned to that reading's time
- * (and value), so the highlighted last point is the real latest reading.
- */
 export function aggregateSeries(
   readings: Reading[],
   range: TrendRange,
@@ -93,7 +77,6 @@ export function aggregateSeries(
   };
 }
 
-/** Earliest `takenAt` (epoch ms) among readings, or `undefined`. */
 export function firstReadingMs(readings: Reading[]): number | undefined {
   let first: number | undefined;
   for (const r of readings) {

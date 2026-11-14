@@ -1,8 +1,6 @@
 import type { SourceStatus } from '../logic/sources';
 import type { SourceProvider } from './types';
 
-// M07 · Web: HealthKit does not exist. Same API as healthkit.ts, always "unavailable".
-
 export const HEALTHKIT_MAPPINGS: { indicator: string }[] = [];
 
 export function createHealthKitProvider(): SourceProvider {

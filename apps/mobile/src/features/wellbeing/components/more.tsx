@@ -10,7 +10,6 @@ import {
 import { Icon } from '@/shared/components/ui/icon';
 import { Text } from '@/shared/components/ui/text';
 
-/** Secondary detail folded behind one 48 pt row ("More", "Why?"): keeps the screen to 3–4 blocks. */
 export function More({ label, children }: { label: string; children: ReactNode }) {
   const [open, setOpen] = useState(false);
   return (

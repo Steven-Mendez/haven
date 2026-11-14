@@ -9,24 +9,16 @@ import { BigButton } from './big-button';
 import { havenTexts } from './i18n';
 
 type InlineConfirmProps = {
-  /** The question, in a short sentence ("End the emergency?"). */
   title: string;
-  /** What happens if you confirm ("The packet will be sent to Earth."). */
   description?: string;
   confirmLabel?: string;
   cancelLabel?: string;
   onConfirm: () => void;
   onCancel: () => void;
-  /** Use `destructive` only when confirming opens/escalates an emergency. Default primary. */
   confirmVariant?: 'primary' | 'destructive';
   className?: string;
 };
 
-/**
- * In-line confirmation (DESIGN_SYSTEM.md §3, "no pop-ups"): replaces the action in place with a
- * question, its consequence and two stacked 56 pt buttons (confirm on top, cancel as secondary).
- * Replaces RNR `Alert` for confirmations. No animation.
- */
 export function InlineConfirm({
   title,
   description,

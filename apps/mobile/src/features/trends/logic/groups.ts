@@ -1,8 +1,5 @@
 import type { Level } from '@haven/core';
 
-// List view of Trends (M04): a level summary on top (counts per level) and the rows grouped by
-// body zone, worst zone first. Pure: only `@haven/core` types.
-
 const SEVERITY: Record<Level, number> = { red: 0, amber: 1, pending: 2, green: 3 };
 export const LEVEL_ORDER: Level[] = ['red', 'amber', 'green', 'pending'];
 
@@ -16,10 +13,6 @@ export function levelCounts(levels: Level[]): LevelCounts {
 
 export type ZoneGroup<T> = { zone: string; items: T[] };
 
-/**
- * Groups items by zone. Inside a zone, worst level first and input order as tie-break; zones are
- * ordered by their worst item, then by `zoneOrder` (config order). Zones without items are left out.
- */
 export function groupByZone<T extends { id: string; zone: string }>(
   items: T[],
   levelOf: (id: string) => Level,

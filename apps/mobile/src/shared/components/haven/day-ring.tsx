@@ -13,23 +13,13 @@ import { format, havenTexts } from './i18n';
 type Segment = { zone: string; progress: number };
 
 type Props = {
-  /** One entry per zone (`dailyProgress()` from @haven/core). Missing zones count as 0. */
   segments: Segment[];
-  /** Diameter in pt: 160 on Body and Routine, 96 or less in compact places. */
   size?: number;
-  /** Stroke thickness. Default: 10 (≥ 120 pt) or 6 (smaller). */
   thickness?: number;
-  /** Custom centre. Default: "n/7" + "actions". */
   children?: ReactNode;
   className?: string;
 };
 
-/**
- * Day ring (shared chart spec): one continuous ring, 4–6 pt stroke, `muted` track, the day's
- * progress in the accent «Ion» with round caps and a tabular numeral in the centre. Progress =
- * the sum of the seven daily actions (a partial action counts partly). It measures what is done,
- * not health: no level colours.
- */
 export function DayRing({ segments, size = 160, thickness, children, className }: Props) {
   const colors = useColors();
   const t = useTexts(havenTexts);
@@ -86,7 +76,6 @@ export function DayRing({ segments, size = 160, thickness, children, className }
 
 type Day = { label: string; complete: boolean; today?: boolean };
 
-/** The week: one 8 pt dot per day. Complete = text colour, today = accent ring, rest = track. */
 export function WeekDots({ days, className }: { days: Day[]; className?: string }) {
   const t = useTexts(havenTexts);
   return (

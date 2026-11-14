@@ -12,10 +12,6 @@ import { texts } from '../i18n';
 import { CREW_NAME_MAX, type CrewOption, isValidCrewName } from '../logic/crew';
 import { Group, Row } from './rows';
 
-/**
- * «Who are you?» step after joining: the roster mission control created on Earth, one large row per
- * person. Without a roster (none yet, or offline) it explains why and lets the person type a name.
- */
 export function WhoGroup({
   crew,
   offline,

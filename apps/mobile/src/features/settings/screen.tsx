@@ -31,18 +31,11 @@ import { type Language, useTexts } from '@/shared/i18n';
 import { requestTour } from '@/shared/tour';
 import { texts } from './i18n';
 
-/** Language names in their own language. */
 const LANGUAGE_OPTIONS: { value: Language; label: string }[] = [
   { value: 'es', label: 'Español' },
   { value: 'en', label: 'English' },
 ];
 
-/**
- * Settings (X / Linear grouped list, SPEC.md §4: 44 pt rows in hairline groups). Only settings wired
- * to real state: language and appearance (persisted preferences), the Earth link (the same
- * `Mission.linkDown` that Mission toggles), the queue, system permissions, local data reset
- * (`store.reset`, inline confirm), the developer panel and the app version.
- */
 export default function SettingsScreen() {
   const t = useTexts(texts);
   const preferences = usePreferences();
@@ -109,7 +102,6 @@ export default function SettingsScreen() {
             label={t.tour}
             hint={t.tourHint}
             onPress={() => {
-              // Back to Body first: the spotlight measures what is on screen.
               router.dismissTo('/');
               requestTour();
             }}
@@ -119,7 +111,6 @@ export default function SettingsScreen() {
 
       <Section title={t.link}>
         <ListGroup inset={52}>
-          {/* Detected by the earth queue: a status, never a switch. */}
           <SettingsRow
             icon={mission.linkDown ? WifiOff : Wifi}
             label={t.linkStatus}

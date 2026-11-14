@@ -1,16 +1,5 @@
 import SwiftUI
 
-// HAVEN mission disc (same geometry as Earth's `ActivityRings` and the phone's): one ring split into a sector per
-// category, clockwise from 12 o'clock, each sector cut into one segment per action (4 of 7 = four lit pieces).
-//   ring-1 cyan   · routine of the day (actions done / total)
-//   ring-2 blue   · measurements of the day (readings taken / planned)
-//   ring-3 violet · wellbeing (check-in + cognitive battery)
-// Flat colours with butt ends; unlit segments are the same hue at 20 %. Under 32 pt (or with too many actions to
-// cut) a sector is one proportional arc. Shows progress only, never health: levels (● ◐ ▲ ○) stay with LevelHero.
-//
-// Not shown on any screen yet: the phone → watch `status` contract does not carry routine progress, and the watch
-// never shows invented data. Status (≈ 64–80 pt next to the level hero) will use it when the bridge sends it.
-
 struct HavenRing: Identifiable, Equatable {
     enum Kind: Int, CaseIterable {
         case routine, measurements, wellbeing
@@ -42,11 +31,8 @@ extension HavenRing.Kind {
 }
 
 struct HavenRings: View {
-    /// Sectors in this order; at most three are drawn.
     let rings: [HavenRing]
-    /// 64–80 pt on Status.
     var diameter: CGFloat = 72
-    /// Optional tabular figure in the centre («5/7»). Only fits from about 64 pt.
     var centerText: String?
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -54,7 +40,6 @@ struct HavenRings: View {
     private var lineWidth: CGFloat { max(2.5, (diameter * 0.12).rounded()) }
     private var radius: CGFloat { (diameter - lineWidth) / 2 }
 
-    /// Fraction of a full turn for a gap of `points` on the ring.
     private func gap(_ points: CGFloat) -> Double { Double(points / (2 * .pi * radius)) }
 
     var body: some View {
@@ -94,12 +79,10 @@ struct HavenRings: View {
     }
 }
 
-/// One category: a segment per action (lit = done), or one proportional arc when segments would be too small.
 private struct Sector: View {
     let ring: HavenRing
     let from: Double
     let to: Double
-    /// `nil`: draw one continuous arc.
     let segmentGap: Double?
     let lineWidth: CGFloat
 

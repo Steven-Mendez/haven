@@ -4,25 +4,18 @@ import { RING_ORDER, type RingDatum, type RingId } from './rings-data';
 const TOKEN: Record<RingId, 1 | 2 | 3> = { routine: 1, measurements: 2, wellbeing: 3 };
 
 type Props = {
-  /** Sectors in this order (clockwise from the top). Missing ones are simply not drawn. */
   rings: RingDatum[];
-  /** Diameter in px. */
   size?: number;
-  /** Accessible summary («Routine 3/7, Measurements 7/7…»). Decorative when omitted. */
   label?: string;
-  /** Text in the centre (legible from ~64 px). */
   center?: string;
-  /** Segments fade in one after another (360 ms each). Reduce Motion removes it (global rule). */
   animate?: boolean;
   className?: string;
 };
 
-/** Below this diameter a sector is one continuous arc (segment gaps would be sub-pixel). */
 const SEGMENTED_FROM = 32;
 
 function point(c: number, r: number, deg: number): [number, number] {
   const rad = ((deg - 90) * Math.PI) / 180;
-  // Rounded: Math.cos/sin can differ in the last bits between the server and the browser (hydration).
   return [
     Math.round((c + r * Math.cos(rad)) * 100) / 100,
     Math.round((c + r * Math.sin(rad)) * 100) / 100,
@@ -36,15 +29,8 @@ function arc(c: number, r: number, from: number, to: number) {
   return `M${x0} ${y0}A${r} ${r} 0 ${large} 1 ${x1} ${y1}`;
 }
 
-/** Gap in degrees for a gap of `px` on a circle of radius `r`. */
 const gapDeg = (px: number, r: number) => (px / r) * (180 / Math.PI);
 
-/**
- * HAVEN's mission disc: one ring split into a sector per category (routine, measurements, wellbeing), each
- * sector cut into one segment per action (4 of 7 = four lit pieces). Flat colours with butt ends, the unlit
- * segments in the same hue at low opacity. Under 32 px each sector is a single proportional arc. Shows
- * progress, never health (levels do that). Same geometry on mobile and the watch.
- */
 export function ActivityRings({
   rings,
   size = 120,
@@ -86,7 +72,6 @@ export function ActivityRings({
           const lit = `var(--ring-${n})`;
           const track = `var(--ring-${n}-track)`;
 
-          // Continuous sector: track + proportional lit arc (small sizes, or too many actions to cut).
           const step = total > 0 ? (end - start) / total : 0;
           if (size < SEGMENTED_FROM || total <= 1 || step < segmentGap * 2.5) {
             const to = total > 0 ? start + ((end - start) * done) / total : start;

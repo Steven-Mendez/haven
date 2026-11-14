@@ -26,12 +26,6 @@ const typing = (target: EventTarget | null) =>
     'input, textarea, select, [contenteditable="true"], [role="dialog"], [role="menu"]',
   );
 
-/**
- * Global shortcuts (Linear): `?` opens this list, `g` then `c` / `r` / `t` / `e` / `m` goes to Crew / Rules /
- * Trends / EVA / Missions.
- * Only shortcuts that really work are listed (⌘K and ⌘B are handled by the command menu and the sidebar,
- * j / k / ↵ by the crew list).
- */
 export function KeyboardShortcuts({ lang }: { lang: Language }) {
   const t = havenTexts[lang];
   const router = useRouter();

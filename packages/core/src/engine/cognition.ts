@@ -11,27 +11,19 @@ import { BATTERY_INDICATORS } from './routine';
 import { MIN_MS, ms, worstLevel } from './util';
 
 export type CognitiveVerdict = {
-  /** Current battery level (worst of its indicators); with no battery yet, "pending". */
   level: Level;
-  /** Current assessments of the battery indicators. */
   assessments: Assessment[];
-  /** End time of the last battery session. */
   takenAt?: string;
-  /** Failed batteries in a row, counting the last one (0 if the last one was green). */
   consecutiveFailures: number;
-  /** While `now` < `lockedUntil` the battery cannot be repeated (2 h after a failure). */
   lockedUntil?: string;
   canRetake: boolean;
-  /** Second failure in a row: a notice to Earth must be queued. */
   notifyEarth: boolean;
   actions: Action[];
   explanation: I18n;
 };
 
 export type CognitionOptions = {
-  /** Lock minutes after a failure (default 120). */
   lockMin?: number;
-  /** Battery readings less than N minutes apart belong to the same session (default 15). */
   sessionGapMin?: number;
   actions?: Action[];
 };
@@ -56,13 +48,6 @@ function sessions(readings: Reading[], now: Date, gapMin: number): Session[] {
   return result;
 }
 
-/**
- * Cognitive battery verdict (M10). `evaluate()` decides the level with the config rules (reaction vs.
- * baseline, lapses, memory, attention). A battery "fails" if any of its indicators is amber or red.
- * After a failure the battery is locked for `lockMin` (2 h); two failures in a row add the
- * "notify Earth" action (`notify-earth`). For each past session, any baseline missing from
- * `baseline` is computed from the readings before that session.
- */
 export function cognitiveVerdict(
   readings: Reading[],
   config: Config,
@@ -130,7 +115,6 @@ export function cognitiveVerdict(
     ...assessments.flatMap((a) => a.actions.map((x) => x.id)),
   ];
   const actions = resolveActions(ids, catalog);
-  // Keep "notify Earth" even if the catalog gives it a low priority.
   if (notifyEarth && !actions.some((a) => a.id === ACTION_NOTIFY_EARTH)) {
     actions.splice(2, 1, ...resolveActions([ACTION_NOTIFY_EARTH], catalog));
   }

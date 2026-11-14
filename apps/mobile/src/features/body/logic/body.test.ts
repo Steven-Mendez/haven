@@ -96,7 +96,6 @@ describe('day ring is independent from health (M01 acceptance)', () => {
     const assessmentsBefore = evaluate(before, config, 'transit', {}, [], now);
     const progressBefore = dailyProgress(before, config, now);
 
-    // The lungs daily action is a manual mark (M03): a `daily-action` reading with the zone id.
     const mark: Reading = {
       ...reading('daily-action', 'manual', false),
       value: 'lungs',

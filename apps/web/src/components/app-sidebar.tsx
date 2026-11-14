@@ -10,21 +10,11 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 
 type Props = Omit<ComponentProps<typeof Sidebar>, 'children'> & {
-  /** Usually <MissionSwitcher>. */
   header: ReactNode;
-  /** Usually <NavMain>. */
   children: ReactNode;
-  /** Usually <NavOperator>. */
   footer: ReactNode;
 };
 
-/**
- * Ground View sidebar (shadcn sidebar, `inset` variant: 240 px on the page background with the content in an
- * inset bordered panel, SPEC §6 «Armazón web»). Collapses to icons on desktop and becomes a
- * Sheet on narrow screens (ui/sidebar). It takes slots instead of data so the root layout can stream
- * each slot in its own <Suspense> while the Sidebar frame itself renders synchronously: if the frame
- * suspended, it would hydrate after `useIsMobile` flipped and mismatch the server HTML on phones.
- */
 export function AppSidebar({ header, children, footer, ...props }: Props) {
   return (
     <Sidebar collapsible="icon" variant="inset" {...props}>
@@ -35,16 +25,11 @@ export function AppSidebar({ header, children, footer, ...props }: Props) {
       <SidebarFooter className="pb-[max(0.5rem,env(safe-area-inset-bottom))] pl-[max(0.5rem,env(safe-area-inset-left))]">
         {footer}
       </SidebarFooter>
-      {/* «Panel» reads the same in es and en: the frame renders outside the language Suspense. */}
       <SidebarRail aria-label="Panel" title="Panel" />
     </Sidebar>
   );
 }
 
-// Language-neutral fallbacks for the layout's <Suspense>: no text, so a reader in English never sees a
-// Spanish flash while the cookie-dependent slots stream in. Static (no pulse, no Math.random).
-
-/** Placeholder for MissionSwitcher: the brand mark and one bar. */
 export function MissionSwitcherSkeleton() {
   return (
     <div className="flex h-9 items-center gap-2 px-1.5">
@@ -54,7 +39,6 @@ export function MissionSwitcherSkeleton() {
   );
 }
 
-/** Placeholder for NavOperator: the operator row. */
 export function NavOperatorSkeleton() {
   return (
     <div className="flex flex-col gap-2 px-2 group-data-[collapsible=icon]:hidden">

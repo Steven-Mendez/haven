@@ -20,16 +20,11 @@ type Props = {
   crewMember: string;
   packets: ReceivedPacket[];
   now: string;
-  /** Show every packet instead of the latest PACKETS_PER_TAB. */
   showAll: boolean;
   lang: Language;
   t: AstronautTexts;
 };
 
-/**
- * One packet as a log row (Vercel logs, 44 px): mono crew time, level shape, type, «measured · received» and
- * attachment icons. Emergencies get the 2 px red rule on the left (the only rows that do).
- */
 function PacketRow({
   crewMember,
   p,
@@ -97,7 +92,6 @@ function PacketRow({
   );
 }
 
-/** Attachment icon with a hover label (inside the row link: no extra tab stop; the label is also sr-only). */
 function IconTip({ label, icon }: { label: string; icon: React.ReactNode }) {
   return (
     <Tooltip>
@@ -110,7 +104,6 @@ function IconTip({ label, icon }: { label: string; icon: React.ReactNode }) {
   );
 }
 
-/** Packets grouped by day (UTC), newest first. */
 function byDay(packets: ReceivedPacket[], lang: Language) {
   const groups: { day: string; items: ReceivedPacket[] }[] = [];
   for (const p of packets) {
@@ -122,10 +115,6 @@ function byDay(packets: ReceivedPacket[], lang: Language) {
   return groups;
 }
 
-/**
- * Packets tab (SPEC §6, Vercel logs + incident.io timeline): the latest emergency pinned on top, then one
- * group per day with a 32 px header and 44 px rows with mono times. Each row opens the packet's own page.
- */
 export function PacketList({ crewMember, packets, now, showAll, lang, t }: Props) {
   if (packets.length === 0) return <EmptyState title={havenTexts[lang].noPackets} />;
   const all = byNewest(packets);

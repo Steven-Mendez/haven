@@ -57,7 +57,6 @@ function WebIndicator({ value, className }: IndicatorProps) {
 }
 
 function NativeIndicator({ value, className }: IndicatorProps) {
-  // The shared value is written outside render (Reanimated warns on writes during render).
   const progress = useSharedValue(value ?? 0);
   useEffect(() => {
     progress.value = withSpring(value ?? 0, { overshootClamping: true });

@@ -133,11 +133,9 @@ describe('demoHistory routine streak', () => {
       expect(s).toBeGreaterThanOrEqual(5);
       expect(s).toBeLessThanOrEqual(12);
       expect(s).toBe(Math.min(...demoMissedDays(id)) - 1);
-      // Realistic: some past days are incomplete, most are complete.
       const past = days.slice(1, -1);
       expect(past.filter((d) => !d.complete).length).toBeGreaterThanOrEqual(2);
       expect(past.filter((d) => d.complete).length).toBeGreaterThanOrEqual(22);
-      // Today stays open (manual action not done yet).
       expect(days.at(-1)?.complete).toBe(false);
     }
   });

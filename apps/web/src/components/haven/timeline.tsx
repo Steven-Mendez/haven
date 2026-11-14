@@ -15,28 +15,18 @@ import { havenTexts } from './texts';
 import type { Now, ReceivedPacket } from './types';
 
 type Props = {
-  /** `AstronautResponse.packets` (ReceivedPacket) or plain packets. */
   packets: (ReceivedPacket | Packet)[];
   now: Now;
   lang: Language;
-  /** Indicator id → display name (translated). */
   indicatorNames?: Record<string, string>;
-  /** Opens this packet expanded (e.g. the latest emergency). */
   openId?: string;
   title?: string;
   emptyText?: string;
   className?: string;
 };
 
-/** When the data was created on the server clock (`dataAt`), falling back to the phone's `sentAt`. */
 const sentAtOf = (p: ReceivedPacket | Packet) => ('dataAt' in p ? p.dataAt : p.sentAt);
 
-/**
- * Received packets as a vertical timeline, newest first, with day separators and the UTC time in mono
- * (DESIGN_SYSTEM.md §5.2, ref. incident.io, Attio). Grey borders only; the level is told by the badge.
- * Each packet is a shadcn `Card` with a `Collapsible` body: assessments with the engine's explanation,
- * ECG trace, photos and notes.
- */
 export function Timeline({
   packets,
   now,

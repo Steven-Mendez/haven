@@ -15,22 +15,14 @@ import { havenTexts } from './texts';
 import type { MissionInfo, Now } from './types';
 
 type Props = {
-  /** `CrewResponse.mission` / `AstronautResponse.mission`. */
   mission: MissionInfo;
   now: Now;
   lang: Language;
-  /** Environment display name (config `Environment.name`, translated). Defaults to the id. */
   environmentName?: string;
-  /** Right-hand slot (actions, filters). */
   actions?: ReactNode;
   className?: string;
 };
 
-/**
- * Page title (20/600) + one 12 px metadata line (SPEC §6, X right-rail metadata): «ARES01 · Day 142 · Transit ·
- * updated 2 min ago». The one-way delay lives in the app header, so every «ago» stays interpretable without
- * repeating it here. «No link» appears as a neutral chip only when the mission reports it.
- */
 export function MissionHeader({ mission, now, lang, environmentName, actions, className }: Props) {
   const t = havenTexts[lang];
   return (
@@ -54,7 +46,6 @@ export function MissionHeader({ mission, now, lang, environmentName, actions, cl
             ·
           </span>
           {mission.phase ? (
-            // Phased mission: today's stretch by name, with its place in the plan («Phase 3 of 8»).
             <Tooltip>
               <TooltipTrigger render={<span className="cursor-default" />}>
                 {mission.phase.label

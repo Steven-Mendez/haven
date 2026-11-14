@@ -7,15 +7,6 @@ import { useTranslate } from '@/shared/i18n';
 
 type Props = { className?: string };
 
-/**
- * Mission header (M00, contract B): the designer's `MissionStrip` (DESIGN_SYSTEM.md §3.7) fed from
- * `@/shared/data`. The delay chip shows the environment's communication delay as mission data
- * (nothing is delayed artificially); the link chip opens Mission on its Link group
- * (`/mission?focus=link`) and the queue chip opens the queue.
- *
- * No developer shortcut here: in development builds `/dev` opens from the Expo dev menu (shake /
- * ⌘D → «HAVEN developer panel») or with the deep link `haven://dev` (see `@/shared/startup`).
- */
 export function MissionHeader({ className }: Props) {
   const translate = useTranslate();
   const mission = useMission();

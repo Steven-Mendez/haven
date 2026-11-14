@@ -3,18 +3,11 @@ import { format, formatDuration, type Language, minutesBetween } from '@/lib/i18
 import { havenTexts } from './texts';
 import type { Now, VisualLevel } from './types';
 
-// HAVEN traffic light (DESIGN_SYSTEM.md §3.2, tokens.json → level): symbol + label, never colour alone.
-// Labels are the same on mobile, web and watch: In range · Check · Emergency · Pending (+ No recent data, Earth only).
-
 type LevelMeta = {
-  /** Text glyph (● ◐ ▲ ○ ◷), for plain-text contexts; UI draws the same shapes with <LevelGlyph>. */
   symbol: string;
   key: 'levelGreen' | 'levelAmber' | 'levelRed' | 'levelPending' | 'noData';
-  /** Foreground (symbol and label). */
   text: string;
-  /** Solid level background (none for pending and no-data). */
   bg: string;
-  /** Level outline; dashed for pending and no-data. */
   border: string;
 };
 
@@ -56,7 +49,6 @@ export const LEVELS: Record<VisualLevel, LevelMeta> = {
   },
 };
 
-/** Severity order for sorting lists: red first, green last. */
 export const LEVEL_ORDER: Record<VisualLevel, number> = {
   red: 0,
   amber: 1,
@@ -69,12 +61,10 @@ export function levelLabel(level: VisualLevel, lang: Language): string {
   return havenTexts[lang][LEVELS[level].key];
 }
 
-/** Stable sort by severity. */
 export function bySeverity<T>(items: T[], levelOf: (item: T) => VisualLevel): T[] {
   return [...items].sort((a, b) => LEVEL_ORDER[levelOf(a)] - LEVEL_ORDER[levelOf(b)]);
 }
 
-/** Worst level of a list (presentation only: the engine already evaluated each one). */
 export function worstLevel(levels: Level[]): Level {
   if (!levels.length) return 'pending';
   return bySeverity(levels, (l) => l)[0] ?? 'pending';
@@ -86,7 +76,6 @@ export function countLevels(levels: Level[]): Record<Level, number> {
   return count;
 }
 
-/** Zone ids in canonical order (GLOSSARY.md). Zones are told by name and icon, never by colour. */
 export const ZONE_ORDER = [
   'heart',
   'lungs',
@@ -97,12 +86,10 @@ export const ZONE_ORDER = [
   'mind',
 ] as const;
 
-/** «12 min», «3 h 5 min»… from `from` to `now`. */
 export function ago(from: string, now: Now): string {
   return formatDuration(minutesBetween(from, now));
 }
 
-/** «Last data 12 min ago». */
 export function lastDataText(from: string, now: Now, lang: Language): string {
   const t = havenTexts[lang];
   const min = minutesBetween(from, now);

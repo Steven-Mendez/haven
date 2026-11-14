@@ -17,13 +17,9 @@ import { format, havenTexts } from './i18n';
 import { LevelSymbol } from './level-symbol';
 
 type Props = {
-  /** Number of folded items: the default label is «24 in range». */
   count: number;
-  /** Override the label («6 done», «See all 7 zones»). */
   label?: string;
-  /** Leading level symbol. Default green (the usual case: everything in range). Pass null for none. */
   level?: 'green' | 'pending' | null;
-  /** Folded content (rows), mounted when open. The trigger's label says what is folded. */
   children: ReactNode;
   defaultOpen?: boolean;
   open?: boolean;
@@ -31,10 +27,6 @@ type Props = {
   className?: string;
 };
 
-/**
- * «24 in range ›» (DESIGN_SYSTEM.md §8.0.4): folds what needs no attention into one 56 pt row
- * on RNR `Collapsible`. The trigger says how many items it hides, so nothing is lost.
- */
 export function CollapsedGroup({
   count,
   label,

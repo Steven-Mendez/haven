@@ -8,20 +8,13 @@ import type { Language } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { havenTexts } from './texts';
 
-/** Copies text and confirms with a 2 s toast («Copied»). Toasts only confirm, never alert. */
 export async function copyText(value: string, lang: Language) {
   try {
     await navigator.clipboard.writeText(value);
     toast.success(havenTexts[lang].copied, { description: value });
-  } catch {
-    // Clipboard blocked (insecure origin): nothing to confirm.
-  }
+  } catch {}
 }
 
-/**
- * Mono ID that copies itself on click (tooltip shows the full value and «Copy ID»). `display` can shorten the
- * visible text; the full value is always copied.
- */
 export function CopyId({
   value,
   display,

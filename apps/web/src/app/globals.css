@@ -2,9 +2,6 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* HAVEN · Ground View · «Vela 3» (design/redesign/SPEC.md). Pure black, hairlines, one accent («Ion»).
-   Dark is the default (class on <html>); light is the same system inverted. */
-
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -15,7 +12,6 @@
   --font-heading: var(--font-sans);
   --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
-  /* Type scale (SPEC §3, web column). 13 px is the UI base: `text-sm` = 13/20. */
   --text-2xs: 11px;
   --text-2xs--line-height: 16px;
   --text-xs: 12px;
@@ -66,8 +62,6 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
 
-  /* HAVEN layers and tiers. `accent` keeps its shadcn meaning (neutral hover of menus); the accent
-     (Apple system blue, SPEC v3.1) is `brand` (bg-brand, text-brand, ring-brand, bg-brand-subtle). */
   --color-surface: var(--surface);
   --color-surface-elevated: var(--surface-elevated);
   --color-hover: var(--hover);
@@ -110,8 +104,6 @@
   --color-ring-track: var(--ring-track);
   --color-ring-partial: var(--ring-partial);
 
-  /* Radii (SPEC §4): sm 4 (badges, kbd) · md 6 (chips, nav) · lg 8 (buttons, inputs) · xl 12 (panel,
-     cards, ⌘K) · 2xl 16 (sheets). */
   --radius-xs: 4px;
   --radius-sm: 4px;
   --radius-md: 6px;
@@ -121,7 +113,6 @@
   --radius-3xl: 20px;
   --radius-4xl: 999px;
 
-  /* Motion (SPEC §5). */
   --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
@@ -131,7 +122,6 @@
   --animate-live: live 2s ease-in-out infinite;
   --animate-ring-in: ring-in 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
 
-  /* Elevation: none in dark; light sheets/menus only (SPEC §4). */
   --shadow-sm: var(--elevation);
   --shadow-md: var(--elevation);
   --shadow-lg: var(--elevation);
@@ -162,7 +152,6 @@
   }
 }
 
-/* Light theme (SPEC §2, «Claro» column). */
 :root {
   color-scheme: light;
   --radius: 8px;
@@ -217,7 +206,6 @@
   --level-pending-bg: transparent;
   --level-pending-border: rgba(108, 108, 112, 0.4);
 
-  /* Charts (shared chart spec, same on mobile). */
   --chart-line: #0a0a0b;
   --chart-grid: #f0f0f1;
   --chart-axis: #6e6e77;
@@ -242,8 +230,6 @@
   --ring-track: #f2f2f3;
   --ring-partial: #f2f2f3;
 
-  /* Mission disc (HAVEN's own progress mark): three cool hues — cyan, blue, violet — that never read as a
-     health level (red / amber / green). Flat colours; the unlit segments are the same hue at 14 % (20 % dark). */
   --ring-1: #0e9fc2;
   --ring-1-track: rgba(14, 159, 194, 0.14);
   --ring-2: #3a6ff0;
@@ -261,7 +247,6 @@
   --sidebar-ring: #007aff;
 }
 
-/* Dark theme, the default (SPEC §2, «Oscuro» column). */
 .dark {
   color-scheme: dark;
   --elevation: none;
@@ -311,7 +296,6 @@
   --level-pending-bg: transparent;
   --level-pending-border: rgba(142, 142, 147, 0.4);
 
-  /* Charts (shared chart spec, same on mobile). */
   --chart-line: #ececee;
   --chart-grid: #16161a;
   --chart-axis: #80808a;
@@ -375,7 +359,6 @@
 }
 
 @layer components {
-  /* Touch target ≥ 40 px (DESIGN_SYSTEM.md §2.3, web minimum) without changing the visual size. */
   .hit-area {
     position: relative;
   }
@@ -388,18 +371,15 @@
     height: max(100%, 2.5rem);
     transform: translate(-50%, -50%);
   }
-  /* Figures: tabular digits that stay put when they change. */
   .numeric {
     font-variant-numeric: tabular-nums;
   }
-  /* Small label: caption, secondary text, sentence case. */
   .eyebrow {
     font-size: 0.75rem;
     line-height: 1rem;
     font-weight: 500;
     color: var(--muted-foreground);
   }
-  /* Hatched region for missing data in charts and stale gaps (SPEC §6, Plane «future» region). */
   .hatch {
     background-image: repeating-linear-gradient(
       135deg,
@@ -422,8 +402,6 @@
   }
 }
 
-/* No blur or glass: neutralise the backdrop blur of the vendored overlays (mobile sidebar sheet,
-   dialogs, ⌘K). Unlayered on purpose so it wins over the utility layer without editing the components. */
 [data-slot="sheet-overlay"],
 [data-slot="dialog-overlay"] {
   backdrop-filter: none;

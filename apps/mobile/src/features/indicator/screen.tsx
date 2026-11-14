@@ -49,15 +49,9 @@ const ORIGIN_KEY: Partial<Record<Source, keyof IndicatorTexts>> = {
   screen: 'originScreen',
 };
 
-/** Ghost `Button` reduced to its content: no height, padding or pressed fill; 70 % opacity on press. */
 const INLINE_TRIGGER =
   'h-auto self-start rounded-none p-0 active:bg-transparent active:opacity-70 sm:h-auto';
 
-/**
- * M02 · Indicator (DESIGN_SYSTEM §8.6): value + badge, one delta line, the data line, the trend
- * with D/W/M, the tabs What to do · How to measure · Why it matters, and «Register» folded in the
- * footer. `?measure=1` (the «Measure» shortcut) opens the entry with the field focused.
- */
 export default function Screen() {
   const { id, measure } = useLocalSearchParams<{ id: string; measure?: string }>();
   const t = useTexts(texts);
@@ -98,8 +92,6 @@ export default function Screen() {
   const zone = config.zones.find((z) => z.id === indicator.zone);
   const level = assessment?.level ?? 'pending';
   const isCategory = indicator.kind === 'category';
-  // The hero always shows the LAST known value (assessment value, else the latest reading); a
-  // stale one is dimmed with its age, never hidden. «No reading yet» only with zero readings.
   const latestNumber =
     latest && Number.isFinite(Number(latest.value)) ? Number(latest.value) : undefined;
   const lastValue = assessment?.value ?? latestNumber;
@@ -128,7 +120,6 @@ export default function Screen() {
       className="bg-background flex-1"
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      {/* Empty bar title: the screen header already names the indicator (and its zone). */}
       <Stack.Screen options={{ title: '' }} />
       <ScrollView
         ref={scroll}
@@ -140,7 +131,6 @@ export default function Screen() {
           paddingRight: 16 + insets.right,
         }}
         keyboardShouldPersistTaps="handled"
-        // The iOS navigation bar is translucent: let the system inset the content below it.
         contentInsetAdjustmentBehavior="automatic"
       >
         <View className="gap-3">
@@ -166,7 +156,6 @@ export default function Screen() {
             </View>
           </View>
 
-          {/* Hero (Garmin / Robinhood): 64 pt figure that follows the scrub, one-word status. */}
           <View className="gap-2">
             <View
               accessible
@@ -192,7 +181,6 @@ export default function Screen() {
                     </Text>
                   ) : null}
                   {dimmed && !scrub ? (
-                    // Age chip: neutral, amber-ish only beyond the indicator's stale rule.
                     <View
                       className={cn(
                         'ml-1 self-center rounded-full border px-2 py-0.5',
@@ -233,7 +221,6 @@ export default function Screen() {
                   onPress={() => explainLevel(level)}
                   className={cn(INLINE_TRIGGER, 'justify-start gap-2')}
                 >
-                  {/* Reset Button's text classes: the label keeps its own size, weight and colour. */}
                   <TextClassContext.Provider value={undefined}>
                     <LevelSymbol level={level} size={12} />
                     <Text

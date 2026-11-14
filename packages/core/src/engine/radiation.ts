@@ -4,7 +4,6 @@ import { DAY_MS, dayKey, mean, ms, numeric, round } from './util';
 export const CAREER_LIMIT_MSV = 600;
 export const WATCH_PERCENT = 70;
 export const EVENT_BUDGET_MSV = 25;
-/** Demo mission length (Ares-1: 540 days); `Mission` has no duration. */
 export const DEMO_MISSION_DAYS = 540;
 
 export type RadiationOptions = {
@@ -19,20 +18,12 @@ export type RadiationDose = {
   careerLimitPercent: number;
   projectedMSv: number;
   estimate: true;
-  /** Cumulative ≥ `watchPercent` of the limit. */
   watch: boolean;
   dailyMeanMSv: number;
   remainingDays: number;
-  /** Mission days without a reading, filled with `environment.dailyDoseMSv`. */
   estimatedDays: number;
 };
 
-/**
- * Cumulative dose and projection (C01). `radiation-dose` readings are rates in mSv/day: each UTC day
- * takes the mean of its readings and days are summed. Mission days (`mission.day`) without readings
- * are filled with `environment.dailyDoseMSv`. Linear projection: cumulative + mean of the last 30
- * days × remaining days. Reference career limit 600 mSv, watch from 70 %. Always a demo estimate.
- */
 export function radiationDose(
   readings: Reading[],
   mission: Mission,
@@ -73,12 +64,6 @@ export function radiationDose(
   };
 }
 
-/**
- * Estimated time outside the shelter during a solar event, in minutes:
- * (event budget − today's dose) / (local rate × shielding). `localRateMSvH` in mSv/h and `shielding`
- * as the transmitted fraction (0..1]. Without rate or shielding (the scenario does not provide them)
- * it returns null and nothing is shown.
- */
 export function timeOutsideShelter(params: {
   todayDoseMSv: number;
   localRateMSvH?: number;

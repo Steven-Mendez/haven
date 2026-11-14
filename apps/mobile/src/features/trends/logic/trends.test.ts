@@ -32,7 +32,6 @@ describe('range windows', () => {
     expect(rangeWindow('week', NOW)).toEqual([NOW - 7 * 24 * HOUR, NOW]);
     expect(rangeWindow('mission', NOW, NOW - 10 * 24 * HOUR)).toEqual([NOW - 10 * 24 * HOUR, NOW]);
     expect(rangeWindow('mission', NOW)[0]).toBe(NOW - 30 * 24 * HOUR);
-    // A mission that started an hour ago still shows at least a day.
     expect(rangeWindow('mission', NOW, NOW - HOUR)[0]).toBe(NOW - 24 * HOUR);
   });
 });
@@ -44,8 +43,8 @@ describe('aggregateSeries', () => {
       reading(NOW - 3 * HOUR + 60_000, 70),
       reading(NOW - HOUR, 80),
       reading(NOW - HOUR + 60_000, 90),
-      reading(NOW - 30 * HOUR, 100), // outside the day
-      reading(NOW - 2 * HOUR, 'sinus'), // not numeric
+      reading(NOW - 30 * HOUR, 100),
+      reading(NOW - 2 * HOUR, 'sinus'),
     ];
     const s = aggregateSeries(readings, 'day', rangeWindow('day', NOW), HOUR);
     expect(s.count).toBe(4);
@@ -94,17 +93,14 @@ describe('markers', () => {
     const upsert = (m: TrendMarker | undefined) => {
       if (m) markers = [...markers.filter((k) => k.id !== m.id), m];
     };
-    // Opened, then closed with packet p1: the open marker is linked, not duplicated.
     upsert({ id: 'open', t: NOW - HOUR, kind: 'emergency', ref: 'button' });
     upsert(markerForClosedEmergency(markers, NOW, 'p1'));
     expect(markers).toHaveLength(1);
     expect(markers[0]).toMatchObject({ id: 'open', packet: 'p1' });
-    // Re-emitted with the same packet (a note was added): still one marker.
     expect(markerForClosedEmergency(markers, NOW - HOUR, 'p1')).toBeUndefined();
     upsert(markerForClosedEmergency(markers, NOW + 60_000, 'p1'));
     expect(markers).toHaveLength(1);
     expect(markers[0]).toMatchObject({ id: 'open', packet: 'p1', t: NOW + 60_000 });
-    // A close without a prior open: one marker keyed by the packet, stable on re-emission.
     upsert(markerForClosedEmergency(markers, NOW + 5 * HOUR, 'p2'));
     upsert(markerForClosedEmergency(markers, NOW + 5 * HOUR + 1, 'p2'));
     expect(markers.filter((m) => m.packet === 'p2')).toHaveLength(1);

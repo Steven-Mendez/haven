@@ -31,11 +31,6 @@ import { useCategoryText } from './use-category-text';
 
 const SYMPTOM_INDICATOR = 'symptom';
 
-/**
- * «Register» always visible in the fixed footer (DESIGN_SYSTEM 4.1a): `[ 128 ] mmHg [Save]`.
- * While typing, the badge shows the level the engine would give; saving updates the screen in
- * place (no confirmation screen). Blood pressure: two fields, two readings. Categories: a selector.
- */
 export function EntryBar({
   indicator,
   autoFocus,
@@ -43,10 +38,8 @@ export function EntryBar({
 }: {
   indicator: Indicator;
   autoFocus?: boolean;
-  /** A red level: «Open protocol» is the only main action, so «Register» steps back (§8.0.7). */
   secondary?: boolean;
 }) {
-  // Folded into one 56 pt button (DESIGN_SYSTEM §8.6); «Measure» (`autoFocus`) opens it directly.
   const [open, setOpen] = useState(Boolean(autoFocus));
   const t = useTexts(texts);
   const tr = useTranslate();
@@ -72,10 +65,8 @@ export function EntryBar({
   const [showErrors, setShowErrors] = useState(false);
   const [saving, setSaving] = useState(false);
   const [savedNote, setSavedNote] = useState<string | undefined>();
-  // The preview runs the engine: defer it so typing stays instant.
   const typed = useDeferredValue(values);
 
-  // Candidate readings from what is typed (only when every field is a number).
   const candidates = useMemo((): Reading[] | undefined => {
     const takenAt = new Date().toISOString();
     if (isCategory) {
@@ -114,7 +105,6 @@ export function EntryBar({
   const dailyZoneName = tr(config.zones.find((z) => z.id === dailyZone)?.name);
 
   const save = async () => {
-    // Built from what is typed now, not from the deferred preview.
     const takenAt = new Date().toISOString();
     const parsed = fields.map((f) => parseNumber(values[f.id] ?? ''));
     const toSave: Reading[] | undefined = isCategory
@@ -139,7 +129,6 @@ export function EntryBar({
     setSaving(true);
     try {
       await store.saveReadings(toSave);
-      // Show the updated screen: the keyboard would cover it.
       Keyboard.dismiss();
       setValues({});
       setCategory(undefined);
@@ -161,14 +150,12 @@ export function EntryBar({
     if (savedNote) setSavedNote(undefined);
   };
 
-  // Status line: live mark against the reference range, errors, or the saved note.
   const status = (() => {
     if (showErrors && !isCategory) {
       const error = fields.map((f) => validateNumber(values[f.id] ?? '')).find(Boolean);
       if (error) return { text: error === 'empty' ? t.errorEmpty : t.errorNumber, strong: true };
     }
     if (candidates && !isCategory) {
-      // Only what falls outside the reference range, short: «Above 139 mmHg».
       const outside = fields.flatMap((f, i) => {
         const side = referenceSide(f, candidates[i]?.value as number);
         if (side === 'inside') return [];
@@ -193,7 +180,6 @@ export function EntryBar({
     };
   })();
 
-  // Safe areas: the footer always clears the home indicator (EQUIPOS.md «Safe areas»).
   const footerStyle = { paddingBottom: insets.bottom + 16 };
 
   if (!open) {
@@ -225,7 +211,6 @@ export function EntryBar({
       <View className="gap-1">
         <View className="min-h-touch flex-row items-center gap-2">
           <Text className="text-foreground text-sm font-semibold">{t.register}</Text>
-          {/* Live level the engine will give (§4.1a); one badge per field, in field order. */}
           <View className="flex-1 flex-row flex-wrap gap-2">
             {preview.map((a) => (
               <LevelBadge key={a.indicator} level={a.level} size="md" />
@@ -274,7 +259,6 @@ export function EntryBar({
                 accessibilityLabel={categoryOf(indicator, c)}
                 className={cn(
                   'min-h-touch-lg h-auto flex-1 rounded-lg border',
-                  // `hover:` keeps the selected look under the web pointer.
                   category === c ? 'bg-primary hover:bg-primary border-primary' : 'border-input',
                 )}
               >

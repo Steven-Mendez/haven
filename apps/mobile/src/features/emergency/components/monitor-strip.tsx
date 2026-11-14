@@ -24,17 +24,11 @@ import { texts } from '../i18n';
 const WINDOW_MS = 10 * 60_000;
 const MIN_SPAN_MS = 2 * 60_000;
 
-/**
- * Compact live patient strip (A): pulse on the left, last SpO₂ with its age on the right and one
- * DataLabel (source · age). Tapping it unfolds the 10-minute pulse trace, fed by new
- * readings. Static numbers: nothing blinks.
- */
 export function MonitorStrip({
   allowChart = true,
   leading,
 }: {
   allowChart?: boolean;
-  /** Left slot (the close button), so nothing sits above the strip. */
   leading?: ReactNode;
 }) {
   const t = useTexts(texts);
@@ -48,10 +42,8 @@ export function MonitorStrip({
   const spo2Age = useAgeMin(spo2?.takenAt);
   const pulseLevel = useAssessment('heart-rate')?.level;
   const spo2Level = useAssessment('spo2')?.level;
-  // Re-rendered on every new reading: the window follows the live trace.
   const now = Date.now();
 
-  // One point per instant (live readings clamped to "now" can share a timestamp).
   const byTime = new Map<number, number>();
   for (const r of pulses) {
     const ms = new Date(r.takenAt).getTime();

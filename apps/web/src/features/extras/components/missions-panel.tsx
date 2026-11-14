@@ -34,13 +34,12 @@ export async function MissionsPanel({
   const envName = (id: string) => {
     const e = config.environments.find((x) => x.id === id);
     return e ? translate(e.name, lang) : id;
-  }; /** Today's stretch of a phased mission («Cruise to Mars»), else its environment. */
+  };
   const stageName = (m: (typeof missions)[number]) => {
     const phase = m.phases?.length ? phaseAt(m.phases, m.day)?.phase : undefined;
     return phase?.label ? translate(phase.label, lang) : envName(m.environment);
   };
 
-  // Missions that only exist because packets arrived with an unknown code: flagged, and merged into a real one.
   const unknown = (m: (typeof missions)[number]) => m.origin === 'packet';
   const targets = missions.filter((m) => !unknown(m)).map((m) => ({ code: m.code, name: m.name }));
   const dayText = (m: (typeof missions)[number]) =>
@@ -51,7 +50,6 @@ export async function MissionsPanel({
         : m.status === 'scheduled'
           ? format(t.startsOn, { date: formatDate(m.start, lang) })
           : format(t.dayOf, { day: m.day, total: m.durationDays });
-  /** Row action: «Current», «Merge…» for an unknown code, otherwise «Open». */
   const rowAction = (m: (typeof missions)[number], mobile: boolean) =>
     m.code === current ? (
       <Badge variant="secondary">{t.current}</Badge>
@@ -71,7 +69,6 @@ export async function MissionsPanel({
         </form>
       </div>
     );
-  /** Name cell: links to the mission page; an unknown code says so instead of passing for a real mission. */
   const nameOf = (m: (typeof missions)[number]) =>
     unknown(m) ? (
       <Badge variant="outline" title={t.unknownCodeHint}>
@@ -82,7 +79,6 @@ export async function MissionsPanel({
         {m.name}
       </Link>
     );
-  /** Preparation / Running / Finished. */
   const statusOf = (m: (typeof missions)[number]) =>
     m.status === 'planned' || m.status === 'scheduled'
       ? t.statusPreparation

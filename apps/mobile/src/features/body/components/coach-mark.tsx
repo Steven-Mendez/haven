@@ -16,19 +16,13 @@ function seen(): boolean {
   }
 }
 
-/**
- * First-run coach mark under the organ figure: one line, dismissible, shown once (kv-store).
- * After it is dismissed, a quiet hint line takes its place.
- */
 export function CoachMark({ text, dismissLabel }: { text: string; dismissLabel: string }) {
   const [open, setOpen] = useState(() => !seen());
   const dismiss = () => {
     setOpen(false);
     try {
       Storage.setItemSync(KEY, '1');
-    } catch {
-      // Not persisted: it shows again next launch, which is harmless.
-    }
+    } catch {}
   };
   if (!open) return null;
   return (

@@ -13,11 +13,9 @@ import { texts } from '../i18n';
 import { isInvalidVital, VITAL_IDS, type VitalId } from '../logic/vitals';
 
 type Props = {
-  /** Saves the valid values as manual readings; returns how many were saved. */
   onSave: (values: Partial<Record<VitalId, string>>) => number;
 };
 
-/** In-line quick entry for the "measure-vitals" step: pressure, SpO₂ and pulse as manual readings. */
 export function VitalsEntry({ onSave }: Props) {
   const t = useTexts(texts);
   const tr = useTranslate();

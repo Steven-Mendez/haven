@@ -68,7 +68,6 @@ function Group({ title, note, children }: { title: string; note?: string; childr
   );
 }
 
-/** Development tool (`__DEV__` only): writes test records into the simulator's HealthKit. */
 function TestSamplesTool() {
   const t = useTexts(texts);
   const [state, setState] = useState<'idle' | 'writing' | number>('idle');
@@ -96,8 +95,6 @@ function TestSamplesTool() {
   );
 }
 
-/** M07 · "Data sources" (DESIGN_SYSTEM §8.13): providers in one-line rows grouped in active / not
- *  available, and the source of each indicator grouped by source. Only real sources. */
 export default function Screen() {
   const t = useTexts(texts);
   const ht = useTexts(havenTexts);
@@ -132,7 +129,6 @@ export default function Screen() {
       ? 'pending'
       : (assessments.find((a) => a.indicator === plan.indicator)?.level ?? 'pending');
 
-  // Source per indicator, grouped: "HealthKit · 7", "Manual · 5", "Pending · 3", "No reading · 9"…
   const groupLabel = (plan: IndicatorPlan) => {
     if (plan.mode === 'pending') return t.planPending;
     if (plan.mode === 'provider')
@@ -208,7 +204,6 @@ export default function Screen() {
         <ProviderRow name={t.manual} state={t.stateAlways} connected />
       </Group>
 
-      {/* Not available on this device: one row with the names instead of one row each. */}
       {unavailable.length > 0 ? (
         <Group title={t.unavailableSection} note={t.unavailableNote}>
           <ProviderRow

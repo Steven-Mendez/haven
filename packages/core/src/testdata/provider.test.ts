@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import type { Reading, Scenario, WatchEnvelope } from '../contracts';
 import { createSimulator, type Timers } from './provider';
 
-/** Fake timers: `run()` fires pending callbacks in order without waiting. */
 function fakeTimers() {
   let queue: { fn: () => void; ms: number; id: number }[] = [];
   let next = 0;
@@ -74,7 +73,7 @@ describe('createSimulator', () => {
     expect(live.map((r) => r.value)).toEqual([80, 120, 150]);
     expect(live.every((r) => !r.simulated && r.source === 'watch')).toBe(true);
     expect(live[1]?.takenAt).toBe('2026-11-14T08:01:00.000Z');
-    expect(ft.delays).toContain(1000); // 1 simulated minute at factor 60
+    expect(ft.delays).toContain(1000);
     expect(watch.map((e) => e.type)).toEqual(['emergency', 'monitor']);
     expect(watch[0]).toMatchObject({
       simulated: false,

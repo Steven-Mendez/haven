@@ -1,15 +1,7 @@
 import type { NextAction } from './next-action';
 
-// «Getting started» card (M01) while there are no readings yet: ways in, not a checklist, so a
-// step never shows as done before the data actually arrives.
-
 export type FirstRunStep = { id: 'measure'; next: NextAction } | { id: 'sources' } | { id: 'who' };
 
-/**
- * Steps to show, in order: record a first value (the next daily action), connect automatic
- * sources, and pick who uses this phone when the crew member is not on the mission roster.
- * Empty once any reading exists.
- */
 export function firstRunSteps({
   readings,
   next,

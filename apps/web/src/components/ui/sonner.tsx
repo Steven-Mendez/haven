@@ -10,10 +10,6 @@ import {
 import { useEffect, useState } from 'react';
 import { Toaster as Sonner, type ToasterProps } from 'sonner';
 
-/**
- * shadcn Sonner, adapted: the theme follows the `dark` class on <html> (HAVEN has no next-themes). Toasts are
- * only for confirmations («Copied»), bottom-right, on the elevated layer.
- */
 const Toaster = ({ ...props }: ToasterProps) => {
   const [theme, setTheme] = useState<ToasterProps['theme']>('dark');
   useEffect(() => {

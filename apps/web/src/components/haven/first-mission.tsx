@@ -5,10 +5,6 @@ import type { Language } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { havenTexts } from './texts';
 
-/**
- * First run (no mission yet): what HAVEN does and the two ways in — create a mission or join one by code.
- * Shown by every page that needs an active mission instead of inventing one.
- */
 export function FirstMission({ lang }: { lang: Language }) {
   const t = havenTexts[lang];
   return (

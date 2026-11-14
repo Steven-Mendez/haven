@@ -21,14 +21,9 @@ export default function TabsLayout() {
 
   return (
     <InTabsProvider>
-      {/* First-run tour: wraps the tabs so it can point at Body and at the tab bar's SOS. */}
       <TourProvider>
-        {/* No top bar on any tab (Withings, Hers): each screen puts the avatar beside its title and
-          the SOS is the centre of the tab bar. The top inset is padded here, so content scrolls
-          under an opaque strip, never under the clock. */}
         <View className="bg-background flex-1" style={{ paddingTop: insets.top }}>
           <Tabs
-            // SPEC.md: outline icons, active in foreground, hairline top border, on background.
             tabBar={(props) => <HavenTabBar {...props} icons={ICONS} />}
             screenOptions={{ headerShown: false }}
           >

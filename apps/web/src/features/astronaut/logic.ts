@@ -11,9 +11,6 @@ import type { Language } from '@/lib/i18n';
 import { translate } from '@/lib/i18n';
 import type { AstronautResponse, ReceivedPacket } from '@/server/types';
 
-// T02 · Pure presentation helpers for the astronaut detail. No data access, no clock: `now` comes in.
-
-/** Indicators read by the on-board monitor (watch or sensor) during an emergency. */
 export const MONITOR_INDICATORS = [
   'heart-rate',
   'spo2',
@@ -22,7 +19,6 @@ export const MONITOR_INDICATORS = [
   'diastolic-bp',
 ] as const;
 
-/** Daily counts drawn as bars (chart spec «Bars»). */
 export const BAR_INDICATORS = [
   'steps',
   'distance',
@@ -32,13 +28,10 @@ export const BAR_INDICATORS = [
   'resistance-exercise',
 ] as const;
 
-/** Diary entries travel as readings of this indicator. */
 export const DIARY_INDICATOR = 'diary';
 
-/** Notes listed at once; older ones are summarised. */
 export const NOTE_ENTRIES_SHOWN = 20;
 
-/** Packets per tab in «Received packets»; older ones are summarised. */
 export const PACKETS_PER_TAB = 12;
 
 export type IndicatorInfo = {
@@ -48,7 +41,6 @@ export type IndicatorInfo = {
   zone: string;
   kind: 'number' | 'category';
   green: [number, number];
-  /** Category value → label via `categoryLabel` from @haven/core (`sinus` → «Sinusal»). */
   label: (value: string) => string;
 };
 
@@ -65,7 +57,6 @@ const config = () => {
   return cached;
 };
 
-/** Display names, units and normal ranges from the config, translated. */
 export function namesFor(environment: string, lang: Language): Names {
   const c = config();
   const env = c.environments.find((e) => e.id === environment);
@@ -100,29 +91,24 @@ export function namesFor(environment: string, lang: Language): Names {
   };
 }
 
-/** Indicator id → translated name, for components that only need the name. */
 export function indicatorNameMap(names: Names): Record<string, string> {
   return Object.fromEntries(Object.values(names.indicators).map((i) => [i.id, i.name]));
 }
 
-/** Packets newest first by creation time on the server clock (what the API already does). */
 export function byNewest(packets: ReceivedPacket[]): ReceivedPacket[] {
   return [...packets].sort((a, b) => Date.parse(b.dataAt) - Date.parse(a.dataAt));
 }
 
-/** The packet whose assessments the API returned (latest visible one with assessments). */
 export function assessedPacket(data: AstronautResponse): ReceivedPacket | undefined {
   return byNewest(data.packets).find((p) => p.assessments.length > 0);
 }
 
-/** Latest visible emergency packet, if any. */
 export function latestEmergency(data: AstronautResponse): ReceivedPacket | undefined {
   return byNewest(data.packets).find((p) => p.type === 'emergency');
 }
 
 export type ZoneGroup = { zone: string; assessments: Assessment[] };
 
-/** Assessments grouped by zone in the canonical order; unknown zones go last. */
 export function groupByZone(assessments: Assessment[], names: Names): ZoneGroup[] {
   const groups = new Map<string, Assessment[]>();
   for (const a of assessments) {
@@ -138,7 +124,6 @@ export function groupByZone(assessments: Assessment[], names: Names): ZoneGroup[
     .map(([zone, list]) => ({ zone, assessments: list }));
 }
 
-/** Decimals that make a series readable (0 for integers, up to 2). */
 export function decimalsFor(values: number[]): number {
   let decimals = 0;
   for (const v of values) {
@@ -149,10 +134,6 @@ export function decimalsFor(values: number[]): number {
   return decimals;
 }
 
-/**
- * Whether the reference range is worth drawing on the chart: a degenerate range ([0, 0]) or one far wider
- * than the data (steps 0–100 000) would flatten the line. It is then given as text instead.
- */
 export function drawableRange(green: [number, number], values: number[]): boolean {
   if (green[1] <= green[0] || values.length === 0) return false;
   const lo = Math.min(...values);
@@ -161,7 +142,6 @@ export function drawableRange(green: [number, number], values: number[]): boolea
   return green[1] - green[0] <= scale * 4;
 }
 
-/** Protocol ids the engine prompted (actions with `protocol`), most urgent first. */
 export function promptedProtocols(assessments: Assessment[]): string[] {
   const ids = assessments
     .filter((a) => a.level === 'red' || a.level === 'amber')
@@ -172,7 +152,6 @@ export function promptedProtocols(assessments: Assessment[]): string[] {
   return [...new Set(ids)];
 }
 
-/** Symptom ids reported in a packet. */
 export function symptomsOf(packet: ReceivedPacket): string[] {
   return [
     ...new Set(
@@ -181,7 +160,6 @@ export function symptomsOf(packet: ReceivedPacket): string[] {
   ];
 }
 
-/** Monitor readings of a packet in time order. */
 export function monitorReadings(packet: ReceivedPacket): Reading[] {
   return packet.readings
     .filter((r) => (MONITOR_INDICATORS as readonly string[]).includes(r.indicator))
@@ -197,9 +175,6 @@ export type NoteEntry = {
   text: string;
 };
 
-/**
- * Notes, diary entries and reading/photo notes, newest first. Notes on spacecraft telemetry (`source: 'ship'`,
- * e.g. the module a sensor sits in) are metadata, not something the astronaut wrote, and are skipped. */
 export function noteEntries(packets: ReceivedPacket[]): NoteEntry[] {
   const entries: NoteEntry[] = [];
   for (const p of packets) {
@@ -241,7 +216,6 @@ export function noteEntries(packets: ReceivedPacket[]): NoteEntry[] {
   return entries.sort((a, b) => Date.parse(b.at) - Date.parse(a.at));
 }
 
-/** Minutes since each assessment's reading: packet age on the server clock + the engine's `ageMin`. */
 export function ageOf(
   a: Assessment,
   assessedAt: string | undefined,
@@ -251,7 +225,6 @@ export function ageOf(
   return Math.max(0, Math.floor((Date.parse(now) - Date.parse(assessedAt)) / 60_000)) + a.ageMin;
 }
 
-/** Actions of every flagged assessment, deduplicated, most urgent first (one block, not per indicator). */
 export function groupedActions(assessments: Assessment[]): Assessment['actions'] {
   const seen = new Map<string, Assessment['actions'][number]>();
   for (const a of assessments) {
@@ -264,7 +237,6 @@ export function groupedActions(assessments: Assessment[]): Assessment['actions']
   return [...seen.values()].sort((x, y) => x.priority - y.priority);
 }
 
-/** The five astronaut tabs (`?tab=`), Summary first. */
 export const TABS = ['summary', 'states', 'trends', 'packets', 'notes'] as const;
 export type Tab = (typeof TABS)[number];
 
@@ -272,23 +244,19 @@ export function isTab(value: unknown): value is Tab {
   return typeof value === 'string' && (TABS as readonly string[]).includes(value);
 }
 
-/** URL of the astronaut page on a tab. */
 export function astronautHref(crewMember: string, tab: Tab = 'summary'): string {
   const base = `/astronaut/${encodeURIComponent(crewMember)}`;
   return tab === 'summary' ? base : `${base}?tab=${tab}`;
 }
 
-/** URL of a packet's own page. */
 export function packetHref(crewMember: string, packetId: string): string {
   return `/astronaut/${encodeURIComponent(crewMember)}/packet/${encodeURIComponent(packetId)}`;
 }
 
-/** Unit as shown to the user (`unitLabel` from @haven/core). Single entry point for rows, packet page and trends. */
 export function displayUnit(unit: string, lang: Language): string {
   return unitLabel(unit, lang);
 }
 
-/** Source of the latest reading of each indicator across visible packets (Assessment has no source). */
 export function latestSources(packets: ReceivedPacket[]): Record<string, Reading['source']> {
   const out: Record<string, { at: number; source: Reading['source'] }> = {};
   for (const p of packets) {
@@ -301,7 +269,6 @@ export function latestSources(packets: ReceivedPacket[]): Record<string, Reading
   return Object.fromEntries(Object.entries(out).map(([k, v]) => [k, v.source]));
 }
 
-/** Value of the latest categorical reading of each indicator (`heart-rhythm` → `sinus`); Assessment has none. */
 export function latestCategories(packets: ReceivedPacket[]): Record<string, string> {
   const out: Record<string, { at: number; value: string }> = {};
   for (const p of packets) {

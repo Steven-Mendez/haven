@@ -1,5 +1,3 @@
-// Shared contracts §2 and §3 · Reading and the single health data interface.
-
 export type ReadingSource =
   | 'watch'
   | 'healthkit'
@@ -8,14 +6,14 @@ export type ReadingSource =
   | 'manual'
   | 'screen'
   | 'simulator'
-  | 'ship'; // habitat telemetry and solar events
+  | 'ship';
 
 export type Reading = {
   id: string;
   indicator: string;
   value: number | string;
   unit: string;
-  takenAt: string; // ISO 8601
+  takenAt: string;
   source: ReadingSource;
   simulated: boolean;
   crewMember: string;
@@ -26,5 +24,5 @@ export interface HealthProvider {
   id: string;
   isAvailable(): Promise<boolean>;
   read(indicator: string, since: string): Promise<Reading[]>;
-  subscribe(indicator: string, cb: (reading: Reading) => void): () => void; // live monitor
+  subscribe(indicator: string, cb: (reading: Reading) => void): () => void;
 }

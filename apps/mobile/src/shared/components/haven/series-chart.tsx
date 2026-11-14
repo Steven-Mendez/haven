@@ -29,53 +29,28 @@ import { monotonePath } from './logic/monotone';
 import { useUnitLabel } from './unit-label';
 
 export type ChartEvent = {
-  /** Epoch ms. */
   t: number;
-  /** Short label (≤ 14 characters reads well), e.g. "Emergency", "Mars". */
   label: string;
   kind?: 'emergency' | 'environment' | 'other';
 };
 
 type Props = {
-  /** `[epoch ms, value][]`, any order. Same shape as the Earth API `series`. */
   data: [number, number][];
-  /** Personal baseline from the engine (`Assessment.baseline`): band + dashed line + inline label. */
   baseline?: { median: number; range: [number, number] };
-  /**
-   * Reference range from the config (`Indicator.green`): always inside the y-domain (so in-range
-   * noise looks calm) and points outside it get a level colour.
-   */
   referenceRange?: [number, number];
-  /**
-   * Aggregate to one point per window (median) before drawing, with the min–max of each window as
-   * a faint 6 % area: 7 d and 4 w → 1 d. 0 / undefined = raw points (1 d).
-   */
   bucketMs?: number;
   events?: ChartEvent[];
-  /** 200 on the indicator screen (full-bleed), 120 in cards. */
   height?: number;
-  /** `Indicator.unit` id (or an already translated label): shown via `useUnitLabel`. */
   unit?: string;
-  /** @deprecated Ignored: the line always uses the foreground colour. */
   color?: string;
-  /** Level of the latest reading: colours the last point when it is out of range. */
   lastLevel?: Level;
-  /** Level of any point (amber/red points get their colour; others stay on the line). */
   levelAt?: (t: number, value: number) => Level | undefined;
-  /** Fixed x domain (e.g. the selected range) instead of the data extent. */
   timeDomain?: [number, number];
   formatTime?: (t: number) => string;
   formatValue?: (v: number) => string;
-  /**
-   * Scrubbing (Robinhood / Garmin): called with the point under the finger while dragging and with
-   * `null` on release, so the screen updates its hero number instead of showing a tooltip.
-   */
   onScrub?: (point: [number, number] | null) => void;
-  /** Reading line above the chart (only when nobody listens to `onScrub`). Default false. */
   readout?: boolean;
-  /** @deprecated No legends: the baseline is labelled inline. */
   legend?: boolean;
-  /** Edge-to-edge plot with labels inset 16 (detail screens). Default true. */
   bleed?: boolean;
   accessibilityLabel?: string;
   className?: string;
@@ -88,14 +63,6 @@ const MAX_POINTS_FOR_HAPTICS = 400;
 
 const AnimatedRect = Animated.createAnimatedComponent(Rect);
 
-/**
- * Trend chart (shared chart spec): 1.5 pt monotone-cubic foreground line with a soft area
- * (8 % → 0 %), personal range band (5 %), dashed baseline labelled inline, ≤ 3 horizontal grid
- * lines, right-side y labels and start / middle / end x labels — no axes, no legend. Only the last
- * point (with a halo) and out-of-range points (level colour) are dotted. Drag to scrub: a 1 px
- * cursor plus `onScrub` (with a selection haptic per point). Draws in once (400 ms ease-out);
- * Reduce Motion: no draw-in.
- */
 export function SeriesChart({
   data,
   baseline,
@@ -140,12 +107,10 @@ export function SeriesChart({
   const raw = [...data].filter(([, v]) => Number.isFinite(v)).sort((a, b) => a[0] - b[0]);
   const buckets = bucketSeries(raw, bucketMs ?? 0);
   const points: [number, number][] = buckets.map((b) => [b.t, b.median]);
-  // The real latest reading stays the last point (a bucket median would hide it).
   const latestRaw = raw.at(-1);
   if (latestRaw && bucketMs && points.length) points[points.length - 1] = latestRaw;
   const last = points.at(-1);
 
-  // Draw once, when the chart first has a size and data.
   useEffect(() => {
     if (drawn.current || width === 0 || points.length === 0) return;
     drawn.current = true;
@@ -179,8 +144,6 @@ export function SeriesChart({
         }`
       : t.chartEmpty);
 
-  // Domain: the data, the personal band AND the reference range, + 10 % (an empty chart still
-  // shows its grid). Including the reference keeps normal noise calm instead of «spiky».
   const values = raw.map(([, v]) => v);
   if (baseline) values.push(baseline.range[0], baseline.range[1]);
   if (referenceRange) values.push(referenceRange[0], referenceRange[1]);
@@ -199,7 +162,6 @@ export function SeriesChart({
     (points.length ? [points[0][0], (last as [number, number])[0]] : [now - 86_400_000, now]);
   const tSpan = Math.max(t1 - t0, 1);
 
-  // Edge-to-edge grid; the plot stops before the right label column so labels never sit on data.
   const left = bleed ? 0 : 4;
   const right = points.length ? 60 : 12;
   const plotW = Math.max(width - left - right, 1);
@@ -216,14 +178,11 @@ export function SeriesChart({
   const ticks = niceTicks(vMin, vMax, 3);
   const timeTicks = [t0, t0 + tSpan / 2, t1];
 
-  // Safety: every raw reading that needs attention is drawn at its real time and value, even
-  // when the line shows daily medians (the y-domain already includes all raw values).
   const flagged = flaggedPoints(raw, {
     levelAt,
     referenceRange,
     personalRange: baseline?.range,
   });
-  // Scrub targets: the drawn points plus the flagged readings (snap to whichever is closer).
   const targets: [number, number][] = [
     ...points,
     ...flagged.map((f) => [f.t, f.v] as [number, number]),
@@ -255,7 +214,6 @@ export function SeriesChart({
   const shown = cursor !== null ? targets[cursor] : points[points.length - 1];
   const fg = colors.foreground;
   const baseLabel = baseline ? format(t.baseShort, { b: formatValue(baseline.median) }) : '';
-  // Y labels never collide with the baseline label (both live in the right gutter).
   const yLabels = ticks.filter((v) => !baseline || Math.abs(y(v) - y(baseline.median)) > 20);
   const rangeArea =
     bucketMs && buckets.length > 1 && buckets.some((b) => b.max > b.min)
@@ -314,7 +272,6 @@ export function SeriesChart({
               </ClipPath>
             </Defs>
 
-            {/* ≤ 3 horizontal grid lines, labels on the right (inset 16). */}
             {ticks.map((v) => (
               <Line
                 key={`g${v}`}
@@ -360,7 +317,6 @@ export function SeriesChart({
                   strokeDasharray="3 3"
                   strokeWidth={1}
                 />
-                {/* Inline label in the right gutter, outside the plot, on a black pill. */}
                 <Rect
                   x={width - INSET - baseLabel.length * 6.2 - 4}
                   y={y(baseline.median) - 8}
@@ -381,7 +337,6 @@ export function SeriesChart({
               </G>
             ) : null}
 
-            {/* Events: quiet dashed vertical line + label (emergency in its level colour). */}
             {events
               .filter((e) => e.t >= t0 && e.t <= t1)
               .map((e) => {
@@ -427,8 +382,6 @@ export function SeriesChart({
               ) : null}
             </G>
 
-            {/* Readings that need attention, on top of the line at their real value: 3 pt dot in
-                the level colour with a 1.5 pt black ring (never hidden by aggregation). */}
             {flagged.map((f) => (
               <Circle
                 key={`f${f.t}-${f.v}`}
@@ -441,7 +394,6 @@ export function SeriesChart({
               />
             ))}
 
-            {/* Last point: solid dot + 15 % halo (level colour when out of range). */}
             {last && cursor === null
               ? (() => {
                   const [lx, ly] = xy[xy.length - 1];
@@ -456,7 +408,6 @@ export function SeriesChart({
                 })()
               : null}
 
-            {/* Scrub cursor: 1 px line + highlighted point. */}
             {cursor !== null && txy[cursor] ? (
               <G>
                 <Line

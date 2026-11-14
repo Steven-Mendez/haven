@@ -1,10 +1,6 @@
 import { type ClassValue, clsx } from 'clsx';
 import { extendTailwindMerge } from 'tailwind-merge';
 
-// tailwind-merge must know HAVEN's custom font sizes (tailwind.config.js `fontSize`): otherwise it
-// reads `text-label` or `text-title` as a text color and drops the real color (`text-foreground`).
-// It must also know HAVEN's custom spacing and sizes (`h-touch`, `min-h-row`, `px-gutter`): otherwise
-// a `className="h-touch"` would not replace a component default such as RNR Button's `h-10`.
 const twMerge = extendTailwindMerge({
   extend: {
     theme: {

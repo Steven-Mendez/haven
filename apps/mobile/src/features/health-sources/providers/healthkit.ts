@@ -4,29 +4,19 @@ import { dailyTotalReading, type SourceStatus, sleepNights } from '../logic/sour
 import { planTestSamples, TEST_QUANTITY_TYPES, TEST_SLEEP_TYPE } from '../logic/test-samples';
 import type { SourceProvider } from './types';
 
-// M07 · HealthKit provider (iOS only). The library needs a development build: in Expo Go, on
-// Android and on the web it reports "unavailable" with a reason and the app keeps working.
-// Apple hides read refusals: after asking, "no data at all for steps, distance and floors" is shown
-// as refused, with how to grant it (Settings › Health › Data Access & Devices › HAVEN).
-
 type HealthKitModule = typeof import('@kingstinct/react-native-healthkit');
 type QuantityId = Parameters<HealthKitModule['queryQuantitySamples']>[0];
 
 type Mapping = {
   indicator: string;
   type: QuantityId;
-  /** HealthKit unit string asked for. */
   hkUnit: string;
-  /** `Reading.unit` (from the config). */
   unit: string;
   decimals: number;
-  /** Daily total (sum) instead of single samples. */
   cumulative?: boolean;
-  /** Multiply the HealthKit value (percent comes as 0..1). */
   scale?: number;
 };
 
-/** What an iPhone without a watch delivers, plus values typed in Health or synced by devices. */
 export const HEALTHKIT_MAPPINGS: Mapping[] = [
   {
     indicator: 'steps',
@@ -115,13 +105,11 @@ const PRIMARY = ['steps', 'distance', 'floors'];
 const SLEEP_TYPE = 'HKCategoryTypeIdentifierSleepAnalysis' as const;
 const INDICATORS = [...HEALTHKIT_MAPPINGS.map((m) => m.indicator), 'sleep'];
 const TO_READ = [...HEALTHKIT_MAPPINGS.map((m) => m.type), SLEEP_TYPE];
-/** First sync looks back this many days. */
 const HISTORY_DAYS = 7;
 const DAY_MS = 86_400_000;
 
 let module: HealthKitModule | null | undefined;
 
-/** Loads the native module lazily: importing it without the native side would throw. */
 function healthKit(): HealthKitModule | null {
   if (module !== undefined) return module;
   if (Platform.OS !== 'ios') {
@@ -129,7 +117,6 @@ function healthKit(): HealthKitModule | null {
     return module;
   }
   try {
-    // Lazy require: importing without the native side (Expo Go) would throw.
     module = require('@kingstinct/react-native-healthkit') as HealthKitModule;
     if (!module.isHealthDataAvailable()) module = null;
   } catch {
@@ -175,7 +162,6 @@ export function createHealthKitProvider(): SourceProvider {
     const out: Reading[] = [];
     if (m.cumulative) {
       for (let day = startOfDay(since); day <= now; day = new Date(day.getTime() + DAY_MS)) {
-        // Next local midnight (robust to DST), or now for today.
         const nextDay = startOfDay(new Date(day.getTime() + DAY_MS * 1.5));
         const end = nextDay < now ? nextDay : now;
         const stats = await hk.queryStatisticsForQuantity(m.type, ['cumulativeSum'], {
@@ -222,7 +208,6 @@ export function createHealthKitProvider(): SourceProvider {
     return out;
   }
 
-  /** Hours asleep per night (indicator `sleep`, unit h), one reading per morning. */
   async function readSleep(hk: HealthKitModule, since: Date, now: Date, crewMember: string) {
     const samples = await hk.queryCategorySamples(SLEEP_TYPE, {
       limit: 0,
@@ -344,7 +329,6 @@ export function createHealthKitProvider(): SourceProvider {
       update({ lastSyncAt: undefined });
     },
 
-    /** Development only: writes `planTestSamples` records into this device's HealthKit. */
     async writeTestSamples(now) {
       const hk = healthKit();
       if (!hk) return 0;
@@ -353,9 +337,7 @@ export function createHealthKitProvider(): SourceProvider {
         toRead: TO_READ,
       });
       asked = true;
-      lastSync = null; // the next sync reads the whole history window again
-      // Idempotent: first remove the records HAVEN itself wrote in the window (HealthKit only lets
-      // an app delete its own samples), so writing twice does not double the daily totals.
+      lastSync = null;
       const windowStart = new Date(now.getTime() - (HISTORY_DAYS + 1) * DAY_MS);
       for (const type of [...TEST_QUANTITY_TYPES, TEST_SLEEP_TYPE]) {
         try {

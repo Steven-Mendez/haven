@@ -1,5 +1,3 @@
-/* driver.js tour (product-tour.tsx) in HAVEN's popover style: tokens, hairline border, 13 px copy.
-   Imported after driver.css; the `.haven-tour` class makes these win. */
 .driver-popover.haven-tour {
   background: var(--popover);
   color: var(--popover-foreground);

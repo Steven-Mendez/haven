@@ -11,15 +11,10 @@ type Props<T extends string> = {
   options: Option<T>[];
   value: T;
   onChange: (value: T) => void;
-  /** Accessible name of the whole control ("Range"). */
   accessibilityLabel?: string;
   className?: string;
 };
 
-/**
- * Segmented control (1d / 7d / 4w) on RNR `ToggleGroup`: 32 pt hairline track, `muted` thumb,
- * 13/500 labels, 44 pt touch (hit slop) and a selection haptic on change.
- */
 export function SegmentedControl<T extends string>({
   options,
   value,
@@ -67,17 +62,12 @@ export function SegmentedControl<T extends string>({
   );
 }
 
-/**
- * Segmented step progress (alias / Opal): one 3 pt bar per step, done = accent, current =
- * foreground, rest = muted. Decorative; pair it with a «Step n of N» label.
- */
 export function SegmentedProgress({
   total,
   current,
   className,
 }: {
   total: number;
-  /** 0-based index of the current step; steps before it count as done. */
   current: number;
   className?: string;
 }) {

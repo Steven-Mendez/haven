@@ -1,19 +1,13 @@
 import Foundation
 
-// Copy of `ComplicationSnapshot` in targets/watch/Status/ComplicationStore.swift: keep both identical.
-// The watch app writes it as JSON under `key` in the App Group; this extension only reads it.
-
 struct ComplicationSnapshot: Codable, Equatable {
-    /// green · amber · red · pending.
     let overallLevel: String
     let nextPending: String?
     let evaluatedAt: Date
-    /// `es` or `en`, from the phone.
     let language: String?
 
     static let appGroup = "group.app.haven.mobile"
     static let key = "haven.complication.snapshot"
-    /// Past this age the complication adds a `clock` (same rule as `AgeLabel(staleAfterMin: 60)`).
     static let staleAfter: TimeInterval = 60 * 60
 
     static func load() -> ComplicationSnapshot? {

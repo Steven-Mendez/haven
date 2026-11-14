@@ -1,7 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 
-/** Portraits in /public/crew. */
 export const CREW_PORTRAITS: Record<string, string> = {
   'elena-vega': '/crew/elena-vega.webp',
   'mateo-rios': '/crew/mateo-rios.webp',
@@ -20,13 +19,11 @@ export function initials(name: string) {
 type Props = {
   id: string;
   name: string;
-  /** Overrides the built-in portrait. `null` forces initials. */
   src?: string | null;
   size?: number;
   className?: string;
 };
 
-/** Crew portrait on shadcn `Avatar` (rounded square); initials as fallback. */
 export function Portrait({ id, name, src, size = 56, className }: Props) {
   const url = src === null ? undefined : (src ?? CREW_PORTRAITS[id]);
   return (

@@ -1,9 +1,3 @@
-// What to show instead of «Day n» for Earth's mission states. Pure: imports only @haven/core types.
-//   planned            → being prepared (days do not run, no date yet)
-//   scheduled          → starts on a date (days do not run yet)
-//   active (or absent) → day n
-//   finished           → a record: its last day and «Finished»
-
 import type { Mission } from '@haven/core';
 
 export type MissionPhase =
@@ -25,14 +19,12 @@ export function missionPhase(mission: Pick<Mission, 'status' | 'day' | 'start'>)
   }
 }
 
-/** Days run (and «Day n» makes sense) only while the mission is running or once it finished. */
 export function hasDay(phase: MissionPhase): phase is Extract<MissionPhase, { day: number }> {
   return phase.kind === 'running' || phase.kind === 'finished';
 }
 
 export type PhaseTexts = { day: string; preparing: string; startsOn: string; finishedDay: string };
 
-/** One short line for the phase: «Day 12», «Being prepared», «Starts on 3 Dec», «Finished · day 540». */
 export function missionPhaseText(
   phase: MissionPhase,
   texts: PhaseTexts,

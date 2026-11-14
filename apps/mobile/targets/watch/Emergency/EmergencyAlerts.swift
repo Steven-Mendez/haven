@@ -1,15 +1,5 @@
 import SwiftUI
 
-// W03 (Deneb) · App-wide emergency presentations:
-//   • automatic trigger: full-screen 15 s countdown with the origin title and «Estoy bien» (DISENO.md §4, W03);
-//   • `crewHaptic` received from the phone: a sheet with the message (the bridge already played the haptic).
-//     During the monitor (W04) there is neither haptic nor sheet: MonitorView shows the message inline.
-// It also starts `EmergencyCenter` (reading sources and DEBUG triggers).
-//
-// Apply it once, at the root (ContentView does): `.emergencyAlerts()`. It is idempotent: an inner application below
-// an outer one does nothing.
-// Motion is limited to the countdown ring (linear; stepped with Reduce Motion).
-
 extension View {
     func emergencyAlerts() -> some View { modifier(EmergencyAlerts()) }
 }
@@ -62,7 +52,6 @@ private struct EmergencyAlertsHost<Content: View>: View {
             }
     }
 
-    /// The cover has no system ✕ (AutoTriggerView hides it); if the system closes it anyway, it counts as «Estoy bien».
     private var pendingBinding: Binding<EmergencyCenter.PendingTrigger?> {
         Binding(
             get: { center.pendingTrigger },
@@ -70,8 +59,6 @@ private struct EmergencyAlertsHost<Content: View>: View {
         )
     }
 }
-
-// MARK: - Automatic trigger countdown
 
 struct AutoTriggerView: View {
     let trigger: EmergencyCenter.PendingTrigger
@@ -104,17 +91,14 @@ struct AutoTriggerView: View {
                 center.confirmPending()
             }
             .frame(width: 88, height: 88)
-            // The safe way out is the primary (white) action: inside an emergency the main button is never red.
             Button(L("Estoy bien", "I'm OK")) {
                 center.imOK()
             }
             .buttonStyle(.haven())
         }
-        // Rounded display corners (DISENO.md §2.1): screen margin and the bottom corner inset.
         .havenScreen()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Theme.background)
-        // No system ✕ over the title: «Estoy bien» is the explicit way out.
         .toolbar(.hidden, for: .navigationBar)
         .accessibilityElement(children: .contain)
         .accessibilityLabel(
@@ -123,8 +107,6 @@ struct AutoTriggerView: View {
                 "Your crew will be alerted unless you are OK"))
     }
 }
-
-// MARK: - Crew notice
 
 extension ReceivedCrewHaptic: Identifiable {
     var id: Date { receivedAt }

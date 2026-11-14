@@ -2,10 +2,8 @@ packages:
   - apps/*
   - packages/*
 
-# Expo/Metro y React Native necesitan node_modules planos.
 nodeLinker: hoisted
 
-# pnpm bloquea los scripts de instalación salvo los permitidos aquí.
 allowBuilds:
   sharp: true
   unrs-resolver: true

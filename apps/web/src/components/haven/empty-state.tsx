@@ -13,17 +13,11 @@ type Props = {
   title: string;
   description?: ReactNode;
   icon?: ReactNode;
-  /** A link or button that gets the user unstuck (e.g. «Create mission»). */
   action?: ReactNode;
   className?: string;
 };
 
-/**
- * Minimal empty state (SPEC §6 «Estados», Plane / Square): 20 px icon, one 13 px title line, one 12 px help line
- * and at most one action, inside a hairline box. Errors use it too, never in red (red is health).
- */
 export function EmptyState({ title, description, icon, action, className }: Props) {
-  // border-solid goes last: dashed is reserved for «pending», even if a caller passes it.
   return (
     <Empty className={cn('gap-4 rounded-xl border px-6 py-10', className, 'border-solid')}>
       <EmptyHeader className="gap-1.5">

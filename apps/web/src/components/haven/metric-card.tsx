@@ -10,7 +10,6 @@ import type { VisualLevel } from './types';
 
 export type Trend = {
   direction: 'up' | 'down' | 'flat';
-  /** Short context, e.g. «+2 vs. yesterday». Defaults to Rising / Falling / Steady. */
   text?: string;
 };
 
@@ -19,10 +18,8 @@ type Props = {
   value: string | number;
   lang: Language;
   unit?: string;
-  /** Second line under the figure («of 21 done», «received data only»). */
   detail?: ReactNode;
   trend?: Trend;
-  /** Adds the level symbol (e.g. the "zones to check" tile). The figure itself never takes a colour. Pass it only when value > 0. */
   level?: VisualLevel;
   icon?: ReactNode;
   className?: string;
@@ -30,7 +27,6 @@ type Props = {
 
 const TREND_ICON = { up: ArrowUpRight, down: ArrowDownRight, flat: ArrowRight };
 
-/** Metric tile on shadcn `Card` (Square style, DESIGN_SYSTEM.md §3.1): label, figure (28/500, tabular), grey delta. */
 export function MetricCard({
   label,
   value,

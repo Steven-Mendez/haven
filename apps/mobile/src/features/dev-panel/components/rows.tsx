@@ -11,7 +11,6 @@ import { Switch } from '@/shared/components/ui/switch';
 import { Text } from '@/shared/components/ui/text';
 import { cn } from '@/shared/lib/utils';
 
-/** Group of settings (DESIGN_SYSTEM.md §3.5): heading outside, rows in an RNR `Card` split by `Separator`. */
 export function Group({ title, children }: { title: string; children: ReactNode }) {
   const rows = Children.toArray(children);
   return (
@@ -34,7 +33,6 @@ export function Group({ title, children }: { title: string; children: ReactNode 
   );
 }
 
-/** One row: label, optional one-line hint and a control on the right (or below when stacked). */
 export function Row({
   label,
   hint,
@@ -80,7 +78,6 @@ export function SwitchRow({
   );
 }
 
-/** RNR `Select` over a list of `{ value, label }` options (values are strings). */
 export function Picker({
   label,
   options,
@@ -112,7 +109,6 @@ export function Picker({
   );
 }
 
-/** Monospace block for raw values (last envelope, etc.). */
 export function Code({ children }: { children: string }) {
   return (
     <Text className="bg-muted text-muted-foreground text-caption rounded-md p-2 font-mono">

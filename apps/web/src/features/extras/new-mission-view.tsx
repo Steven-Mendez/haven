@@ -46,7 +46,6 @@ async function NewMissionContent() {
   );
 }
 
-/** T03 · «New mission» (`/missions/new`): a name and an optional base plan; the rest is set up on its page. */
 export function NewMissionView() {
   return (
     <PageContainer>

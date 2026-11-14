@@ -36,10 +36,8 @@ import { MONO_FONT } from '@/shared/lib/theme';
 import { texts } from './i18n';
 import { baselineCoverage, daysOfData, levelCounts } from './logic/profile';
 
-/** Severity order, like the Linear crew groups: emergency → check → pending → in range. */
 const LEVEL_ORDER: Level[] = ['red', 'amber', 'pending', 'green'];
 
-/** One X-style stat: bold figure + grey label («142 Mission day»). */
 function Stat({ value, label }: { value: string; label: string }) {
   return (
     <View
@@ -53,11 +51,6 @@ function Stat({ value, label }: { value: string; label: string }) {
   );
 }
 
-/**
- * Profile of the crew member using this phone (X / Threads profile, Oura «My profile»): 72 pt
- * avatar, name, role, mission and crew id in mono, X-style stats, current levels with their shapes,
- * personal baseline facts (only real store data) and links to Sources, Earth queue and Settings.
- */
 export default function ProfileScreen() {
   const t = useTexts(texts);
   const phaseText = useMissionPhaseText();
@@ -77,7 +70,6 @@ export default function ProfileScreen() {
   const counts = levelCounts(assessments);
   const coverage = baselineCoverage(assessments);
   const days = useMemo(() => daysOfData(readings, Date.now()), [readings]);
-  // Same streak as Routine and Body (shared gamification: rings closed, emergencies protected).
   const { streak } = useGamification();
   const number = (n: number) => n.toLocaleString(language === 'es' ? 'es-ES' : 'en-US');
 
@@ -101,7 +93,6 @@ export default function ProfileScreen() {
         }}
       />
 
-      {/* Identity */}
       <View className="gap-4">
         <CrewAvatar size={72} />
         <View className="gap-1">
@@ -132,7 +123,6 @@ export default function ProfileScreen() {
         </View>
       </View>
 
-      {/* Current levels, with shapes (never colour alone) */}
       <Section title={t.statusSection}>
         <Button
           variant="outline"
@@ -154,7 +144,6 @@ export default function ProfileScreen() {
                 <Text
                   className="text-muted-foreground text-caption group-active:text-muted-foreground shrink font-normal"
                   numberOfLines={1}
-                  // Quarter-width cells on 402 pt phones: shrink «Emergency» a little instead of cutting it.
                   adjustsFontSizeToFit
                   minimumFontScale={0.85}
                 >
@@ -166,7 +155,6 @@ export default function ProfileScreen() {
         </Button>
       </Section>
 
-      {/* Personal baseline: only what the store really knows */}
       <Section title={t.baselineSection}>
         <ListGroup>
           <SettingsRow

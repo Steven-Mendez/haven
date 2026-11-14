@@ -23,9 +23,7 @@ import type { Language } from '@/lib/i18n';
 export type NavCrewMember = {
   id: string;
   name: string;
-  /** Overall level: worst zone, or 'no-data' when no recent packets. */
   level: VisualLevel;
-  /** An emergency packet is the latest one received: a pulsing red dot marks the row. */
   emergency?: boolean;
 };
 
@@ -34,10 +32,6 @@ type Props = {
   crew: NavCrewMember[];
 };
 
-/**
- * Static placeholder for the layout's <Suspense> fallback. It must not read the URL: usePathname() in a
- * fallback runs during prerender, outside any Suspense boundary.
- */
 export function NavMainSkeleton() {
   return (
     <SidebarGroup>
@@ -54,10 +48,6 @@ export function NavMainSkeleton() {
   );
 }
 
-/**
- * Sidebar navigation (SPEC §6 «Armazón web», Linear): ⌘K search field, Crew · Extras · Missions, then one
- * 28 px row per astronaut with its level shape. Active = subtle fill, never the accent. Also syncs <html lang>.
- */
 export function NavMain({ lang, crew }: Props) {
   const t = havenTexts[lang];
   const pathname = usePathname();

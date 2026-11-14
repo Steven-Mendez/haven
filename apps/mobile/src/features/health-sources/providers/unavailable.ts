@@ -1,11 +1,6 @@
 import type { SourceId, SourceStatus } from '../logic/sources';
 import type { SourceProvider } from './types';
 
-// M07 · Health Connect and Bluetooth (BLE GATT 0x1810 blood pressure, 0x1808 glucose) are not
-// installed in this build (`react-native-health-connect`, `react-native-ble-plx`). They are
-// registered so the screen lists them honestly, and always answer "unavailable" with a reason.
-// Their indicators fall back to manual entry.
-
 function unavailable(id: SourceId, indicators: string[], reason: string): SourceProvider {
   const status: SourceStatus = {
     id,

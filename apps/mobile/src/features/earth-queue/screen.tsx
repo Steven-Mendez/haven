@@ -20,12 +20,6 @@ const GROUPS: { status: DisplayStatus; title: GroupTitle }[] = [
   { status: 'received', title: 'groupReceived' },
 ];
 
-/**
- * M09 · Pending sends (DESIGN_SYSTEM §8.11, «Producto real»): a diagnosis view, reached only from
- * Settings. Sending is just «Enviar» (`/send`); the queue behind it is internal. One summary line,
- * then packets grouped by their real state (queued → sending → received by Earth, with Earth's
- * receive time). No countdown: nothing is delayed artificially.
- */
 export default function Screen() {
   const t = useTexts(texts);
   const insets = useSafeAreaInsets();
@@ -56,7 +50,6 @@ export default function Screen() {
       contentContainerClassName="gap-section p-4"
       contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
     >
-      {/* Hero: how many packets wait (tabular), then the link notice as one hairline row. */}
       <View className="flex-row items-baseline gap-3" accessible accessibilityLabel={summary}>
         <Text className="text-metric font-semibold tabular-nums">{pending}</Text>
         <Text className="text-muted-foreground text-body-sm flex-1">{t.queuedWord}</Text>

@@ -9,7 +9,6 @@ import { renameMissionAction } from '../actions';
 import { texts } from '../i18n';
 import { FormError } from './form-error';
 
-/** The mission name, editable in place until the mission is finished. */
 export function RenameMission({
   code,
   name,

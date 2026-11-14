@@ -4,47 +4,6 @@ import WatchConnectivity
 import WatchKit
 import os
 
-// W00 · Watch side of the WatchConnectivity bridge, using the contract in Contract/Contract.swift.
-// The iPhone side is the HavenWatch native module (apps/mobile/modules/haven-watch).
-//
-// ─── API for W01–W04 ────────────────────────────────────────────────────────────────────────────
-// HavenWatchApp injects a single instance into the environment. In any view:
-//
-//     @Environment(WatchBridge.self) private var bridge
-//
-// Read (observable, always updated on the main thread):
-//   bridge.status: ReceivedStatus?     last `status` from the phone (StatusPayload + receivedAt).
-//                                      Persisted in UserDefaults: also shown offline.
-//                                      Age: `status.age(now:)` or `status.evaluatedAt`.
-//   bridge.isReachable: Bool           the iPhone app is open and receives messages immediately.
-//   bridge.isActivated: Bool           WCSession activated.
-//   bridge.lastCrewHaptic: ReceivedCrewHaptic?   last `crewHaptic` (message + receivedAt).
-//   bridge.crewMember: String          crew member id (set by the last envelope from the phone).
-//   (`simulated` is frozen to false in every envelope and is never shown: EQUIPOS.md «Producto real».)
-//   bridge.isEmergencyActive: Bool     an emergency is running on this watch; ContentView shows MonitorView
-//                                      full screen while it is true.
-//   bridge.emergencyOrigin / emergencyStartedAt   origin and start of the running emergency.
-//
-// Send (watch → phone). sendMessage when the iPhone is reachable; otherwise transferUserInfo plus a persisted outbox:
-// when the iPhone becomes reachable again (or the app relaunches reachable) queued envelopes are resent with
-// sendMessage and the duplicate transfer is cancelled (covers W02 "stored and resent"):
-//   bridge.sendMood(3)                                      // 1…5
-//   bridge.sendEmergency(.button)                           // .button .fall .heartRate .rhythm .spo2
-//   bridge.sendMonitor(heartRate: 92, spo2: 97, spo2TakenAt: date)
-//
-// Emergency (W03/W04); an incoming `emergencyEnd` from the phone calls endEmergency() (monitor and workout stop).
-//   bridge.startEmergency(.button)      sends `emergency` and sets isEmergencyActive (no-op if one is running).
-//   bridge.startEmergency(nil, notifyPhone: false)   phone-initiated (startWatchApp): monitor only, nothing sent.
-//   bridge.endEmergency()               clears it (and mutesHaptics); the monitor closes and sending must stop.
-//
-// Haptics: an incoming `crewHaptic` plays WKInterfaceDevice.current().play(.notification) unless
-// `bridge.mutesHaptics = true` (W04 sets it while measuring: the haptic engine interrupts heart-rate readings).
-// It only plays with the app in the foreground or during a workout session (watchOS limitation).
-//
-// Logs: `xcrun simctl spawn <watch-udid> log stream --predicate 'subsystem == "app.haven.watch"'`.
-// ────────────────────────────────────────────────────────────────────────────────────────────────
-
-/// Last `status` received from the phone, with the time it reached the watch.
 struct ReceivedStatus: Codable, Equatable {
     let payload: StatusPayload
     let receivedAt: Date
@@ -54,10 +13,8 @@ struct ReceivedStatus: Codable, Equatable {
         case payload, receivedAt, sentAt
     }
 
-    /// When the phone evaluated it (or when it was received if the date can't be parsed).
     var evaluatedAt: Date { ISODate.date(payload.evaluatedAt) ?? receivedAt }
 
-    /// Seconds since the phone evaluated it.
     func age(now: Date = .now) -> TimeInterval { now.timeIntervalSince(evaluatedAt) }
 }
 
@@ -81,19 +38,10 @@ final class WatchBridge: NSObject {
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let session: WCSession?
     @ObservationIgnored private var pendingOutgoing: [String] = []
-    /// Envelopes handed to transferUserInfo and not acknowledged by the iPhone app yet. Persisted, so a relaunch can
-    /// still resend them. When the iPhone becomes reachable they are resent with sendMessage; only its reply removes
-    /// them (and cancels the matching outstanding transfer). `didFinish userInfoTransfer` is not trusted: on the
-    /// simulator pair it reports success although the iPhone app never gets `didReceiveUserInfo`, and on a device it
-    /// only means the iPhone *system* has it. The phone module drops duplicates (HavenWatchModule.swift).
     @ObservationIgnored private var outbox: [String] = []
     @ObservationIgnored private var isFlushingOutbox = false
-    /// Oldest entries are dropped beyond this (the monitor sends every few seconds while offline).
     private static let outboxLimit = 100
     @ObservationIgnored private let log = Logger(subsystem: "app.haven.watch", category: "bridge")
-    /// Deneb (W03), DEBUG only: `SIMCTL_CHILD_HAVEN_FORCE_OFFLINE=1` behaves as if the iPhone were unreachable
-    /// (isReachable false, everything through transferUserInfo). The watchOS simulator keeps reporting the iPhone as
-    /// reachable even with the iPhone simulator shut down, so the offline states can't be tested otherwise.
     #if DEBUG
         @ObservationIgnored private let forceOffline = ProcessInfo.processInfo.environment["HAVEN_FORCE_OFFLINE"] == "1"
     #else
@@ -106,7 +54,6 @@ final class WatchBridge: NSObject {
         static let outbox = "haven.bridge.outbox"
     }
 
-    /// Crew member used until the phone says otherwise (`DEMO_CREW[0]` in @haven/core).
     static let defaultCrewMember = "elena-vega"
 
     init(defaults: UserDefaults = .standard, activate: Bool = true) {
@@ -118,15 +65,12 @@ final class WatchBridge: NSObject {
         }
         self.outbox = defaults.stringArray(forKey: Key.outbox) ?? []
         super.init()
-        // W01 (Altair): restore the phone's language from the persisted status.
         if let language = status?.payload.language.flatMap(Language.init(rawValue:)) { Language.current = language }
         if activate, let session {
             session.delegate = self
             session.activate()
         }
     }
-
-    // MARK: Sending
 
     func sendMood(_ score: Int, takenAt: Date = .now) {
         send(MoodPayload(score: min(max(score, 1), 5), takenAt: ISODate.string(takenAt)))
@@ -153,10 +97,6 @@ final class WatchBridge: NSObject {
         )
     }
 
-    /// Starts an emergency on this watch: sends `emergency` to the phone and opens the monitor.
-    /// Calling it again while one is running does nothing (avoids duplicate alerts).
-    /// `notifyPhone: false` (origin nil) is used when the phone started the emergency and woke this app with
-    /// `startWatchApp(with:)` (App/WatchAppDelegate.swift): only the monitor opens, nothing is sent back.
     func startEmergency(
         _ origin: EmergencyPayload.Origin? = .button, at date: Date = .now, notifyPhone: Bool = true,
         reading: EmergencyCenter.TriggerReading? = nil
@@ -168,7 +108,6 @@ final class WatchBridge: NSObject {
         if notifyPhone, let origin { sendEmergency(origin, takenAt: date, reading: reading) }
     }
 
-    /// Ends the emergency on this watch (closes the monitor). Nothing is sent: the protocol is closed on the phone.
     func endEmergency() {
         isEmergencyActive = false
         emergencyOrigin = nil
@@ -176,7 +115,6 @@ final class WatchBridge: NSObject {
         mutesHaptics = false
     }
 
-    /// Builds the envelope and sends it. Views use the helpers above.
     func send<Payload: WatchPayload>(_ payload: Payload) {
         let envelope = WatchEnvelope(
             crewMember: crewMember,
@@ -216,7 +154,6 @@ final class WatchBridge: NSObject {
         }
     }
 
-    /// transferUserInfo + outbox entry until delivery is confirmed.
     private func enqueue(_ json: String, on session: WCSession) {
         session.transferUserInfo([WatchContract.jsonKey: json])
         if !outbox.contains(json) {
@@ -229,7 +166,6 @@ final class WatchBridge: NSObject {
 
     private func saveOutbox() { defaults.set(outbox, forKey: Key.outbox) }
 
-    /// Removes a delivered envelope from the outbox and cancels its pending transfer, if any.
     private func markDelivered(_ json: String, via channel: String) {
         guard let index = outbox.firstIndex(of: json) else { return }
         outbox.remove(at: index)
@@ -241,7 +177,6 @@ final class WatchBridge: NSObject {
         log.info("Delivered via \(channel, privacy: .public) (outbox \(self.outbox.count))")
     }
 
-    /// Resends what is still in the outbox with sendMessage once the iPhone is reachable. Called on the main thread.
     private func flushOutbox() {
         guard let session, session.activationState == .activated, session.isReachable, !forceOffline,
             !outbox.isEmpty, !isFlushingOutbox
@@ -271,9 +206,6 @@ final class WatchBridge: NSObject {
         group.notify(queue: .main) { [weak self] in self?.isFlushingOutbox = false }
     }
 
-    // MARK: Receiving
-
-    /// Handles a dictionary received through any channel. Called on the main thread.
     func receive(_ dictionary: [String: Any], via channel: String) {
         guard let json = dictionary[WatchContract.jsonKey] as? String else {
             log.error("Message without json key via \(channel, privacy: .public)")
@@ -298,21 +230,17 @@ final class WatchBridge: NSObject {
 
         switch envelope.payload {
         case .status(let payload):
-            // transferUserInfo and applicationContext may arrive out of order: keep the newest.
             if let current = status, current.sentAt > envelope.sentAt { return }
             let received = ReceivedStatus(
                 payload: payload, receivedAt: .now, sentAt: envelope.sentAt)
             status = received
             if let data = try? JSONEncoder().encode(received) { defaults.set(data, forKey: Key.status) }
-            // W01 (Altair): follow the phone's language and refresh the complication (Status/ComplicationStore.swift).
             if let language = payload.language.flatMap(Language.init(rawValue:)) { Language.current = language }
             ComplicationStore.publish(received)
         case .crewHaptic(let payload):
             lastCrewHaptic = ReceivedCrewHaptic(message: payload.message, receivedAt: .now)
             if !mutesHaptics { WKInterfaceDevice.current().play(.notification) }
         case .emergencyEnd(let payload):
-            // Closed on the phone: stop the monitor here too. Nothing is sent back. A late end from an earlier
-            // emergency (queued transfer, out-of-order delivery) must not close the one that is running now.
             guard isEmergencyActive else { return }
             if let endedAt = ISODate.date(payload.endedAt), let startedAt = emergencyStartedAt, endedAt < startedAt {
                 log.info("Ignored emergencyEnd older than the running emergency")
@@ -324,8 +252,6 @@ final class WatchBridge: NSObject {
         }
     }
 
-    /// The phone's application context holds one envelope per key (`json` = last status, `emergencyEnd` = last
-    /// emergency end; see HavenWatchModule.swift). Each one is handled like any other envelope.
     private func receiveContext(_ context: [String: Any]) {
         for key in context.keys.sorted() {
             guard let json = context[key] as? String else { continue }
@@ -348,11 +274,9 @@ final class WatchBridge: NSObject {
         let pending = pendingOutgoing
         pendingOutgoing.removeAll()
         for json in pending { send(json: json) }
-        flushOutbox()  // also covers a relaunch: the outbox is persisted
+        flushOutbox()
     }
 }
-
-// MARK: - WCSessionDelegate (called on a background thread: everything hops to main)
 
 extension WatchBridge: WCSessionDelegate {
     func session(
@@ -379,7 +303,6 @@ extension WatchBridge: WCSessionDelegate {
     func session(_ session: WCSession, didFinish userInfoTransfer: WCSessionUserInfoTransfer, error: Error?) {
         let json = userInfoTransfer.userInfo[WatchContract.jsonKey] as? String
         DispatchQueue.main.async {
-            // Logged only: the outbox keeps the envelope until the iPhone app acknowledges a sendMessage retry.
             let pending = json.map { self.outbox.contains($0) } ?? false
             if let error {
                 self.log.info("transferUserInfo ended: \(error.localizedDescription, privacy: .public)")

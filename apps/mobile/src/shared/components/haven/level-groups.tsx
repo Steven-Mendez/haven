@@ -9,10 +9,8 @@ import { cn } from '@/shared/lib/utils';
 import { havenTexts } from './i18n';
 import { LEVEL_TEXT_CLASS, levelLabel, levelPhrase } from './level';
 
-/** Display order of the groups: worst first, pending last (Tonal sections, HAVEN order). */
 const ORDER: Level[] = ['red', 'amber', 'green', 'pending'];
 
-/** Filled segments per level, Tonal readiness style (user request): in range 3 · check 2 · emergency 1. */
 const FILLED: Record<Level, number> = { green: 3, amber: 2, red: 1, pending: 0 };
 const FILL: Record<Level, string> = {
   green: 'bg-level-green',
@@ -26,20 +24,12 @@ type Item = { id: string; label: string; selected?: boolean };
 type Props = {
   groups: Partial<Record<Level, Item[]>>;
   onPressItem?: (id: string) => void;
-  /** Long-press on a chip (context sheet). */
   onLongPressItem?: (id: string) => void;
-  /** Tap on a level header / meter: explain what the level means (popover). */
   onPressLevel?: (level: Level) => void;
-  /** Override the grey line under each header (default: the level phrase). */
   descriptions?: Partial<Record<Level, string>>;
   className?: string;
 };
 
-/**
- * Level sections with chips (Tonal «Muscle Readiness»): bold caps level name + a small filled
- * 3-segment meter, one grey line saying what the level means, then a chip per zone / indicator in
- * that level. Only non-empty groups, in order Emergency → Check → In range → Pending.
- */
 export function LevelGroups({
   groups,
   onPressItem,
@@ -65,7 +55,6 @@ export function LevelGroups({
               !onPressLevel && 'opacity-100',
             )}
           >
-            {/* The header keeps its own type styles, not the button's text defaults. */}
             <TextClassContext.Provider value={undefined}>
               <View className="flex-row items-center gap-3">
                 <Text

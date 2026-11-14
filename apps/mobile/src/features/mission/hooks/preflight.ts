@@ -2,13 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { db } from '@/shared/db';
 import { mergePreflight, type PreflightBaseline } from '../logic/preflight';
 
-// Pre-flight baseline per crew member, in the `preflight_baselines` collection (key = crew member id).
-// It is reference data only: the shared store evaluates with the in-flight baseline
-// (`computeBaseline` has no pre-flight input). See logic/preflight.ts.
-
 const collection = db.collection<PreflightBaseline>('preflight_baselines');
 
-/** `refresh`: any value that, when it changes, reloads the stored baseline (e.g. the open view). */
 export function usePreflightBaseline(crewMember: string, refresh?: unknown) {
   const [baseline, setBaseline] = useState<PreflightBaseline | undefined>();
 

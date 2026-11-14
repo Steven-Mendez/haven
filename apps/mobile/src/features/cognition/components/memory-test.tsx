@@ -21,7 +21,6 @@ import {
 } from '../logic/battery';
 import { TestFrame } from './test-frame';
 
-/** Recall window per trial; without all taps by then the trial is a miss. */
 export const RECALL_LIMIT_MS = 10_000;
 const BETWEEN_MS = 600;
 
@@ -34,7 +33,6 @@ type Props = {
   onExit: () => void;
 };
 
-/** Spatial working memory on a 4×4 grid (cells ≥ 64 pt), adaptive from 3 to 5 cells. */
 export function MemoryTest({ t, random, onDone, onExit }: Props) {
   const [trial, setTrial] = useState(0);
   const [level, setLevel] = useState(MEMORY_MIN_LEVEL);
@@ -118,7 +116,6 @@ export function MemoryTest({ t, random, onDone, onExit }: Props) {
                   accessibilityRole="button"
                   accessibilityLabel={format(t.cell, { n: cell + 1 })}
                   accessibilityState={{ selected: tapped }}
-                  // Neutralise Button's look: no fixed height, padding, pressed fill or disabled fade.
                   className={cn(
                     'min-h-touch-lg h-auto flex-1 rounded-md border p-0 opacity-100 sm:h-auto',
                     lit || tapped

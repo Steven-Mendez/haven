@@ -24,7 +24,6 @@ async function MissionsContent() {
   return <MissionsPanel current={code ?? ''} lang={lang} t={t} />;
 }
 
-/** T03 · Missions list with «Join with code» (`/missions`); creating one is its own page (`/missions/new`). */
 export function MissionsView() {
   return (
     <PageContainer>

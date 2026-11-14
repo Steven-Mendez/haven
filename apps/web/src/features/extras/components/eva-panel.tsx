@@ -31,7 +31,6 @@ import { getEvaReadiness } from '../server';
 
 const READINESS: EvaReadiness[] = ['fit', 'review', 'unfit', 'no-data'];
 
-/** Glossary id explaining each EVA category header. */
 const CATEGORY_TERM: Record<EvaCategory, string> = {
   heart: 'heart',
   lungs: 'lungs',

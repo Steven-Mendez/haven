@@ -27,42 +27,21 @@ export type ChartMarker = { at: string | number; label: string };
 export type ChartRange = '1d' | '7d' | '4w';
 
 type Props = {
-  /** `AstronautResponse.series[indicator]`: `[epoch ms, value][]`. */
   points: SeriesPoint[];
   lang: Language;
   title?: string;
   unit?: string;
-  /** Personal baseline (`Assessment.baseline`): 5 % band for the range, dashed «Base n» line for the median. */
   baseline?: { median: number; range: [number, number] };
-  /**
-   * Reference range (`Indicator.green`). Not drawn: points outside it are marked in the level colour and the
-   * range is written in the header.
-   */
   normalRange?: [number, number];
-  /** Level of the indicator; colours out-of-range points (red, else amber). */
   level?: VisualLevel;
-  /** Period events (rules version sent…) as dashed vertical marks with an inline label. */
   markers?: ChartMarker[];
   decimals?: number;
-  /** Plot height in px (chart spec: 240). */
   height?: number;
-  /**
-   * Earth «now» (epoch ms): dashed vertical «Now (Earth)» line at the right edge and a hatched gap since the
-   * last received sample (communication delay / stale data).
-   */
   nowAt?: number;
-  /** @deprecated The «now» label comes from the shared texts. */
   nowLabel?: string;
-  /**
-   * `full`: title, hero number (32/500) + delta pill + 1d/7d/4w control. `controls`: only the control and the
-   * timestamp (when metric tiles above already show the number). `none`: plot only.
-   */
   header?: 'full' | 'controls' | 'none';
-  /** @deprecated Use `header`. `false` = `controls`. */
   showHeader?: boolean;
-  /** `bar`: one bar per day (counts such as steps or sleep). */
   kind?: 'line' | 'bar';
-  /** Glossary explanations (resolved on the server) for the title and the inline «Base» / «Reference». */
   titleExplain?: TermExplanation;
   glossary?: { baseline?: TermExplanation; reference?: TermExplanation; now?: TermExplanation };
   className?: string;
@@ -76,7 +55,6 @@ const RANGES: ChartRange[] = ['1d', '7d', '4w'];
 
 type Datum = { at: number; value: number };
 
-/** Three «nice» ticks covering [lo, hi]. */
 function niceTicks(lo: number, hi: number): number[] {
   const span = hi - lo || Math.abs(hi) || 1;
   const raw = span / 2;
@@ -91,7 +69,6 @@ function niceTicks(lo: number, hi: number): number[] {
   return ticks;
 }
 
-/** Smallest window (7d, else 4w) with enough points to read a trend. */
 function defaultRange(data: Datum[], end: number): ChartRange {
   const inWindow = (r: ChartRange) => data.filter((d) => d.at >= end - WINDOW[r]).length;
   return inWindow('7d') >= 4 ? '7d' : '4w';
@@ -105,7 +82,6 @@ function useAnimateOnce() {
   return [animate, () => setAnimate(false)] as const;
 }
 
-/** Elevated tooltip: value 13/600 tabular + unit, timestamp 11 px mono (chart spec). */
 function ChartTooltip({
   active,
   payload,
@@ -137,7 +113,6 @@ function ChartTooltip({
   );
 }
 
-/** X tick anchored to the edges (start · middle · end) so the first and last labels are never dropped. */
 function EdgeTick({
   x,
   y,
@@ -170,14 +145,6 @@ function EdgeTick({
 const levelColor = (level?: VisualLevel) =>
   level === 'red' ? 'var(--level-red)' : 'var(--level-amber)';
 
-/**
- * Main chart (shared chart spec, web and mobile): 1.5 px monotone line in the foreground with an 8 % → 0 area,
- * personal band at 5 % and a dashed «Base n» median labelled inline; three horizontal gridlines, no axis lines
- * or ticks; Y labels on the right and 3 X labels (start · middle · end) at 11 px. Hover: 1 px crosshair and an
- * elevated tooltip. Dots only on the last point (Ø4 + Ø10 halo) and out-of-range points (Ø3, level colour).
- * «Now (Earth)» dashed line with the hatched gap since the last sample. Draws once in 400 ms; Reduce Motion
- * turns it off. Client component; every prop is serialisable.
- */
 export function SeriesChart({
   points,
   lang,
@@ -218,7 +185,6 @@ export function SeriesChart({
   const now = nowAt !== undefined && nowAt > lastAt ? nowAt : undefined;
   const outOf = (v: number) => (normalRange ? v < normalRange[0] || v > normalRange[1] : false);
 
-  // Y: values + band, padded, 3 nice ticks (the gridlines sit on them).
   const values = data.map((d) => d.value);
   const extra = baseline ? [...baseline.range, baseline.median] : [];
   const lo = Math.min(...values, ...extra);
@@ -286,7 +252,6 @@ export function SeriesChart({
     </ToggleGroup>
   );
 
-  // Daily buckets for bars (mean per UTC day).
   const bars =
     kind === 'bar'
       ? Object.values(

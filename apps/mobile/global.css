@@ -2,16 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/*
-  HAVEN mobile tokens «Vela 3.1» (X / Linear / Grok structure + Apple system data colours). Source of truth: haven/design/tokens.json
-  (platformMap.mobile) + design/redesign/SPEC.md.
-  - HSL triplets for React Native Reusables (used as hsl(var(--x))). :root = light, .dark:root = dark.
-  - Translucent tokens carry their alpha in the triplet («0 0% 100% / 0.04»).
-  - RNR names kept; shadcn "accent" is the pressed SURFACE. The brand accent «Ion» is --brand.
-  - Mirrored in src/shared/lib/theme.ts (hex, for SVG). Change both together.
-  - Dark is the on-board default: the root layout sets colorScheme 'dark' at startup.
-*/
-
 @layer base {
   :root {
     --background: 0 0% 100%;

@@ -14,7 +14,6 @@ import { FormError, INVALID_INPUT } from './form-error';
 
 const INITIAL: JoinFormState = { status: 'idle' };
 
-/** «Join a mission» by its six-character code; sets the mission cookie and opens Crew. */
 export function JoinMissionForm({
   lang,
   id,

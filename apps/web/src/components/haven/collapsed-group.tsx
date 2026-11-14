@@ -6,22 +6,14 @@ import { LevelGlyph } from './level-glyph';
 import type { VisualLevel } from './types';
 
 type Props = {
-  /** Visible summary, already translated: «24 en rango», «Corazón · ◆ 3 · ● 2». */
   title: ReactNode;
-  /** Optional level symbol before the title (e.g. green for «24 in range»). */
   level?: VisualLevel;
-  /** Optional right-aligned text («Ver todas (12)»). */
   meta?: ReactNode;
-  /** The folded rows (usually ExpandableRow). */
   children: ReactNode;
   defaultOpen?: boolean;
   className?: string;
 };
 
-/**
- * A folded group (DESIGN_SYSTEM.md §8.0.4): «24 in range ›» that opens in line (shadcn `Collapsible`).
- * Use it for what is in range, for long lists («See all (n)») and for body zones with their counts.
- */
 export function CollapsedGroup({ title, level, meta, children, defaultOpen, className }: Props) {
   return (
     <Collapsible defaultOpen={defaultOpen} className={cn('w-full', className)}>

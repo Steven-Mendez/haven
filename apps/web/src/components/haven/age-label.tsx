@@ -14,25 +14,17 @@ import { lastDataText } from './levels';
 import { havenTexts } from './texts';
 import type { Now } from './types';
 
-/** Default "no recent data" threshold when the API does not say (minutes). Same as NO_RECENT_DATA_HOURS. */
 export const NO_RECENT_DATA_MIN = 6 * 60;
 
 type Props = {
-  /** ISO time of the last visible data; null when nothing has arrived yet. */
   lastDataAt: string | null;
   now: Now;
   lang: Language;
-  /** Computed by the API (`CrewCard.noRecentData`). When missing, `thresholdMin` decides. */
   noRecentData?: boolean;
   thresholdMin?: number;
   className?: string;
 };
 
-/**
- * Relative time with a tooltip. Plain: the absolute UTC time. With `receivedAt` / `delayMin` / `staleHours`
- * it becomes the data-age tooltip: measured on board (crew time), received on Earth (UTC), one-way light time
- * and the «no recent data» rule, so every «ago» is interpretable.
- */
 export function TimeAgo({
   at,
   lang,
@@ -46,11 +38,8 @@ export function TimeAgo({
   lang: Language;
   children: ReactNode;
   className?: string;
-  /** When the packet reached Earth. */
   receivedAt?: string | null;
-  /** One-way communication delay of the mission (minutes). */
   delayMin?: number;
-  /** Hours without packets before «No recent data». */
   staleHours?: number;
 }) {
   const t = havenTexts[lang];
@@ -92,10 +81,6 @@ export function TimeAgo({
   );
 }
 
-/**
- * «Last data 12 min ago» (caption, grey) or, when the data is old, «◷ No recent data · last received 7 h ago».
- * Never presents an old status as current.
- */
 export function AgeLabel({
   lastDataAt,
   now,
@@ -120,7 +105,6 @@ export function AgeLabel({
   const minutes = minutesBetween(lastDataAt, now);
   const stale = noRecentData ?? minutes >= thresholdMin;
 
-  // Stale (DESIGN_SYSTEM.md §3.11): clock icon and primary text, never a colour.
   if (stale) {
     return (
       <span className={cn('inline-flex flex-wrap items-center gap-x-1.5 text-xs', className)}>

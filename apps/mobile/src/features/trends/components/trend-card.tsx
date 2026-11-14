@@ -30,17 +30,11 @@ type Props = {
   range: TrendRange;
   window: [number, number];
   events: ChartEvent[];
-  /** Range control, between the hero and the chart. */
   controls?: ReactNode;
 };
 
 const formatNumber = (v: number) => String(Math.round(v * 10) / 10);
 
-/**
- * Single-chart view (Google Health · weight, DESIGN_SYSTEM §3.3 and §8.8): the latest value appears
- * once (the chart readout is off), the grey baseline band, one line joining legend and baseline,
- * and the source in `DataLabel`. A row at the end opens the indicator screen.
- */
 export function TrendCard({ indicator, range, window, events, controls }: Props) {
   const h = useTexts(havenTexts);
   const t = useTexts(texts);
@@ -63,7 +57,6 @@ export function TrendCard({ indicator, range, window, events, controls }: Props)
   const name = translate(indicator.name);
   const lastValue = typeof series.last?.value === 'number' ? series.last.value : undefined;
 
-  // A day window starts and ends at the same clock time: show the weekday too.
   const formatTime = (ms: number) =>
     range === 'day'
       ? new Date(ms).toLocaleString(language, {
@@ -95,7 +88,6 @@ export function TrendCard({ indicator, range, window, events, controls }: Props)
 
   return (
     <View className="gap-5">
-      {/* Hero (WHOOP trend): 44 pt figure that follows the scrub, one-word status. */}
       <View className="gap-1.5">
         <View className="flex-row items-baseline gap-2" accessibilityLiveRegion="polite">
           <Text className="text-metric font-semibold tabular-nums">{heroValue}</Text>
@@ -139,7 +131,6 @@ export function TrendCard({ indicator, range, window, events, controls }: Props)
         unit={indicator.unit}
         lastLevel={assessment?.level}
         referenceRange={rules.green}
-        // Per-point level from the config rules (environment-adjusted): red readings show red.
         levelAt={(_, v) => pointLevel(rules, v)}
         bucketMs={range === 'day' ? 0 : 86_400_000}
         timeDomain={window}

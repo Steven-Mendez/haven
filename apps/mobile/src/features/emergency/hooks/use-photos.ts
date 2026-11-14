@@ -6,7 +6,6 @@ import type { Photo } from '../logic/packet';
 const OPTIONS: ImagePicker.ImagePickerOptions = {
   mediaTypes: ['images'],
   quality: 0.4,
-  // A data URI travels inside the JSON packet so Earth (T02) can show it.
   base64: true,
 };
 
@@ -17,10 +16,6 @@ function toPhoto(asset: ImagePicker.ImagePickerAsset, note?: string): Photo {
   return { uri, takenAt: new Date().toISOString(), note };
 }
 
-/**
- * Attach a photo (skin, wound, AED screen). Camera on the phone, file picker on web; if the camera
- * permission is denied it falls back to the library.
- */
 export function usePhotos() {
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [failed, setFailed] = useState(false);

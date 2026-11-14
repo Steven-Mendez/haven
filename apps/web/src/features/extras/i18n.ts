@@ -28,7 +28,6 @@ export const texts = defineTexts({
     tabMissions: 'Misiones',
     tabEva: 'Aptitud EVA',
 
-    // Rules · versions
     versionsTitle: 'Versiones',
     versionsDescription: 'Se envía al crearla; cada móvil la recibe al descargarla y la aplica.',
     baseVersion: 'Configuración base',
@@ -49,7 +48,6 @@ export const texts = defineTexts({
     exporting: 'Exportando…',
     exportFailed: 'No se pudo exportar',
 
-    // Rules · editor
     thresholdsTitle: 'Umbrales en vigor',
     thresholdsDescription:
       'Configuración {version}. Abre una fila para editarla y enviar una versión nueva.',
@@ -98,7 +96,6 @@ export const texts = defineTexts({
     errSave: 'No se pudo guardar la versión.',
     unitless: 'sin unidad',
 
-    // Rules · delivery
     deliveryTitle: 'Entrega por astronauta',
     deliveryDescription:
       '«Recibida» cuando el móvil la descarga; «Aplicada» cuando confirma que la aplicó.',
@@ -117,7 +114,6 @@ export const texts = defineTexts({
     eventApplied: 'Aplicó la versión {version}',
     noAudit: 'Sin eventos todavía',
 
-    // Trends
     trendsTitle: 'Tendencias de la tripulación',
     trendsDescription:
       'Media diaria del grupo. Cada astronauta pesa lo mismo; el valor de cada persona está en su ficha.',
@@ -131,7 +127,6 @@ export const texts = defineTexts({
     markerRules: 'Reglas {version}',
     meanOfCrew: 'Media del grupo',
 
-    // Missions
     missionsPageTitle: 'Misiones',
     missionsPageSubtitle:
       'Crea una misión o únete a una existente con su código de seis caracteres.',
@@ -293,7 +288,6 @@ export const texts = defineTexts({
     mergeFailed: 'No se pudo fusionar. Inténtalo de nuevo.',
     noMissions: 'No hay misiones',
 
-    // EVA
     evaTitle: 'Aptitud para EVA',
     evaDescription: 'Apoyo para decidir, no una evaluación de Tierra.',
     evaSource:

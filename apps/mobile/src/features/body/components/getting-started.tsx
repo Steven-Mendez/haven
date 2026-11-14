@@ -20,11 +20,6 @@ const ICONS: Record<StartRow['icon'], LucideIcon> = {
   who: UserRound,
 };
 
-/**
- * First-run card while there are no readings (Withings «Getting to know you», Gentler Streak):
- * a title, one line on what the first reading unlocks, and one large row per way in. The first
- * row is the main one and gets the filled icon.
- */
 export function GettingStarted({
   title,
   body,
@@ -51,7 +46,6 @@ export function GettingStarted({
           onPress={row.onPress}
           className="active:bg-active border-border min-h-row-indicator h-auto justify-start gap-3 rounded-none border-t px-4 py-3 sm:h-auto"
         >
-          {/* Reset Button's text classes: the row keeps its own type and colours. */}
           <TextClassContext.Provider value={undefined}>
             <View
               className={cn(
