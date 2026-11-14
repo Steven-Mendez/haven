@@ -1,0 +1,871 @@
+[
+  {
+    "id": "chest-pain",
+    "name": {
+      "es": "Dolor torácico y colapso",
+      "en": "Chest pain and collapse"
+    },
+    "start": "call-for-help",
+    "steps": [
+      {
+        "id": "call-for-help",
+        "text": {
+          "es": "Avisa a la tripulación. Que alguien traiga el botiquín y el desfibrilador (DEA).",
+          "en": "Alert the crew. Have someone bring the medical kit and the defibrillator (AED)."
+        },
+        "audio": {
+          "es": "Avisa a la tripulación. Que alguien traiga el botiquín y el desfibrilador (DEA).",
+          "en": "Alert the crew. Have someone bring the medical kit and the defibrillator (AED)."
+        },
+        "illustration": "crew-alert",
+        "next": "check-response"
+      },
+      {
+        "id": "check-response",
+        "text": {
+          "es": "Tócale los hombros y háblale fuerte. ¿Responde?",
+          "en": "Tap their shoulders and speak loudly. Do they respond?"
+        },
+        "audio": {
+          "es": "Tócale los hombros y háblale fuerte. ¿Responde?",
+          "en": "Tap their shoulders and speak loudly. Do they respond?"
+        },
+        "illustration": "check-response",
+        "options": [
+          {
+            "text": {
+              "es": "Sí, responde",
+              "en": "Yes, they respond"
+            },
+            "next": "secure-patient-micro"
+          },
+          {
+            "text": {
+              "es": "No responde",
+              "en": "No response"
+            },
+            "next": "check-breathing"
+          }
+        ]
+      },
+      {
+        "id": "check-breathing",
+        "text": {
+          "es": "Mira su pecho durante 10 segundos. ¿Respira con normalidad?",
+          "en": "Watch their chest for 10 seconds. Are they breathing normally?"
+        },
+        "audio": {
+          "es": "Mira su pecho durante 10 segundos. ¿Respira con normalidad?",
+          "en": "Watch their chest for 10 seconds. Are they breathing normally?"
+        },
+        "seconds": 10,
+        "illustration": "check-breathing",
+        "options": [
+          {
+            "text": {
+              "es": "Sí, respira normal",
+              "en": "Yes, breathing normally"
+            },
+            "next": "unconscious-breathing"
+          },
+          {
+            "text": {
+              "es": "No respira o solo boquea",
+              "en": "Not breathing or only gasping"
+            },
+            "next": "cpr-restraint-micro"
+          }
+        ]
+      },
+      {
+        "id": "unconscious-breathing",
+        "text": {
+          "es": "Respira pero no responde. Mantén la cabeza inclinada hacia atrás para abrir la vía aérea y vigila su respiración. Si deja de respirar, empieza la RCP.",
+          "en": "Breathing but not responding. Keep the head tilted back to open the airway and watch the breathing. If breathing stops, start CPR."
+        },
+        "audio": {
+          "es": "Mantén la vía aérea abierta y vigila la respiración. Si deja de respirar, empieza la RCP.",
+          "en": "Keep the airway open and watch the breathing. If breathing stops, start CPR."
+        },
+        "illustration": "open-airway",
+        "next": "secure-patient-micro"
+      },
+      {
+        "id": "cpr-restraint-micro",
+        "text": {
+          "es": "Sujeta al paciente boca arriba con correas a la camilla o a una pared firme. Ánclate con los pies en las sujeciones o apóyate invertido contra el techo.",
+          "en": "Strap the patient face up to the stretcher or a firm wall. Anchor yourself with your feet in the foot restraints, or brace upside down against the ceiling."
+        },
+        "audio": {
+          "es": "Sujeta al paciente con correas y ánclate tú antes de empujar.",
+          "en": "Strap the patient down and anchor yourself before pushing."
+        },
+        "illustration": "cpr-restraint-microgravity",
+        "onlyIn": ["transit", "station", "lunar-orbit", "mars-orbit"],
+        "next": "cpr-position-surface"
+      },
+      {
+        "id": "cpr-position-surface",
+        "text": {
+          "es": "Túmbalo boca arriba sobre el suelo duro. Arrodíllate a su lado, a la altura del pecho.",
+          "en": "Lay them face up on the hard floor. Kneel beside them at chest level."
+        },
+        "audio": {
+          "es": "Túmbalo boca arriba sobre el suelo duro. Arrodíllate a su lado, a la altura del pecho.",
+          "en": "Lay them face up on the hard floor. Kneel beside them at chest level."
+        },
+        "illustration": "cpr-position-surface",
+        "onlyIn": ["moon", "mars", "rover"],
+        "next": "cpr-compressions"
+      },
+      {
+        "id": "cpr-compressions",
+        "text": {
+          "es": "Compresiones: manos en el centro del pecho, brazos rectos. Empuja 5–6 cm, 100–120 por minuto, y deja que el pecho vuelva. Si sabes, 30 compresiones y 2 ventilaciones con la bolsa; si no, solo compresiones.",
+          "en": "Compressions: hands on the center of the chest, arms straight. Push 5–6 cm, 100–120 per minute, and let the chest come back up. If trained, 30 compressions and 2 breaths with the bag; if not, compressions only."
+        },
+        "audio": {
+          "es": "Empuja fuerte y rápido en el centro del pecho. Sigue el ritmo.",
+          "en": "Push hard and fast in the center of the chest. Follow the beat."
+        },
+        "seconds": 120,
+        "illustration": "cpr-compressions",
+        "next": "aed-pads"
+      },
+      {
+        "id": "aed-pads",
+        "text": {
+          "es": "Enciende el DEA y descubre el pecho. Pega un parche justo bajo la clavícula derecha y el otro en el costado izquierdo, unos centímetros bajo la axila, a la altura del pezón. Que otra persona los pegue sin parar las compresiones.",
+          "en": "Turn on the AED and bare the chest. Stick one pad just below the right collarbone and the other on the left side, a few centimeters below the armpit, level with the nipple. Have someone else place them while compressions continue."
+        },
+        "audio": {
+          "es": "Enciende el desfibrilador. Un parche bajo la clavícula derecha y otro en el costado izquierdo, bajo la axila.",
+          "en": "Turn on the defibrillator. One pad below the right collarbone, the other on the left side below the armpit."
+        },
+        "illustration": "aed-pads",
+        "next": "aed-analyze"
+      },
+      {
+        "id": "aed-analyze",
+        "text": {
+          "es": "Que nadie toque al paciente. El DEA analiza el ritmo. ¿Qué indica?",
+          "en": "Nobody touches the patient. The AED is analyzing the rhythm. What does it say?"
+        },
+        "audio": {
+          "es": "Nadie toca al paciente. Escucha al desfibrilador.",
+          "en": "Nobody touches the patient. Listen to the defibrillator."
+        },
+        "seconds": 10,
+        "illustration": "aed-analyze",
+        "options": [
+          {
+            "text": {
+              "es": "Recomienda descarga",
+              "en": "Shock advised"
+            },
+            "next": "aed-shock"
+          },
+          {
+            "text": {
+              "es": "No recomienda descarga",
+              "en": "No shock advised"
+            },
+            "next": "cpr-after-shock"
+          }
+        ]
+      },
+      {
+        "id": "aed-shock",
+        "text": {
+          "es": "Di en voz alta «¡Fuera todos!», comprueba que nadie toca al paciente ni sus correas metálicas, y pulsa el botón de descarga.",
+          "en": "Say out loud \"Everyone clear!\", check that nobody touches the patient or metal restraints, and press the shock button."
+        },
+        "audio": {
+          "es": "Fuera todos. Pulsa la descarga.",
+          "en": "Everyone clear. Press shock."
+        },
+        "illustration": "aed-shock",
+        "next": "cpr-after-shock"
+      },
+      {
+        "id": "cpr-after-shock",
+        "text": {
+          "es": "Vuelve a las compresiones de inmediato durante 2 minutos. El DEA volverá a analizar solo.",
+          "en": "Restart compressions right away for 2 minutes. The AED will analyze again by itself."
+        },
+        "audio": {
+          "es": "Compresiones otra vez, dos minutos.",
+          "en": "Compressions again, two minutes."
+        },
+        "seconds": 120,
+        "illustration": "cpr-compressions",
+        "next": "signs-of-life"
+      },
+      {
+        "id": "signs-of-life",
+        "text": {
+          "es": "¿Recupera signos de vida? (se mueve, abre los ojos, respira con normalidad)",
+          "en": "Any signs of life? (moving, opening eyes, breathing normally)"
+        },
+        "audio": {
+          "es": "¿Recupera signos de vida? (se mueve, abre los ojos, respira con normalidad)",
+          "en": "Any signs of life? (moving, opening eyes, breathing normally)"
+        },
+        "illustration": "check-breathing",
+        "options": [
+          {
+            "text": {
+              "es": "Sí",
+              "en": "Yes"
+            },
+            "next": "measure-vitals"
+          },
+          {
+            "text": {
+              "es": "No: seguir con la RCP",
+              "en": "No: continue CPR"
+            },
+            "next": "aed-analyze"
+          }
+        ]
+      },
+      {
+        "id": "secure-patient-micro",
+        "text": {
+          "es": "Sujétalo con correas a una superficie, con la espalda apoyada y la cabeza alineada. Afloja la ropa ajustada.",
+          "en": "Strap them to a surface with the back supported and the head aligned. Loosen tight clothing."
+        },
+        "audio": {
+          "es": "Sujétalo con correas a una superficie, con la espalda apoyada y la cabeza alineada. Afloja la ropa ajustada.",
+          "en": "Strap them to a surface with the back supported and the head aligned. Loosen tight clothing."
+        },
+        "illustration": "secure-patient-microgravity",
+        "onlyIn": ["transit", "station", "lunar-orbit", "mars-orbit"],
+        "next": "position-patient-surface"
+      },
+      {
+        "id": "position-patient-surface",
+        "text": {
+          "es": "Siéntalo medio incorporado, con la espalda apoyada. Afloja la ropa ajustada y no le dejes caminar.",
+          "en": "Sit them half upright with the back supported. Loosen tight clothing and do not let them walk."
+        },
+        "audio": {
+          "es": "Siéntalo medio incorporado, con la espalda apoyada. Afloja la ropa ajustada y no le dejes caminar.",
+          "en": "Sit them half upright with the back supported. Loosen tight clothing and do not let them walk."
+        },
+        "illustration": "position-patient-surface",
+        "onlyIn": ["moon", "mars", "rover"],
+        "next": "measure-vitals"
+      },
+      {
+        "id": "measure-vitals",
+        "text": {
+          "es": "Mide la presión con el brazalete y el oxígeno con el oxímetro o el reloj, y anótalos aquí. Si lleva el Apple Watch, el pulso sale en el monitor.",
+          "en": "Measure blood pressure with the cuff and oxygen with the oximeter or watch, and enter both here. If they wear the Apple Watch, the pulse shows on the monitor."
+        },
+        "audio": {
+          "es": "Mide la presión y el oxígeno, y anótalos.",
+          "en": "Measure pressure and oxygen, and enter them."
+        },
+        "seconds": 120,
+        "illustration": "measure-vitals",
+        "next": "record-ecg"
+      },
+      {
+        "id": "record-ecg",
+        "text": {
+          "es": "Si lleva el Apple Watch, graba un ECG de 30 segundos con su app ECG: dedo sobre la corona, brazo apoyado y quieto. Si no, salta este paso.",
+          "en": "If they wear the Apple Watch, record a 30-second ECG with its ECG app: finger on the crown, arm resting and still. If not, skip this step."
+        },
+        "audio": {
+          "es": "Graba el electrocardiograma, treinta segundos, sin moverte.",
+          "en": "Record the ECG, thirty seconds, keep still."
+        },
+        "seconds": 30,
+        "illustration": "record-ecg",
+        "next": "symptom-check"
+      },
+      {
+        "id": "symptom-check",
+        "text": {
+          "es": "Pregunta y marca aquí sus síntomas: dolor en el pecho que va al brazo, la mandíbula o la espalda, sudor, falta de aire, mareo.",
+          "en": "Ask and mark their symptoms here: chest pain spreading to the arm, jaw or back, sweating, shortness of breath, dizziness."
+        },
+        "audio": {
+          "es": "Pregunta por el dolor, el sudor, el aire y el mareo, y márcalo.",
+          "en": "Ask about pain, sweating, breathing and dizziness, and mark it."
+        },
+        "illustration": "symptom-check",
+        "next": "medication-plan"
+      },
+      {
+        "id": "medication-plan",
+        "text": {
+          "es": "Abre el plan médico de a bordo. Da solo la medicación que indica para dolor torácico (por ejemplo, aspirina masticada si no es alérgico).",
+          "en": "Open the onboard medical plan. Give only the medication it lists for chest pain (for example, chewed aspirin if not allergic)."
+        },
+        "audio": {
+          "es": "Sigue el plan médico de a bordo antes de dar cualquier medicamento.",
+          "en": "Follow the onboard medical plan before giving any medication."
+        },
+        "illustration": "medical-kit",
+        "next": "patient-status"
+      },
+      {
+        "id": "patient-status",
+        "text": {
+          "es": "¿Cómo está ahora?",
+          "en": "How are they now?"
+        },
+        "audio": {
+          "es": "¿Cómo está ahora?",
+          "en": "How are they now?"
+        },
+        "options": [
+          {
+            "text": {
+              "es": "Estable",
+              "en": "Stable"
+            },
+            "next": "guided-ultrasound"
+          },
+          {
+            "text": {
+              "es": "Empeora o deja de responder",
+              "en": "Getting worse or stops responding"
+            },
+            "next": "check-breathing"
+          }
+        ]
+      },
+      {
+        "id": "guided-ultrasound",
+        "text": {
+          "es": "Si hay ecógrafo y alguien entrenado, haz una vista del corazón y otra de cada pulmón con el procedimiento del equipo. Si no, salta este paso.",
+          "en": "If there is an ultrasound device and someone trained, take one view of the heart and one of each lung using the device procedure. If not, skip this step."
+        },
+        "audio": {
+          "es": "Ecografía guiada: corazón y pulmones.",
+          "en": "Guided ultrasound: heart and lungs."
+        },
+        "seconds": 300,
+        "illustration": "guided-ultrasound",
+        "next": "earth-packet"
+      },
+      {
+        "id": "earth-packet",
+        "text": {
+          "es": "Prepara el paquete a Tierra con mediciones, síntomas, fotos y notas. Envíalo: sin enlace, queda en cola y sale solo cuando vuelva.",
+          "en": "Prepare the packet to Earth with measurements, symptoms, photos and notes. Send it: with no link, it waits in the queue and goes out when the link returns."
+        },
+        "audio": {
+          "es": "Envía el paquete a Tierra.",
+          "en": "Send the packet to Earth."
+        },
+        "illustration": "earth-packet",
+        "next": "follow-up"
+      },
+      {
+        "id": "follow-up",
+        "text": {
+          "es": "Seguimiento: no lo dejes solo. Repite presión, pulso y oxígeno cada 5 minutos. Si deja de responder, vuelve al inicio.",
+          "en": "Follow-up: do not leave them alone. Repeat pressure, pulse and oxygen every 5 minutes. If they stop responding, start again."
+        },
+        "audio": {
+          "es": "Repite las mediciones cada cinco minutos.",
+          "en": "Repeat the measurements every five minutes."
+        },
+        "seconds": 300,
+        "illustration": "measure-vitals"
+      }
+    ]
+  },
+  {
+    "id": "radiation-shelter",
+    "name": {
+      "es": "Refugio por tormenta solar",
+      "en": "Solar storm shelter"
+    },
+    "start": "stop-outside-activity",
+    "steps": [
+      {
+        "id": "stop-outside-activity",
+        "text": {
+          "es": "Interrumpe la actividad exterior y vuelve dentro. Avisa a quien esté fuera.",
+          "en": "Stop outside activity and go back inside. Alert anyone who is outside."
+        },
+        "audio": {
+          "es": "Interrumpe la actividad exterior y vuelve dentro. Avisa a quien esté fuera.",
+          "en": "Stop outside activity and go back inside. Alert anyone who is outside."
+        },
+        "illustration": "stop-eva",
+        "next": "go-to-shelter"
+      },
+      {
+        "id": "go-to-shelter",
+        "text": {
+          "es": "Ve ya al módulo blindado con tu dosímetro personal puesto: las partículas pueden llegar en pocos minutos.",
+          "en": "Go to the shielded module now, wearing your personal dosimeter: particles can arrive within minutes."
+        },
+        "audio": {
+          "es": "Ve al refugio con tu dosímetro.",
+          "en": "Go to the shelter with your dosimeter."
+        },
+        "illustration": "shelter",
+        "next": "check-supplies"
+      },
+      {
+        "id": "check-supplies",
+        "text": {
+          "es": "Revisa los suministros del refugio: agua, comida, medicación, luz y comunicaciones.",
+          "en": "Check shelter supplies: water, food, medication, lights and communications."
+        },
+        "audio": {
+          "es": "Revisa los suministros del refugio: agua, comida, medicación, luz y comunicaciones.",
+          "en": "Check shelter supplies: water, food, medication, lights and communications."
+        },
+        "illustration": "shelter-supplies",
+        "next": "confirm-plan"
+      },
+      {
+        "id": "confirm-plan",
+        "text": {
+          "es": "Confirma a la tripulación que estás en el refugio. Repite la comprobación cada 10 minutos hasta que todos estén dentro.",
+          "en": "Confirm to the crew that you are in the shelter. Repeat the check every 10 minutes until everyone is inside."
+        },
+        "audio": {
+          "es": "Confirma que estás en el refugio y repite cada diez minutos.",
+          "en": "Confirm you are in the shelter and repeat every ten minutes."
+        },
+        "seconds": 600,
+        "next": "wait-for-all-clear"
+      },
+      {
+        "id": "wait-for-all-clear",
+        "text": {
+          "es": "Espera a que el evento baje de S2 y el flujo baje de 10 pfu, o a que Tierra lo confirme. No salgas antes.",
+          "en": "Wait until the event drops below S2 and the flux below 10 pfu, or until Earth confirms. Do not leave before."
+        },
+        "audio": {
+          "es": "Espera a que el evento baje de S2 y el flujo baje de 10 pfu, o a que Tierra lo confirme. No salgas antes.",
+          "en": "Wait until the event drops below S2 and the flux below 10 pfu, or until Earth confirms. Do not leave before."
+        },
+        "next": "log-dose"
+      },
+      {
+        "id": "log-dose",
+        "text": {
+          "es": "Al salir, registra la dosis que marca tu dosímetro; se suma a tu dosis acumulada.",
+          "en": "When you leave, log the dose your dosimeter shows; it adds to your cumulative dose."
+        },
+        "audio": {
+          "es": "Al salir, registra la dosis que marca tu dosímetro; se suma a tu dosis acumulada.",
+          "en": "When you leave, log the dose your dosimeter shows; it adds to your cumulative dose."
+        }
+      }
+    ]
+  },
+  {
+    "id": "hypoglycemia",
+    "name": {
+      "es": "Glucosa baja (regla 15/15)",
+      "en": "Low blood sugar (15/15 rule)"
+    },
+    "start": "can-swallow",
+    "steps": [
+      {
+        "id": "can-swallow",
+        "text": {
+          "es": "Glucosa por debajo de 70. ¿Está despierto y puede tragar?",
+          "en": "Glucose below 70. Are they awake and able to swallow?"
+        },
+        "audio": {
+          "es": "Glucosa por debajo de 70. ¿Está despierto y puede tragar?",
+          "en": "Glucose below 70. Are they awake and able to swallow?"
+        },
+        "options": [
+          {
+            "text": {
+              "es": "Sí",
+              "en": "Yes"
+            },
+            "next": "take-15g"
+          },
+          {
+            "text": {
+              "es": "No",
+              "en": "No"
+            },
+            "next": "cannot-swallow"
+          }
+        ]
+      },
+      {
+        "id": "take-15g",
+        "text": {
+          "es": "Toma 15 g de azúcar rápido: 4 tabletas de glucosa, medio vaso de zumo o una cucharada de azúcar.",
+          "en": "Take 15 g of fast sugar: 4 glucose tablets, half a glass of juice or a tablespoon of sugar."
+        },
+        "audio": {
+          "es": "Toma 15 g de azúcar rápido: 4 tabletas de glucosa, medio vaso de zumo o una cucharada de azúcar.",
+          "en": "Take 15 g of fast sugar: 4 glucose tablets, half a glass of juice or a tablespoon of sugar."
+        },
+        "illustration": "fast-sugar",
+        "next": "wait-15"
+      },
+      {
+        "id": "wait-15",
+        "text": {
+          "es": "Espera 15 minutos sentado.",
+          "en": "Wait 15 minutes sitting down."
+        },
+        "audio": {
+          "es": "Espera 15 minutos sentado.",
+          "en": "Wait 15 minutes sitting down."
+        },
+        "seconds": 900,
+        "next": "measure-again"
+      },
+      {
+        "id": "measure-again",
+        "text": {
+          "es": "Vuelve a medir la glucosa. ¿Cuánto da?",
+          "en": "Measure glucose again. What is it?"
+        },
+        "audio": {
+          "es": "Vuelve a medir la glucosa. ¿Cuánto da?",
+          "en": "Measure glucose again. What is it?"
+        },
+        "options": [
+          {
+            "text": {
+              "es": "Sigue por debajo de 70",
+              "en": "Still below 70"
+            },
+            "next": "take-15g"
+          },
+          {
+            "text": {
+              "es": "70 o más",
+              "en": "70 or more"
+            },
+            "next": "eat-snack"
+          }
+        ]
+      },
+      {
+        "id": "eat-snack",
+        "text": {
+          "es": "Come algo con hidratos y proteína, o adelanta la próxima comida. Anota lo ocurrido para Tierra.",
+          "en": "Eat something with carbs and protein, or bring the next meal forward. Note what happened for Earth."
+        },
+        "audio": {
+          "es": "Come algo con hidratos y proteína, o adelanta la próxima comida. Anota lo ocurrido para Tierra.",
+          "en": "Eat something with carbs and protein, or bring the next meal forward. Note what happened for Earth."
+        }
+      },
+      {
+        "id": "cannot-swallow",
+        "text": {
+          "es": "No le des nada por la boca. Ponlo de lado, sujétalo y avisa a la tripulación. Usa el glucagón del botiquín solo si estás entrenado y el plan médico lo indica. Envía un paquete urgente a Tierra.",
+          "en": "Give nothing by mouth. Turn them on their side, secure them and alert the crew. Use glucagon from the kit only if trained and the medical plan says so. Send an urgent packet to Earth."
+        },
+        "audio": {
+          "es": "Nada por la boca. De lado, y avisa a la tripulación.",
+          "en": "Nothing by mouth. On their side, and alert the crew."
+        }
+      }
+    ]
+  },
+  {
+    "id": "fever",
+    "name": {
+      "es": "Fiebre",
+      "en": "Fever"
+    },
+    "start": "confirm-temperature",
+    "steps": [
+      {
+        "id": "confirm-temperature",
+        "text": {
+          "es": "Repite la temperatura con el termómetro en 15 minutos, en reposo.",
+          "en": "Repeat the temperature with the thermometer in 15 minutes, at rest."
+        },
+        "audio": {
+          "es": "Repite la temperatura con el termómetro en 15 minutos, en reposo.",
+          "en": "Repeat the temperature with the thermometer in 15 minutes, at rest."
+        },
+        "seconds": 900,
+        "next": "find-source"
+      },
+      {
+        "id": "find-source",
+        "text": {
+          "es": "Busca de dónde viene: piel (heridas, granos), dientes, garganta, orina con dolor o tos.",
+          "en": "Look for the cause: skin (cuts, spots), teeth, throat, painful urination or cough."
+        },
+        "audio": {
+          "es": "Busca de dónde viene: piel (heridas, granos), dientes, garganta, orina con dolor o tos.",
+          "en": "Look for the cause: skin (cuts, spots), teeth, throat, painful urination or cough."
+        },
+        "illustration": "infection-sources",
+        "next": "fluids-rest"
+      },
+      {
+        "id": "fluids-rest",
+        "text": {
+          "es": "Bebe agua y descansa. Toma un antitérmico solo si el plan médico de a bordo lo indica.",
+          "en": "Drink water and rest. Take a fever reducer only if the onboard medical plan says so."
+        },
+        "audio": {
+          "es": "Bebe agua y descansa. Toma un antitérmico solo si el plan médico de a bordo lo indica.",
+          "en": "Drink water and rest. Take a fever reducer only if the onboard medical plan says so."
+        },
+        "next": "limit-spread"
+      },
+      {
+        "id": "limit-spread",
+        "text": {
+          "es": "En una nave cerrada los gérmenes pasan fácil: lávate las manos, usa mascarilla y descansa aparte si puedes.",
+          "en": "In a closed ship germs spread easily: wash your hands, wear a mask and rest apart if you can."
+        },
+        "audio": {
+          "es": "En una nave cerrada los gérmenes pasan fácil: lávate las manos, usa mascarilla y descansa aparte si puedes.",
+          "en": "In a closed ship germs spread easily: wash your hands, wear a mask and rest apart if you can."
+        },
+        "next": "warning-signs"
+      },
+      {
+        "id": "warning-signs",
+        "text": {
+          "es": "¿Hay confusión, falta de aire, cuello rígido o la fiebre dura 3 días?",
+          "en": "Is there confusion, shortness of breath, a stiff neck, or has the fever lasted 3 days?"
+        },
+        "audio": {
+          "es": "¿Hay confusión, falta de aire, cuello rígido o la fiebre dura 3 días?",
+          "en": "Is there confusion, shortness of breath, a stiff neck, or has the fever lasted 3 days?"
+        },
+        "options": [
+          {
+            "text": {
+              "es": "Sí",
+              "en": "Yes"
+            },
+            "next": "earth-packet"
+          },
+          {
+            "text": {
+              "es": "No",
+              "en": "No"
+            },
+            "next": "monitor"
+          }
+        ]
+      },
+      {
+        "id": "monitor",
+        "text": {
+          "es": "Mide la temperatura cada 4 horas y anota los síntomas.",
+          "en": "Measure temperature every 4 hours and note symptoms."
+        },
+        "audio": {
+          "es": "Mide la temperatura cada 4 horas y anota los síntomas.",
+          "en": "Measure temperature every 4 hours and note symptoms."
+        },
+        "next": "earth-packet"
+      },
+      {
+        "id": "earth-packet",
+        "text": {
+          "es": "Envía un paquete a Tierra con temperaturas, síntomas y fotos si hay algo en la piel.",
+          "en": "Send a packet to Earth with temperatures, symptoms and photos if there is something on the skin."
+        },
+        "audio": {
+          "es": "Envía un paquete a Tierra con temperaturas, síntomas y fotos si hay algo en la piel.",
+          "en": "Send a packet to Earth with temperatures, symptoms and photos if there is something on the skin."
+        }
+      }
+    ]
+  },
+  {
+    "id": "cabin-atmosphere",
+    "name": {
+      "es": "Aire de la cabina",
+      "en": "Cabin air"
+    },
+    "start": "leave-module",
+    "steps": [
+      {
+        "id": "leave-module",
+        "text": {
+          "es": "Sal del módulo afectado y ve a uno con lecturas normales.",
+          "en": "Leave the affected module and go to one with normal readings."
+        },
+        "audio": {
+          "es": "Sal del módulo afectado y ve a uno con lecturas normales.",
+          "en": "Leave the affected module and go to one with normal readings."
+        },
+        "next": "check-readings"
+      },
+      {
+        "id": "check-readings",
+        "text": {
+          "es": "Mira las lecturas de la nave: CO₂, oxígeno y presión de cada módulo.",
+          "en": "Check the ship readings: CO₂, oxygen and pressure in each module."
+        },
+        "audio": {
+          "es": "Mira las lecturas de la nave: CO₂, oxígeno y presión de cada módulo.",
+          "en": "Check the ship readings: CO₂, oxygen and pressure in each module."
+        },
+        "next": "check-airflow"
+      },
+      {
+        "id": "check-airflow",
+        "text": {
+          "es": "Comprueba la ventilación: que los ventiladores giren y que nada tape las rejillas.",
+          "en": "Check ventilation: fans running and nothing blocking the vents."
+        },
+        "audio": {
+          "es": "Comprueba la ventilación: que los ventiladores giren y que nada tape las rejillas.",
+          "en": "Check ventilation: fans running and nothing blocking the vents."
+        },
+        "illustration": "ventilation",
+        "next": "check-symptoms"
+      },
+      {
+        "id": "check-symptoms",
+        "text": {
+          "es": "¿Alguien tiene dolor de cabeza, mareo o falta de aire? Mide su oxígeno.",
+          "en": "Does anyone have a headache, dizziness or shortness of breath? Measure their oxygen."
+        },
+        "audio": {
+          "es": "¿Alguien tiene dolor de cabeza, mareo o falta de aire? Mide su oxígeno.",
+          "en": "Does anyone have a headache, dizziness or shortness of breath? Measure their oxygen."
+        },
+        "options": [
+          {
+            "text": {
+              "es": "Oxígeno por debajo de 90 %",
+              "en": "Oxygen below 90%"
+            },
+            "next": "give-oxygen"
+          },
+          {
+            "text": {
+              "es": "Oxígeno normal",
+              "en": "Oxygen normal"
+            },
+            "next": "rest-elsewhere"
+          }
+        ]
+      },
+      {
+        "id": "give-oxygen",
+        "text": {
+          "es": "Ponle oxígeno con mascarilla y vuelve a medir en 5 minutos.",
+          "en": "Give oxygen with a mask and measure again in 5 minutes."
+        },
+        "audio": {
+          "es": "Ponle oxígeno con mascarilla y vuelve a medir en 5 minutos.",
+          "en": "Give oxygen with a mask and measure again in 5 minutes."
+        },
+        "seconds": 300,
+        "illustration": "oxygen-mask",
+        "next": "rest-elsewhere"
+      },
+      {
+        "id": "rest-elsewhere",
+        "text": {
+          "es": "Descansa y duerme en otro módulo hasta que el aire vuelva a lo normal. Avisa a la tripulación y envía las lecturas a Tierra.",
+          "en": "Rest and sleep in another module until the air is back to normal. Alert the crew and send the readings to Earth."
+        },
+        "audio": {
+          "es": "Descansa y duerme en otro módulo hasta que el aire vuelva a lo normal. Avisa a la tripulación y envía las lecturas a Tierra.",
+          "en": "Rest and sleep in another module until the air is back to normal. Alert the crew and send the readings to Earth."
+        }
+      }
+    ]
+  },
+  {
+    "id": "psychological-support",
+    "name": {
+      "es": "Apoyo psicológico",
+      "en": "Psychological support"
+    },
+    "start": "breathing-pause",
+    "steps": [
+      {
+        "id": "breathing-pause",
+        "text": {
+          "es": "Pausa de dos minutos: inspira en 4 tiempos y suelta el aire en 6.",
+          "en": "Two-minute pause: breathe in for 4 counts and out for 6."
+        },
+        "audio": {
+          "es": "Inspira, dos, tres, cuatro. Suelta, dos, tres, cuatro, cinco, seis.",
+          "en": "Breathe in, two, three, four. Out, two, three, four, five, six."
+        },
+        "seconds": 120,
+        "next": "reach-out"
+      },
+      {
+        "id": "reach-out",
+        "text": {
+          "es": "Escribe o graba un mensaje a alguien de tu familia o a un amigo.",
+          "en": "Write or record a message to a family member or a friend."
+        },
+        "audio": {
+          "es": "Escribe o graba un mensaje a alguien de tu familia o a un amigo.",
+          "en": "Write or record a message to a family member or a friend."
+        },
+        "next": "talk-to-crewmate"
+      },
+      {
+        "id": "talk-to-crewmate",
+        "text": {
+          "es": "Habla con un compañero de confianza o comparte un rato con la tripulación.",
+          "en": "Talk to a crewmate you trust or spend some time with the crew."
+        },
+        "audio": {
+          "es": "Habla con un compañero de confianza o comparte un rato con la tripulación.",
+          "en": "Talk to a crewmate you trust or spend some time with the crew."
+        },
+        "next": "review-needs"
+      },
+      {
+        "id": "review-needs",
+        "text": {
+          "es": "Revisa lo básico: sueño, ejercicio, comida y carga de trabajo. Elige una cosa que puedas cambiar hoy.",
+          "en": "Check the basics: sleep, exercise, food and workload. Pick one thing you can change today."
+        },
+        "audio": {
+          "es": "Revisa lo básico: sueño, ejercicio, comida y carga de trabajo. Elige una cosa que puedas cambiar hoy.",
+          "en": "Check the basics: sleep, exercise, food and workload. Pick one thing you can change today."
+        },
+        "next": "private-conference"
+      },
+      {
+        "id": "private-conference",
+        "text": {
+          "es": "Pide una conferencia psicológica privada. Lejos de la Tierra será por mensajes grabados.",
+          "en": "Request a private psychological conference. Far from Earth it will be through recorded messages."
+        },
+        "audio": {
+          "es": "Pide una conferencia psicológica privada. Lejos de la Tierra será por mensajes grabados.",
+          "en": "Request a private psychological conference. Far from Earth it will be through recorded messages."
+        },
+        "next": "private-journal"
+      },
+      {
+        "id": "private-journal",
+        "text": {
+          "es": "Si te ayuda, escribe en tu diario privado. Nadie más lo lee.",
+          "en": "If it helps, write in your private journal. Nobody else reads it."
+        },
+        "audio": {
+          "es": "Si te ayuda, escribe en tu diario privado. Nadie más lo lee.",
+          "en": "If it helps, write in your private journal. Nobody else reads it."
+        }
+      }
+    ]
+  }
+]

@@ -1,0 +1,249 @@
+[
+  {
+    "id": "start-chest-pain-protocol",
+    "text": {
+      "es": "Empieza ya el protocolo de dolor torácico",
+      "en": "Start the chest pain protocol now"
+    },
+    "priority": 1,
+    "protocol": "chest-pain"
+  },
+  {
+    "id": "start-rule-15-15",
+    "text": {
+      "es": "Toma 15 g de azúcar rápido y vuelve a medir en 15 min",
+      "en": "Take 15 g of fast sugar and measure again in 15 min"
+    },
+    "priority": 1,
+    "protocol": "hypoglycemia"
+  },
+  {
+    "id": "start-fever-protocol",
+    "text": {
+      "es": "Sigue el protocolo de fiebre",
+      "en": "Follow the fever protocol"
+    },
+    "priority": 1,
+    "protocol": "fever"
+  },
+  {
+    "id": "go-to-shelter",
+    "text": {
+      "es": "Ve al refugio blindado con tu dosímetro",
+      "en": "Go to the shielded shelter with your dosimeter"
+    },
+    "priority": 1,
+    "protocol": "radiation-shelter"
+  },
+  {
+    "id": "apply-oxygen",
+    "text": {
+      "es": "Ponte oxígeno con mascarilla y sal del módulo",
+      "en": "Put on an oxygen mask and leave the module"
+    },
+    "priority": 1,
+    "protocol": "cabin-atmosphere"
+  },
+  {
+    "id": "stop-eva",
+    "text": {
+      "es": "Suspende la actividad exterior y vuelve dentro",
+      "en": "Stop the outside activity and go back inside"
+    },
+    "priority": 1
+  },
+  {
+    "id": "warm-up",
+    "text": {
+      "es": "Abrígate, calienta el módulo y vuelve a medir",
+      "en": "Warm up, heat the module and measure again"
+    },
+    "priority": 1
+  },
+  {
+    "id": "repeat-measurement",
+    "text": {
+      "es": "Repite la medición en reposo dentro de 5 minutos",
+      "en": "Repeat the measurement at rest in 5 minutes"
+    },
+    "priority": 2
+  },
+  {
+    "id": "continuous-monitoring",
+    "text": {
+      "es": "Deja el monitor puesto y grabando",
+      "en": "Keep the monitor on and recording"
+    },
+    "priority": 2
+  },
+  {
+    "id": "postpone-eva",
+    "text": {
+      "es": "No salgas fuera hasta que el flujo baje de 10 pfu",
+      "en": "Stay inside until the flux drops below 10 pfu"
+    },
+    "priority": 2
+  },
+  {
+    "id": "check-ventilation",
+    "text": {
+      "es": "Revisa la ventilación del módulo",
+      "en": "Check the module ventilation"
+    },
+    "priority": 2,
+    "protocol": "cabin-atmosphere"
+  },
+  {
+    "id": "change-module",
+    "text": {
+      "es": "Descansa en otro módulo con aire normal",
+      "en": "Rest in another module with normal air"
+    },
+    "priority": 2
+  },
+  {
+    "id": "find-infection-source",
+    "text": {
+      "es": "Busca la infección: piel, dientes, garganta u orina",
+      "en": "Look for the infection: skin, teeth, throat or urine"
+    },
+    "priority": 2
+  },
+  {
+    "id": "measure-body-temperature",
+    "text": {
+      "es": "Mide tu temperatura corporal con el termómetro",
+      "en": "Measure your body temperature with the thermometer"
+    },
+    "priority": 2
+  },
+  {
+    "id": "report-vision",
+    "text": {
+      "es": "Repite la prueba ojo por ojo y avisa a Tierra",
+      "en": "Retest each eye and tell Earth what's blurry"
+    },
+    "priority": 2
+  },
+  {
+    "id": "repeat-battery-2h",
+    "text": {
+      "es": "Descansa y repite la batería en 2 horas",
+      "en": "Rest and repeat the test battery in 2 hours"
+    },
+    "priority": 2
+  },
+  {
+    "id": "complete-exercise",
+    "text": {
+      "es": "Haz hoy tus 45 min de ejercicio resistivo",
+      "en": "Do your 45 min of resistance exercise today"
+    },
+    "priority": 2
+  },
+  {
+    "id": "psychological-support",
+    "text": {
+      "es": "Abre la guía de apoyo y pide una llamada privada",
+      "en": "Open the support guide and request a private call"
+    },
+    "priority": 2,
+    "protocol": "psychological-support"
+  },
+  {
+    "id": "record-reading",
+    "text": {
+      "es": "Toma una lectura",
+      "en": "Take a reading"
+    },
+    "priority": 2
+  },
+  {
+    "id": "notify-earth",
+    "text": {
+      "es": "Inclúyelo en el próximo paquete a Tierra",
+      "en": "Include it in the next packet to Earth"
+    },
+    "priority": 3
+  },
+  {
+    "id": "hydrate",
+    "text": {
+      "es": "Bebe agua: medio litro en la próxima hora",
+      "en": "Drink water: half a liter over the next hour"
+    },
+    "priority": 3
+  },
+  {
+    "id": "adjust-diet",
+    "text": {
+      "es": "Revisa lo que comes hoy con tu plan de nutrición",
+      "en": "Review today’s food against your nutrition plan"
+    },
+    "priority": 3
+  },
+  {
+    "id": "log-exposure",
+    "text": {
+      "es": "Registra la dosis del evento en tu historial",
+      "en": "Log the event dose in your record"
+    },
+    "priority": 3
+  },
+  {
+    "id": "hearing-protection",
+    "text": {
+      "es": "Usa protección para los oídos",
+      "en": "Use hearing protection"
+    },
+    "priority": 3
+  },
+  {
+    "id": "prioritize-rest",
+    "text": {
+      "es": "Descansa hoy y evita el esfuerzo intenso",
+      "en": "Rest today and avoid hard effort"
+    },
+    "priority": 3
+  },
+  {
+    "id": "sleep-hygiene",
+    "text": {
+      "es": "Acuéstate a la misma hora, sin pantallas 1 h antes",
+      "en": "Same bedtime daily, no screens 1 h before"
+    },
+    "priority": 3
+  },
+  {
+    "id": "adjust-light-schedule",
+    "text": {
+      "es": "Ajusta la luz del módulo y tu horario de sueño",
+      "en": "Adjust module lighting and your sleep schedule"
+    },
+    "priority": 3
+  },
+  {
+    "id": "review-workload",
+    "text": {
+      "es": "Revisa tu carga de trabajo con la comandante o con Tierra",
+      "en": "Review your workload with the commander or with Earth"
+    },
+    "priority": 3
+  },
+  {
+    "id": "quiet-moment",
+    "text": {
+      "es": "Haz una pausa: ventana, música o respiración",
+      "en": "Take a break: window, music or breathing"
+    },
+    "priority": 3
+  },
+  {
+    "id": "message-family",
+    "text": {
+      "es": "Manda un mensaje a tu familia o a un amigo",
+      "en": "Send a message to family or a friend"
+    },
+    "priority": 3
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "id": "cabin-atmosphere",
+  "name": {
+    "es": "Aire de la cabina: módulo de descanso cargado",
+    "en": "Cabin air: stuffy rest module"
+  },
+  "durationMin": 10,
+  "sources": [
+    "CO₂ 3,2 mmHg y 64 dB en el módulo de descanso (laboratorio nominal, 1,8 mmHg y 48 dB): guion de P04 y C02. Umbrales de 3 mmHg y 60 dB: valores iniciales de P01, a confirmar con NASA-STD-3001 Vol. 2 (https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/). Oxígeno: OMS (https://cdn.who.int/media/docs/default-source/patient-safety/pulse-oximetry/who-ps-pulse-oxymetry-training-manual-en.pdf)."
+  ],
+  "series": [
+    {
+      "indicator": "cabin-co2",
+      "points": [[0, 2], [2, 2.4], [4, 2.9], [5, 3.2], [10, 3.2]]
+    },
+    {
+      "indicator": "cabin-noise",
+      "points": [[0, 50], [3, 58], [5, 64], [10, 64]]
+    },
+    {
+      "indicator": "spo2",
+      "points": [[0, 98], [4, 96], [6, 94], [10, 94]]
+    }
+  ],
+  "events": [],
+  "expected": [
+    {
+      "zone": "lungs",
+      "level": "amber"
+    }
+  ]
+}

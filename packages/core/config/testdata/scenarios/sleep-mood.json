@@ -1,0 +1,43 @@
+{
+  "id": "sleep-mood",
+  "name": {
+    "es": "Sueño y ánimo en descenso",
+    "en": "Declining sleep and mood"
+  },
+  "durationMin": 10,
+  "sources": [
+    "Regla de tres registros seguidos con ánimo ≤2 o estrés ≥4 (M10, P01; referencia provisional). Sueño recomendado ≥7 h: AASM y SRS (https://doi.org/10.5665/sleep.4716); ~6,1 h en la ISS: Barger et al. 2014 (https://doi.org/10.1016/S1474-4422%2814%2970122-X). Cada minuto del guion representa un día de misión."
+  ],
+  "series": [
+    {
+      "indicator": "mood",
+      "points": [[0, 4], [1, 4], [2, 3], [3, 3], [4, 3], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2]]
+    },
+    {
+      "indicator": "stress",
+      "points": [[0, 2], [1, 2], [2, 3], [3, 3], [4, 3], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4]]
+    },
+    {
+      "indicator": "sleep",
+      "points": [
+        [0, 7],
+        [1, 6.8],
+        [2, 6.6],
+        [3, 6.3],
+        [4, 6],
+        [5, 5.8],
+        [6, 5.6],
+        [7, 5.5],
+        [8, 5.4],
+        [9, 5.3]
+      ]
+    }
+  ],
+  "events": [],
+  "expected": [
+    {
+      "zone": "mind",
+      "level": "amber"
+    }
+  ]
+}

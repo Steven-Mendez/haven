@@ -1,0 +1,377 @@
+[
+  {
+    "id": "launch",
+    "name": {
+      "es": "Lanzamiento y ascenso",
+      "en": "Launch and ascent"
+    },
+    "gravity": 3,
+    "delayMin": 0,
+    "delayMax": 0,
+    "blackouts": false,
+    "evacuation": true,
+    "dailyDoseMSv": 0,
+    "description": {
+      "es": "Minutos de aceleración de 3–4 g, vibración y ruido, con la tripulación sentada y atada.",
+      "en": "Minutes of 3–4 g acceleration, vibration and noise, with the crew seated and strapped in."
+    },
+    "watch": [
+      {
+        "es": "Pulso y presión bajo alta aceleración",
+        "en": "Heart rate and blood pressure under high g"
+      },
+      {
+        "es": "Mareo y desorientación al llegar a órbita",
+        "en": "Dizziness and disorientation on reaching orbit"
+      }
+    ]
+  },
+  {
+    "id": "station",
+    "name": {
+      "es": "Órbita terrestre",
+      "en": "Earth orbit"
+    },
+    "gravity": 0,
+    "delayMin": 0,
+    "delayMax": 0.02,
+    "blackouts": false,
+    "evacuation": true,
+    "dailyDoseMSv": 0.5,
+    "description": {
+      "es": "Microgravedad protegida por la magnetosfera (ISS, estaciones comerciales); se vuelve a Tierra en horas.",
+      "en": "Microgravity shielded by the magnetosphere (ISS, commercial stations); home within hours."
+    },
+    "watch": [
+      {
+        "es": "Mareo espacial: 60–70 % de la tripulación en las primeras 72 h",
+        "en": "Space motion sickness: 60–70 % of crews in the first 72 h"
+      },
+      {
+        "es": "Líquidos que suben a la cabeza: visión y presión",
+        "en": "Fluids shifting to the head: vision and pressure"
+      },
+      {
+        "es": "Pérdida ósea y muscular en estancias largas",
+        "en": "Bone and muscle loss on long stays"
+      }
+    ],
+    "destinations": [
+      {
+        "id": "iss",
+        "name": {
+          "es": "Estación Espacial Internacional",
+          "en": "International Space Station"
+        },
+        "delayMin": 0,
+        "durationDays": 180,
+        "image": "station.webp"
+      },
+      {
+        "id": "commercial-stations",
+        "name": {
+          "es": "Estaciones comerciales",
+          "en": "Commercial stations"
+        },
+        "delayMin": 0,
+        "durationDays": 90,
+        "image": "commercial-leo.webp"
+      },
+      {
+        "id": "tiangong-bas",
+        "name": {
+          "es": "Tiangong / BAS",
+          "en": "Tiangong / BAS"
+        },
+        "delayMin": 0,
+        "durationDays": 180,
+        "image": "tiangong-bas.webp"
+      }
+    ]
+  },
+  {
+    "id": "transit",
+    "name": {
+      "es": "Espacio profundo",
+      "en": "Deep space"
+    },
+    "gravity": 0,
+    "delayMin": 0.0213,
+    "delayMax": 22,
+    "blackouts": true,
+    "evacuation": false,
+    "dailyDoseMSv": 1.8,
+    "description": {
+      "es": "Camino a la Luna o Marte, sin magnetosfera: ~1,8 mSv/día (MSL/RAD), tormentas solares y cabina pequeña.",
+      "en": "On the way to the Moon or Mars, no magnetosphere: ~1.8 mSv/day (MSL/RAD), solar storms, a small cabin."
+    },
+    "watch": [
+      {
+        "es": "Dosis acumulada y avisos de evento solar",
+        "en": "Cumulative dose and solar-event alerts"
+      },
+      {
+        "es": "CO₂, sueño y ánimo por el confinamiento",
+        "en": "CO₂, sleep and mood from confinement"
+      },
+      {
+        "es": "Decisiones a bordo: no hay evacuación rápida",
+        "en": "On-board decisions: no quick evacuation"
+      }
+    ],
+    "destinations": [
+      {
+        "id": "mars-orbit",
+        "name": {
+          "es": "Órbita marciana",
+          "en": "Mars orbit"
+        },
+        "delayMin": 11,
+        "durationDays": 540,
+        "image": "martian-orbit.webp"
+      },
+      {
+        "id": "phobos-deimos",
+        "name": {
+          "es": "Fobos y Deimos",
+          "en": "Phobos and Deimos"
+        },
+        "delayMin": 11,
+        "durationDays": 540,
+        "image": "phobos-deimos.webp"
+      },
+      {
+        "id": "near-earth-asteroids",
+        "name": {
+          "es": "Asteroides cercanos",
+          "en": "Near-Earth asteroids"
+        },
+        "delayMin": 2,
+        "durationDays": 365,
+        "image": "near-earth-asteroids.webp"
+      },
+      {
+        "id": "high-venus-orbit",
+        "name": {
+          "es": "Órbita alta de Venus",
+          "en": "High Venus orbit"
+        },
+        "delayMin": 6,
+        "durationDays": 420,
+        "image": "high-venus-orbit.webp"
+      }
+    ]
+  },
+  {
+    "id": "lunar-orbit",
+    "name": {
+      "es": "Órbita lunar",
+      "en": "Lunar orbit"
+    },
+    "gravity": 0,
+    "delayMin": 0.0213,
+    "delayMax": 0.0213,
+    "blackouts": true,
+    "evacuation": true,
+    "dailyDoseMSv": 1.8,
+    "description": {
+      "es": "Microgravedad junto a la Luna (Orion, Gateway): radiación, 1,3 s de retardo, cortes de señal y días para volver.",
+      "en": "Microgravity around the Moon (Orion, Gateway): radiation, 1.3 s delay, signal loss and days to get home."
+    },
+    "watch": [
+      {
+        "es": "Dosis acumulada y avisos de evento solar",
+        "en": "Cumulative dose and solar-event alerts"
+      },
+      {
+        "es": "Carga de trabajo en acoplamientos y descenso",
+        "en": "Workload around docking and descent"
+      },
+      {
+        "es": "Readaptación a 0 g tras la superficie",
+        "en": "Readapting to 0 g after the surface"
+      }
+    ]
+  },
+  {
+    "id": "moon",
+    "name": {
+      "es": "Superficie lunar",
+      "en": "Lunar surface"
+    },
+    "gravity": 0.17,
+    "delayMin": 0.0213,
+    "delayMax": 0.0213,
+    "blackouts": false,
+    "evacuation": true,
+    "dailyDoseMSv": 1.37,
+    "description": {
+      "es": "Un sexto de gravedad, sin atmósfera ni magnetosfera: ~1,4 mSv/día (Chang'e 4), polvo abrasivo y salidas fuera.",
+      "en": "One-sixth gravity, no atmosphere or magnetosphere: ~1.4 mSv/day (Chang'e 4), abrasive dust and spacewalks."
+    },
+    "watch": [
+      {
+        "es": "Polvo lunar: ojos y vías respiratorias",
+        "en": "Lunar dust: eyes and airways"
+      },
+      {
+        "es": "Aptitud, fatiga y lesiones en salidas fuera",
+        "en": "Readiness, fatigue and injuries on surface walks"
+      },
+      {
+        "es": "Ritmo de sueño con la luz rasante del polo",
+        "en": "Sleep rhythm under low polar sunlight"
+      },
+      {
+        "es": "Oxígeno del hábitat (umbrales propios de SpO₂)",
+        "en": "Habitat oxygen (own SpO₂ thresholds)"
+      }
+    ],
+    "destinations": [
+      {
+        "id": "lunar-south-pole",
+        "name": {
+          "es": "Polo sur lunar",
+          "en": "Lunar south pole"
+        },
+        "delayMin": 0.0213,
+        "durationDays": 45,
+        "image": "moon.webp"
+      },
+      {
+        "id": "equatorial-mining",
+        "name": {
+          "es": "Minería ecuatorial",
+          "en": "Equatorial mining"
+        },
+        "delayMin": 0.0213,
+        "durationDays": 90,
+        "image": "equatorial-mining.webp"
+      }
+    ]
+  },
+  {
+    "id": "mars-orbit",
+    "name": {
+      "es": "Órbita marciana",
+      "en": "Mars orbit"
+    },
+    "gravity": 0,
+    "delayMin": 3,
+    "delayMax": 22,
+    "blackouts": true,
+    "evacuation": false,
+    "dailyDoseMSv": 1.8,
+    "description": {
+      "es": "Microgravedad alrededor de Marte, antes y después de la superficie: radiación y retardo de 3 a 22 min.",
+      "en": "Microgravity around Mars, before and after the surface: radiation and a 3 to 22 min delay."
+    },
+    "watch": [
+      {
+        "es": "Dosis acumulada",
+        "en": "Cumulative dose"
+      },
+      {
+        "es": "Readaptación a la gravedad parcial tras meses en 0 g",
+        "en": "Readapting to partial gravity after months in 0 g"
+      }
+    ]
+  },
+  {
+    "id": "mars",
+    "name": {
+      "es": "Superficie de Marte",
+      "en": "Mars surface"
+    },
+    "gravity": 0.38,
+    "delayMin": 3,
+    "delayMax": 22,
+    "blackouts": true,
+    "evacuation": false,
+    "dailyDoseMSv": 0.64,
+    "description": {
+      "es": "0,38 g y atmósfera fina: ~0,64 mSv/día (Curiosity/RAD), polvo tóxico, retardo de 3 a 22 min, 2 semanas sin señal y sin evacuación.",
+      "en": "0.38 g and thin air: ~0.64 mSv/day (Curiosity/RAD), toxic dust, a 3 to 22 min delay, 2 weeks without signal and no evacuation."
+    },
+    "watch": [
+      {
+        "es": "Polvo con percloratos: tiroides, ojos, pulmones",
+        "en": "Perchlorate dust: thyroid, eyes, lungs"
+      },
+      {
+        "es": "Decisiones médicas sin respuesta rápida de Tierra",
+        "en": "Medical decisions without a quick answer from Earth"
+      },
+      {
+        "es": "Aislamiento y ánimo en estancias de más de un año",
+        "en": "Isolation and mood over stays longer than a year"
+      }
+    ],
+    "destinations": [
+      {
+        "id": "mars-surface",
+        "name": {
+          "es": "Superficie de Marte",
+          "en": "Mars surface"
+        },
+        "delayMin": 11,
+        "durationDays": 540,
+        "image": "mars.webp"
+      }
+    ]
+  },
+  {
+    "id": "rover",
+    "name": {
+      "es": "Excursión en rover",
+      "en": "Rover excursion"
+    },
+    "gravity": 0.38,
+    "delayMin": 3,
+    "delayMax": 22,
+    "blackouts": true,
+    "evacuation": false,
+    "dailyDoseMSv": 0.64,
+    "description": {
+      "es": "Días lejos del hábitat de Marte en un vehículo pequeño: más confinamiento y menos recursos médicos.",
+      "en": "Days away from the Mars habitat in a small vehicle: tighter confinement and fewer medical resources."
+    },
+    "watch": [
+      {
+        "es": "Fatiga y sueño en cabina pequeña",
+        "en": "Fatigue and sleep in a small cabin"
+      },
+      {
+        "es": "Distancia al hábitat si hay una emergencia",
+        "en": "Distance to the habitat in an emergency"
+      }
+    ]
+  },
+  {
+    "id": "reentry",
+    "name": {
+      "es": "Reentrada y amerizaje",
+      "en": "Reentry and splashdown"
+    },
+    "gravity": 4,
+    "delayMin": 0,
+    "delayMax": 0,
+    "blackouts": true,
+    "evacuation": false,
+    "dailyDoseMSv": 0,
+    "description": {
+      "es": "Varias g de frenado tras días o meses sin gravedad, un corte de radio y la readaptación tras el amerizaje.",
+      "en": "Several g of braking after days or months without gravity, a radio blackout and readaptation after splashdown."
+    },
+    "watch": [
+      {
+        "es": "Mareo al ponerse de pie",
+        "en": "Dizziness on standing up"
+      },
+      {
+        "es": "Náuseas y desequilibrio en las primeras horas",
+        "en": "Nausea and imbalance in the first hours"
+      }
+    ]
+  }
+]

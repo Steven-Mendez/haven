@@ -1,0 +1,82 @@
+[
+  {
+    "id": "chest-pain",
+    "name": { "es": "Dolor en el pecho", "en": "Chest pain" },
+    "description": {
+      "es": "Presión, opresión o dolor en el pecho, que a veces va al brazo, la mandíbula o la espalda.",
+      "en": "Pressure, tightness or pain in the chest, sometimes spreading to the arm, jaw or back."
+    }
+  },
+  {
+    "id": "shortness-of-breath",
+    "name": { "es": "Falta de aire", "en": "Shortness of breath" },
+    "description": {
+      "es": "Cuesta respirar o no llega el aire, incluso en reposo.",
+      "en": "Breathing is hard or you cannot get enough air, even at rest."
+    }
+  },
+  {
+    "id": "dizziness",
+    "name": { "es": "Mareo", "en": "Dizziness" },
+    "description": {
+      "es": "Sensación de que todo da vueltas o de que te vas a caer.",
+      "en": "Feeling that everything is spinning or that you might fall."
+    }
+  },
+  {
+    "id": "fainting",
+    "name": { "es": "Desmayo", "en": "Fainting" },
+    "description": {
+      "es": "Pérdida breve del conocimiento, o sentir que estás a punto de perderlo.",
+      "en": "Briefly passing out, or feeling about to pass out."
+    }
+  },
+  {
+    "id": "blurred-vision",
+    "name": { "es": "Visión borrosa", "en": "Blurred vision" },
+    "description": {
+      "es": "Ves borroso o peor que de costumbre, en uno o en los dos ojos.",
+      "en": "Things look blurry or worse than usual, in one or both eyes."
+    }
+  },
+  {
+    "id": "confusion",
+    "name": { "es": "Confusión", "en": "Confusion" },
+    "description": {
+      "es": "Cuesta pensar con claridad, recordar o saber dónde estás.",
+      "en": "Hard to think clearly, remember or know where you are."
+    }
+  },
+  {
+    "id": "nausea",
+    "name": { "es": "Náuseas", "en": "Nausea" },
+    "description": {
+      "es": "Ganas de vomitar o malestar en el estómago.",
+      "en": "Feeling like throwing up or an upset stomach."
+    }
+  },
+  {
+    "id": "fever-chills",
+    "name": { "es": "Fiebre o escalofríos", "en": "Fever or chills" },
+    "description": {
+      "es": "Sensación de calor, temblores o frío intenso sin motivo.",
+      "en": "Feeling hot, shivering or very cold for no reason."
+    }
+  },
+  {
+    "id": "sweating",
+    "name": { "es": "Sudoración", "en": "Sweating" },
+    "description": {
+      "es": "Sudor frío o abundante sin haber hecho esfuerzo.",
+      "en": "Cold or heavy sweat without any effort."
+    }
+  },
+  {
+    "id": "palpitations",
+    "name": { "es": "Palpitaciones", "en": "Palpitations" },
+    "description": {
+      "es": "Notas el corazón muy rápido, fuerte o irregular.",
+      "en": "You feel your heart beating very fast, hard or irregularly."
+    }
+  }
+]

@@ -1,0 +1,501 @@
+{
+  "heart-rate": {
+    "howToMeasure": {
+      "es": "El reloj la mide en la muñeca y la app la lee de Salud (HealthKit). Para un valor en reposo, siéntate tranquilo 5 minutos y mira la cifra. A mano: dos dedos en la muñeca, cuenta los latidos 30 segundos y multiplica por 2. En una emergencia, el reloj la envía cada pocos segundos.",
+      "en": "The watch measures it at the wrist and the app reads it from Health (HealthKit). For a resting value, sit quietly for 5 minutes and read the number. By hand: two fingers on the wrist, count beats for 30 seconds and multiply by 2. In an emergency, the watch sends it every few seconds."
+    },
+    "whyItMatters": {
+      "es": "En el espacio el corazón se adapta, puede perder fuerza y sube el riesgo de ritmos anormales. Un pulso muy alto o muy bajo, sobre todo con dolor en el pecho o mareo, puede ser el primer aviso de algo grave.",
+      "en": "In space the heart adapts, can lose strength and the risk of abnormal rhythms goes up. A very high or very low pulse, especially with chest pain or dizziness, can be the first warning of something serious."
+    },
+    "whatToDo": {
+      "es": "En reposo lo normal es 60–100 (40–60 en personas muy entrenadas); compáralo con tu línea base. Si sale fuera, repite sentado. Más de 120 o menos de 50 con síntomas: empieza el protocolo de dolor torácico. Más de 150 o menos de 40: comprueba ya cómo está la persona.",
+      "en": "At rest, normal is 60–100 (40–60 in very fit people); compare it with your baseline. If it is outside, repeat sitting down. Over 120 or under 50 with symptoms: start the chest pain protocol. Over 150 or under 40: check on the person right now."
+    },
+    "sources": [
+      "MedlinePlus, Pulse: https://medlineplus.gov/ency/article/003399.htm",
+      "NASA, Cardiovascular Health in Microgravity: https://www.nasa.gov/missions/station/cardiovascular-health-in-microgravity/",
+      "CSA, Bio-Monitor: https://www.asc-csa.gc.ca/eng/sciences/bio-monitor.asp"
+    ]
+  },
+  "hrv": {
+    "howToMeasure": {
+      "es": "El reloj la calcula de noche o en reposo con los pequeños cambios entre latidos (en milisegundos). No tienes que hacer nada: la app la lee de Salud (HealthKit).",
+      "en": "The watch calculates it at night or at rest from the small changes between beats (in milliseconds). You don’t need to do anything: the app reads it from Health (HealthKit)."
+    },
+    "whyItMatters": {
+      "es": "Un corazón descansado varía un poco su ritmo; con cansancio o estrés varía menos, y en vuelo suele bajar. Una caída grande frente a tu valor habitual sugiere que necesitas recuperarte.",
+      "en": "A rested heart varies its rhythm a little; with fatigue or stress it varies less, and it usually drops in flight. A big drop from your usual value suggests you need to recover."
+    },
+    "whatToDo": {
+      "es": "Si baja mucho frente a tu línea base, prioriza el descanso y el sueño y evita esfuerzos intensos ese día. Repite al día siguiente.",
+      "en": "If it drops a lot from your baseline, prioritize rest and sleep and avoid hard effort that day. Repeat the next day."
+    },
+    "sources": [
+      "NASA, Cardiovascular Health in Microgravity: https://www.nasa.gov/missions/station/cardiovascular-health-in-microgravity/"
+    ]
+  },
+  "heart-rhythm": {
+    "howToMeasure": {
+      "es": "Graba un ECG de 30 segundos con el reloj: dedo sobre la corona y brazo quieto. Sale «sinusal» (normal) o «irregular». La app lo lee de Salud (HealthKit) donde el ECG del reloj esté disponible.",
+      "en": "Record a 30-second ECG with the watch: finger on the crown and arm still. It shows \"sinus\" (normal) or \"irregular\". The app reads it from Health (HealthKit) where the watch ECG is available."
+    },
+    "whyItMatters": {
+      "es": "El ritmo dice si el corazón late de forma ordenada. En el espacio aumenta el riesgo de arritmias (latidos desordenados), y algunas pueden hacer que una persona colapse.",
+      "en": "The rhythm tells whether the heart beats in an orderly way. In space the risk of arrhythmias (disordered beats) goes up, and some can make a person collapse."
+    },
+    "whatToDo": {
+      "es": "Irregular sin síntomas: repite en reposo y envía el ECG a Tierra. Irregular con dolor en el pecho, mareo, falta de aire o desmayo: empieza el protocolo de dolor torácico.",
+      "en": "Irregular without symptoms: repeat at rest and send the ECG to Earth. Irregular with chest pain, dizziness, shortness of breath or fainting: start the chest pain protocol."
+    },
+    "sources": [
+      "MedlinePlus, Pulse: https://medlineplus.gov/ency/article/003399.htm",
+      "NASA, Cardiovascular Health in Microgravity: https://www.nasa.gov/missions/station/cardiovascular-health-in-microgravity/"
+    ]
+  },
+  "systolic-bp": {
+    "howToMeasure": {
+      "es": "Siéntate 5 minutos con la espalda apoyada y los pies en las sujeciones. Pon el brazalete en el brazo desnudo, a la altura del corazón, y no hables mientras mide. Anota los dos números: el alto (sistólica, al latir) y el bajo (diastólica, entre latidos). Con Bluetooth el valor llega solo a la app; si no, escríbelo a mano.",
+      "en": "Sit for 5 minutes with your back supported and feet in the restraints. Put the cuff on your bare arm, at heart level, and don’t talk while it measures. Write down both numbers: the top one (systolic, when the heart beats) and the bottom one (diastolic, between beats). With Bluetooth the value reaches the app by itself; if not, type it in."
+    },
+    "whyItMatters": {
+      "es": "Sin gravedad, la sangre sube a la cabeza y el corazón trabaja distinto y pierde forma; al volver a la gravedad puedes marearte al ponerte de pie. Una presión muy alta o muy baja avisa de que la circulación está bajo estrés.",
+      "en": "Without gravity, blood shifts to the head and the heart works differently and loses fitness; back in gravity you can feel dizzy when standing up. Very high or very low pressure warns that the circulation is under stress."
+    },
+    "whatToDo": {
+      "es": "Referencia: por debajo de 140/90 y por encima de 90/60. Si sale fuera, bebe agua y repite sentado en 5 minutos. Si sigue igual, inclúyelo en el próximo paquete a Tierra. Con mareo, dolor en el pecho o desmayo, abre el protocolo de emergencia.",
+      "en": "Reference: below 140/90 and above 90/60. If it is outside, drink water and repeat sitting down in 5 minutes. If it stays the same, add it to the next packet to Earth. With dizziness, chest pain or fainting, open the emergency protocol."
+    },
+    "sources": [
+      "MSD Manual, Classification of Blood Pressure in Adults (AHA/ACC 2025): https://www.msdmanuals.com/professional/multimedia/table/classification-of-blood-pressure-in-adults",
+      "NHLBI, Low Blood Pressure: https://www.nhlbi.nih.gov/health/low-blood-pressure",
+      "MSD Manual, Hypertensive Emergencies: https://www.msdmanuals.com/professional/cardiovascular-disorders/hypertension/hypertensive-emergencies",
+      "NASA, Cardiovascular Health in Microgravity: https://www.nasa.gov/missions/station/cardiovascular-health-in-microgravity/"
+    ]
+  },
+  "diastolic-bp": {
+    "howToMeasure": {
+      "es": "Siéntate 5 minutos con la espalda apoyada y los pies en las sujeciones. Pon el brazalete en el brazo desnudo, a la altura del corazón, y no hables mientras mide. Anota los dos números: el alto (sistólica, al latir) y el bajo (diastólica, entre latidos). Con Bluetooth el valor llega solo a la app; si no, escríbelo a mano.",
+      "en": "Sit for 5 minutes with your back supported and feet in the restraints. Put the cuff on your bare arm, at heart level, and don’t talk while it measures. Write down both numbers: the top one (systolic, when the heart beats) and the bottom one (diastolic, between beats). With Bluetooth the value reaches the app by itself; if not, type it in."
+    },
+    "whyItMatters": {
+      "es": "Sin gravedad, la sangre sube a la cabeza y el corazón trabaja distinto y pierde forma; al volver a la gravedad puedes marearte al ponerte de pie. Una presión muy alta o muy baja avisa de que la circulación está bajo estrés.",
+      "en": "Without gravity, blood shifts to the head and the heart works differently and loses fitness; back in gravity you can feel dizzy when standing up. Very high or very low pressure warns that the circulation is under stress."
+    },
+    "whatToDo": {
+      "es": "Referencia: por debajo de 140/90 y por encima de 90/60. Si sale fuera, bebe agua y repite sentado en 5 minutos. Si sigue igual, inclúyelo en el próximo paquete a Tierra. Con mareo, dolor en el pecho o desmayo, abre el protocolo de emergencia.",
+      "en": "Reference: below 140/90 and above 90/60. If it is outside, drink water and repeat sitting down in 5 minutes. If it stays the same, add it to the next packet to Earth. With dizziness, chest pain or fainting, open the emergency protocol."
+    },
+    "sources": [
+      "MSD Manual, Classification of Blood Pressure in Adults (AHA/ACC 2025): https://www.msdmanuals.com/professional/multimedia/table/classification-of-blood-pressure-in-adults",
+      "NHLBI, Low Blood Pressure: https://www.nhlbi.nih.gov/health/low-blood-pressure",
+      "MSD Manual, Hypertensive Emergencies: https://www.msdmanuals.com/professional/cardiovascular-disorders/hypertension/hypertensive-emergencies",
+      "NASA, Cardiovascular Health in Microgravity: https://www.nasa.gov/missions/station/cardiovascular-health-in-microgravity/"
+    ]
+  },
+  "spo2": {
+    "howToMeasure": {
+      "es": "Lo mide el reloj o un oxímetro en el dedo: quédate quieto y con la mano caliente. La app lee de Salud (HealthKit) la última medición; para una nueva, ábrela en el reloj.",
+      "en": "The watch or a finger oximeter measures it: keep still, with a warm hand. The app reads the latest measurement from Health (HealthKit); for a new one, start it on the watch."
+    },
+    "whyItMatters": {
+      "es": "Si el aire de la nave tiene poco oxígeno o la presión es baja (por ejemplo, antes de una salida), el cuerpo recibe menos oxígeno. Eso causa mareo, confusión y errores, a veces sin notarlo.",
+      "en": "If the ship’s air has little oxygen or the pressure is low (for example, before a spacewalk), the body gets less oxygen. That causes dizziness, confusion and mistakes, sometimes without noticing."
+    },
+    "whatToDo": {
+      "es": "Normal: 95–100 %. Por debajo de 95, repite y revisa el aire del módulo. Por debajo de 90, o con falta de aire: oxígeno con mascarilla, suspende cualquier salida y avisa.",
+      "en": "Normal: 95–100%. Below 95, repeat and check the module air. Below 90, or with shortness of breath: oxygen mask, stop any spacewalk and report it."
+    },
+    "sources": [
+      "WHO, Pulse Oximetry Training Manual: https://cdn.who.int/media/docs/default-source/patient-safety/pulse-oximetry/who-ps-pulse-oxymetry-training-manual-en.pdf",
+      "NASA HRP, Hostile/Closed Environments: https://www.nasa.gov/hrp/hazard-hostile-closed-environments/"
+    ]
+  },
+  "cabin-co2": {
+    "howToMeasure": {
+      "es": "Lo miden los analizadores de aire de cada módulo, en milímetros de mercurio (mmHg). No llevas ningún sensor: la app recibe la telemetría de la nave.",
+      "en": "The air analyzers in each module measure it, in millimeters of mercury (mmHg). You wear no sensor: the app receives the ship’s telemetry."
+    },
+    "whyItMatters": {
+      "es": "El CO₂ que exhalamos se acumula donde el aire se mueve poco, como donde duermes. Un poco más de lo normal ya puede dar dolor de cabeza, cansancio y peor concentración.",
+      "en": "The CO₂ we breathe out builds up where the air barely moves, like where you sleep. A little more than normal can already cause headache, tiredness and poorer focus."
+    },
+    "whatToDo": {
+      "es": "Por encima de 3 mmHg: descansa en otro módulo y revisa la ventilación. Si alguien tiene dolor de cabeza o falta de aire, mide su oxígeno.",
+      "en": "Above 3 mmHg: rest in another module and check ventilation. If someone has a headache or shortness of breath, measure their oxygen."
+    },
+    "sources": [
+      "NASA-STD-3001 (OCHMO): https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/",
+      "Valinia et al., NESC 2022: https://ntrs.nasa.gov/api/citations/20220009899/downloads/F5.2_04_Valinia.pdf",
+      "NASA HRP, Hostile/Closed Environments: https://www.nasa.gov/hrp/hazard-hostile-closed-environments/"
+    ]
+  },
+  "cabin-noise": {
+    "howToMeasure": {
+      "es": "Lo miden dosímetros acústicos (medidores de ruido) de la nave, en decibelios (dB); la app lo recibe por la telemetría de la nave.",
+      "en": "The ship’s acoustic dosimeters (noise meters) measure it in decibels (dB); the app receives it through the ship’s telemetry."
+    },
+    "whyItMatters": {
+      "es": "Ventiladores y bombas suenan todo el día. Mucho ruido cansa, dificulta dormir y, con el tiempo, puede dañar el oído.",
+      "en": "Fans and pumps run all day. A lot of noise is tiring, makes sleep harder and, over time, can damage hearing."
+    },
+    "whatToDo": {
+      "es": "Por encima de 60 dB: usa protección para los oídos o descansa en un módulo más silencioso.",
+      "en": "Above 60 dB: use hearing protection or rest in a quieter module."
+    },
+    "sources": [
+      "NASA-STD-3001 (OCHMO): https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/",
+      "NASA HRP, Hostile/Closed Environments: https://www.nasa.gov/hrp/hazard-hostile-closed-environments/"
+    ]
+  },
+  "visual-acuity": {
+    "howToMeasure": {
+      "es": "Sujeta el móvil a la distancia que marca la app, tapa un ojo y lee la carta de 10 líneas de arriba abajo. Anota cuántas lees bien y repite con el otro ojo. La línea 10 es una vista normal (20/20).",
+      "en": "Hold the phone at the distance the app shows, cover one eye and read the 10-line chart from top to bottom. Note how many you read correctly and repeat with the other eye. Line 10 is normal vision (20/20)."
+    },
+    "whyItMatters": {
+      "es": "Sin gravedad, los líquidos suben a la cabeza y pueden deformar el ojo y el nervio óptico (lo que NASA llama SANS). Ver un poco peor puede ser la primera señal.",
+      "en": "Without gravity, fluids move to the head and can change the shape of the eye and the optic nerve (what NASA calls SANS). Seeing slightly worse can be the first sign."
+    },
+    "whatToDo": {
+      "es": "Si lees menos de 8 líneas, repite con buena luz y con cada ojo. Si sigue igual, o ves borroso de repente, avisa a Tierra; puede hacer falta una ecografía guiada del ojo.",
+      "en": "If you read fewer than 8 lines, repeat with good light and with each eye. If it stays the same, or your vision suddenly turns blurry, report to Earth; a guided eye ultrasound may be needed."
+    },
+    "sources": [
+      "NASA HRP, Gravity Fields: https://www.nasa.gov/hrp/hazard-gravity-fields/",
+      "NASA, Cardiovascular Health in Microgravity: https://www.nasa.gov/missions/station/cardiovascular-health-in-microgravity/"
+    ]
+  },
+  "reaction-time": {
+    "howToMeasure": {
+      "es": "Prueba de vigilancia (PVT): toca la pantalla en cuanto aparezca la señal, cinco veces. Se mide en milisegundos. Forma parte de la batería cognitiva del móvil (menos de 4 minutos). Hazla en un sitio tranquilo, a la misma hora del día. La app la compara con tu línea base de antes del vuelo, que se actualiza en vuelo.",
+      "en": "Vigilance test (PVT): tap the screen as soon as the signal appears, five times. It is measured in milliseconds. It is part of the phone’s cognitive battery (under 4 minutes). Do it somewhere quiet, at the same time of day. The app compares it with your pre-flight baseline, which updates in flight."
+    },
+    "whyItMatters": {
+      "es": "Dormir poco, el estrés, el aislamiento y la radiación pueden hacer que pienses y reacciones más despacio sin que lo notes. Una prueba corta y diaria lo detecta antes de que cause un error.",
+      "en": "Little sleep, stress, isolation and radiation can slow your thinking and reactions without you noticing. A short daily test catches it before it causes a mistake."
+    },
+    "whatToDo": {
+      "es": "Si sale peor que tu línea base, descansa y repite en 2 horas. Si vuelve a salir mal, la app avisa a Tierra. No hagas tareas críticas (salidas, maniobras) hasta repetir con buen resultado.",
+      "en": "If it comes out worse than your baseline, rest and repeat in 2 hours. If it fails again, the app notifies Earth. Avoid critical tasks (spacewalks, maneuvers) until a repeat comes out fine."
+    },
+    "sources": [
+      "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/",
+      "NASA HRP, Isolation and Confinement: https://www.nasa.gov/hrp/hazard-isolation-and-confinement/"
+    ]
+  },
+  "pvt-lapses": {
+    "howToMeasure": {
+      "es": "En la prueba de vigilancia, un lapso es una respuesta que tarda más de medio segundo (500 ms). Forma parte de la batería cognitiva del móvil (menos de 4 minutos). Hazla en un sitio tranquilo, a la misma hora del día. La app la compara con tu línea base de antes del vuelo, que se actualiza en vuelo.",
+      "en": "In the vigilance test, a lapse is a response that takes more than half a second (500 ms). It is part of the phone’s cognitive battery (under 4 minutes). Do it somewhere quiet, at the same time of day. The app compares it with your pre-flight baseline, which updates in flight."
+    },
+    "whyItMatters": {
+      "es": "Los lapsos son pequeños «apagones» de atención. Suben con la falta de sueño y son peligrosos en tareas que no perdonan un despiste.",
+      "en": "Lapses are small attention \"blackouts\". They go up with lack of sleep and are dangerous in tasks where a slip is not forgiven."
+    },
+    "whatToDo": {
+      "es": "Si sale peor que tu línea base, descansa y repite en 2 horas. Si vuelve a salir mal, la app avisa a Tierra. No hagas tareas críticas (salidas, maniobras) hasta repetir con buen resultado.",
+      "en": "If it comes out worse than your baseline, rest and repeat in 2 hours. If it fails again, the app notifies Earth. Avoid critical tasks (spacewalks, maneuvers) until a repeat comes out fine."
+    },
+    "sources": [
+      "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/",
+      "NASA HRP, Isolation and Confinement: https://www.nasa.gov/hrp/hazard-isolation-and-confinement/"
+    ]
+  },
+  "working-memory": {
+    "howToMeasure": {
+      "es": "Memoria espacial: repite las celdas que se iluminan en una cuadrícula de 4×4. El nivel (de 3 a 5 celdas) sube si aciertas. Forma parte de la batería cognitiva del móvil (menos de 4 minutos). Hazla en un sitio tranquilo, a la misma hora del día. La app la compara con tu línea base de antes del vuelo, que se actualiza en vuelo.",
+      "en": "Spatial memory: repeat the cells that light up on a 4×4 grid. The level (3 to 5 cells) goes up when you get it right. It is part of the phone’s cognitive battery (under 4 minutes). Do it somewhere quiet, at the same time of day. The app compares it with your pre-flight baseline, which updates in flight."
+    },
+    "whyItMatters": {
+      "es": "La memoria de trabajo es la que usas para seguir un procedimiento paso a paso. El cansancio y el estrés la reducen.",
+      "en": "Working memory is what you use to follow a procedure step by step. Fatigue and stress reduce it."
+    },
+    "whatToDo": {
+      "es": "Si sale peor que tu línea base, descansa y repite en 2 horas. Si vuelve a salir mal, la app avisa a Tierra. No hagas tareas críticas (salidas, maniobras) hasta repetir con buen resultado.",
+      "en": "If it comes out worse than your baseline, rest and repeat in 2 hours. If it fails again, the app notifies Earth. Avoid critical tasks (spacewalks, maneuvers) until a repeat comes out fine."
+    },
+    "sources": [
+      "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/",
+      "NASA HRP, Isolation and Confinement: https://www.nasa.gov/hrp/hazard-isolation-and-confinement/"
+    ]
+  },
+  "go-nogo-accuracy": {
+    "howToMeasure": {
+      "es": "Go/No-Go: durante 20 segundos, toca solo los círculos y no las otras formas. Se mide el porcentaje de aciertos. Forma parte de la batería cognitiva del móvil (menos de 4 minutos). Hazla en un sitio tranquilo, a la misma hora del día. La app la compara con tu línea base de antes del vuelo, que se actualiza en vuelo.",
+      "en": "Go/No-Go: for 20 seconds, tap only the circles, not the other shapes. It measures the percentage of correct answers. It is part of the phone’s cognitive battery (under 4 minutes). Do it somewhere quiet, at the same time of day. The app compares it with your pre-flight baseline, which updates in flight."
+    },
+    "whyItMatters": {
+      "es": "Mide si sabes frenar un gesto automático. Equivocarse más de lo habitual indica cansancio o falta de concentración.",
+      "en": "It measures whether you can stop an automatic action. More mistakes than usual point to fatigue or poor focus."
+    },
+    "whatToDo": {
+      "es": "Si sale peor que tu línea base, descansa y repite en 2 horas. Si vuelve a salir mal, la app avisa a Tierra. No hagas tareas críticas (salidas, maniobras) hasta repetir con buen resultado.",
+      "en": "If it comes out worse than your baseline, rest and repeat in 2 hours. If it fails again, the app notifies Earth. Avoid critical tasks (spacewalks, maneuvers) until a repeat comes out fine."
+    },
+    "sources": [
+      "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/",
+      "NASA HRP, Isolation and Confinement: https://www.nasa.gov/hrp/hazard-isolation-and-confinement/"
+    ]
+  },
+  "glucose": {
+    "howToMeasure": {
+      "es": "Lávate las manos, pincha el lateral de la yema del dedo y pon la gota en la tira del glucómetro; el resultado sale en mg/dL. Mejor en ayunas por la mañana, para comparar con la referencia. Con Bluetooth el valor llega solo; si no, escríbelo a mano.",
+      "en": "Wash your hands, prick the side of your fingertip and put the drop on the meter strip; the result is in mg/dL. Best fasting in the morning, to compare with the reference. With Bluetooth the value arrives by itself; if not, type it in."
+    },
+    "whyItMatters": {
+      "es": "Comer mal o poco en una misión larga es uno de los grandes riesgos para Marte, y en vuelo el cuerpo puede responder peor a la insulina. Muy baja causa sudor, temblor y confusión; alta y repetida, problemas a largo plazo.",
+      "en": "Eating badly or too little on a long mission is one of the big risks for Mars, and in flight the body can respond worse to insulin. Very low causes sweating, shaking and confusion; high and repeated, long-term problems."
+    },
+    "whatToDo": {
+      "es": "En ayunas, normal: 70–99. Por debajo de 70: regla 15/15 (15 g de azúcar rápido y medir otra vez a los 15 minutos). Con confusión o mareo, es urgente. De 100 a 125, o 126 o más dos veces: repite en ayunas y envíalo a Tierra.",
+      "en": "Fasting, normal: 70–99. Below 70: 15/15 rule (15 g of fast sugar and measure again after 15 minutes). With confusion or dizziness, it is urgent. 100 to 125, or 126 or more twice: repeat fasting and send it to Earth."
+    },
+    "sources": [
+      "ADA, Diagnosis: https://diabetes.org/about-diabetes/diagnosis",
+      "ADA, Hypoglycemia: https://diabetes.org/living-with-diabetes/treatment-care/hypoglycemia-low-blood-glucose",
+      "Hughson et al. 2016: https://doi.org/10.1152/ajpheart.00802.2015",
+      "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/"
+    ]
+  },
+  "body-temperature": {
+    "howToMeasure": {
+      "es": "Usa el termómetro del botiquín: bajo la lengua, boca cerrada, hasta que pite. No midas justo después de comer, beber o hacer ejercicio. La temperatura de muñeca del reloj no sirve para esto. Escribe el valor en la app.",
+      "en": "Use the kit thermometer: under the tongue, mouth closed, until it beeps. Don’t measure right after eating, drinking or exercising. The watch’s wrist temperature doesn’t work for this. Type the value into the app."
+    },
+    "whyItMatters": {
+      "es": "La fiebre suele indicar infección: en el espacio las defensas bajan, pueden despertar virus dormidos y en una nave cerrada los gérmenes pasan fácil. NASA cree que la temperatura puede subir más en microgravedad, sobre todo con ejercicio.",
+      "en": "Fever usually means infection: in space defenses weaken, dormant viruses can wake up and germs spread easily in a closed ship. NASA thinks body temperature may run higher in microgravity, especially with exercise."
+    },
+    "whatToDo": {
+      "es": "Normal: 35,5–37,9 °C. Con 38 o más, repite, bebe agua y busca de dónde viene (piel, dientes, garganta, orina). Si hay escalofríos, confusión o falta de aire, o dura 3 días, sigue el protocolo de fiebre. Por debajo de 35: abriga a la persona y avisa.",
+      "en": "Normal: 35.5–37.9 °C. At 38 or more, repeat, drink water and look for the cause (skin, teeth, throat, urine). With chills, confusion or shortness of breath, or if it lasts 3 days, follow the fever protocol. Below 35: warm the person up and report it."
+    },
+    "sources": [
+      "NHS, High temperature (fever) in adults: https://www.nhs.uk/symptoms/fever-in-adults/",
+      "MedlinePlus, Hypothermia: https://medlineplus.gov/ency/article/000038.htm",
+      "NASA, body temperature in low Earth orbit: https://www.nasa.gov/help-nasa-find-practical-ways-to-monitor-astronaut-body-temperature-in-low-earth-orbit/"
+    ]
+  },
+  "wrist-temperature": {
+    "howToMeasure": {
+      "es": "El reloj la mide mientras duermes, en la piel de la muñeca, y la muestra como diferencia frente a tu valor habitual. La app la lee de Salud (HealthKit).",
+      "en": "The watch measures it while you sleep, on the skin of your wrist, and shows it as a difference from your usual value. The app reads it from Health (HealthKit)."
+    },
+    "whyItMatters": {
+      "es": "Cambia con el ciclo del sueño, la temperatura del módulo o el inicio de una enfermedad. Es una pista, no la temperatura del cuerpo.",
+      "en": "It changes with your sleep cycle, the module temperature or the start of an illness. It is a hint, not your body temperature."
+    },
+    "whatToDo": {
+      "es": "Si se aleja más de 1 °C de lo habitual, mide la temperatura corporal con el termómetro.",
+      "en": "If it is more than 1 °C off your usual value, measure your body temperature with the thermometer."
+    },
+    "sources": ["Apple, Wrist temperature: https://support.apple.com/en-us/102674"]
+  },
+  "weight": {
+    "howToMeasure": {
+      "es": "Sin gravedad una báscula normal no funciona: a bordo se usa un medidor de masa corporal con muelle. Mide a la misma hora, antes de comer, y escribe el valor en la app.",
+      "en": "Without gravity a normal scale doesn’t work: on board you use a spring-based body mass device. Measure at the same time of day, before eating, and type the value into the app."
+    },
+    "whyItMatters": {
+      "es": "Perder peso suele significar que comes menos de lo que gastas o que pierdes músculo. Eso te debilita para el regreso o para trabajar en otro planeta.",
+      "en": "Losing weight usually means you eat less than you burn or that you are losing muscle. That weakens you for the return or for working on another planet."
+    },
+    "whatToDo": {
+      "es": "Si tu masa cambia más de un 5 % frente a lo habitual, revisa la dieta con el plan de nutrición y avisa a Tierra.",
+      "en": "If your body mass changes more than 5% from usual, review your diet against the nutrition plan and tell Earth."
+    },
+    "sources": [
+      "GLIM, Cederholm et al. 2019: https://doi.org/10.1002/jcsm.12383",
+      "NASA-STD-3001 Vol. 1 (V1 4020): https://www.nasa.gov/wp-content/uploads/2023/11/nasa-std-3001-vol-1-rev-c-with-signature.pdf"
+    ]
+  },
+  "food-intake": {
+    "howToMeasure": {
+      "es": "Anota lo que comes en el diario de la app; las raciones de a bordo traen sus calorías (kcal).",
+      "en": "Log what you eat in the app’s diary; onboard meals list their calories (kcal)."
+    },
+    "whyItMatters": {
+      "es": "Comer menos de lo necesario durante semanas es uno de los grandes riesgos para Marte: debilita músculos, huesos y defensas.",
+      "en": "Eating less than you need for weeks is one of the big risks for Mars: it weakens muscles, bones and defenses."
+    },
+    "whatToDo": {
+      "es": "Si llevas tres días muy por debajo o por encima de tu plan, ajusta la dieta y coméntalo con Tierra.",
+      "en": "If you have been well below or above your plan for three days, adjust your diet and discuss it with Earth."
+    },
+    "sources": [
+      "NASA-STD-3001 Vol. 1 (V1 4020): https://www.nasa.gov/wp-content/uploads/2023/11/nasa-std-3001-vol-1-rev-c-with-signature.pdf",
+      "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/"
+    ]
+  },
+  "resistance-exercise": {
+    "howToMeasure": {
+      "es": "Al terminar la sesión en el equipo de ejercicio de fuerza de la nave (pesas de vacío), marca los minutos en la Rutina.",
+      "en": "When you finish your session on the ship’s resistance exercise device (vacuum weights), log the minutes in Routine."
+    },
+    "whyItMatters": {
+      "es": "Sin gravedad, huesos y músculos no cargan peso y se debilitan. El ejercicio diario es la mejor defensa que existe.",
+      "en": "Without gravity, bones and muscles carry no weight and get weaker. Daily exercise is the best defense there is."
+    },
+    "whatToDo": {
+      "es": "Completa al menos 45 minutos al día. Si un día no llegas, recupéralo al día siguiente.",
+      "en": "Complete at least 45 minutes a day. If you miss a day, make it up the next day."
+    },
+    "sources": ["NASA HRP, Gravity Fields: https://www.nasa.gov/hrp/hazard-gravity-fields/"]
+  },
+  "bone-loss": {
+    "howToMeasure": {
+      "es": "A bordo no se puede medir la densidad del hueso; esa prueba (DXA) se hace en Tierra antes y después del vuelo. La app estima la pérdida según los días de misión y el ejercicio que registras.",
+      "en": "Bone density cannot be measured on board; that test (DXA) is done on Earth before and after flight. The app estimates the loss from mission days and the exercise you log."
+    },
+    "whyItMatters": {
+      "es": "En el espacio el hueso pierde alrededor de un 1–1,5 % al mes. Eso aumenta el riesgo de fracturas y de piedras en el riñón.",
+      "en": "In space bone loses about 1–1.5% per month. That raises the risk of fractures and kidney stones."
+    },
+    "whatToDo": {
+      "es": "Desde un 3 % estimado, cumple el plan de ejercicio y bebe agua. Más de un 5 %: avisa a Tierra. Dolor fuerte en la espalda baja o el costado puede ser una piedra en el riñón.",
+      "en": "From an estimated 3%, stick to the exercise plan and drink water. Over 5%: tell Earth. Strong pain in the lower back or side can be a kidney stone."
+    },
+    "sources": [
+      "NASA-STD-3001 Vol. 1 (V1 4027): https://www.nasa.gov/wp-content/uploads/2023/11/nasa-std-3001-vol-1-rev-c-with-signature.pdf",
+      "NASA HRP, Gravity Fields: https://www.nasa.gov/hrp/hazard-gravity-fields/"
+    ]
+  },
+  "steps": {
+    "howToMeasure": {
+      "es": "Los cuenta el móvil o el reloj al caminar. En microgravedad no se camina y el valor es cero.",
+      "en": "The phone or watch counts them as you walk. In microgravity nobody walks and the value is zero."
+    },
+    "whyItMatters": {
+      "es": "En la Luna o en Marte caminar vuelve a cargar los huesos y ayuda a mantenerlos.",
+      "en": "On the Moon or Mars, walking loads the bones again and helps maintain them."
+    },
+    "whatToDo": {
+      "es": "En superficie, intenta superar 3000 pasos al día además del ejercicio de fuerza.",
+      "en": "On a surface, try to go over 3000 steps a day in addition to resistance exercise."
+    },
+    "sources": ["NASA HRP, Gravity Fields: https://www.nasa.gov/hrp/hazard-gravity-fields/"]
+  },
+  "distance": {
+    "howToMeasure": {
+      "es": "La calcula el móvil a partir de los pasos.",
+      "en": "The phone calculates it from your steps."
+    },
+    "whyItMatters": {
+      "es": "Es informativa: ayuda a ver cuánto te mueves en superficie.",
+      "en": "It is for information: it shows how much you move on a surface."
+    },
+    "whatToDo": {
+      "es": "No hay un objetivo fijo; úsala junto con los pasos.",
+      "en": "There is no fixed target; use it together with steps."
+    },
+    "sources": ["NASA HRP, Gravity Fields: https://www.nasa.gov/hrp/hazard-gravity-fields/"]
+  },
+  "floors": {
+    "howToMeasure": {
+      "es": "Los cuenta el móvil con su sensor de presión al subir desniveles.",
+      "en": "The phone counts them with its pressure sensor when you climb."
+    },
+    "whyItMatters": {
+      "es": "Es informativa: subir desniveles carga más los huesos y los músculos.",
+      "en": "It is for information: climbing loads bones and muscles more."
+    },
+    "whatToDo": {
+      "es": "No hay un objetivo fijo.",
+      "en": "There is no fixed target."
+    },
+    "sources": ["NASA HRP, Gravity Fields: https://www.nasa.gov/hrp/hazard-gravity-fields/"]
+  },
+  "radiation-dose": {
+    "howToMeasure": {
+      "es": "La mide en milisieverts (mSv) el dosímetro personal que llevas siempre, también fuera de la nave. Los sensores fijos miden cada módulo; la app recibe ambos por la telemetría de la nave.",
+      "en": "Your personal dosimeter, worn at all times, also outside the ship, measures it in millisieverts (mSv). Fixed sensors measure each module; the app receives both through the ship’s telemetry."
+    },
+    "whyItMatters": {
+      "es": "Fuera del campo magnético de la Tierra, la radiación del espacio y del Sol atraviesa el cuerpo sin que lo notes. Se acumula y aumenta el riesgo de cáncer y de daño en el cerebro; NASA fija un límite de 600 mSv para toda la carrera.",
+      "en": "Outside Earth’s magnetic field, radiation from space and the Sun passes through the body without you noticing. It adds up and raises the risk of cancer and brain damage; NASA sets a limit of 600 mSv for a whole career."
+    },
+    "whatToDo": {
+      "es": "Si la dosis del día supera lo esperado en tu entorno, mira si hay un evento solar y regístralo. Si supera 25 mSv en un día, ve al refugio blindado.",
+      "en": "If today’s dose is above what is expected where you are, check for a solar event and log it. If it goes over 25 mSv in a day, go to the shielded shelter."
+    },
+    "sources": [
+      "NASA-STD-3001 Vol. 1 (V1 4029, V1 4030): https://www.nasa.gov/wp-content/uploads/2023/11/nasa-std-3001-vol-1-rev-c-with-signature.pdf",
+      "NASA HRP, Space Radiation: https://www.nasa.gov/hrp/hazard-space-radiation/"
+    ]
+  },
+  "solar-event": {
+    "howToMeasure": {
+      "es": "Llega como aviso de la nave o de Tierra, con la escala de NOAA de S1 (menor) a S5 (extrema).",
+      "en": "It arrives as an alert from the ship or Earth, using NOAA’s scale from S1 (minor) to S5 (extreme)."
+    },
+    "whyItMatters": {
+      "es": "Una tormenta solar lanza partículas que pueden dar en pocas horas tanta dosis como meses normales. Estar en el refugio blindado reduce mucho esa dosis.",
+      "en": "A solar storm sends out particles that can deliver in a few hours as much dose as normal months. Being in the shielded shelter cuts that dose a lot."
+    },
+    "whatToDo": {
+      "es": "S1: pospón la actividad exterior hasta que el flujo baje de 10 pfu. S2 o más: ve al refugio con tu dosímetro y confirma en la app.",
+      "en": "S1: postpone outside activity until the flux drops below 10 pfu. S2 or higher: go to the shelter with your dosimeter and confirm in the app."
+    },
+    "sources": [
+      "NOAA SWPC, Space Weather Scales: https://www.spaceweather.gov/noaa-scales-explanation",
+      "NASA HRP, Space Radiation: https://www.nasa.gov/hrp/hazard-space-radiation/"
+    ]
+  },
+  "mood": {
+    "howToMeasure": {
+      "es": "Cada día, en el registro de bienestar (móvil o reloj), elige del 1 (muy mal) al 5 (muy bien) cómo te sientes. Tarda menos de un minuto y solo tú lo sabes: ningún sensor mide el ánimo. Tu diario privado nunca se envía.",
+      "en": "Every day, in the wellbeing check-in (phone or watch), pick from 1 (very bad) to 5 (very good) how you feel. It takes under a minute and only you know it: no sensor measures mood. Your private journal is never sent."
+    },
+    "whyItMatters": {
+      "es": "Meses de aislamiento, encierro, poca intimidad y lejos de la familia desgastan. NASA ve los cambios de ánimo y de conducta como uno de los mayores riesgos para Marte, porque afectan a la salud y al trabajo en equipo.",
+      "en": "Months of isolation, confinement, little privacy and distance from family wear people down. NASA sees mood and behavior changes as one of the most serious risks for Mars, because they affect health and teamwork."
+    },
+    "whatToDo": {
+      "es": "Un día bajo es normal. Con tres registros seguidos de 2 o menos, busca un momento tranquilo y escribe a alguien de tu familia. Pide una conferencia psicológica privada. La app avisa a Tierra sin enviar tu diario.",
+      "en": "A low day is normal. With three check-ins in a row at 2 or less, find a quiet moment and write to a family member. Request a private psychological conference. The app notifies Earth without sending your journal."
+    },
+    "sources": [
+      "NASA, Isolation (CONNECT): https://www.nasa.gov/humans-in-space/isolation-what-can-we-learn-from-the-experiences-of-nasa-astronauts/",
+      "NASA HRP, Isolation and Confinement: https://www.nasa.gov/hrp/hazard-isolation-and-confinement/",
+      "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/"
+    ]
+  },
+  "stress": {
+    "howToMeasure": {
+      "es": "En el mismo registro de bienestar, elige del 1 (nada) al 5 (muchísimo) tu nivel de estrés. Lo introduces tú.",
+      "en": "In the same wellbeing check-in, pick from 1 (none) to 5 (very high) your stress level. You enter it yourself."
+    },
+    "whyItMatters": {
+      "es": "El estrés sostenido empeora el sueño, la atención y la convivencia, y lejos de la Tierra no hay escapatoria fácil.",
+      "en": "Sustained stress worsens sleep, attention and living together, and far from Earth there is no easy way out."
+    },
+    "whatToDo": {
+      "es": "Con tres registros seguidos de 4 o más, revisa tu carga de trabajo y usa la guía de apoyo psicológico.",
+      "en": "With three check-ins in a row at 4 or more, review your workload and use the psychological support guide."
+    },
+    "sources": [
+      "NASA, Isolation (CONNECT): https://www.nasa.gov/humans-in-space/isolation-what-can-we-learn-from-the-experiences-of-nasa-astronauts/",
+      "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/"
+    ]
+  },
+  "sleep": {
+    "howToMeasure": {
+      "es": "El reloj calcula las horas dormidas si lo llevas de noche, y la app las lee de Salud (HealthKit). Si no lo llevas, anótalas al despertar.",
+      "en": "The watch calculates hours slept if you wear it at night, and the app reads them from Health (HealthKit). If not, log them when you wake up."
+    },
+    "whyItMatters": {
+      "es": "En la nave hay ruido, luz artificial y ni día ni noche normales; en la ISS se durmió de media unas 6 horas, menos de las 7 recomendadas. Dormir poco empeora la atención, la memoria y el ánimo, y aumenta los errores.",
+      "en": "The ship has noise, artificial light and no normal day or night; on the ISS astronauts slept about 6 hours on average, less than the recommended 7. Too little sleep worsens attention, memory and mood, and increases mistakes."
+    },
+    "whatToDo": {
+      "es": "Intenta dormir 7 horas o más. Si llevas tres noches con menos de 6, apaga pantallas una hora antes, ajusta la luz del módulo, mantén el mismo horario y revisa tu carga de trabajo.",
+      "en": "Aim for 7 hours or more. If you have had three nights under 6, turn off screens an hour before, adjust the module lighting, keep the same schedule and review your workload."
+    },
+    "sources": [
+      "AASM & SRS, Watson et al. 2015: https://doi.org/10.5665/sleep.4716",
+      "Barger et al. 2014: https://doi.org/10.1016/S1474-4422%2814%2970122-X",
+      "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/"
+    ]
+  }
+}

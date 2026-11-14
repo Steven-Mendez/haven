@@ -1,0 +1,670 @@
+{
+  "heart-rate": {
+    "term": { "es": "Pulso (frecuencia cardíaca)", "en": "Pulse (heart rate)" },
+    "short": {
+      "es": "Cuántas veces late tu corazón por minuto. En el espacio el corazón se adapta y puede cambiar.",
+      "en": "How many times your heart beats per minute. In space the heart adapts and can change."
+    },
+    "unitHint": {
+      "es": "lpm: latidos por minuto",
+      "en": "bpm: beats per minute"
+    }
+  },
+  "hrv": {
+    "term": { "es": "Variación del latido (VFC)", "en": "Beat-to-beat variation (HRV)" },
+    "short": {
+      "es": "Cuánto varía el tiempo entre latidos. Si baja mucho, tu cuerpo necesita descansar.",
+      "en": "How much the time between beats varies. A big drop means your body needs rest."
+    },
+    "unitHint": {
+      "es": "ms: milisegundos, milésimas de segundo",
+      "en": "ms: milliseconds, thousandths of a second"
+    }
+  },
+  "heart-rhythm": {
+    "term": { "es": "Ritmo del corazón", "en": "Heart rhythm" },
+    "short": {
+      "es": "Si el corazón late de forma ordenada. En el espacio aumenta el riesgo de latidos desordenados.",
+      "en": "Whether the heart beats in an orderly way. Space raises the risk of disordered beats."
+    }
+  },
+  "systolic-bp": {
+    "term": {
+      "es": "Presión al latir (sistólica)",
+      "en": "Heartbeat pressure (systolic)"
+    },
+    "short": {
+      "es": "La fuerza de la sangre cuando el corazón late. En el espacio puede cambiar por la falta de gravedad.",
+      "en": "How hard blood pushes when the heart beats. It can change in space without gravity."
+    },
+    "unitHint": {
+      "es": "mmHg: milímetros de mercurio, la unidad de la presión",
+      "en": "mmHg: millimetres of mercury, the unit for pressure"
+    }
+  },
+  "diastolic-bp": {
+    "term": {
+      "es": "Presión entre latidos (diastólica)",
+      "en": "Pressure between beats (diastolic)"
+    },
+    "short": {
+      "es": "La fuerza de la sangre entre latido y latido. Sin gravedad, la sangre se reparte distinto.",
+      "en": "How hard blood pushes between beats. Without gravity, blood spreads differently."
+    },
+    "unitHint": {
+      "es": "mmHg: milímetros de mercurio, la unidad de la presión",
+      "en": "mmHg: millimetres of mercury, the unit for pressure"
+    }
+  },
+  "spo2": {
+    "term": { "es": "Oxígeno en sangre (SpO₂)", "en": "Blood oxygen (SpO₂)" },
+    "short": {
+      "es": "Cuánto oxígeno lleva tu sangre. Si el aire de la nave falla, baja sin que lo notes.",
+      "en": "How much oxygen your blood carries. If the ship's air fails, it drops without you noticing."
+    },
+    "unitHint": {
+      "es": "%: de cada 100 partes de sangre que pueden llevar oxígeno, cuántas lo llevan",
+      "en": "%: out of every 100 parts of blood that can carry oxygen, how many do"
+    }
+  },
+  "cabin-co2": {
+    "term": { "es": "CO₂ de la cabina", "en": "Cabin CO₂" },
+    "short": {
+      "es": "El gas que exhalamos. En una nave cerrada se acumula y da dolor de cabeza y cansancio.",
+      "en": "The gas we breathe out. In a closed ship it builds up and causes headaches and tiredness."
+    },
+    "unitHint": {
+      "es": "mmHg: milímetros de mercurio; aquí, cuánto CO₂ hay en el aire",
+      "en": "mmHg: millimetres of mercury; here, how much CO₂ is in the air"
+    }
+  },
+  "cabin-noise": {
+    "term": { "es": "Ruido de la cabina", "en": "Cabin noise" },
+    "short": {
+      "es": "Lo fuerte que suenan ventiladores y bombas. Mucho ruido cansa, quita sueño y daña el oído.",
+      "en": "How loud fans and pumps are. Too much noise tires you, ruins sleep and harms hearing."
+    },
+    "unitHint": {
+      "es": "dB: decibelios, la unidad del volumen del sonido",
+      "en": "dB: decibels, the unit for how loud a sound is"
+    }
+  },
+  "visual-acuity": {
+    "term": { "es": "Nitidez de la vista", "en": "Sharpness of vision" },
+    "short": {
+      "es": "Lo bien que ves letras pequeñas. Sin gravedad, el ojo puede deformarse y ver peor.",
+      "en": "How well you read small letters. Without gravity, the eye can change shape and see worse."
+    },
+    "unitHint": {
+      "es": "líneas: filas leídas de una carta de 10; la 10 es vista normal",
+      "en": "lines: rows read on a 10-row chart; row 10 is normal vision"
+    }
+  },
+  "reaction-time": {
+    "term": { "es": "Tiempo de reacción", "en": "Reaction time" },
+    "short": {
+      "es": "Lo rápido que respondes a una señal. El cansancio lo alarga sin que lo notes.",
+      "en": "How fast you respond to a signal. Tiredness slows it down without you noticing."
+    },
+    "unitHint": {
+      "es": "ms: milisegundos, milésimas de segundo",
+      "en": "ms: milliseconds, thousandths of a second"
+    }
+  },
+  "pvt-lapses": {
+    "term": { "es": "Despistes de atención", "en": "Attention slips" },
+    "short": {
+      "es": "Veces que tardas demasiado en reaccionar. Suben al dormir poco y son peligrosos en tareas críticas.",
+      "en": "Times you react far too late. They rise with poor sleep and are risky in critical tasks."
+    },
+    "unitHint": {
+      "es": "lapsos: respuestas que llegaron tarde en la prueba",
+      "en": "lapses: answers that came too late in the test"
+    }
+  },
+  "working-memory": {
+    "term": { "es": "Memoria de trabajo", "en": "Working memory" },
+    "short": {
+      "es": "La memoria que usas para seguir pasos en orden. El cansancio y el estrés la reducen.",
+      "en": "The memory you use to follow steps in order. Tiredness and stress reduce it."
+    },
+    "unitHint": {
+      "es": "de 5: nivel alcanzado en la prueba; 5 es el máximo",
+      "en": "of 5: level reached in the test; 5 is the top"
+    }
+  },
+  "go-nogo-accuracy": {
+    "term": { "es": "Control de impulsos (Go/No-Go)", "en": "Impulse control (Go/No-Go)" },
+    "short": {
+      "es": "Si sabes frenar un gesto automático a tiempo. Fallar más de lo normal indica cansancio.",
+      "en": "Whether you can stop an automatic move in time. More mistakes than usual mean tiredness."
+    },
+    "unitHint": {
+      "es": "%: aciertos de cada 100 intentos",
+      "en": "%: correct answers out of every 100 tries"
+    }
+  },
+  "glucose": {
+    "term": { "es": "Azúcar en sangre (glucosa)", "en": "Blood sugar (glucose)" },
+    "short": {
+      "es": "La energía que llevas en la sangre. Muy baja causa temblor y confusión; comer mal la altera.",
+      "en": "The energy carried in your blood. Very low causes shaking and confusion; poor eating upsets it."
+    },
+    "unitHint": {
+      "es": "mg/dL: miligramos de azúcar por cada décima de litro de sangre",
+      "en": "mg/dL: milligrams of sugar in each tenth of a litre of blood"
+    }
+  },
+  "body-temperature": {
+    "term": { "es": "Temperatura del cuerpo", "en": "Body temperature" },
+    "short": {
+      "es": "Lo caliente que está tu cuerpo. La fiebre avisa de infección, y en el espacio las defensas bajan.",
+      "en": "How warm your body is. Fever warns of infection, and in space your defences are weaker."
+    },
+    "unitHint": {
+      "es": "°C: grados Celsius",
+      "en": "°C: degrees Celsius"
+    }
+  },
+  "wrist-temperature": {
+    "term": { "es": "Temperatura de la muñeca (noche)", "en": "Wrist temperature (night)" },
+    "short": {
+      "es": "Cambio de temperatura de la piel mientras duermes. Es una pista de enfermedad, no la fiebre.",
+      "en": "Change in skin temperature while you sleep. A hint of illness, not a fever reading."
+    },
+    "unitHint": {
+      "es": "Δ°C: grados por encima o por debajo de tu valor habitual",
+      "en": "Δ°C: degrees above or below your usual value"
+    }
+  },
+  "weight": {
+    "term": { "es": "Peso (masa corporal)", "en": "Weight (body mass)" },
+    "short": {
+      "es": "Cuánta masa tiene tu cuerpo. Perderla suele indicar que comes poco o pierdes músculo.",
+      "en": "How much mass your body has. Losing it often means eating too little or losing muscle."
+    },
+    "unitHint": {
+      "es": "kg: kilogramos",
+      "en": "kg: kilograms"
+    }
+  },
+  "food-intake": {
+    "term": { "es": "Energía comida", "en": "Food energy eaten" },
+    "short": {
+      "es": "Cuánta energía comes al día. Comer poco durante semanas debilita músculos, huesos y defensas.",
+      "en": "How much energy you eat each day. Eating too little for weeks weakens muscle, bone and defences."
+    },
+    "unitHint": {
+      "es": "kcal: kilocalorías, la energía que aporta la comida",
+      "en": "kcal: kilocalories, the energy food provides"
+    }
+  },
+  "resistance-exercise": {
+    "term": { "es": "Ejercicio de fuerza", "en": "Strength exercise" },
+    "short": {
+      "es": "Ejercicio contra una resistencia, como pesas. Sin gravedad, es lo que protege huesos y músculos.",
+      "en": "Exercise against resistance, like weights. Without gravity, it protects bones and muscles."
+    },
+    "unitHint": {
+      "es": "min: minutos de ejercicio en el día",
+      "en": "min: minutes of exercise in the day"
+    }
+  },
+  "bone-loss": {
+    "term": { "es": "Pérdida ósea (estimada)", "en": "Bone loss (estimated)" },
+    "short": {
+      "es": "Cuánto hueso se ha perdido. En el espacio baja cada mes y aumenta el riesgo de fracturas.",
+      "en": "How much bone has been lost. In space it drops every month and raises the risk of fractures."
+    },
+    "unitHint": {
+      "es": "%: parte del hueso perdida desde el inicio de la misión",
+      "en": "%: share of bone lost since the mission began"
+    }
+  },
+  "steps": {
+    "term": { "es": "Pasos", "en": "Steps" },
+    "short": {
+      "es": "Pasos que das en el día. En la Luna o en Marte, caminar vuelve a cargar los huesos.",
+      "en": "Steps you take in a day. On the Moon or Mars, walking loads your bones again."
+    },
+    "unitHint": {
+      "es": "pasos: cada vez que apoyas un pie al andar",
+      "en": "steps: each time a foot lands as you walk"
+    }
+  },
+  "distance": {
+    "term": { "es": "Distancia recorrida", "en": "Distance covered" },
+    "short": {
+      "es": "Cuánto te desplazas caminando en superficie. Es informativa: muestra cuánto te mueves.",
+      "en": "How far you walk on the surface. It is for information: it shows how much you move."
+    },
+    "unitHint": {
+      "es": "km: kilómetros",
+      "en": "km: kilometres"
+    }
+  },
+  "floors": {
+    "term": { "es": "Pisos subidos", "en": "Floors climbed" },
+    "short": {
+      "es": "Desniveles que subes. Subir carga más los huesos y los músculos que andar en llano.",
+      "en": "Height you climb. Climbing loads bones and muscles more than walking on flat ground."
+    },
+    "unitHint": {
+      "es": "pisos: unos 3 metros de subida cada uno",
+      "en": "floors: about 3 metres of climb each"
+    }
+  },
+  "radiation-dose": {
+    "term": { "es": "Dosis de radiación", "en": "Radiation dose" },
+    "short": {
+      "es": "Radiación que recibe tu cuerpo. No se siente, pero se acumula y aumenta el riesgo de cáncer.",
+      "en": "Radiation your body takes in. You can't feel it, but it adds up and raises cancer risk."
+    },
+    "unitHint": {
+      "es": "mSv/día: milisieverts al día, la unidad del daño de la radiación",
+      "en": "mSv/day: millisieverts per day, the unit for radiation harm"
+    }
+  },
+  "solar-event": {
+    "term": { "es": "Tormenta solar", "en": "Solar storm" },
+    "short": {
+      "es": "Una descarga de partículas del Sol. En pocas horas puede dar la dosis de meses normales.",
+      "en": "A burst of particles from the Sun. In a few hours it can give months' worth of dose."
+    },
+    "unitHint": {
+      "es": "escala S: de S0 (nada) a S5 (extrema); desde S2, al refugio",
+      "en": "S scale: from S0 (none) to S5 (extreme); from S2, go to the shelter"
+    }
+  },
+  "mood": {
+    "term": { "es": "Ánimo", "en": "Mood" },
+    "short": {
+      "es": "Cómo te sientes hoy. Meses de aislamiento lo desgastan y afectan al trabajo en equipo.",
+      "en": "How you feel today. Months of isolation wear it down and affect teamwork."
+    },
+    "unitHint": {
+      "es": "puntos (1–5): 1 es muy mal y 5 es muy bien",
+      "en": "points (1–5): 1 is very bad and 5 is very good"
+    }
+  },
+  "stress": {
+    "term": { "es": "Estrés", "en": "Stress" },
+    "short": {
+      "es": "Cuánta presión sientes. Si dura, empeora el sueño, la atención y la convivencia.",
+      "en": "How much pressure you feel. If it lasts, it hurts sleep, focus and getting along."
+    },
+    "unitHint": {
+      "es": "puntos (1–5): 1 es muy bajo y 5 es muy alto",
+      "en": "points (1–5): 1 is very low and 5 is very high"
+    }
+  },
+  "sleep": {
+    "term": { "es": "Sueño", "en": "Sleep" },
+    "short": {
+      "es": "Horas que duermes. En la nave no hay día ni noche normales, y dormir poco causa errores.",
+      "en": "Hours you sleep. The ship has no normal day or night, and too little sleep causes errors."
+    },
+    "unitHint": {
+      "es": "h: horas",
+      "en": "h: hours"
+    }
+  },
+  "heart": {
+    "term": { "es": "Corazón", "en": "Heart" },
+    "short": {
+      "es": "Bombea la sangre con oxígeno. Sin gravedad trabaja distinto y puede perder fuerza.",
+      "en": "Pumps oxygen-rich blood. Without gravity it works differently and can lose strength."
+    }
+  },
+  "lungs": {
+    "term": { "es": "Pulmones y aire", "en": "Lungs and air" },
+    "short": {
+      "es": "Toman oxígeno y sacan CO₂. Dependen de que el aire de la nave esté bien.",
+      "en": "Take in oxygen and get rid of CO₂. They depend on the ship's air being right."
+    }
+  },
+  "head": {
+    "term": { "es": "Cabeza y ojos", "en": "Head and eyes" },
+    "short": {
+      "es": "Cómo piensas, reaccionas y ves. El cansancio y la falta de gravedad pueden afectarlos.",
+      "en": "How you think, react and see. Tiredness and lack of gravity can affect them."
+    }
+  },
+  "metabolism": {
+    "term": { "es": "Abdomen y metabolismo", "en": "Abdomen and metabolism" },
+    "short": {
+      "es": "Cómo tu cuerpo usa la comida y la energía. Comer poco en una misión larga es un gran riesgo.",
+      "en": "How your body uses food and energy. Eating too little on a long mission is a big risk."
+    }
+  },
+  "musculoskeletal": {
+    "term": { "es": "Huesos y músculos", "en": "Bones and muscles" },
+    "short": {
+      "es": "Te sostienen y te mueven. Sin gravedad se debilitan si no haces ejercicio cada día.",
+      "en": "They hold you up and move you. Without gravity they weaken unless you exercise daily."
+    }
+  },
+  "skin": {
+    "term": { "es": "Piel y cuerpo (radiación)", "en": "Skin and body (radiation)" },
+    "short": {
+      "es": "Lo que recibe la radiación del espacio y del Sol. No se siente, pero se acumula.",
+      "en": "What takes the radiation from space and the Sun. You can't feel it, but it adds up."
+    }
+  },
+  "mind": {
+    "term": { "es": "Mente", "en": "Mind" },
+    "short": {
+      "es": "Tu ánimo, estrés y sueño. El aislamiento largo los desgasta y afecta a todo lo demás.",
+      "en": "Your mood, stress and sleep. Long isolation wears them down and affects everything else."
+    }
+  },
+  "baseline": {
+    "term": { "es": "Línea base", "en": "Baseline" },
+    "short": {
+      "es": "Tu valor normal, calculado con tus últimas lecturas. Sirve para notar cambios en ti.",
+      "en": "Your normal value, worked out from your recent readings. It helps spot changes in you."
+    }
+  },
+  "personal-range": {
+    "term": { "es": "Tu rango habitual", "en": "Your usual range" },
+    "short": {
+      "es": "Entre qué valores sueles estar tú. Salir de él importa más que compararte con otros.",
+      "en": "The values you usually stay between. Leaving it matters more than comparing with others."
+    }
+  },
+  "median": {
+    "term": { "es": "Mediana", "en": "Median" },
+    "short": {
+      "es": "El valor del medio al ordenar tus lecturas. Una lectura rara no la mueve.",
+      "en": "The middle value when your readings are sorted. One odd reading doesn't move it."
+    }
+  },
+  "reference-range": {
+    "term": { "es": "Rango de referencia", "en": "Reference range" },
+    "short": {
+      "es": "Los valores que se consideran normales para la mayoría de las personas.",
+      "en": "The values considered normal for most people."
+    }
+  },
+  "level-green": {
+    "term": { "es": "En rango", "en": "In range" },
+    "short": {
+      "es": "Todo está dentro de lo esperado. Sigue con tu rutina.",
+      "en": "Everything is as expected. Carry on with your routine."
+    }
+  },
+  "level-amber": {
+    "term": { "es": "Revisar", "en": "Review" },
+    "short": {
+      "es": "Algo se sale de lo normal. Repite la medición o avisa a Tierra; no es una urgencia.",
+      "en": "Something is off. Measure again or tell Earth; it is not an emergency."
+    }
+  },
+  "level-red": {
+    "term": { "es": "Emergencia", "en": "Emergency" },
+    "short": {
+      "es": "Puede ser grave. Abre el protocolo de emergencia ahora y avisa a la tripulación.",
+      "en": "It may be serious. Open the emergency protocol now and alert the crew."
+    }
+  },
+  "level-pending": {
+    "term": { "es": "Pendiente", "en": "Pending" },
+    "short": {
+      "es": "No hay una lectura reciente, así que aún no se puede saber cómo está.",
+      "en": "There is no recent reading, so its state can't be known yet."
+    }
+  },
+  "blood-pressure": {
+    "term": { "es": "Presión arterial", "en": "Blood pressure" },
+    "short": {
+      "es": "La fuerza de la sangre contra las arterias. Se dan dos cifras: al latir y entre latidos.",
+      "en": "How hard blood pushes on your arteries. Two numbers: when the heart beats and between beats."
+    },
+    "unitHint": {
+      "es": "mmHg: milímetros de mercurio, la unidad de la presión",
+      "en": "mmHg: millimetres of mercury, the unit for pressure"
+    }
+  },
+  "respiratory-rate": {
+    "term": { "es": "Respiraciones por minuto", "en": "Breaths per minute" },
+    "short": {
+      "es": "Cuántas veces respiras en un minuto. Si sube mucho, puede faltar oxígeno o haber un problema.",
+      "en": "How many times you breathe in a minute. A big rise can mean low oxygen or a problem."
+    },
+    "unitHint": {
+      "es": "rpm: respiraciones por minuto",
+      "en": "br/min: breaths per minute"
+    }
+  },
+  "ecg": {
+    "term": { "es": "Electrocardiograma (ECG)", "en": "Electrocardiogram (ECG)" },
+    "short": {
+      "es": "Un registro de la electricidad del corazón. Permite a un médico ver si el ritmo es normal.",
+      "en": "A recording of the heart's electrical activity. It lets a doctor check the rhythm."
+    }
+  },
+  "sinus-rhythm": {
+    "term": { "es": "Ritmo normal (sinusal)", "en": "Normal rhythm (sinus)" },
+    "short": {
+      "es": "El corazón late de forma ordenada, como debe.",
+      "en": "The heart beats in an orderly way, as it should."
+    }
+  },
+  "arrhythmia": {
+    "term": { "es": "Ritmo irregular (arritmia)", "en": "Irregular rhythm (arrhythmia)" },
+    "short": {
+      "es": "Latidos desordenados. Algunos son leves y otros pueden hacer que alguien se desmaye.",
+      "en": "Disordered heartbeats. Some are mild and others can make a person collapse."
+    }
+  },
+  "tachycardia": {
+    "term": { "es": "Pulso muy rápido (taquicardia)", "en": "Very fast pulse (tachycardia)" },
+    "short": {
+      "es": "El corazón late más rápido de lo normal en reposo. Con dolor o mareo, es una alarma.",
+      "en": "The heart beats faster than normal at rest. With pain or dizziness, it's a warning."
+    }
+  },
+  "bradycardia": {
+    "term": { "es": "Pulso muy lento (bradicardia)", "en": "Very slow pulse (bradycardia)" },
+    "short": {
+      "es": "El corazón late más despacio de lo normal. Con mareo o desmayo, es una alarma.",
+      "en": "The heart beats slower than normal. With dizziness or fainting, it's a warning."
+    }
+  },
+  "hypoglycemia": {
+    "term": { "es": "Azúcar baja (hipoglucemia)", "en": "Low blood sugar (hypoglycaemia)" },
+    "short": {
+      "es": "Falta azúcar en la sangre. Causa sudor, temblor y confusión; se corrige comiendo azúcar rápido.",
+      "en": "Too little sugar in the blood. It causes sweating, shaking and confusion; fast sugar fixes it."
+    }
+  },
+  "rule-15-15": {
+    "term": { "es": "Regla 15/15", "en": "15/15 rule" },
+    "short": {
+      "es": "Toma 15 g de azúcar rápido, espera 15 minutos y vuelve a medir la glucosa.",
+      "en": "Take 15 g of fast sugar, wait 15 minutes and measure your glucose again."
+    }
+  },
+  "fever": {
+    "term": { "es": "Fiebre", "en": "Fever" },
+    "short": {
+      "es": "Temperatura del cuerpo más alta de lo normal. Suele indicar que el cuerpo combate una infección.",
+      "en": "Body temperature higher than normal. It usually means the body is fighting an infection."
+    }
+  },
+  "microgravity": {
+    "term": { "es": "Microgravedad (sin peso)", "en": "Microgravity (weightlessness)" },
+    "short": {
+      "es": "Flotar casi sin gravedad. Los líquidos suben a la cabeza y huesos y músculos se debilitan.",
+      "en": "Floating with almost no gravity. Fluids shift to the head and bones and muscles weaken."
+    }
+  },
+  "sans": {
+    "term": {
+      "es": "Cambios oculares (SANS)",
+      "en": "Eye changes (SANS)"
+    },
+    "short": {
+      "es": "Sin gravedad, los líquidos presionan el ojo y pueden deformarlo. Lo primero es ver algo peor.",
+      "en": "Without gravity, fluids press on the eye and can change its shape. First sign: blurrier vision."
+    }
+  },
+  "cognitive-battery": {
+    "term": { "es": "Pruebas mentales rápidas", "en": "Quick mind tests" },
+    "short": {
+      "es": "Pruebas cortas de reacción, atención y memoria. Detectan cansancio antes de que cause un error.",
+      "en": "Short tests of reaction, focus and memory. They catch tiredness before it causes a mistake."
+    }
+  },
+  "check-in": {
+    "term": { "es": "Registro diario (check-in)", "en": "Daily check-in" },
+    "short": {
+      "es": "Un momento al día para anotar cómo estás. Ayuda a ver cambios antes de que crezcan.",
+      "en": "A moment each day to note how you are. It helps spot changes before they grow."
+    }
+  },
+  "daily-actions": {
+    "term": { "es": "Acciones del día", "en": "Daily actions" },
+    "short": {
+      "es": "Pequeñas tareas de salud, una por zona. El anillo mide lo que hiciste, no tu salud.",
+      "en": "Small health tasks, one per zone. The ring shows what you did, not how healthy you are."
+    }
+  },
+  "triage": {
+    "term": { "es": "Clasificación de urgencia (triaje)", "en": "Urgency sorting (triage)" },
+    "short": {
+      "es": "Decidir rápido qué tan grave es algo para saber qué hacer primero.",
+      "en": "Quickly deciding how serious something is, to know what to do first."
+    }
+  },
+  "protocol": {
+    "term": { "es": "Protocolo", "en": "Protocol" },
+    "short": {
+      "es": "Una guía paso a paso para actuar ante un problema de salud sin ayuda de Tierra.",
+      "en": "A step-by-step guide for handling a health problem without help from Earth."
+    }
+  },
+  "cpr": {
+    "term": { "es": "Reanimación (RCP)", "en": "Resuscitation (CPR)" },
+    "short": {
+      "es": "Empujar fuerte y rápido en el pecho para mover la sangre cuando el corazón se ha parado.",
+      "en": "Pushing hard and fast on the chest to move blood when the heart has stopped."
+    }
+  },
+  "aed": {
+    "term": { "es": "Desfibrilador (DEA)", "en": "Defibrillator (AED)" },
+    "short": {
+      "es": "Aparato que analiza el corazón y, si hace falta, da una descarga para que vuelva a latir bien.",
+      "en": "A device that checks the heart and, if needed, gives a shock to restart a normal beat."
+    }
+  },
+  "airway": {
+    "term": { "es": "Vía aérea", "en": "Airway" },
+    "short": {
+      "es": "El camino del aire de la boca y la nariz a los pulmones. Debe estar abierto para respirar.",
+      "en": "The path air takes from mouth and nose to the lungs. It must be open to breathe."
+    }
+  },
+  "ultrasound": {
+    "term": { "es": "Ecografía", "en": "Ultrasound" },
+    "short": {
+      "es": "Una imagen del interior del cuerpo hecha con sonido. A bordo se hace guiada desde Tierra.",
+      "en": "A picture of the inside of the body made with sound. On board it's guided from Earth."
+    }
+  },
+  "oximeter": {
+    "term": { "es": "Oxímetro", "en": "Pulse oximeter" },
+    "short": {
+      "es": "Pinza que se pone en el dedo y mide el oxígeno en sangre y el pulso.",
+      "en": "A clip on your finger that measures blood oxygen and pulse."
+    }
+  },
+  "emergency-packet": {
+    "term": { "es": "Paquete de emergencia", "en": "Emergency packet" },
+    "short": {
+      "es": "Todos los datos de una emergencia, enviados juntos a Tierra para que el equipo médico los vea.",
+      "en": "All the data from an emergency, sent together to Earth for the medical team to review."
+    }
+  },
+  "routine-packet": {
+    "term": { "es": "Paquete de rutina", "en": "Routine packet" },
+    "short": {
+      "es": "El resumen diario de tus datos que se envía a Tierra.",
+      "en": "The daily summary of your data that is sent to Earth."
+    }
+  },
+  "communication-delay": {
+    "term": {
+      "es": "Retardo de comunicación",
+      "en": "Communication delay"
+    },
+    "short": {
+      "es": "Lo que tarda un mensaje en llegar a Tierra. Desde Marte, hasta 22 minutos por trayecto.",
+      "en": "How long a message takes to reach Earth. From Mars, up to 22 minutes each way."
+    }
+  },
+  "link-down": {
+    "term": { "es": "Sin enlace", "en": "No link" },
+    "short": {
+      "es": "No hay comunicación con Tierra ahora. La tripulación decide a bordo con estas guías.",
+      "en": "There is no contact with Earth right now. The crew decides on board using these guides."
+    }
+  },
+  "send-queue": {
+    "term": { "es": "En cola de envío", "en": "Waiting to send" },
+    "short": {
+      "es": "Datos guardados que se enviarán a Tierra en cuanto vuelva el enlace. No se pierden.",
+      "en": "Saved data that will go to Earth as soon as the link is back. Nothing is lost."
+    }
+  },
+  "telemetry": {
+    "term": { "es": "Telemetría de la nave", "en": "Ship telemetry" },
+    "short": {
+      "es": "Datos que miden los sensores de la propia nave, como el aire o la radiación.",
+      "en": "Data measured by the ship's own sensors, such as the air or radiation."
+    }
+  },
+  "eva": {
+    "term": { "es": "Salida al exterior (EVA)", "en": "Spacewalk (EVA)" },
+    "short": {
+      "es": "Trabajar fuera de la nave con traje espacial. Exige estar en buena forma y bien descansado.",
+      "en": "Working outside the ship in a spacesuit. It requires being fit and well rested."
+    }
+  },
+  "radiation-shelter": {
+    "term": { "es": "Refugio contra radiación", "en": "Radiation shelter" },
+    "short": {
+      "es": "La zona más protegida de la nave. Durante una tormenta solar reduce mucho la dosis.",
+      "en": "The best-shielded part of the ship. During a solar storm it cuts the dose a lot."
+    }
+  },
+  "dosimeter": {
+    "term": { "es": "Dosímetro", "en": "Dosimeter" },
+    "short": {
+      "es": "Aparato pequeño que llevas encima y mide la radiación que recibes.",
+      "en": "A small device you carry that measures the radiation you receive."
+    }
+  },
+  "career-dose-limit": {
+    "term": { "es": "Límite de dosis total", "en": "Career dose limit" },
+    "short": {
+      "es": "La radiación máxima que NASA permite en toda la vida de un astronauta: 600 mSv.",
+      "en": "The most radiation NASA allows in an astronaut's whole career: 600 mSv."
+    },
+    "unitHint": {
+      "es": "mSv: milisieverts, la unidad del daño de la radiación",
+      "en": "mSv: millisieverts, the unit for radiation harm"
+    }
+  },
+  "proton-flux": {
+    "term": { "es": "Partículas solares", "en": "Solar particles" },
+    "short": {
+      "es": "Cuántas partículas del Sol llegan ahora. Por debajo de 10 pfu se puede salir del refugio.",
+      "en": "How many particles from the Sun are arriving now. Below 10 pfu you can leave the shelter."
+    },
+    "unitHint": {
+      "es": "pfu: unidad que cuenta las partículas que llegan cada segundo",
+      "en": "pfu: unit that counts the particles arriving each second"
+    }
+  }
+}

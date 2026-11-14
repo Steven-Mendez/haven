@@ -1,0 +1,236 @@
+[
+  {
+    "id": "lunar-landing",
+    "name": {
+      "es": "Alunizaje",
+      "en": "Lunar landing"
+    },
+    "description": {
+      "es": "Ida a órbita lunar, una semana en la superficie del polo sur y regreso. Unas cuatro semanas.",
+      "en": "Out to lunar orbit, a week on the south-pole surface and back. About four weeks."
+    },
+    "summary": {
+      "es": "La tripulación viaja unos cuatro días a la Luna y parte del equipo pasa una semana cerca del polo sur antes de volver. Es corta, pero pasa por casi todos los entornos: aceleración, ingravidez, radiación y gravedad lunar.",
+      "en": "The crew travels about four days to the Moon and part of the team spends a week near the south pole before returning. It is short, but it crosses almost every environment: acceleration, weightlessness, radiation and lunar gravity."
+    },
+    "basedOn": {
+      "es": "el plan de Artemis III (NASA)",
+      "en": "NASA's Artemis III plan"
+    },
+    "sourceUrl": "https://www.nasa.gov/mission/artemis-iii/",
+    "phases": [
+      {
+        "environment": "launch",
+        "days": 1
+      },
+      {
+        "environment": "station",
+        "days": 1,
+        "label": {
+          "es": "Comprobaciones en órbita alta",
+          "en": "High-orbit checkouts"
+        }
+      },
+      {
+        "environment": "transit",
+        "days": 4,
+        "delayMin": 0.0213,
+        "label": {
+          "es": "Crucero translunar",
+          "en": "Translunar cruise"
+        }
+      },
+      {
+        "environment": "lunar-orbit",
+        "days": 8
+      },
+      {
+        "environment": "moon",
+        "days": 7
+      },
+      {
+        "environment": "lunar-orbit",
+        "days": 2
+      },
+      {
+        "environment": "transit",
+        "days": 4,
+        "delayMin": 0.0213,
+        "label": {
+          "es": "Regreso a la Tierra",
+          "en": "Return to Earth"
+        }
+      },
+      {
+        "environment": "reentry",
+        "days": 1
+      }
+    ]
+  },
+  {
+    "id": "lunar-flyby",
+    "name": {
+      "es": "Sobrevuelo lunar",
+      "en": "Lunar flyby"
+    },
+    "description": {
+      "es": "Prueba tripulada alrededor de la Luna con trayectoria de retorno libre, sin aterrizar. Unos 10 días.",
+      "en": "Crewed test around the Moon on a free-return trajectory, without landing. About 10 days."
+    },
+    "summary": {
+      "es": "La nave rodea la Luna sin aterrizar y la gravedad lunar la devuelve a la Tierra (retorno libre). Prueba la nave y el soporte vital con personas, lejos de la Tierra por primera vez desde Apollo.",
+      "en": "The spacecraft swings around the Moon without landing and lunar gravity sends it home (free return). It tests the ship and life support with people aboard, far from Earth for the first time since Apollo."
+    },
+    "basedOn": {
+      "es": "Artemis II (NASA)",
+      "en": "NASA's Artemis II"
+    },
+    "sourceUrl": "https://www.nasa.gov/mission/artemis-ii/",
+    "phases": [
+      {
+        "environment": "launch",
+        "days": 1
+      },
+      {
+        "environment": "station",
+        "days": 1,
+        "label": {
+          "es": "Comprobaciones en órbita alta",
+          "en": "High-orbit checkouts"
+        }
+      },
+      {
+        "environment": "transit",
+        "days": 3,
+        "delayMin": 0.0213,
+        "label": {
+          "es": "Crucero translunar",
+          "en": "Translunar cruise"
+        }
+      },
+      {
+        "environment": "lunar-orbit",
+        "days": 1,
+        "label": {
+          "es": "Sobrevuelo de la cara oculta",
+          "en": "Far-side flyby"
+        }
+      },
+      {
+        "environment": "transit",
+        "days": 3,
+        "delayMin": 0.0213,
+        "label": {
+          "es": "Regreso a la Tierra",
+          "en": "Return to Earth"
+        }
+      },
+      {
+        "environment": "reentry",
+        "days": 1
+      }
+    ]
+  },
+  {
+    "id": "station-stay",
+    "name": {
+      "es": "Estancia en estación",
+      "en": "Station stay"
+    },
+    "description": {
+      "es": "Expedición de seis meses en órbita baja (ISS o estación comercial).",
+      "en": "Six-month expedition in low Earth orbit (ISS or a commercial station)."
+    },
+    "summary": {
+      "es": "Seis meses viviendo en una estación en órbita baja. Hablar con la Tierra es instantáneo y se vuelve en horas, pero tanto tiempo sin gravedad afecta a huesos, músculos y visión.",
+      "en": "Six months living on a station in low Earth orbit. Talking to Earth is instant and home is hours away, but so long without gravity affects bones, muscles and vision."
+    },
+    "basedOn": {
+      "es": "las expediciones a la Estación Espacial Internacional",
+      "en": "International Space Station expeditions"
+    },
+    "sourceUrl": "https://www.nasa.gov/international-space-station/",
+    "phases": [
+      {
+        "environment": "launch",
+        "days": 1
+      },
+      {
+        "environment": "station",
+        "days": 180
+      },
+      {
+        "environment": "reentry",
+        "days": 1
+      }
+    ]
+  },
+  {
+    "id": "mars-conjunction",
+    "name": {
+      "es": "Misión a Marte",
+      "en": "Mars mission"
+    },
+    "description": {
+      "es": "Unos 7 meses de crucero, cerca de 500 días en la superficie y el regreso. Unos 900 días.",
+      "en": "About 7 months of cruise, around 500 days on the surface and the return. About 900 days."
+    },
+    "summary": {
+      "es": "La más larga: hay que esperar a que la Tierra y Marte se alineen, así que la tripulación pasa más de un año en la superficie. Los mensajes tardan hasta 22 min por sentido y no hay regreso rápido: casi todas las decisiones médicas se toman a bordo.",
+      "en": "The longest: Earth and Mars must line up, so the crew spends more than a year on the surface. Messages take up to 22 min each way and there is no quick way home: almost every medical decision is made on board."
+    },
+    "basedOn": {
+      "es": "la arquitectura de referencia de NASA para Marte (DRA 5.0)",
+      "en": "NASA's Mars Design Reference Architecture 5.0"
+    },
+    "sourceUrl": "https://ntrs.nasa.gov/citations/20090012109",
+    "phases": [
+      {
+        "environment": "launch",
+        "days": 1
+      },
+      {
+        "environment": "station",
+        "days": 2,
+        "label": {
+          "es": "Comprobaciones en órbita",
+          "en": "Orbit checkouts"
+        }
+      },
+      {
+        "environment": "transit",
+        "days": 200,
+        "delayMin": 11,
+        "label": {
+          "es": "Crucero a Marte",
+          "en": "Cruise to Mars"
+        }
+      },
+      {
+        "environment": "mars-orbit",
+        "days": 3
+      },
+      {
+        "environment": "mars",
+        "days": 500
+      },
+      {
+        "environment": "mars-orbit",
+        "days": 3
+      },
+      {
+        "environment": "transit",
+        "days": 190,
+        "delayMin": 11,
+        "label": {
+          "es": "Regreso a la Tierra",
+          "en": "Return to Earth"
+        }
+      },
+      {
+        "environment": "reentry",
+        "days": 1
+      }
+    ]
+  }
+]

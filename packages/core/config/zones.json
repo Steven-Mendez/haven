@@ -1,0 +1,148 @@
+[
+  {
+    "id": "heart",
+    "name": {
+      "es": "Corazón",
+      "en": "Heart"
+    },
+    "purpose": {
+      "es": "Bombea la sangre que lleva oxígeno a todo el cuerpo.",
+      "en": "Pumps the blood that carries oxygen to the whole body."
+    },
+    "indicators": ["heart-rate", "hrv", "heart-rhythm", "systolic-bp", "diastolic-bp"],
+    "dailyAction": {
+      "text": {
+        "es": "Medir la presión arterial (brazalete o a mano)",
+        "en": "Measure your blood pressure (cuff or manual)"
+      },
+      "minutes": 2,
+      "opens": "systolic-bp"
+    }
+  },
+  {
+    "id": "lungs",
+    "name": {
+      "es": "Pulmones",
+      "en": "Lungs"
+    },
+    "purpose": {
+      "es": "Toman el oxígeno del aire y expulsan el CO₂; dependen del aire de la nave.",
+      "en": "Take oxygen from the air and get rid of CO₂; they depend on the ship’s air."
+    },
+    "indicators": ["spo2", "cabin-co2", "cabin-noise"],
+    "dailyAction": {
+      "text": {
+        "es": "Revisar el CO₂ y el ruido del módulo de descanso",
+        "en": "Check CO₂ and noise in the rest module"
+      },
+      "minutes": 2,
+      "opens": "routine"
+    }
+  },
+  {
+    "id": "head",
+    "name": {
+      "es": "Cabeza y ojos",
+      "en": "Head and eyes"
+    },
+    "purpose": {
+      "es": "El cerebro piensa, reacciona y recuerda; los ojos pueden cambiar sin gravedad.",
+      "en": "The brain thinks, reacts and remembers; the eyes can change without gravity."
+    },
+    "indicators": [
+      "visual-acuity",
+      "reaction-time",
+      "pvt-lapses",
+      "working-memory",
+      "go-nogo-accuracy"
+    ],
+    "dailyAction": {
+      "text": {
+        "es": "Hacer la batería cognitiva",
+        "en": "Do the cognitive test battery"
+      },
+      "minutes": 4,
+      "opens": "cognition"
+    }
+  },
+  {
+    "id": "metabolism",
+    "name": {
+      "es": "Abdomen y metabolismo",
+      "en": "Abdomen and metabolism"
+    },
+    "purpose": {
+      "es": "Convierte la comida en energía y mantiene la temperatura del cuerpo.",
+      "en": "Turns food into energy and keeps the body at the right temperature."
+    },
+    "indicators": ["glucose", "body-temperature", "wrist-temperature", "weight", "food-intake"],
+    "dailyAction": {
+      "text": {
+        "es": "Registrar la glucosa, o el peso y la ingesta",
+        "en": "Log your glucose, or your weight and food intake"
+      },
+      "minutes": 2,
+      "opens": "glucose"
+    }
+  },
+  {
+    "id": "musculoskeletal",
+    "name": {
+      "es": "Huesos y músculos",
+      "en": "Bones and muscles"
+    },
+    "purpose": {
+      "es": "Sostienen y mueven el cuerpo; sin gravedad se debilitan si no se ejercitan.",
+      "en": "Support and move the body; without gravity they weaken unless exercised."
+    },
+    "indicators": ["resistance-exercise", "bone-loss", "steps", "distance", "floors"],
+    "dailyAction": {
+      "text": {
+        "es": "Registrar la sesión de ejercicio resistivo",
+        "en": "Log your resistance exercise session"
+      },
+      "minutes": 45,
+      "opens": "resistance-exercise"
+    }
+  },
+  {
+    "id": "skin",
+    "name": {
+      "es": "Piel y cuerpo",
+      "en": "Skin and body"
+    },
+    "purpose": {
+      "es": "La piel protege el cuerpo; aquí vigilamos la radiación que lo atraviesa.",
+      "en": "The skin protects the body; here we track the radiation that passes through it."
+    },
+    "indicators": ["radiation-dose", "solar-event"],
+    "dailyAction": {
+      "text": {
+        "es": "Confirmar el refugio si hay evento solar",
+        "en": "Confirm the shelter if there's a solar event"
+      },
+      "minutes": 1,
+      "opens": "solar-event"
+    }
+  },
+  {
+    "id": "mind",
+    "name": {
+      "es": "Mente",
+      "en": "Mind"
+    },
+    "purpose": {
+      "es": "Ánimo, estrés y sueño: cómo te sientes y cuánto descansas.",
+      "en": "Mood, stress and sleep: how you feel and how well you rest."
+    },
+    "indicators": ["mood", "stress", "sleep"],
+    "dailyAction": {
+      "text": {
+        "es": "Registrar ánimo, estrés, contacto y diario",
+        "en": "Log mood, stress, contact and journal"
+      },
+      "minutes": 2,
+      "opens": "wellbeing"
+    }
+  }
+]

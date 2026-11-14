@@ -1,0 +1,1315 @@
+[
+  {
+    "id": "heart-rate",
+    "name": {
+      "es": "Frecuencia cardíaca",
+      "en": "Heart rate"
+    },
+    "zone": "heart",
+    "unit": "bpm",
+    "suggestedByChallenge": true,
+    "everyHours": 4,
+    "kind": "number",
+    "green": [50, 100],
+    "rules": [
+      {
+        "level": "red",
+        "outside": [50, 120],
+        "withSymptoms": true,
+        "categories": [
+          "chest-pain",
+          "shortness-of-breath",
+          "dizziness",
+          "fainting",
+          "sweating",
+          "palpitations",
+          "confusion"
+        ],
+        "explanation": {
+          "es": "Pulso por encima de 120 o por debajo de 50 con síntomas: puede ser un problema del corazón.",
+          "en": "Pulse above 120 or below 50 with symptoms: this may be a heart problem."
+        },
+        "actions": ["start-chest-pain-protocol", "continuous-monitoring", "notify-earth"]
+      },
+      {
+        "level": "red",
+        "outside": [40, 150],
+        "explanation": {
+          "es": "Pulso por encima de 150 o por debajo de 40: comprueba ahora cómo está la persona.",
+          "en": "Pulse above 150 or below 40: check on the person right now."
+        },
+        "actions": ["start-chest-pain-protocol", "continuous-monitoring"]
+      },
+      {
+        "level": "amber",
+        "baselineDeviation": 1.5,
+        "sustainedMin": 10,
+        "explanation": {
+          "es": "Tu pulso lleva más de 10 minutos lejos de tu valor habitual.",
+          "en": "Your pulse has been far from your usual value for more than 10 minutes."
+        },
+        "actions": ["repeat-measurement", "hydrate", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [50, 100],
+        "explanation": {
+          "es": "Pulso fuera de la referencia en reposo (50–100 lpm). Repite sentado y tranquilo.",
+          "en": "Pulse outside the resting reference (50–100 bpm). Repeat sitting and calm."
+        },
+        "actions": ["repeat-measurement", "notify-earth"]
+      }
+    ],
+    "source": "60–100 lpm en reposo y 40–60 en deportistas: MedlinePlus, Pulse (https://medlineplus.gov/ency/article/003399.htm). Rojo >120 o <50 con síntomas: Tabla de indicadores de HAVEN a partir de esa referencia. Rojo >150 o <40 sin síntomas y desviación sostenida 10 min (1,5 veces el rango personal): referencia provisional."
+  },
+  {
+    "id": "hrv",
+    "name": {
+      "es": "Variabilidad cardíaca",
+      "en": "Heart rate variability"
+    },
+    "zone": "heart",
+    "unit": "ms",
+    "suggestedByChallenge": false,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [20, 200],
+    "rules": [
+      {
+        "level": "amber",
+        "baselineDeviation": 0.75,
+        "explanation": {
+          "es": "Tu variabilidad cambió mucho frente a tu valor habitual (si bajó, suele ser cansancio o estrés).",
+          "en": "Your variability changed a lot from your usual value (a drop usually means fatigue or stress)."
+        },
+        "actions": ["prioritize-rest", "sleep-hygiene", "repeat-measurement"]
+      },
+      {
+        "level": "amber",
+        "outside": [20, 200],
+        "explanation": {
+          "es": "Variabilidad fuera de la referencia (20–200 ms). Repite la medición en reposo.",
+          "en": "Variability outside the reference (20–200 ms). Repeat at rest."
+        },
+        "actions": ["repeat-measurement"]
+      }
+    ],
+    "source": "Caída ≥20 % frente a la línea base (P01), expresada como 0,75 veces el rango personal: referencia provisional. Rango 20–200 ms (SDNN): referencia provisional. La variabilidad baja en vuelo: NASA, Cardiovascular Health in Microgravity (https://www.nasa.gov/missions/station/cardiovascular-health-in-microgravity/)."
+  },
+  {
+    "id": "heart-rhythm",
+    "name": {
+      "es": "Ritmo cardíaco",
+      "en": "Heart rhythm"
+    },
+    "zone": "heart",
+    "unit": "category",
+    "suggestedByChallenge": false,
+    "everyHours": 24,
+    "kind": "category",
+    "green": [0, 0],
+    "categoryLabels": {
+      "sinus": {
+        "es": "Sinusal",
+        "en": "Sinus"
+      },
+      "irregular": {
+        "es": "Irregular",
+        "en": "Irregular"
+      }
+    },
+    "rules": [
+      {
+        "level": "red",
+        "categories": ["irregular"],
+        "withSymptoms": true,
+        "explanation": {
+          "es": "Ritmo irregular con síntomas: puede ser una arritmia peligrosa. Empieza el protocolo.",
+          "en": "Irregular rhythm with symptoms: this may be a dangerous arrhythmia. Start the protocol."
+        },
+        "actions": ["start-chest-pain-protocol", "continuous-monitoring", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "categories": ["irregular"],
+        "explanation": {
+          "es": "Ritmo irregular sin síntomas. Repite el ECG en reposo y envíalo a Tierra.",
+          "en": "Irregular rhythm without symptoms. Repeat the ECG at rest and send it to Earth."
+        },
+        "actions": ["repeat-measurement", "continuous-monitoring", "notify-earth"]
+      }
+    ],
+    "source": "Ritmo irregular en rojo con síntomas: Tabla de indicadores de HAVEN; arritmias en vuelo: NASA, Cardiovascular Health in Microgravity (https://www.nasa.gov/missions/station/cardiovascular-health-in-microgravity/). Categorías: sinus (normal) e irregular."
+  },
+  {
+    "id": "systolic-bp",
+    "name": {
+      "es": "Presión arterial sistólica",
+      "en": "Systolic blood pressure"
+    },
+    "zone": "heart",
+    "unit": "mmHg",
+    "suggestedByChallenge": true,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [90, 139],
+    "rules": [
+      {
+        "level": "red",
+        "outside": [90, 139],
+        "withSymptoms": true,
+        "categories": ["chest-pain", "dizziness", "fainting", "blurred-vision", "confusion"],
+        "explanation": {
+          "es": "Presión sistólica fuera de rango con mareo, dolor en el pecho o desmayo: es una emergencia.",
+          "en": "Systolic pressure out of range with dizziness, chest pain or fainting: this is an emergency."
+        },
+        "actions": ["start-chest-pain-protocol", "notify-earth"]
+      },
+      {
+        "level": "red",
+        "outside": [0, 179],
+        "explanation": {
+          "es": "Presión sistólica muy alta, nivel de crisis. Siéntate, repite en 5 minutos y avisa.",
+          "en": "Systolic pressure very high, crisis level. Sit down, repeat in 5 minutes and report it."
+        },
+        "actions": ["repeat-measurement", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [90, 139],
+        "explanation": {
+          "es": "Presión sistólica fuera de la referencia (90–139 mmHg): demasiado alta o baja.",
+          "en": "Systolic pressure outside the reference (90–139 mmHg): too high or too low."
+        },
+        "actions": ["repeat-measurement", "hydrate", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "baselineDeviation": 2,
+        "explanation": {
+          "es": "Cambio brusco: tu presión se aleja mucho de tu valor habitual.",
+          "en": "Sudden change: your pressure is far from your usual value."
+        },
+        "actions": ["repeat-measurement", "hydrate", "notify-earth"]
+      }
+    ],
+    "source": "≥140/90 hipertensión en estadio 2: Manual MSD con la guía AHA/ACC 2025 (https://www.msdmanuals.com/professional/multimedia/table/classification-of-blood-pressure-in-adults). <90/60 presión baja: NHLBI (https://www.nhlbi.nih.gov/health/low-blood-pressure). ≥180/120 rango de emergencia hipertensiva: Manual MSD (https://www.msdmanuals.com/professional/cardiovascular-disorders/hypertension/hypertensive-emergencies). Cambio brusco (2 veces el rango personal, ≈20 %): referencia provisional."
+  },
+  {
+    "id": "diastolic-bp",
+    "name": {
+      "es": "Presión arterial diastólica",
+      "en": "Diastolic blood pressure"
+    },
+    "zone": "heart",
+    "unit": "mmHg",
+    "suggestedByChallenge": true,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [60, 89],
+    "rules": [
+      {
+        "level": "red",
+        "outside": [60, 89],
+        "withSymptoms": true,
+        "categories": ["chest-pain", "dizziness", "fainting", "blurred-vision", "confusion"],
+        "explanation": {
+          "es": "Presión diastólica fuera de rango con mareo, dolor en el pecho o desmayo: es una emergencia.",
+          "en": "Diastolic pressure out of range with dizziness, chest pain or fainting: this is an emergency."
+        },
+        "actions": ["start-chest-pain-protocol", "notify-earth"]
+      },
+      {
+        "level": "red",
+        "outside": [0, 119],
+        "explanation": {
+          "es": "Presión diastólica muy alta, nivel de crisis. Siéntate, repite en 5 minutos y avisa.",
+          "en": "Diastolic pressure very high, crisis level. Sit down, repeat in 5 minutes and report it."
+        },
+        "actions": ["repeat-measurement", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [60, 89],
+        "explanation": {
+          "es": "Presión diastólica fuera de la referencia (60–89 mmHg): demasiado alta o baja.",
+          "en": "Diastolic pressure outside the reference (60–89 mmHg): too high or too low."
+        },
+        "actions": ["repeat-measurement", "hydrate", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "baselineDeviation": 2,
+        "explanation": {
+          "es": "Cambio brusco: tu presión se aleja mucho de tu valor habitual.",
+          "en": "Sudden change: your pressure is far from your usual value."
+        },
+        "actions": ["repeat-measurement", "hydrate", "notify-earth"]
+      }
+    ],
+    "source": "≥140/90 hipertensión en estadio 2: Manual MSD con la guía AHA/ACC 2025 (https://www.msdmanuals.com/professional/multimedia/table/classification-of-blood-pressure-in-adults). <90/60 presión baja: NHLBI (https://www.nhlbi.nih.gov/health/low-blood-pressure). ≥180/120 rango de emergencia hipertensiva: Manual MSD (https://www.msdmanuals.com/professional/cardiovascular-disorders/hypertension/hypertensive-emergencies). Cambio brusco (2 veces el rango personal, ≈20 %): referencia provisional."
+  },
+  {
+    "id": "spo2",
+    "name": {
+      "es": "Saturación de oxígeno",
+      "en": "Oxygen saturation"
+    },
+    "zone": "lungs",
+    "unit": "%",
+    "suggestedByChallenge": false,
+    "everyHours": 12,
+    "kind": "number",
+    "green": [95, 100],
+    "rules": [
+      {
+        "level": "red",
+        "outside": [90, 100],
+        "explanation": {
+          "es": "Oxígeno por debajo de 90 %: emergencia según la OMS. Usa oxígeno y sal del módulo.",
+          "en": "Oxygen below 90%: an emergency per the WHO. Use oxygen and leave the module."
+        },
+        "actions": ["apply-oxygen", "stop-eva", "notify-earth"]
+      },
+      {
+        "level": "red",
+        "outside": [95, 100],
+        "withSymptoms": true,
+        "categories": ["shortness-of-breath", "dizziness", "confusion", "fainting"],
+        "explanation": {
+          "es": "Oxígeno por debajo de 95 % con síntomas (falta de aire, mareo, confusión).",
+          "en": "Oxygen below 95% with symptoms (shortness of breath, dizziness, confusion)."
+        },
+        "actions": ["apply-oxygen", "stop-eva", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [95, 100],
+        "explanation": {
+          "es": "Oxígeno por debajo de 95 %: busca pronto la causa (aire del módulo, esfuerzo, sensor mal puesto).",
+          "en": "Oxygen below 95%: look for the cause soon (module air, effort, badly placed sensor)."
+        },
+        "actions": ["repeat-measurement", "check-ventilation", "stop-eva"]
+      }
+    ],
+    "source": "95–100 % de referencia, desde 94 buscar la causa, <90 emergencia: OMS, Pulse Oximetry Training Manual (https://cdn.who.int/media/docs/default-source/patient-safety/pulse-oximetry/who-ps-pulse-oxymetry-training-manual-en.pdf). Verde desde 93 % en Luna, Marte y rover (hábitats y rovers con atmósfera de menor presión para facilitar las salidas): referencia provisional, a confirmar con NASA-STD-3001 Vol. 2 (https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/).",
+    "environmentOverrides": {
+      "moon": {
+        "green": [93, 100],
+        "rules": [
+          {
+            "level": "red",
+            "outside": [90, 100],
+            "explanation": {
+              "es": "Oxígeno por debajo de 90 %: emergencia según la OMS. Usa oxígeno y sal del módulo.",
+              "en": "Oxygen below 90%: an emergency per the WHO. Use oxygen and leave the module."
+            },
+            "actions": ["apply-oxygen", "stop-eva", "notify-earth"]
+          },
+          {
+            "level": "red",
+            "outside": [93, 100],
+            "withSymptoms": true,
+            "categories": ["shortness-of-breath", "dizziness", "confusion", "fainting"],
+            "explanation": {
+              "es": "Oxígeno por debajo de 93 % con síntomas (falta de aire, mareo, confusión).",
+              "en": "Oxygen below 93% with symptoms (shortness of breath, dizziness, confusion)."
+            },
+            "actions": ["apply-oxygen", "stop-eva", "notify-earth"]
+          },
+          {
+            "level": "amber",
+            "outside": [93, 100],
+            "explanation": {
+              "es": "Oxígeno por debajo de 93 %: busca pronto la causa (aire del módulo, esfuerzo, sensor mal puesto).",
+              "en": "Oxygen below 93%: look for the cause soon (module air, effort, badly placed sensor)."
+            },
+            "actions": ["repeat-measurement", "check-ventilation", "stop-eva"]
+          }
+        ]
+      },
+      "mars": {
+        "green": [93, 100],
+        "rules": [
+          {
+            "level": "red",
+            "outside": [90, 100],
+            "explanation": {
+              "es": "Oxígeno por debajo de 90 %: emergencia según la OMS. Usa oxígeno y sal del módulo.",
+              "en": "Oxygen below 90%: an emergency per the WHO. Use oxygen and leave the module."
+            },
+            "actions": ["apply-oxygen", "stop-eva", "notify-earth"]
+          },
+          {
+            "level": "red",
+            "outside": [93, 100],
+            "withSymptoms": true,
+            "categories": ["shortness-of-breath", "dizziness", "confusion", "fainting"],
+            "explanation": {
+              "es": "Oxígeno por debajo de 93 % con síntomas (falta de aire, mareo, confusión).",
+              "en": "Oxygen below 93% with symptoms (shortness of breath, dizziness, confusion)."
+            },
+            "actions": ["apply-oxygen", "stop-eva", "notify-earth"]
+          },
+          {
+            "level": "amber",
+            "outside": [93, 100],
+            "explanation": {
+              "es": "Oxígeno por debajo de 93 %: busca pronto la causa (aire del módulo, esfuerzo, sensor mal puesto).",
+              "en": "Oxygen below 93%: look for the cause soon (module air, effort, badly placed sensor)."
+            },
+            "actions": ["repeat-measurement", "check-ventilation", "stop-eva"]
+          }
+        ]
+      },
+      "rover": {
+        "green": [93, 100],
+        "rules": [
+          {
+            "level": "red",
+            "outside": [90, 100],
+            "explanation": {
+              "es": "Oxígeno por debajo de 90 %: emergencia según la OMS. Usa oxígeno y sal del módulo.",
+              "en": "Oxygen below 90%: an emergency per the WHO. Use oxygen and leave the module."
+            },
+            "actions": ["apply-oxygen", "stop-eva", "notify-earth"]
+          },
+          {
+            "level": "red",
+            "outside": [93, 100],
+            "withSymptoms": true,
+            "categories": ["shortness-of-breath", "dizziness", "confusion", "fainting"],
+            "explanation": {
+              "es": "Oxígeno por debajo de 93 % con síntomas (falta de aire, mareo, confusión).",
+              "en": "Oxygen below 93% with symptoms (shortness of breath, dizziness, confusion)."
+            },
+            "actions": ["apply-oxygen", "stop-eva", "notify-earth"]
+          },
+          {
+            "level": "amber",
+            "outside": [93, 100],
+            "explanation": {
+              "es": "Oxígeno por debajo de 93 %: busca pronto la causa (aire del módulo, esfuerzo, sensor mal puesto).",
+              "en": "Oxygen below 93%: look for the cause soon (module air, effort, badly placed sensor)."
+            },
+            "actions": ["repeat-measurement", "check-ventilation", "stop-eva"]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "cabin-co2",
+    "name": {
+      "es": "CO₂ de la cabina",
+      "en": "Cabin CO₂"
+    },
+    "zone": "lungs",
+    "unit": "mmHg",
+    "suggestedByChallenge": false,
+    "everyHours": 12,
+    "kind": "number",
+    "green": [0, 3],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [0, 3],
+        "explanation": {
+          "es": "CO₂ del módulo por encima de 3 mmHg (dolor de cabeza, cansancio). Cambia de módulo y revisa la ventilación.",
+          "en": "Module CO₂ above 3 mmHg (headache, tiredness). Move to another module and check ventilation."
+        },
+        "actions": ["change-module", "check-ventilation", "notify-earth"]
+      }
+    ],
+    "source": "Umbral de 3 mmHg: valor inicial de P01, a confirmar con NASA-STD-3001 Vol. 2 (https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/). El CO₂ figura como riesgo del peligro de entornos cerrados: Valinia et al., NESC 2022 (https://ntrs.nasa.gov/api/citations/20220009899/downloads/F5.2_04_Valinia.pdf); NASA HRP, Hostile/Closed Environments (https://www.nasa.gov/hrp/hazard-hostile-closed-environments/)."
+  },
+  {
+    "id": "cabin-noise",
+    "name": {
+      "es": "Ruido de la cabina",
+      "en": "Cabin noise"
+    },
+    "zone": "lungs",
+    "unit": "dB",
+    "suggestedByChallenge": false,
+    "everyHours": 12,
+    "kind": "number",
+    "green": [0, 60],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [0, 60],
+        "explanation": {
+          "es": "El ruido del módulo supera 60 dB: dificulta el descanso y cansa. Protégete los oídos o cambia de módulo.",
+          "en": "Module noise is above 60 dB: it makes rest harder and tires you. Protect your ears or change module."
+        },
+        "actions": ["hearing-protection", "change-module"]
+      }
+    ],
+    "source": "Umbral de 60 dB: valor inicial de P01, referencia provisional a confirmar con NASA-STD-3001 Vol. 2 (https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/). Ruido como factor del hábitat: NASA HRP, Hostile/Closed Environments (https://www.nasa.gov/hrp/hazard-hostile-closed-environments/)."
+  },
+  {
+    "id": "visual-acuity",
+    "name": {
+      "es": "Agudeza visual",
+      "en": "Visual acuity"
+    },
+    "zone": "head",
+    "unit": "lines",
+    "suggestedByChallenge": false,
+    "everyHours": 168,
+    "kind": "number",
+    "green": [8, 10],
+    "rules": [
+      {
+        "level": "red",
+        "outside": [8, 10],
+        "withSymptoms": true,
+        "categories": ["blurred-vision"],
+        "explanation": {
+          "es": "Lees menos de 8 líneas y ves borroso: posible cambio brusco de la vista. Avisa a Tierra con prioridad.",
+          "en": "Fewer than 8 lines and blurry vision: possible sudden vision change. Report to Earth with priority."
+        },
+        "actions": ["report-vision", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [8, 10],
+        "explanation": {
+          "es": "Lees menos de 8 líneas (2 menos de lo normal). Repite con cada ojo y buena luz, y avisa a Tierra.",
+          "en": "You read fewer than 8 lines (2 fewer than normal). Repeat with each eye in good light and report to Earth."
+        },
+        "actions": ["report-vision", "repeat-measurement", "notify-earth"]
+      }
+    ],
+    "source": "Carta de 10 líneas en pantalla: la línea 10 equivale a logMAR 0,0 (20/20) y cada línea a 0,1 logMAR. Ámbar por debajo de 8 líneas (pérdida de 2 líneas): referencia provisional. Contexto SANS: NASA HRP, Gravity Fields (https://www.nasa.gov/hrp/hazard-gravity-fields/); NASA, Cardiovascular Health in Microgravity (https://www.nasa.gov/missions/station/cardiovascular-health-in-microgravity/)."
+  },
+  {
+    "id": "reaction-time",
+    "name": {
+      "es": "Tiempo de reacción",
+      "en": "Reaction time"
+    },
+    "zone": "head",
+    "unit": "ms",
+    "suggestedByChallenge": false,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [150, 400],
+    "rules": [
+      {
+        "level": "amber",
+        "baselineDeviation": 1.5,
+        "repetitions": 2,
+        "explanation": {
+          "es": "Tu reacción se aleja de tu línea base por segunda vez seguida. Descansa, repite en 2 h y avisa a Tierra.",
+          "en": "Your reaction is off your baseline for the second time in a row. Rest, repeat in 2 h and report to Earth."
+        },
+        "actions": ["repeat-battery-2h", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "baselineDeviation": 1.5,
+        "explanation": {
+          "es": "Tu reacción se aleja de tu línea base (suele ser más lenta). Descansa y repite en 2 h.",
+          "en": "Your reaction is off your baseline (usually slower). Rest and repeat in 2 h."
+        },
+        "actions": ["repeat-battery-2h"]
+      }
+    ],
+    "source": "Reglas de la batería cognitiva de M10 y P01 (reacción +15 % sobre la línea base, 2 lapsos de más de 500 ms, memoria 2 niveles por debajo, reintento a las 2 h): referencia provisional. Riesgo conductual y cognitivo: NASA HRP, Risks of Human Spaceflight (https://www.nasa.gov/hrp/risks/)."
+  },
+  {
+    "id": "pvt-lapses",
+    "name": {
+      "es": "Lapsos de atención",
+      "en": "Attention lapses"
+    },
+    "zone": "head",
+    "unit": "lapses",
+    "suggestedByChallenge": false,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [0, 1],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [0, 1],
+        "repetitions": 2,
+        "explanation": {
+          "es": "2 o más respuestas de más de 500 ms, por segunda vez seguida. Descansa, repite en 2 h y avisa a Tierra.",
+          "en": "2 or more responses over 500 ms, for the second time in a row. Rest, repeat in 2 h and report to Earth."
+        },
+        "actions": ["repeat-battery-2h", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [0, 1],
+        "explanation": {
+          "es": "Dos o más lapsos (respuestas de más de 500 ms). Descansa y repite en 2 h.",
+          "en": "Two or more lapses (responses over 500 ms). Rest and repeat in 2 h."
+        },
+        "actions": ["repeat-battery-2h"]
+      }
+    ],
+    "source": "Reglas de la batería cognitiva de M10 y P01 (reacción +15 % sobre la línea base, 2 lapsos de más de 500 ms, memoria 2 niveles por debajo, reintento a las 2 h): referencia provisional. Riesgo conductual y cognitivo: NASA HRP, Risks of Human Spaceflight (https://www.nasa.gov/hrp/risks/)."
+  },
+  {
+    "id": "working-memory",
+    "name": {
+      "es": "Memoria de trabajo",
+      "en": "Working memory"
+    },
+    "zone": "head",
+    "unit": "level",
+    "suggestedByChallenge": false,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [4, 5],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [4, 5],
+        "repetitions": 2,
+        "explanation": {
+          "es": "Memoria en nivel 3 o menos por segunda vez seguida. Descansa, repite en 2 h y avisa a Tierra.",
+          "en": "Memory at level 3 or lower for the second time in a row. Rest, repeat in 2 h and report to Earth."
+        },
+        "actions": ["repeat-battery-2h", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [4, 5],
+        "explanation": {
+          "es": "Memoria en nivel 3 o menos: 2 niveles por debajo de lo habitual. Descansa y repite en 2 h.",
+          "en": "Memory at level 3 or lower: 2 levels below usual. Rest and repeat in 2 h."
+        },
+        "actions": ["repeat-battery-2h"]
+      }
+    ],
+    "source": "Reglas de la batería cognitiva de M10 y P01 (reacción +15 % sobre la línea base, 2 lapsos de más de 500 ms, memoria 2 niveles por debajo, reintento a las 2 h): referencia provisional. Riesgo conductual y cognitivo: NASA HRP, Risks of Human Spaceflight (https://www.nasa.gov/hrp/risks/)."
+  },
+  {
+    "id": "go-nogo-accuracy",
+    "name": {
+      "es": "Atención (Go/No-Go)",
+      "en": "Attention (Go/No-Go)"
+    },
+    "zone": "head",
+    "unit": "%",
+    "suggestedByChallenge": false,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [80, 100],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [80, 100],
+        "repetitions": 2,
+        "explanation": {
+          "es": "Menos del 80 % de aciertos en Go/No-Go, por segunda vez seguida. Descansa, repite en 2 h y avisa a Tierra.",
+          "en": "Less than 80% correct in Go/No-Go, for the second time in a row. Rest, repeat in 2 h and report to Earth."
+        },
+        "actions": ["repeat-battery-2h", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [80, 100],
+        "explanation": {
+          "es": "Menos del 80 % de aciertos en Go/No-Go. Descansa y repite en 2 h.",
+          "en": "Less than 80% correct in Go/No-Go. Rest and repeat in 2 h."
+        },
+        "actions": ["repeat-battery-2h"]
+      }
+    ],
+    "source": "Reglas de la batería cognitiva de M10 y P01 (reacción +15 % sobre la línea base, 2 lapsos de más de 500 ms, memoria 2 niveles por debajo, reintento a las 2 h): referencia provisional. Riesgo conductual y cognitivo: NASA HRP, Risks of Human Spaceflight (https://www.nasa.gov/hrp/risks/)."
+  },
+  {
+    "id": "glucose",
+    "name": {
+      "es": "Glucosa",
+      "en": "Glucose"
+    },
+    "zone": "metabolism",
+    "unit": "mg/dL",
+    "suggestedByChallenge": true,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [70, 99],
+    "rules": [
+      {
+        "level": "red",
+        "outside": [70, 1000],
+        "withSymptoms": true,
+        "categories": ["sweating", "confusion", "dizziness", "fainting", "palpitations"],
+        "explanation": {
+          "es": "Glucosa por debajo de 70 con sudor, mareo o confusión: azúcar muy baja. Actúa ya.",
+          "en": "Glucose below 70 with sweating, dizziness or confusion: very low sugar. Act now."
+        },
+        "actions": ["start-rule-15-15", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [70, 1000],
+        "explanation": {
+          "es": "Glucosa por debajo de 70: baja. Toma 15 g de azúcar rápido y vuelve a medir en 15 minutos.",
+          "en": "Glucose below 70: low. Take 15 g of fast sugar and measure again in 15 minutes."
+        },
+        "actions": ["start-rule-15-15", "repeat-measurement"]
+      },
+      {
+        "level": "amber",
+        "outside": [0, 125],
+        "repetitions": 2,
+        "explanation": {
+          "es": "Glucosa en ayunas de 126 o más dos veces seguidas: revísalo con Tierra.",
+          "en": "Fasting glucose of 126 or more twice in a row: review it with Earth."
+        },
+        "actions": ["notify-earth", "adjust-diet", "repeat-measurement"]
+      },
+      {
+        "level": "amber",
+        "outside": [70, 99],
+        "explanation": {
+          "es": "Glucosa en ayunas por encima de 99 (de 100 a 125 es prediabetes). Repite mañana en ayunas.",
+          "en": "Fasting glucose above 99 (100 to 125 is prediabetes). Repeat tomorrow while fasting."
+        },
+        "actions": ["repeat-measurement", "adjust-diet"]
+      }
+    ],
+    "source": "Ayuno <100 normal, 100–125 prediabetes, ≥126 umbral de diabetes: ADA, Diagnosis (https://diabetes.org/about-diabetes/diagnosis). <70 baja y regla 15/15: ADA, Hypoglycemia (https://diabetes.org/living-with-diabetes/treatment-care/hypoglycemia-low-blood-glucose). Resistencia a la insulina en vuelo: Hughson et al. 2016 (https://doi.org/10.1152/ajpheart.00802.2015)."
+  },
+  {
+    "id": "body-temperature",
+    "name": {
+      "es": "Temperatura corporal",
+      "en": "Body temperature"
+    },
+    "zone": "metabolism",
+    "unit": "°C",
+    "suggestedByChallenge": true,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [35.5, 37.9],
+    "rules": [
+      {
+        "level": "red",
+        "outside": [35, 50],
+        "explanation": {
+          "es": "Temperatura por debajo de 35 °C: hipotermia. Abriga a la persona y avisa.",
+          "en": "Temperature below 35 °C: hypothermia. Warm the person up and report it."
+        },
+        "actions": ["warm-up", "notify-earth"]
+      },
+      {
+        "level": "red",
+        "outside": [35.5, 37.9],
+        "withSymptoms": true,
+        "categories": ["fever-chills", "confusion", "shortness-of-breath"],
+        "explanation": {
+          "es": "Fiebre con síntomas (escalofríos, confusión, falta de aire): sigue el protocolo de fiebre.",
+          "en": "Fever with symptoms (chills, confusion, shortness of breath): follow the fever protocol."
+        },
+        "actions": ["start-fever-protocol", "notify-earth"]
+      },
+      {
+        "level": "red",
+        "outside": [35.5, 37.9],
+        "sustainedMin": 4320,
+        "explanation": {
+          "es": "Fiebre que dura 3 días: necesita revisión. Sigue el protocolo de fiebre.",
+          "en": "Fever lasting 3 days: it needs review. Follow the fever protocol."
+        },
+        "actions": ["start-fever-protocol", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [35.5, 37.9],
+        "explanation": {
+          "es": "Temperatura fuera de 35,5–37,9 °C: fiebre (38 o más) o temperatura baja. Repite y busca la causa.",
+          "en": "Temperature outside 35.5–37.9 °C: fever (38 or more) or low temperature. Repeat and look for the cause."
+        },
+        "actions": ["repeat-measurement", "find-infection-source", "hydrate"]
+      }
+    ],
+    "source": "Fiebre desde 38 °C: NHS, High temperature (fever) in adults (https://www.nhs.uk/symptoms/fever-in-adults/). Hipotermia <35 °C: MedlinePlus, Hypothermia (https://medlineplus.gov/ency/article/000038.htm). Fiebre persistente de 3 días en rojo: referencia provisional inspirada en el NHS."
+  },
+  {
+    "id": "wrist-temperature",
+    "name": {
+      "es": "Temperatura de muñeca (noche)",
+      "en": "Wrist temperature (night)"
+    },
+    "zone": "metabolism",
+    "unit": "Δ°C",
+    "suggestedByChallenge": false,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [-1, 1],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [-1, 1],
+        "explanation": {
+          "es": "Tu muñeca estuvo más de 1 °C fuera de lo habitual esta noche. No es fiebre: mide la temperatura corporal.",
+          "en": "Your wrist was more than 1 °C off your usual value last night. This is not fever: measure body temperature."
+        },
+        "actions": ["measure-body-temperature"]
+      }
+    ],
+    "source": "Lectura nocturna de la piel como desviación de la línea base personal, no temperatura corporal: Apple, Wrist temperature (https://support.apple.com/en-us/102674). Umbral de ±1 °C: referencia provisional."
+  },
+  {
+    "id": "weight",
+    "name": {
+      "es": "Peso (masa corporal)",
+      "en": "Weight (body mass)"
+    },
+    "zone": "metabolism",
+    "unit": "kg",
+    "suggestedByChallenge": false,
+    "everyHours": 168,
+    "kind": "number",
+    "green": [40, 150],
+    "rules": [
+      {
+        "level": "amber",
+        "baselineDeviation": 1,
+        "explanation": {
+          "es": "Tu masa cambió más de un 5 % frente a lo habitual. Revisa la dieta con Tierra.",
+          "en": "Your body mass changed more than 5% from usual. Review your diet with Earth."
+        },
+        "actions": ["adjust-diet", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [40, 150],
+        "explanation": {
+          "es": "Masa fuera de la referencia (40–150 kg). Repite la medición.",
+          "en": "Body mass outside the reference (40–150 kg). Repeat the measurement."
+        },
+        "actions": ["repeat-measurement"]
+      }
+    ],
+    "source": "Pérdida >5 % como criterio de desnutrición: GLIM, Cederholm et al. 2019 (https://doi.org/10.1002/jcsm.12383); expresada como 1 vez el rango personal, que el motor nunca deja por debajo del 5 % de la mediana. Cubrir el 100 % de las necesidades: NASA-STD-3001 Vol. 1 Rev. C, V1 4020 (https://www.nasa.gov/wp-content/uploads/2023/11/nasa-std-3001-vol-1-rev-c-with-signature.pdf). Rango 40–150 kg: referencia provisional."
+  },
+  {
+    "id": "food-intake",
+    "name": {
+      "es": "Ingesta de energía",
+      "en": "Food intake"
+    },
+    "zone": "metabolism",
+    "unit": "kcal",
+    "suggestedByChallenge": false,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [1800, 3500],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [1800, 3500],
+        "repetitions": 3,
+        "explanation": {
+          "es": "Tres días seguidos comiendo por debajo de 1800 o por encima de 3500 kcal. Ajusta la dieta.",
+          "en": "Three days in a row eating below 1800 or above 3500 kcal. Adjust your diet."
+        },
+        "actions": ["adjust-diet", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [1500, 4000],
+        "explanation": {
+          "es": "La ingesta de hoy está muy lejos de tu plan. Revisa lo que comiste.",
+          "en": "Today’s intake is far from your plan. Review what you ate."
+        },
+        "actions": ["adjust-diet"]
+      }
+    ],
+    "source": "Cubrir el 100 % de las necesidades de energía calculadas: NASA-STD-3001 Vol. 1 Rev. C, V1 4020 (https://www.nasa.gov/wp-content/uploads/2023/11/nasa-std-3001-vol-1-rev-c-with-signature.pdf). Cifras en kcal: referencia provisional; lo correcto es el plan individual."
+  },
+  {
+    "id": "resistance-exercise",
+    "name": {
+      "es": "Ejercicio resistivo",
+      "en": "Resistance exercise"
+    },
+    "zone": "musculoskeletal",
+    "unit": "min",
+    "suggestedByChallenge": false,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [45, 240],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [45, 240],
+        "explanation": {
+          "es": "No llegaste a los 45 minutos de ejercicio resistivo de hoy: el hueso y el músculo lo necesitan.",
+          "en": "You did not reach today’s 45 minutes of resistance exercise: bone and muscle need it."
+        },
+        "actions": ["complete-exercise"]
+      }
+    ],
+    "source": "45 min al día: valor inicial de P01, referencia provisional. El ejercicio es la contramedida principal contra la pérdida ósea y muscular: NASA HRP, Gravity Fields (https://www.nasa.gov/hrp/hazard-gravity-fields/)."
+  },
+  {
+    "id": "bone-loss",
+    "name": {
+      "es": "Pérdida ósea estimada",
+      "en": "Estimated bone loss"
+    },
+    "zone": "musculoskeletal",
+    "unit": "%",
+    "suggestedByChallenge": false,
+    "everyHours": 168,
+    "kind": "number",
+    "green": [0, 2.9],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [0, 5],
+        "explanation": {
+          "es": "Pérdida estimada de más del 5 %: bajo el mínimo de NASA (95 % de densidad). Refuerza el ejercicio y avisa.",
+          "en": "Estimated loss over 5%: below NASA’s minimum (95% density). Step up exercise and report it."
+        },
+        "actions": ["complete-exercise", "notify-earth", "hydrate"]
+      },
+      {
+        "level": "amber",
+        "outside": [0, 2.9],
+        "explanation": {
+          "es": "Pérdida estimada del 3 % o más. Cumple el plan de ejercicio y bebe agua.",
+          "en": "Estimated loss of 3% or more. Stick to the exercise plan and drink water."
+        },
+        "actions": ["complete-exercise", "hydrate"]
+      }
+    ],
+    "source": "Mantener ≥95 % de la densidad previa en cadera y columna: NASA-STD-3001 Vol. 1 Rev. C, V1 4027 (https://www.nasa.gov/wp-content/uploads/2023/11/nasa-std-3001-vol-1-rev-c-with-signature.pdf). Pérdida de ~1–1,5 % al mes: NASA HRP, Gravity Fields (https://www.nasa.gov/hrp/hazard-gravity-fields/). Umbral del 3 %: valor inicial de P01, referencia provisional. Es una estimación a bordo, no una densitometría."
+  },
+  {
+    "id": "steps",
+    "name": {
+      "es": "Pasos",
+      "en": "Steps"
+    },
+    "zone": "musculoskeletal",
+    "unit": "steps",
+    "suggestedByChallenge": false,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [0, 100000],
+    "rules": [],
+    "source": "Sin umbral en microgravedad (no se camina). En superficie, 3000 pasos: referencia provisional.",
+    "environmentOverrides": {
+      "moon": {
+        "green": [3000, 60000],
+        "rules": [
+          {
+            "level": "amber",
+            "outside": [3000, 60000],
+            "explanation": {
+              "es": "Menos de 3000 pasos hoy: con gravedad, caminar ayuda a cargar los huesos.",
+              "en": "Fewer than 3000 steps today: with gravity, walking helps load your bones."
+            },
+            "actions": ["complete-exercise"]
+          }
+        ]
+      },
+      "mars": {
+        "green": [3000, 60000],
+        "rules": [
+          {
+            "level": "amber",
+            "outside": [3000, 60000],
+            "explanation": {
+              "es": "Menos de 3000 pasos hoy: con gravedad, caminar ayuda a cargar los huesos.",
+              "en": "Fewer than 3000 steps today: with gravity, walking helps load your bones."
+            },
+            "actions": ["complete-exercise"]
+          }
+        ]
+      },
+      "rover": {
+        "green": [3000, 60000],
+        "rules": [
+          {
+            "level": "amber",
+            "outside": [3000, 60000],
+            "explanation": {
+              "es": "Menos de 3000 pasos hoy: con gravedad, caminar ayuda a cargar los huesos.",
+              "en": "Fewer than 3000 steps today: with gravity, walking helps load your bones."
+            },
+            "actions": ["complete-exercise"]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "distance",
+    "name": {
+      "es": "Distancia",
+      "en": "Distance"
+    },
+    "zone": "musculoskeletal",
+    "unit": "km",
+    "suggestedByChallenge": false,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [0, 1000],
+    "rules": [],
+    "source": "Informativo, sin umbral: referencia provisional."
+  },
+  {
+    "id": "floors",
+    "name": {
+      "es": "Pisos subidos",
+      "en": "Floors climbed"
+    },
+    "zone": "musculoskeletal",
+    "unit": "floors",
+    "suggestedByChallenge": false,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [0, 1000],
+    "rules": [],
+    "source": "Informativo, sin umbral: referencia provisional."
+  },
+  {
+    "id": "radiation-dose",
+    "name": {
+      "es": "Dosis de radiación",
+      "en": "Radiation dose"
+    },
+    "zone": "skin",
+    "unit": "mSv/day",
+    "suggestedByChallenge": false,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [0, 1],
+    "rules": [
+      {
+        "level": "red",
+        "outside": [0, 25],
+        "explanation": {
+          "es": "Más de 25 mSv en el día: supera el límite por evento. Ve al refugio y registra la dosis.",
+          "en": "More than 25 mSv in one day: over the per-event limit. Go to the shelter and log the dose."
+        },
+        "actions": ["go-to-shelter", "log-exposure", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [0, 1],
+        "explanation": {
+          "es": "Dosis del día por encima de lo esperado en este entorno (más de 1 mSv). Mira si hay un evento solar.",
+          "en": "Today’s dose is above what is expected here (more than 1 mSv). Check for a solar event."
+        },
+        "actions": ["log-exposure", "notify-earth"]
+      }
+    ],
+    "source": "Límite de carrera de 600 mSv y principio ALARA: NASA-STD-3001 Vol. 1 Rev. C, V1 4029 y V1 4030 (https://www.nasa.gov/wp-content/uploads/2023/11/nasa-std-3001-vol-1-rev-c-with-signature.pdf). Dosis diaria de referencia por entorno (estación 0,5; Luna y Marte 1,2; tránsito 1,6 mSv/día) y presupuesto de 25 mSv por evento: valores iniciales de P01, referencia provisional; el verde llega a 1,5 veces la dosis de referencia.",
+    "environmentOverrides": {
+      "station": {
+        "green": [0, 0.8],
+        "rules": [
+          {
+            "level": "red",
+            "outside": [0, 25],
+            "explanation": {
+              "es": "Más de 25 mSv en el día: supera el límite por evento. Ve al refugio y registra la dosis.",
+              "en": "More than 25 mSv in one day: over the per-event limit. Go to the shelter and log the dose."
+            },
+            "actions": ["go-to-shelter", "log-exposure", "notify-earth"]
+          },
+          {
+            "level": "amber",
+            "outside": [0, 0.8],
+            "explanation": {
+              "es": "Dosis del día por encima de lo esperado en este entorno (más de 0.8 mSv). Mira si hay un evento solar.",
+              "en": "Today’s dose is above what is expected here (more than 0.8 mSv). Check for a solar event."
+            },
+            "actions": ["log-exposure", "notify-earth"]
+          }
+        ]
+      },
+      "transit": {
+        "green": [0, 2.4],
+        "rules": [
+          {
+            "level": "red",
+            "outside": [0, 25],
+            "explanation": {
+              "es": "Más de 25 mSv en el día: supera el límite por evento. Ve al refugio y registra la dosis.",
+              "en": "More than 25 mSv in one day: over the per-event limit. Go to the shelter and log the dose."
+            },
+            "actions": ["go-to-shelter", "log-exposure", "notify-earth"]
+          },
+          {
+            "level": "amber",
+            "outside": [0, 2.4],
+            "explanation": {
+              "es": "Dosis del día por encima de lo esperado en este entorno (más de 2.4 mSv). Mira si hay un evento solar.",
+              "en": "Today’s dose is above what is expected here (more than 2.4 mSv). Check for a solar event."
+            },
+            "actions": ["log-exposure", "notify-earth"]
+          }
+        ]
+      },
+      "lunar-orbit": {
+        "green": [0, 2.4],
+        "rules": [
+          {
+            "level": "red",
+            "outside": [0, 25],
+            "explanation": {
+              "es": "Más de 25 mSv en el día: supera el límite por evento. Ve al refugio y registra la dosis.",
+              "en": "More than 25 mSv in one day: over the per-event limit. Go to the shelter and log the dose."
+            },
+            "actions": ["go-to-shelter", "log-exposure", "notify-earth"]
+          },
+          {
+            "level": "amber",
+            "outside": [0, 2.4],
+            "explanation": {
+              "es": "Dosis del día por encima de lo esperado en este entorno (más de 2.4 mSv). Mira si hay un evento solar.",
+              "en": "Today’s dose is above what is expected here (more than 2.4 mSv). Check for a solar event."
+            },
+            "actions": ["log-exposure", "notify-earth"]
+          }
+        ]
+      },
+      "moon": {
+        "green": [0, 1.8],
+        "rules": [
+          {
+            "level": "red",
+            "outside": [0, 25],
+            "explanation": {
+              "es": "Más de 25 mSv en el día: supera el límite por evento. Ve al refugio y registra la dosis.",
+              "en": "More than 25 mSv in one day: over the per-event limit. Go to the shelter and log the dose."
+            },
+            "actions": ["go-to-shelter", "log-exposure", "notify-earth"]
+          },
+          {
+            "level": "amber",
+            "outside": [0, 1.8],
+            "explanation": {
+              "es": "Dosis del día por encima de lo esperado en este entorno (más de 1.8 mSv). Mira si hay un evento solar.",
+              "en": "Today’s dose is above what is expected here (more than 1.8 mSv). Check for a solar event."
+            },
+            "actions": ["log-exposure", "notify-earth"]
+          }
+        ]
+      },
+      "mars-orbit": {
+        "green": [0, 2.4],
+        "rules": [
+          {
+            "level": "red",
+            "outside": [0, 25],
+            "explanation": {
+              "es": "Más de 25 mSv en el día: supera el límite por evento. Ve al refugio y registra la dosis.",
+              "en": "More than 25 mSv in one day: over the per-event limit. Go to the shelter and log the dose."
+            },
+            "actions": ["go-to-shelter", "log-exposure", "notify-earth"]
+          },
+          {
+            "level": "amber",
+            "outside": [0, 2.4],
+            "explanation": {
+              "es": "Dosis del día por encima de lo esperado en este entorno (más de 2.4 mSv). Mira si hay un evento solar.",
+              "en": "Today’s dose is above what is expected here (more than 2.4 mSv). Check for a solar event."
+            },
+            "actions": ["log-exposure", "notify-earth"]
+          }
+        ]
+      },
+      "mars": {
+        "green": [0, 1.8],
+        "rules": [
+          {
+            "level": "red",
+            "outside": [0, 25],
+            "explanation": {
+              "es": "Más de 25 mSv en el día: supera el límite por evento. Ve al refugio y registra la dosis.",
+              "en": "More than 25 mSv in one day: over the per-event limit. Go to the shelter and log the dose."
+            },
+            "actions": ["go-to-shelter", "log-exposure", "notify-earth"]
+          },
+          {
+            "level": "amber",
+            "outside": [0, 1.8],
+            "explanation": {
+              "es": "Dosis del día por encima de lo esperado en este entorno (más de 1.8 mSv). Mira si hay un evento solar.",
+              "en": "Today’s dose is above what is expected here (more than 1.8 mSv). Check for a solar event."
+            },
+            "actions": ["log-exposure", "notify-earth"]
+          }
+        ]
+      },
+      "rover": {
+        "green": [0, 1.8],
+        "rules": [
+          {
+            "level": "red",
+            "outside": [0, 25],
+            "explanation": {
+              "es": "Más de 25 mSv en el día: supera el límite por evento. Ve al refugio y registra la dosis.",
+              "en": "More than 25 mSv in one day: over the per-event limit. Go to the shelter and log the dose."
+            },
+            "actions": ["go-to-shelter", "log-exposure", "notify-earth"]
+          },
+          {
+            "level": "amber",
+            "outside": [0, 1.8],
+            "explanation": {
+              "es": "Dosis del día por encima de lo esperado en este entorno (más de 1.8 mSv). Mira si hay un evento solar.",
+              "en": "Today’s dose is above what is expected here (more than 1.8 mSv). Check for a solar event."
+            },
+            "actions": ["log-exposure", "notify-earth"]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "id": "solar-event",
+    "name": {
+      "es": "Evento solar",
+      "en": "Solar event"
+    },
+    "zone": "skin",
+    "unit": "S scale",
+    "suggestedByChallenge": false,
+    "everyHours": 6,
+    "kind": "number",
+    "green": [0, 0],
+    "rules": [
+      {
+        "level": "red",
+        "outside": [0, 1],
+        "explanation": {
+          "es": "Tormenta de radiación solar S2 o mayor: ve ahora al refugio blindado.",
+          "en": "Solar radiation storm S2 or higher: go to the shielded shelter now."
+        },
+        "actions": ["go-to-shelter", "postpone-eva", "log-exposure"]
+      },
+      {
+        "level": "amber",
+        "outside": [0, 0],
+        "explanation": {
+          "es": "Tormenta solar menor (S1): pospón la actividad exterior hasta que el flujo baje de 10 pfu.",
+          "en": "Minor solar storm (S1): postpone outside activity until the flux drops below 10 pfu."
+        },
+        "actions": ["postpone-eva", "log-exposure"]
+      }
+    ],
+    "source": "Escala NOAA de tormentas de radiación solar S1–S5 (S1 = 10 pfu de protones ≥10 MeV): NOAA SWPC, Space Weather Scales (https://www.spaceweather.gov/noaa-scales-explanation). Refugio desde S2 y actividad exterior pospuesta hasta <10 pfu: valores iniciales de P01, referencia provisional."
+  },
+  {
+    "id": "mood",
+    "name": {
+      "es": "Ánimo",
+      "en": "Mood"
+    },
+    "zone": "mind",
+    "unit": "points (1–5)",
+    "suggestedByChallenge": true,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [3, 5],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [3, 5],
+        "repetitions": 3,
+        "explanation": {
+          "es": "Tres registros seguidos con el ánimo bajo (2 o menos). Busca un momento tranquilo y habla con alguien.",
+          "en": "Three check-ins in a row with low mood (2 or less). Find a quiet moment and talk to someone."
+        },
+        "actions": ["psychological-support", "message-family", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [2, 5],
+        "explanation": {
+          "es": "Ánimo muy bajo hoy (1 de 5). Tómate un momento y piensa en hablar con alguien.",
+          "en": "Very low mood today (1 out of 5). Take a moment and consider talking to someone."
+        },
+        "actions": ["quiet-moment", "psychological-support"]
+      }
+    ],
+    "source": "Tres registros seguidos con ánimo ≤2 o estrés ≥4: regla de M10 y P01, referencia provisional. Recursos CONNECT: NASA, Isolation (https://www.nasa.gov/humans-in-space/isolation-what-can-we-learn-from-the-experiences-of-nasa-astronauts/). Riesgo conductual: NASA HRP, Risks (https://www.nasa.gov/hrp/risks/)."
+  },
+  {
+    "id": "stress",
+    "name": {
+      "es": "Estrés",
+      "en": "Stress"
+    },
+    "zone": "mind",
+    "unit": "points (1–5)",
+    "suggestedByChallenge": false,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [1, 3],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [1, 3],
+        "repetitions": 3,
+        "explanation": {
+          "es": "Tres registros seguidos con estrés alto (4 o más). Revisa tu carga de trabajo y busca apoyo.",
+          "en": "Three check-ins in a row with high stress (4 or more). Review your workload and seek support."
+        },
+        "actions": ["psychological-support", "review-workload", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [1, 4],
+        "explanation": {
+          "es": "Estrés máximo hoy (5 de 5). Haz una pausa y respira.",
+          "en": "Maximum stress today (5 out of 5). Take a break and breathe."
+        },
+        "actions": ["quiet-moment", "psychological-support"]
+      }
+    ],
+    "source": "Tres registros seguidos con estrés ≥4: regla de M10 y P01, referencia provisional. Recursos CONNECT: NASA, Isolation (https://www.nasa.gov/humans-in-space/isolation-what-can-we-learn-from-the-experiences-of-nasa-astronauts/)."
+  },
+  {
+    "id": "sleep",
+    "name": {
+      "es": "Sueño",
+      "en": "Sleep"
+    },
+    "zone": "mind",
+    "unit": "h",
+    "suggestedByChallenge": true,
+    "everyHours": 24,
+    "kind": "number",
+    "green": [6, 12],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [6, 12],
+        "repetitions": 3,
+        "explanation": {
+          "es": "Tres noches seguidas durmiendo menos de 6 horas: afecta a la atención y al ánimo.",
+          "en": "Three nights in a row sleeping less than 6 hours: it affects attention and mood."
+        },
+        "actions": ["sleep-hygiene", "adjust-light-schedule", "review-workload"]
+      },
+      {
+        "level": "amber",
+        "outside": [5, 12],
+        "explanation": {
+          "es": "Noche muy corta (menos de 5 horas). Intenta descansar hoy.",
+          "en": "Very short night (less than 5 hours). Try to rest today."
+        },
+        "actions": ["prioritize-rest", "sleep-hygiene"]
+      }
+    ],
+    "source": "Adultos: 7 h o más por noche, AASM y SRS (https://doi.org/10.5665/sleep.4716). Media de ~6,1 h en la ISS: Barger et al. 2014 (https://doi.org/10.1016/S1474-4422%2814%2970122-X). Ámbar con <6 h tres noches seguidas o con una noche de <5 h: referencia provisional."
+  }
+]
