@@ -6,11 +6,11 @@ import { MoonStarIcon, PlusIcon, SunIcon } from 'lucide-react-native';
 import { useColorScheme } from 'nativewind';
 import * as React from 'react';
 import { ScrollView, View } from 'react-native';
-import type { Item } from '@pole-haven/shared';
+import type { Item } from '@haven/shared';
 import { createItem, getItems } from '@/lib/api';
 
 const SCREEN_OPTIONS = {
-  title: 'Pole Haven',
+  title: 'HAVEN',
   headerRight: () => <ThemeToggle />,
 };
 

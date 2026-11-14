@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct PoleHavenWatchApp: App {
+struct HavenWatchApp: App {
   var body: some Scene {
     WindowGroup {
       ContentView()

@@ -11,5 +11,5 @@ const clientPromise =
 
 export async function getDb(): Promise<Db> {
   const client = await clientPromise;
-  return client.db(process.env.MONGODB_DB ?? "pole-haven");
+  return client.db(process.env.MONGODB_DB ?? "haven");
 }

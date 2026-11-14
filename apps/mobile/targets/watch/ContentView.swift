@@ -55,7 +55,7 @@ struct ContentView: View {
           Text(item.title)
         }
       }
-      .navigationTitle("Pole Haven")
+      .navigationTitle("HAVEN")
       .refreshable { await model.load() }
       .task { await model.load() }
     }

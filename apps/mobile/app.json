@@ -1,25 +1,25 @@
 {
   "expo": {
-    "name": "Pole Haven",
-    "slug": "pole-haven",
+    "name": "HAVEN",
+    "slug": "haven",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "polehaven",
+    "scheme": "haven",
     "userInterfaceStyle": "automatic",
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.polehaven.app"
+      "bundleIdentifier": "com.haven.app"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.polehaven.app"
+      "package": "com.haven.app"
     },
     "web": {
       "bundler": "metro",

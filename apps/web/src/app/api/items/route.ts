@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
-import type { CreateItemInput, Item } from "@pole-haven/shared";
+import type { CreateItemInput, Item } from "@haven/shared";
 
 export const dynamic = "force-dynamic";
 

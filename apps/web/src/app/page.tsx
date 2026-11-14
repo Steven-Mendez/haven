@@ -11,7 +11,7 @@ export default async function Home() {
   return (
     <main className="mx-auto flex w-full max-w-2xl flex-col gap-6 p-6 sm:p-12">
       <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Pole Haven</h1>
+        <h1 className="text-3xl font-semibold tracking-tight">HAVEN</h1>
         <p className="text-muted-foreground">Next.js + shadcn/ui + MongoDB — misma API que iOS y watchOS.</p>
       </div>
       <AddItemForm />

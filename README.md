@@ -1,4 +1,4 @@
-# Pole Haven — starter de hackatón
+# HAVEN — starter de hackatón
 
 Monorepo con pnpm workspaces:
 
@@ -31,7 +31,7 @@ pnpm ios                   # compila la app iOS + watch (requiere Xcode)
 ```
 
 `pnpm ios` corre `expo run:ios`, que hace prebuild y genera `apps/mobile/ios` con el target del Watch.
-Para correr el Watch: abre `apps/mobile/ios/*.xcworkspace` en Xcode, elige el scheme **PoleHavenWatch** y un simulador de Apple Watch.
+Para correr el Watch: abre `apps/mobile/ios/*.xcworkspace` en Xcode, elige el scheme **HavenWatch** y un simulador de Apple Watch.
 
 > Como hay un target de watchOS, la app necesita un **development build**; Expo Go no sirve.
 

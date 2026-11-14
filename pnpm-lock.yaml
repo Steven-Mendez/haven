@@ -171,7 +171,7 @@ importers:
       '@bacons/apple-targets':
         specifier: ^3.0.0
         version: 3.0.7(supports-color@8.1.1)
-      '@pole-haven/shared':
+      '@haven/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       '@rn-primitives/portal':
@@ -268,7 +268,7 @@ importers:
 
   apps/web:
     dependencies:
-      '@pole-haven/shared':
+      '@haven/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       mongodb:

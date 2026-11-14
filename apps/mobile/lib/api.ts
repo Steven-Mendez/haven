@@ -1,4 +1,4 @@
-import type { CreateItemInput, Item } from '@pole-haven/shared';
+import type { CreateItemInput, Item } from '@haven/shared';
 
 const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000';
 
