@@ -38,7 +38,6 @@ export const havenTexts = defineTexts({
     alerts: 'Alertas activas',
     noAlerts: 'Sin alertas activas',
     viewDetail: 'Ver detalle',
-    aiPortrait: 'Retrato generado con IA',
     ai: 'IA',
     staleWarning:
       'No llegan paquetes desde hace {t}. Lo de abajo es el último estado recibido, no el actual.',
@@ -236,7 +235,6 @@ export const havenTexts = defineTexts({
     alerts: 'Active alerts',
     noAlerts: 'No active alerts',
     viewDetail: 'View detail',
-    aiPortrait: 'AI-generated portrait',
     ai: 'AI',
     staleWarning:
       'No packets for {t}. What follows is the last status received, not the current one.',

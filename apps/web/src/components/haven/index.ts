@@ -36,7 +36,7 @@ export { MetricCard, type Trend } from './metric-card';
 export { MissionHeader } from './mission-header';
 export { MissionStats } from './mission-stats';
 export { PageContainer, Section } from './page-container';
-export { CREW_PORTRAITS, initials, Portrait } from './portrait';
+export { initials, Portrait } from './portrait';
 export {
   crewRings,
   type DayRings,
