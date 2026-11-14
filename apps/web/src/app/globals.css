@@ -2,14 +2,39 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+/* HAVEN · Ground View · «Vela 3» (design/redesign/SPEC.md). Pure black, hairlines, one accent («Ion»).
+   Dark is the default (class on <html>); light is the same system inverted. */
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-sans);
   --font-heading: var(--font-sans);
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Type scale (SPEC §3, web column). 13 px is the UI base: `text-sm` = 13/20. */
+  --text-2xs: 11px;
+  --text-2xs--line-height: 16px;
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-sm: 13px;
+  --text-sm--line-height: 20px;
+  --text-base: 14px;
+  --text-base--line-height: 20px;
+  --text-lg: 15px;
+  --text-lg--line-height: 22px;
+  --text-xl: 20px;
+  --text-xl--line-height: 28px;
+  --text-2xl: 24px;
+  --text-2xl--line-height: 32px;
+  --text-metric: 32px;
+  --text-metric--line-height: 36px;
+  --text-metric-xl: 48px;
+  --text-metric-xl--line-height: 52px;
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -27,6 +52,7 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -39,92 +65,370 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* HAVEN layers and tiers. `accent` keeps its shadcn meaning (neutral hover of menus); the accent
+     (Apple system blue, SPEC v3.1) is `brand` (bg-brand, text-brand, ring-brand, bg-brand-subtle). */
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-hover: var(--hover);
+  --color-active: var(--active);
+  --color-border-subtle: var(--border-subtle);
+  --color-border-strong: var(--border-strong);
+  --color-tertiary: var(--tertiary);
+  --color-disabled: var(--disabled);
+  --color-brand: var(--brand);
+  --color-brand-subtle: var(--brand-subtle);
+  --color-link: var(--link);
+  --color-level-green: var(--level-green);
+  --color-level-green-bg: var(--level-green-bg);
+  --color-level-green-border: var(--level-green-border);
+  --color-level-amber: var(--level-amber);
+  --color-level-amber-bg: var(--level-amber-bg);
+  --color-level-amber-border: var(--level-amber-border);
+  --color-level-red: var(--level-red);
+  --color-level-red-bg: var(--level-red-bg);
+  --color-level-red-border: var(--level-red-border);
+  --color-level-pending: var(--level-pending);
+  --color-level-pending-bg: var(--level-pending-bg);
+  --color-level-pending-border: var(--level-pending-border);
+  --color-chart-line: var(--chart-line);
+  --color-chart-grid: var(--chart-grid);
+  --color-chart-axis: var(--chart-axis);
+  --color-chart-band: var(--chart-band);
+  --color-chart-median: var(--chart-median);
+  --color-chart-reference: var(--chart-reference);
+  --color-chart-cursor: var(--chart-cursor);
+  --color-chart-crosshair: var(--chart-crosshair);
+  --color-chart-area: var(--chart-area);
+  --color-chart-hatch: var(--chart-hatch);
+  --color-chart-bar: var(--chart-bar);
+  --color-chart-baseline: var(--chart-baseline);
+  --color-ecg-minor: var(--ecg-minor);
+  --color-ecg-major: var(--ecg-major);
+  --color-ring-progress: var(--ring-progress);
+  --color-ring-done: var(--ring-done);
+  --color-ring-track: var(--ring-track);
+  --color-ring-partial: var(--ring-partial);
+
+  /* Radii (SPEC §4): sm 4 (badges, kbd) · md 6 (chips, nav) · lg 8 (buttons, inputs) · xl 12 (panel,
+     cards, ⌘K) · 2xl 16 (sheets). */
+  --radius-xs: 4px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 20px;
+  --radius-4xl: 999px;
+
+  /* Motion (SPEC §5). */
+  --ease-standard: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --default-transition-duration: 160ms;
+  --default-transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-figure-in: figure-in 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  --animate-live: live 2s ease-in-out infinite;
+  --animate-ring-in: ring-in 360ms cubic-bezier(0.16, 1, 0.3, 1) both;
+
+  /* Elevation: none in dark; light sheets/menus only (SPEC §4). */
+  --shadow-sm: var(--elevation);
+  --shadow-md: var(--elevation);
+  --shadow-lg: var(--elevation);
+
+  @keyframes figure-in {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes ring-in {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes live {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
 }
 
+/* Light theme (SPEC §2, «Claro» column). */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  color-scheme: light;
+  --radius: 8px;
+  --dur-micro: 100ms;
+  --dur-standard: 160ms;
+  --dur-enter: 240ms;
+  --dur-figure: 400ms;
+  --elevation: 0 1px 2px rgba(0, 0, 0, 0.04);
+
+  --background: #ffffff;
+  --surface: #fafafa;
+  --card: #ffffff;
+  --card-foreground: #0a0a0b;
+  --surface-elevated: #ffffff;
+  --popover: #ffffff;
+  --popover-foreground: #0a0a0b;
+  --muted: #f2f2f3;
+  --hover: rgba(0, 0, 0, 0.04);
+  --active: rgba(0, 0, 0, 0.06);
+  --border-subtle: #f0f0f1;
+  --border: #e6e6e8;
+  --border-strong: #d4d4d8;
+  --input: #d4d4d8;
+  --foreground: #0a0a0b;
+  --muted-foreground: #5e5e66;
+  --tertiary: #6e6e77;
+  --disabled: #b4b4bb;
+  --primary: #0a0a0b;
+  --primary-foreground: #ffffff;
+  --secondary: #f2f2f3;
+  --secondary-foreground: #0a0a0b;
+  --accent: rgba(0, 0, 0, 0.06);
+  --accent-foreground: #0a0a0b;
+  --destructive: #d70015;
+  --destructive-foreground: #ffffff;
+
+  --brand: #007aff;
+  --brand-subtle: rgba(0, 122, 255, 0.1);
+  --link: #007aff;
+  --ring: #007aff;
+
+  --level-green: #248a3d;
+  --level-green-bg: rgba(36, 138, 61, 0.12);
+  --level-green-border: rgba(36, 138, 61, 0.24);
+  --level-amber: #c93400;
+  --level-amber-bg: rgba(201, 52, 0, 0.12);
+  --level-amber-border: rgba(201, 52, 0, 0.24);
+  --level-red: #d70015;
+  --level-red-bg: rgba(215, 0, 21, 0.12);
+  --level-red-border: rgba(215, 0, 21, 0.24);
+  --level-pending: #6c6c70;
+  --level-pending-bg: transparent;
+  --level-pending-border: rgba(108, 108, 112, 0.4);
+
+  /* Charts (shared chart spec, same on mobile). */
+  --chart-line: #0a0a0b;
+  --chart-grid: #f0f0f1;
+  --chart-axis: #6e6e77;
+  --chart-band: rgba(10, 10, 11, 0.05);
+  --chart-area: rgba(10, 10, 11, 0.08);
+  --chart-hatch: rgba(10, 10, 11, 0.06);
+  --chart-bar: rgba(10, 10, 11, 0.18);
+  --chart-baseline: #8a8a93;
+  --chart-median: #8a8a93;
+  --chart-reference: #a1a1aa;
+  --chart-cursor: #007aff;
+  --chart-crosshair: #d4d4d8;
+  --chart-1: #0a0a0b;
+  --chart-2: #007aff;
+  --chart-3: #8a8a93;
+  --chart-4: #c93400;
+  --chart-5: #248a3d;
+  --ecg-minor: #f4f4f5;
+  --ecg-major: #e8e8ea;
+  --ring-done: #007aff;
+  --ring-progress: #007aff;
+  --ring-track: #f2f2f3;
+  --ring-partial: #f2f2f3;
+
+  /* Mission disc (HAVEN's own progress mark): three cool hues — cyan, blue, violet — that never read as a
+     health level (red / amber / green). Flat colours; the unlit segments are the same hue at 14 % (20 % dark). */
+  --ring-1: #0e9fc2;
+  --ring-1-track: rgba(14, 159, 194, 0.14);
+  --ring-2: #3a6ff0;
+  --ring-2-track: rgba(58, 111, 240, 0.14);
+  --ring-3: #7b5cf0;
+  --ring-3-track: rgba(123, 92, 240, 0.14);
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0a0a0b;
+  --sidebar-primary: #0a0a0b;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgba(0, 0, 0, 0.06);
+  --sidebar-accent-foreground: #0a0a0b;
+  --sidebar-border: #e6e6e8;
+  --sidebar-ring: #007aff;
 }
 
+/* Dark theme, the default (SPEC §2, «Oscuro» column). */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  color-scheme: dark;
+  --elevation: none;
+
+  --background: #000000;
+  --surface: #0a0a0b;
+  --card: #0f0f11;
+  --card-foreground: #ececee;
+  --surface-elevated: #16161a;
+  --popover: #16161a;
+  --popover-foreground: #ececee;
+  --muted: #1c1c20;
+  --hover: rgba(255, 255, 255, 0.04);
+  --active: rgba(255, 255, 255, 0.07);
+  --border-subtle: #16161a;
+  --border: #232327;
+  --border-strong: #2f3336;
+  --input: #2f3336;
+  --foreground: #ececee;
+  --muted-foreground: #9b9ba3;
+  --tertiary: #80808a;
+  --disabled: #45454c;
+  --primary: #f4f4f5;
+  --primary-foreground: #000000;
+  --secondary: #1c1c20;
+  --secondary-foreground: #ececee;
+  --accent: rgba(255, 255, 255, 0.07);
+  --accent-foreground: #ececee;
+  --destructive: #ff453a;
+  --destructive-foreground: #ffffff;
+
+  --brand: #0a84ff;
+  --brand-subtle: rgba(10, 132, 255, 0.16);
+  --link: #0a84ff;
+  --ring: #0a84ff;
+
+  --level-green: #30d158;
+  --level-green-bg: rgba(48, 209, 88, 0.12);
+  --level-green-border: rgba(48, 209, 88, 0.24);
+  --level-amber: #ff9f0a;
+  --level-amber-bg: rgba(255, 159, 10, 0.12);
+  --level-amber-border: rgba(255, 159, 10, 0.24);
+  --level-red: #ff453a;
+  --level-red-bg: rgba(255, 69, 58, 0.12);
+  --level-red-border: rgba(255, 69, 58, 0.24);
+  --level-pending: #8e8e93;
+  --level-pending-bg: transparent;
+  --level-pending-border: rgba(142, 142, 147, 0.4);
+
+  /* Charts (shared chart spec, same on mobile). */
+  --chart-line: #ececee;
+  --chart-grid: #16161a;
+  --chart-axis: #80808a;
+  --chart-band: rgba(236, 236, 238, 0.05);
+  --chart-area: rgba(236, 236, 238, 0.08);
+  --chart-hatch: rgba(236, 236, 238, 0.04);
+  --chart-bar: rgba(236, 236, 238, 0.18);
+  --chart-baseline: #6b6b73;
+  --chart-median: #6b6b73;
+  --chart-reference: #55555c;
+  --chart-cursor: #0a84ff;
+  --chart-crosshair: #2f3336;
+  --chart-1: #ececee;
+  --chart-2: #0a84ff;
+  --chart-3: #9b9ba3;
+  --chart-4: #ff9f0a;
+  --chart-5: #30d158;
+  --ecg-minor: #121214;
+  --ecg-major: #18181b;
+  --ring-done: #0a84ff;
+  --ring-progress: #0a84ff;
+  --ring-track: #1c1c20;
+  --ring-partial: #1c1c20;
+
+  --ring-1: #4fd2ec;
+  --ring-1-track: rgba(79, 210, 236, 0.2);
+  --ring-2: #6b93ff;
+  --ring-2-track: rgba(107, 147, 255, 0.2);
+  --ring-3: #b88cff;
+  --ring-3-track: rgba(184, 140, 255, 0.2);
+
+  --sidebar: #000000;
+  --sidebar-foreground: #ececee;
+  --sidebar-primary: #f4f4f5;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: rgba(255, 255, 255, 0.07);
+  --sidebar-accent-foreground: #ececee;
+  --sidebar-border: #232327;
+  --sidebar-ring: #0a84ff;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+    -webkit-text-size-adjust: 100%;
   }
+  body {
+    @apply bg-background text-foreground text-sm;
+    font-feature-settings: "tnum", "cv11", "ss01";
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+  ::selection {
+    background: var(--brand-subtle);
+  }
+}
+
+@layer components {
+  /* Touch target ≥ 40 px (DESIGN_SYSTEM.md §2.3, web minimum) without changing the visual size. */
+  .hit-area {
+    position: relative;
+  }
+  .hit-area::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 2.5rem);
+    height: max(100%, 2.5rem);
+    transform: translate(-50%, -50%);
+  }
+  /* Figures: tabular digits that stay put when they change. */
+  .numeric {
+    font-variant-numeric: tabular-nums;
+  }
+  /* Small label: caption, secondary text, sentence case. */
+  .eyebrow {
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    color: var(--muted-foreground);
+  }
+  /* Hatched region for missing data in charts and stale gaps (SPEC §6, Plane «future» region). */
+  .hatch {
+    background-image: repeating-linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--foreground) 6%, transparent) 0 1px,
+      transparent 1px 6px
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override utilities */
+    animation-duration: 0.01ms !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override utilities */
+    animation-iteration-count: 1 !important;
+    /* biome-ignore lint/complexity/noImportantStyles: reduced motion must override utilities */
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* No blur or glass: neutralise the backdrop blur of the vendored overlays (mobile sidebar sheet,
+   dialogs, ⌘K). Unlayered on purpose so it wins over the utility layer without editing the components. */
+[data-slot="sheet-overlay"],
+[data-slot="dialog-overlay"] {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+[data-slot="dialog-overlay"] {
+  background: rgba(0, 0, 0, 0.6);
 }

@@ -1,0 +1,604 @@
+import 'server-only';
+import {
+  crewAggregates,
+  type Mission,
+  type MissionPhase,
+  missionDays,
+  type Reading,
+} from '@haven/core';
+import { missions, packets, rules } from './collections';
+import {
+  baseConfig,
+  type CrewEntry,
+  crewCard,
+  crewIdFor,
+  crewMembers,
+  currentAssessments,
+  generateCode,
+  type MissionDoc,
+  missionForApi,
+  missionFromPacket,
+  missionHeader,
+  missionStatus,
+  missionSummary,
+  type PacketDoc,
+  packetDoc,
+  packetForApi,
+  type RulesDoc,
+  rulesForApi,
+  seriesOf,
+  validatePacket,
+} from './model';
+import type {
+  AggregatesResponse,
+  AstronautResponse,
+  CrewResponse,
+  MissionsResponse,
+  PacketReceipt,
+  RulesResponse,
+  RulesVersion,
+  StoredMission,
+} from './types';
+
+// T01 backend · Queries. Packets are visible as soon as they are received (no artificial delay).
+// Public functions for views and routes are in features/<x>/server.ts.
+
+export type Result<T> =
+  | { ok: true; status: number; data: T }
+  | { ok: false; status: number; error: string; details?: string[] };
+
+const fail = (status: number, error: string, details?: string[]) =>
+  ({ ok: false, status, error, details }) as const;
+
+const NO_ID = { projection: { _id: 0 } } as const;
+const DUPLICATE_KEY = 11000;
+const isDuplicateKey = (error: unknown) => (error as { code?: number }).code === DUPLICATE_KEY;
+
+// ─── Packets ───────────────────────────────────────────────────────────────────
+
+/** POST /api/packets. Idempotent by `id`: a resend returns the original record (200). */
+export async function receivePacket(
+  body: unknown,
+  now = new Date(),
+): Promise<Result<PacketReceipt>> {
+  const checked = validatePacket(body);
+  if (!checked.ok) return fail(400, 'Invalid packet', checked.errors);
+  const { currentMission, ...packet } = checked.packet as typeof checked.packet & {
+    currentMission?: Partial<Mission>;
+  };
+
+  const col = await packets();
+  const existing = await col.findOne({ id: packet.id }, NO_ID);
+  if (existing) return duplicate(existing);
+
+  const doc = packetDoc(packet, now);
+  try {
+    await col.insertOne({ ...doc });
+  } catch (error) {
+    // Race between two simultaneous resends: the unique index decides.
+    if (isDuplicateKey(error)) {
+      const other = await col.findOne({ id: packet.id }, NO_ID);
+      if (other) return duplicate(other);
+    }
+    throw error;
+  }
+  await registerMission(doc, currentMission, now);
+  return {
+    ok: true,
+    status: 201,
+    data: { id: doc.id, receivedAt: doc.receivedAt, visibleAt: doc.visibleAt },
+  };
+}
+
+function duplicate(doc: PacketDoc): Result<PacketReceipt> {
+  return {
+    ok: true,
+    status: 200,
+    data: { id: doc.id, receivedAt: doc.receivedAt, visibleAt: doc.visibleAt, duplicate: true },
+  };
+}
+
+/** Creates the mission if missing and adds the crew member if new. The optional body extra
+ * `currentMission` (a Mission) updates environment and delay as the phone sees them. */
+async function registerMission(
+  packet: PacketDoc,
+  currentMission: Partial<Mission> | undefined,
+  now: Date,
+) {
+  const col = await missions();
+  const created = missionFromPacket(packet, now);
+  const hasCurrent = typeof currentMission === 'object' && currentMission !== null;
+  if (hasCurrent) {
+    if (typeof currentMission.environment === 'string')
+      created.environment = currentMission.environment;
+    if (typeof currentMission.currentDelayMin === 'number')
+      created.currentDelayMin = currentMission.currentDelayMin;
+    if (typeof currentMission.day === 'number' && currentMission.day > 0)
+      created.start = new Date(now.getTime() - (currentMission.day - 1) * 86_400_000).toISOString();
+    if (Array.isArray(currentMission.crew) && currentMission.crew.length)
+      created.crew = currentMission.crew;
+  }
+  const { environment, currentDelayMin, ...onInsertOnly } = created;
+  await col.updateOne(
+    { code: packet.mission },
+    hasCurrent
+      ? { $setOnInsert: onInsertOnly, $set: { environment, currentDelayMin } }
+      : { $setOnInsert: created },
+    { upsert: true },
+  );
+  await col.updateOne(
+    { code: packet.mission, 'crew.id': { $ne: packet.crewMember } },
+    { $push: { crew: { id: packet.crewMember, name: packet.crewMember, hasWatch: false } } },
+  );
+  // Readings measured by the Apple Watch prove this crew member wears one.
+  if (packet.readings.some((r) => r.source === 'watch'))
+    await col.updateOne(
+      {
+        code: packet.mission,
+        crew: { $elemMatch: { id: packet.crewMember, hasWatch: { $ne: true } } },
+      },
+      { $set: { 'crew.$.hasWatch': true } },
+    );
+}
+
+// ─── Crew and astronaut ────────────────────────────────────────────────────────
+
+async function findMission(code: string, now: Date): Promise<StoredMission | null> {
+  const doc = await (await missions()).findOne({ code }, NO_ID);
+  return doc ? missionForApi(doc, now) : null;
+}
+
+/** GET /api/crew. `null` when the mission does not exist. */
+export async function getCrew(code: string, now = new Date()): Promise<CrewResponse | null> {
+  const mission = await findMission(code, now);
+  if (!mission) return null;
+  const visible = await (await packets())
+    .find({ mission: code }, { projection: { _id: 0, readings: 0, notes: 0, photos: 0, ecg: 0 } })
+    .toArray();
+  const ids = [...new Set(visible.map((p) => p.crewMember))];
+  const config = baseConfig();
+  const cards = crewMembers(mission, ids).map((m) =>
+    crewCard(
+      m,
+      visible.filter((p) => p.crewMember === m.id),
+      now,
+      config,
+    ),
+  );
+  return {
+    generatedAt: now.toISOString(),
+    mission: missionHeader(mission, cards),
+    // Invited crew with no packet yet have no data to add up.
+    summary: missionSummary(
+      cards.filter((c) => c.lastPacket !== null),
+      mission,
+    ),
+    crew: cards,
+  };
+}
+
+/** GET /api/astronaut/[id]: every received packet as sent, notes and diary included. */
+export async function getAstronaut(
+  code: string,
+  crewMember: string,
+  now = new Date(),
+): Promise<AstronautResponse | null> {
+  const mission = await findMission(code, now);
+  if (!mission) return null;
+  const visible = await (await packets())
+    .find({ mission: code, crewMember }, NO_ID)
+    .sort({ dataAt: -1 })
+    .toArray();
+  const member = crewMembers(mission, visible.length ? [crewMember] : []).find(
+    (m) => m.id === crewMember,
+  );
+  if (!member) return null;
+
+  const card = crewCard(member, visible, now);
+  const list = visible.map(packetForApi);
+
+  return {
+    generatedAt: now.toISOString(),
+    mission: missionHeader(mission, [card]),
+    crewMember: card,
+    assessments: currentAssessments(visible),
+    series: seriesOf(list),
+    packets: list,
+  };
+}
+
+// ─── Missions ──────────────────────────────────────────────────────────────────
+
+export async function listMissions(now = new Date()): Promise<MissionsResponse> {
+  const docs = await (await missions()).find({}, NO_ID).sort({ createdAt: -1 }).toArray();
+  return { missions: docs.map((d) => missionForApi(d, now)) };
+}
+
+export async function getMission(code: string, now = new Date()) {
+  return findMission(code, now);
+}
+
+/**
+ * «Start mission»: day 1 becomes today (UTC) and days start to run. Only for a mission not started yet
+ * (planned, or scheduled for a later date); an active mission keeps its start.
+ */
+export async function startMission(code: string, now = new Date()): Promise<Result<StoredMission>> {
+  const col = await missions();
+  const mission = await col.findOne({ code }, NO_ID);
+  if (!mission) return fail(404, `Mission ${code} does not exist`);
+  const status = missionStatus(mission, now);
+  if (status === 'active' || status === 'finished') return fail(409, 'Mission already started');
+  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  await col.updateOne(
+    { code },
+    { $set: { start: today.toISOString() }, $unset: { awaitingStart: '' } },
+  );
+  const updated = await col.findOne({ code }, NO_ID);
+  return { ok: true, status: 200, data: missionForApi(updated ?? mission, now) };
+}
+
+/** «Finish mission»: it stays as a record from now on (only a running mission can be finished). */
+export async function finishMission(
+  code: string,
+  now = new Date(),
+): Promise<Result<StoredMission>> {
+  const col = await missions();
+  const mission = await col.findOne({ code }, NO_ID);
+  if (!mission) return fail(404, `Mission ${code} does not exist`);
+  if (missionStatus(mission, now) !== 'active')
+    return fail(409, 'Only a running mission can be finished');
+  await col.updateOne({ code }, { $set: { finishedAt: now.toISOString() } });
+  const updated = await col.findOne({ code }, NO_ID);
+  return { ok: true, status: 200, data: missionForApi(updated ?? mission, now) };
+}
+
+/** What can change: the name until it is finished; plan and start only while in preparation. */
+export type MissionEdit = {
+  name?: string;
+  phases?: MissionPhase[];
+  /** Day 1 (ISO). With `awaitingStart`, only the planned date. */
+  start?: string;
+  awaitingStart?: boolean;
+};
+
+/** Edits a mission within what its status allows (see `MissionEdit`). */
+export async function updateMission(
+  code: string,
+  edit: MissionEdit,
+  now = new Date(),
+): Promise<Result<StoredMission>> {
+  const col = await missions();
+  const mission = await col.findOne({ code }, NO_ID);
+  if (!mission) return fail(404, `Mission ${code} does not exist`);
+  const status = missionStatus(mission, now);
+  if (status === 'finished') return fail(409, 'A finished mission is a record');
+  const preparing = status === 'planned' || status === 'scheduled';
+  if (!preparing && (edit.phases || edit.start || edit.awaitingStart !== undefined))
+    return fail(409, 'The plan and start can only change while the mission is in preparation');
+
+  const set: Partial<MissionDoc> = {};
+  if (edit.name?.trim()) set.name = edit.name.trim().slice(0, 80);
+  if (edit.phases?.length) {
+    const first = baseConfig().environments.find((e) => e.id === edit.phases?.[0]?.environment);
+    set.phases = edit.phases;
+    set.durationDays = missionDays(edit.phases);
+    set.environment = edit.phases[0].environment;
+    set.currentDelayMin = first?.delayMin ?? mission.currentDelayMin;
+  }
+  if (edit.start) set.start = edit.start;
+  const update: Record<string, unknown> = { $set: set };
+  if (edit.awaitingStart === true) set.awaitingStart = true;
+  if (edit.awaitingStart === false) update.$unset = { awaitingStart: '' };
+  await col.updateOne({ code }, update);
+  const updated = await col.findOne({ code }, NO_ID);
+  return { ok: true, status: 200, data: missionForApi(updated ?? mission, now) };
+}
+
+/** A finished mission is a record: its crew no longer changes. */
+async function editableMission(code: string, now = new Date()) {
+  const mission = await (await missions()).findOne({ code }, NO_ID);
+  if (!mission) return fail(404, `Mission ${code} does not exist`);
+  if (missionStatus(mission, now) === 'finished')
+    return fail(409, 'A finished mission is a record');
+  return null;
+}
+
+// ─── Crew roster ───────────────────────────────────────────────────────────────
+
+/** Name and role typed on Earth. The role is one free text, stored in both languages. */
+export type CrewInput = { name: string; role?: string };
+
+const roleOf = (role?: string) => (role ? { role: { es: role, en: role } } : {});
+
+/** Adds a crew member to the roster before their phone sends anything; the id comes from the name. */
+export async function addCrewMember(code: string, input: CrewInput): Promise<Result<CrewEntry>> {
+  const locked = await editableMission(code);
+  if (locked) return locked;
+  const col = await missions();
+  const mission = await col.findOne({ code }, NO_ID);
+  if (!mission) return fail(404, `Mission ${code} does not exist`);
+  const entry: CrewEntry = {
+    id: crewIdFor(
+      input.name,
+      mission.crew.map((m) => m.id),
+    ),
+    name: input.name,
+    hasWatch: false,
+    ...roleOf(input.role),
+  };
+  await col.updateOne({ code }, { $push: { crew: entry } });
+  return { ok: true, status: 201, data: entry };
+}
+
+/** Renames a crew member or changes their role. The id (what the phone sends) never changes. */
+export async function updateCrewMember(
+  code: string,
+  id: string,
+  input: CrewInput,
+): Promise<Result<CrewEntry>> {
+  const locked = await editableMission(code);
+  if (locked) return locked;
+  const col = await missions();
+  const mission = await col.findOne({ code, 'crew.id': id }, NO_ID);
+  const current = mission?.crew.find((m) => m.id === id);
+  if (!current) return fail(404, `Crew member ${id} is not in mission ${code}`);
+  const entry: CrewEntry = {
+    id: current.id,
+    name: input.name,
+    hasWatch: current.hasWatch,
+    ...roleOf(input.role),
+  };
+  await col.updateOne({ code, 'crew.id': id }, { $set: { 'crew.$': entry } });
+  return { ok: true, status: 200, data: entry };
+}
+
+/**
+ * Deletes a crew member from the mission: their roster entry AND every packet they sent (otherwise the packets
+ * would bring them back to the crew list). Cannot be undone; the page asks for confirmation first.
+ */
+export async function removeCrewMember(
+  code: string,
+  id: string,
+): Promise<Result<{ id: string; packets: number }>> {
+  const locked = await editableMission(code);
+  if (locked) return locked;
+  const result = await (await missions()).updateOne({ code }, { $pull: { crew: { id } } });
+  if (!result.matchedCount) return fail(404, `Mission ${code} does not exist`);
+  const removed = await (await packets()).deleteMany({ mission: code, crewMember: id });
+  return { ok: true, status: 200, data: { id, packets: removed.deletedCount } };
+}
+
+/**
+ * Moves everything of a mission that only exists because packets arrived with an unknown code (a typo on a
+ * phone) into the right mission: packets and crew. Then the unknown mission is deleted.
+ */
+export async function mergeMission(from: string, into: string): Promise<Result<{ code: string }>> {
+  if (from === into) return fail(400, 'Cannot merge a mission into itself');
+  const col = await missions();
+  const [source, target] = await Promise.all([
+    col.findOne({ code: from }, NO_ID),
+    col.findOne({ code: into }, NO_ID),
+  ]);
+  if (!source || !target) return fail(404, 'Mission does not exist');
+  if (source.origin !== 'packet')
+    return fail(409, 'Only missions created by a packet can be merged');
+  await (await packets()).updateMany({ mission: from }, { $set: { mission: into } });
+  const known = new Set(target.crew.map((m) => m.id));
+  const newcomers = source.crew.filter((m) => !known.has(m.id));
+  if (newcomers.length)
+    await col.updateOne({ code: into }, { $push: { crew: { $each: newcomers } } });
+  await col.deleteOne({ code: from });
+  return { ok: true, status: 200, data: { code: into } };
+}
+
+const FALLBACK_ENVIRONMENTS = ['transit', 'station', 'moon', 'mars', 'rover'];
+
+/** Longest phase or plan accepted (days): a conjunction-class Mars mission is ~900. */
+const MAX_MISSION_DAYS = 3000;
+
+/** Checks a `phases` body field; returns the clean plan or pushes errors. */
+function parsePhases(value: unknown, environments: string[], errors: string[]) {
+  if (!Array.isArray(value) || value.length === 0) {
+    errors.push('phases: non-empty array');
+    return undefined;
+  }
+  const phases: MissionPhase[] = [];
+  value.forEach((raw, i) => {
+    const p = (typeof raw === 'object' && raw !== null ? raw : {}) as Record<string, unknown>;
+    if (typeof p.environment !== 'string' || !environments.includes(p.environment))
+      errors.push(`phases[${i}].environment: one of ${environments.join(', ')}`);
+    if (
+      typeof p.days !== 'number' ||
+      !Number.isInteger(p.days) ||
+      p.days < 1 ||
+      p.days > MAX_MISSION_DAYS
+    )
+      errors.push(`phases[${i}].days: whole number 1–${MAX_MISSION_DAYS}`);
+    if (p.delayMin !== undefined && typeof p.delayMin !== 'number')
+      errors.push(`phases[${i}].delayMin: number`);
+    const label = p.label as Record<string, unknown> | undefined;
+    if (label !== undefined && (typeof label?.es !== 'string' || typeof label?.en !== 'string'))
+      errors.push(`phases[${i}].label: { es, en }`);
+    phases.push({
+      environment: p.environment as string,
+      days: p.days as number,
+      ...(typeof p.delayMin === 'number' ? { delayMin: p.delayMin } : {}),
+      ...(label ? { label: { es: String(label.es), en: String(label.en) } } : {}),
+    });
+  });
+  if (missionDays(phases) > MAX_MISSION_DAYS)
+    errors.push(`phases: at most ${MAX_MISSION_DAYS} days`);
+  return phases;
+}
+
+/** POST /api/missions: name and a phase plan (or a single environment and duration), start; generates the
+ * six-character code. */
+export async function createMission(
+  body: unknown,
+  now = new Date(),
+): Promise<Result<StoredMission>> {
+  const b = (typeof body === 'object' && body !== null ? body : {}) as Record<string, unknown>;
+  const config = baseConfig();
+  const environments = config.environments.length
+    ? config.environments.map((e) => e.id)
+    : FALLBACK_ENVIRONMENTS;
+  const errors: string[] = [];
+  if (typeof b.name !== 'string' || !b.name.trim()) errors.push('name: required string');
+  const phases = b.phases !== undefined ? parsePhases(b.phases, environments, errors) : undefined;
+  if (!phases) {
+    if (typeof b.environment !== 'string' || !environments.includes(b.environment))
+      errors.push(`environment: one of ${environments.join(', ')}`);
+    if (typeof b.durationDays !== 'number' || b.durationDays <= 0)
+      errors.push('durationDays: number > 0');
+  }
+  if (b.start !== undefined && (typeof b.start !== 'string' || Number.isNaN(Date.parse(b.start))))
+    errors.push('start: ISO date');
+  if (b.code !== undefined && (typeof b.code !== 'string' || !/^[A-Z0-9]{6}$/.test(b.code)))
+    errors.push('code: six characters A-Z/0-9');
+  if (b.currentDelayMin !== undefined && typeof b.currentDelayMin !== 'number')
+    errors.push('currentDelayMin: number');
+  if (b.crew !== undefined && !Array.isArray(b.crew)) errors.push('crew: array');
+  if (b.awaitingStart !== undefined && typeof b.awaitingStart !== 'boolean')
+    errors.push('awaitingStart: boolean');
+  if (errors.length) return fail(400, 'Invalid mission', errors);
+
+  const environmentId = phases?.[0]?.environment ?? (b.environment as string);
+  const environment = config.environments.find((e) => e.id === environmentId);
+  const col = await missions();
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const doc: MissionDoc = {
+      code: (b.code as string | undefined) ?? generateCode(),
+      name: (b.name as string).trim(),
+      environment: environmentId,
+      day: 1,
+      currentDelayMin: (b.currentDelayMin as number | undefined) ?? environment?.delayMin ?? 0,
+      linkDown: false,
+      crew: ((b.crew as Mission['crew'] | undefined) ?? []).filter(
+        (m) => typeof m?.id === 'string',
+      ),
+      start: b.start ? new Date(b.start as string).toISOString() : now.toISOString(),
+      durationDays: phases ? missionDays(phases) : (b.durationDays as number),
+      createdAt: now.toISOString(),
+      origin: 'earth',
+      ...(b.awaitingStart === true ? { awaitingStart: true } : {}),
+      ...(phases ? { phases } : {}),
+    };
+    try {
+      await col.insertOne({ ...doc });
+      return { ok: true, status: 201, data: missionForApi(doc, now) };
+    } catch (error) {
+      if (!isDuplicateKey(error)) throw error;
+      if (b.code) return fail(409, 'A mission with that code already exists');
+    }
+  }
+  return fail(500, 'Could not generate a unique code');
+}
+
+// ─── Versioned rules (closed decision 5) ───────────────────────────────────────
+
+/**
+ * Rule versions of a mission. With `downloadedBy` (the HTTP GET from a phone) every version is marked
+ * received by that crew member at `now`, but ONLY if `downloadedBy` is in the mission crew: anonymous
+ * downloads or unknown ids change nothing. Earth views call it without `downloadedBy`: reading on
+ * Earth never changes the delivery status.
+ */
+export async function listRules(
+  code: string,
+  options: { downloadedBy?: string } = {},
+  now = new Date(),
+): Promise<RulesResponse> {
+  const col = await rules();
+  const by = options.downloadedBy?.trim();
+  const mission = by ? await findMission(code, now) : null;
+  if (by && mission?.crew.some((m) => m.id === by)) {
+    const at = now.toISOString();
+    await col.updateMany({ mission: code, receivedAt: null }, { $set: { receivedAt: at } });
+    await col.updateMany({ mission: code }, { $push: { receivedBy: { crewMember: by, at } } });
+  }
+  const docs = await col.find({ mission: code }, NO_ID).sort({ sentAt: -1 }).toArray();
+  return { mission: code, versions: docs.map((d) => rulesForApi(d)) };
+}
+
+/** POST /api/rules: creates a version (body with `config`) or marks one as applied (`apply`). */
+export async function saveRules(
+  code: string,
+  body: unknown,
+  now = new Date(),
+): Promise<Result<RulesVersion>> {
+  const b = (typeof body === 'object' && body !== null ? body : {}) as Record<string, unknown>;
+  const mission = await findMission(code, now);
+  if (!mission) return fail(404, `Mission ${code} does not exist`);
+  const col = await rules();
+
+  if (typeof b.apply === 'string') {
+    const doc = await col.findOne(
+      { mission: code, $or: [{ id: b.apply }, { version: b.apply }] },
+      { ...NO_ID, sort: { sentAt: -1 } },
+    );
+    if (!doc) return fail(404, `Version ${b.apply} does not exist`);
+    const at =
+      typeof b.appliedAt === 'string' && !Number.isNaN(Date.parse(b.appliedAt))
+        ? new Date(b.appliedAt).toISOString()
+        : now.toISOString();
+    const crewMember = typeof b.crewMember === 'string' ? b.crewMember : 'phone';
+    await col.updateOne(
+      { id: doc.id },
+      {
+        // Applying implies the phone has it: mark it received too if no download was recorded.
+        $set: { appliedAt: doc.appliedAt ?? at, receivedAt: doc.receivedAt ?? at },
+        $push: { appliedBy: { crewMember, at } },
+      },
+    );
+    const updated = await col.findOne({ id: doc.id }, NO_ID);
+    return { ok: true, status: 200, data: rulesForApi(updated as RulesDoc) };
+  }
+
+  if (typeof b.config !== 'object' || b.config === null || Array.isArray(b.config))
+    return fail(400, 'Invalid rules', ['config: required object (or `apply`: id)']);
+  const previous = await col.countDocuments({ mission: code });
+  const config = b.config as Record<string, unknown>;
+  const version =
+    typeof b.version === 'string' && b.version.trim()
+      ? b.version.trim()
+      : typeof config.version === 'string'
+        ? config.version
+        : `${baseConfig().version}-earth.${previous + 1}`;
+  const doc: RulesDoc = {
+    id: crypto.randomUUID(),
+    mission: code,
+    version,
+    note: typeof b.note === 'string' ? b.note : '',
+    author: typeof b.author === 'string' ? b.author : 'mission-control',
+    config,
+    sentAt: now.toISOString(),
+    receivedAt: null,
+    receivedBy: [],
+    appliedAt: null,
+    appliedBy: [],
+  };
+  await col.insertOne({ ...doc });
+  return { ok: true, status: 201, data: rulesForApi(doc) };
+}
+
+// ─── Aggregates (T03, closed decision 4) ───────────────────────────────────────
+
+/** Daily crew means per indicator from received readings, with any crew size; `null` when nobody measured it. */
+export async function missionAggregates(
+  code: string,
+  indicators: string[],
+): Promise<AggregatesResponse> {
+  const visible = await (await packets()).find({ mission: code }, NO_ID).toArray();
+  const byCrewMember: Record<string, Reading[]> = {};
+  for (const p of visible) {
+    byCrewMember[p.crewMember] = [
+      ...(byCrewMember[p.crewMember] ?? []),
+      ...packetForApi(p).readings,
+    ];
+  }
+  return {
+    mission: code,
+    indicators: Object.fromEntries(
+      indicators.map((i) => [i, crewAggregates(byCrewMember, i, { minimum: 1 })]),
+    ),
+  };
+}
