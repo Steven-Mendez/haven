@@ -4,5 +4,15 @@
   <dict>
     <key>WKApplication</key>
     <true/>
+    <key>WKCompanionAppBundleIdentifier</key>
+    <string>app.haven.mobile</string>
+    <key>WKBackgroundModes</key>
+    <array>
+      <string>workout-processing</string>
+    </array>
+    <key>NSHealthShareUsageDescription</key>
+    <string>HAVEN lee tu frecuencia cardíaca y el último oxígeno en sangre del reloj para mostrar tu estado y el monitor de emergencia.</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>HAVEN guarda la sesión de entrenamiento que usa para medir la frecuencia cardíaca en vivo durante una emergencia.</string>
   </dict>
 </plist>

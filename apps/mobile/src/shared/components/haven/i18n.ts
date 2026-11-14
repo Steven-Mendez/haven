@@ -1,0 +1,329 @@
+import { defineTexts } from '@/shared/i18n';
+
+// UI copy for the HAVEN design components. Medical copy (explanations, guides,
+// protocols) does NOT live here: it comes from the config (@haven/core).
+// Interpolation: "{n}" is replaced with `format`.
+
+export const havenTexts = defineTexts({
+  es: {
+    // Traffic light: short label (badge) and phrase (screen readers, legends)
+    levelGreen: 'En rango',
+    levelAmber: 'Revisar',
+    levelRed: 'Emergencia',
+    levelPending: 'Pendiente',
+    phraseGreen: 'Sigue con tu rutina',
+    phraseAmber: 'Repite la medición o avisa a Tierra',
+    phraseRed: 'Abre el protocolo de emergencia ahora',
+    phrasePending: 'No hay lectura vigente',
+    level: 'Nivel',
+
+    // Age and source
+    now: 'ahora',
+    minAgo: 'hace {n} min',
+    hoursAgo: 'hace {n} h',
+    daysAgo: 'hace {n} d',
+    noReading: 'sin lectura',
+    /** @deprecated Always empty: the product never labels data as simulated (EQUIPOS.md). */
+    simulated: '',
+    whereFrom: '¿De dónde sale este dato?',
+    sourceWatch: 'Apple Watch',
+    sourceHealthkit: 'HealthKit',
+    sourceHealthconnect: 'Health Connect',
+    sourceBle: 'Bluetooth',
+    sourceManual: 'Manual',
+    sourceScreen: 'Pantalla',
+    sourceRecord: 'Registro',
+    sourceShip: 'Telemetría de la nave',
+
+    // Indicator
+    yourBaseline: 'Tu línea base',
+    noCurrentValue: 'Sin lectura vigente',
+    openDetails: 'Abrir detalle',
+
+    // Zones (fallback: the config provides Zone.name)
+    zoneHeart: 'Corazón',
+    zoneLungs: 'Pulmones',
+    zoneHead: 'Cabeza y ojos',
+    zoneMetabolism: 'Abdomen y metabolismo',
+    zoneMusculoskeletal: 'Huesos y músculos',
+    zoneSkin: 'Piel y cuerpo',
+    zoneMind: 'Mente',
+    bodyFigure: 'Figura humana con siete zonas',
+
+    // Ring and week
+    actionsDone: 'acciones resueltas',
+    ringSummary: '{n} de 7 acciones del día. Mide lo hecho, no la salud.',
+    actions: 'acciones',
+    dayComplete: 'día completo',
+    dayIncomplete: 'día incompleto',
+    today: 'hoy',
+
+    // Chart
+    chartEmpty: 'Sin lecturas en este periodo',
+    chartLegend: 'Banda: tu rango habitual · Discontinua: tu línea base',
+    baselineBand: 'Banda de tu línea base',
+    latestReading: 'Última lectura',
+
+    // Timer and scale
+    timer: 'Temporizador',
+    timeLeft: 'Quedan {n}',
+    paused: 'En pausa',
+    timeUp: 'Tiempo cumplido',
+    mood1: 'Muy mal',
+    mood2: 'Mal',
+    mood3: 'Regular',
+    mood4: 'Bien',
+    mood5: 'Muy bien',
+    stress1: 'Muy bajo',
+    stress2: 'Bajo',
+    stress3: 'Medio',
+    stress4: 'Alto',
+    stress5: 'Muy alto',
+    pickValue: 'Elige un valor del 1 al 5',
+
+    // Mission strip and SOS
+    day: 'Día {n}',
+    phasePreparing: 'En preparación',
+    phaseStartsOn: 'Empieza el {date}',
+    phaseFinished: 'Finalizada',
+    phaseFinishedDay: 'Finalizada · día {n}',
+    delay: 'Retardo {n} min',
+    linkUp: 'Con enlace',
+    linkDown: 'Sin enlace · decisiones a bordo',
+    queued: '{n} en cola',
+    linkUpShort: 'Enlace',
+    linkDownShort: 'Sin enlace',
+    nothingQueued: 'Nada en cola',
+    sos: 'SOS',
+    openEmergency: 'Abrir emergencia',
+    sosLabel: 'Emergencia, SOS',
+    sosHint:
+      'Mantén pulsado 3 segundos para enviar la alerta, o toca para abrir la pantalla de emergencia',
+    sosHoldToast: 'Mantén 3 s para pedir ayuda',
+
+    // Action row
+    start: 'Empezar',
+    measure: 'Medir',
+    done: 'Hecho',
+    skip: 'Omitir',
+    skipped: 'Omitido',
+    undo: 'Deshacer',
+
+    // Delta against the personal baseline (always neutral grey)
+    deltaAbove: '{n} sobre tu línea base ({b})',
+    deltaBelow: '{n} bajo tu línea base ({b})',
+    deltaWithin: 'En tu rango habitual',
+
+    // Zone list
+    zoneToReview: '{n} por revisar',
+    zoneEmergency: '{n} en emergencia',
+    zoneInRange: 'Todo en rango',
+    zoneNoReadings: 'Sin lecturas vigentes',
+
+    // Inline confirmation
+    confirm: 'Confirmar',
+    cancel: 'Cancelar',
+
+    // Progressive disclosure (DESIGN_SYSTEM.md §8.0)
+    more: 'Más',
+    less: 'Menos',
+    seeAll: 'Ver todas ({n})',
+    inRangeGroup: '{n} en rango',
+    and: 'y',
+
+    // Collapsible register (indicator screen)
+    registerValue: 'Registrar valor',
+    save: 'Guardar',
+    willBe: 'Quedará',
+    valueLabel: 'Valor',
+
+    // Compact mission strip (accessibility)
+    delayShort: '{n} min',
+    queuedShort: '{n} en cola',
+
+    // Hold to confirm (SOS), segmented control, ranges
+    holdToStart: 'Mantén pulsado para empezar',
+    holdRelease: 'Suelta para cancelar',
+    holdHint: 'Mantén pulsado 3 segundos',
+    range1d: '1d',
+    range7d: '7d',
+    range4w: '4s',
+    stepOf: 'Paso {n} de {total}',
+    baselineShort: 'Base {b}',
+    baseShort: 'Base {b}',
+    personalRange: 'Tu rango',
+    low: 'Mín.',
+    high: 'Máx.',
+    average: 'Media',
+    history: 'Historial',
+  },
+  en: {
+    levelGreen: 'In range',
+    levelAmber: 'Check',
+    levelRed: 'Emergency',
+    levelPending: 'Pending',
+    phraseGreen: 'Keep your routine',
+    phraseAmber: 'Measure again or tell Earth',
+    phraseRed: 'Open the emergency protocol now',
+    phrasePending: 'No current reading',
+    level: 'Level',
+
+    now: 'now',
+    minAgo: '{n} min ago',
+    hoursAgo: '{n} h ago',
+    daysAgo: '{n} d ago',
+    noReading: 'no reading',
+    simulated: '',
+    whereFrom: 'Where does this data come from?',
+    sourceWatch: 'Apple Watch',
+    sourceHealthkit: 'HealthKit',
+    sourceHealthconnect: 'Health Connect',
+    sourceBle: 'Bluetooth',
+    sourceManual: 'Manual',
+    sourceScreen: 'Screen',
+    sourceRecord: 'Record',
+    sourceShip: 'Ship telemetry',
+
+    yourBaseline: 'Your baseline',
+    noCurrentValue: 'No current reading',
+    openDetails: 'Open details',
+
+    zoneHeart: 'Heart',
+    zoneLungs: 'Lungs',
+    zoneHead: 'Head and eyes',
+    zoneMetabolism: 'Abdomen and metabolism',
+    zoneMusculoskeletal: 'Bones and muscles',
+    zoneSkin: 'Skin and body',
+    zoneMind: 'Mind',
+    bodyFigure: 'Human figure with seven zones',
+
+    actionsDone: 'actions done',
+    ringSummary: '{n} of 7 daily actions. It measures what is done, not health.',
+    actions: 'actions',
+    dayComplete: 'complete day',
+    dayIncomplete: 'incomplete day',
+    today: 'today',
+
+    chartEmpty: 'No readings in this period',
+    chartLegend: 'Band: your usual range · Dashed: your baseline',
+    baselineBand: 'Your baseline band',
+    latestReading: 'Latest reading',
+
+    timer: 'Timer',
+    timeLeft: '{n} left',
+    paused: 'Paused',
+    timeUp: 'Time is up',
+    mood1: 'Very bad',
+    mood2: 'Bad',
+    mood3: 'Okay',
+    mood4: 'Good',
+    mood5: 'Very good',
+    stress1: 'Very low',
+    stress2: 'Low',
+    stress3: 'Medium',
+    stress4: 'High',
+    stress5: 'Very high',
+    pickValue: 'Pick a value from 1 to 5',
+
+    day: 'Day {n}',
+    phasePreparing: 'Preparing',
+    phaseStartsOn: 'Starts on {date}',
+    phaseFinished: 'Finished',
+    phaseFinishedDay: 'Finished · day {n}',
+    delay: 'Delay {n} min',
+    linkUp: 'Link up',
+    linkDown: 'No link · decide on board',
+    queued: '{n} queued',
+    linkUpShort: 'Link',
+    linkDownShort: 'No link',
+    nothingQueued: 'Nothing queued',
+    sos: 'SOS',
+    openEmergency: 'Open emergency',
+    sosLabel: 'Emergency, SOS',
+    sosHint: 'Hold for 3 seconds to send the alert, or tap to open the emergency screen',
+    sosHoldToast: 'Hold 3 s to ask for help',
+
+    start: 'Start',
+    measure: 'Measure',
+    done: 'Done',
+    skip: 'Skip',
+    skipped: 'Skipped',
+    undo: 'Undo',
+
+    deltaAbove: '{n} above your baseline ({b})',
+    deltaBelow: '{n} below your baseline ({b})',
+    deltaWithin: 'Within your usual range',
+
+    zoneToReview: '{n} to check',
+    zoneEmergency: '{n} in emergency',
+    zoneInRange: 'All in range',
+    zoneNoReadings: 'No current readings',
+
+    confirm: 'Confirm',
+    cancel: 'Cancel',
+
+    more: 'More',
+    less: 'Less',
+    seeAll: 'See all ({n})',
+    inRangeGroup: '{n} in range',
+    and: 'and',
+
+    registerValue: 'Log a value',
+    save: 'Save',
+    willBe: 'Will be',
+    valueLabel: 'Value',
+
+    delayShort: '{n} min',
+    queuedShort: '{n} queued',
+
+    holdToStart: 'Hold to start',
+    holdRelease: 'Release to cancel',
+    holdHint: 'Hold for 3 seconds',
+    range1d: '1d',
+    range7d: '7d',
+    range4w: '4w',
+    stepOf: 'Step {n} of {total}',
+    baselineShort: 'Baseline {b}',
+    baseShort: 'Base {b}',
+    personalRange: 'Your range',
+    low: 'Low',
+    high: 'High',
+    average: 'Average',
+    history: 'History',
+  },
+});
+
+export type HavenTexts = (typeof havenTexts)['es'];
+
+/** Replaces "{n}" (and other keys) in a string. */
+export function format(text: string, values: Record<string, string | number>): string {
+  return text.replace(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? `{${key}}`));
+}
+
+/** "12 min ago", "3 h ago", "2 d ago"; `undefined` → "no reading". */
+export function ageText(t: HavenTexts, ageMin: number | undefined): string {
+  if (ageMin === undefined || !Number.isFinite(ageMin)) return t.noReading;
+  const min = Math.max(0, Math.round(ageMin));
+  if (min < 1) return t.now;
+  if (min < 60) return format(t.minAgo, { n: min });
+  if (min < 60 * 48) return format(t.hoursAgo, { n: Math.round(min / 60) });
+  return format(t.daysAgo, { n: Math.round(min / 1440) });
+}
+
+/**
+ * Number for a metric, legible at a glance and unambiguous in es and en:
+ * ≥ 100 → integer; 10–100 → up to 1 decimal; < 10 → up to 2 decimals. Locale decimal separator.
+ * Thousands are grouped only from 10 000, with a thin space (no "2.265" that reads as a decimal).
+ */
+export function formatMetric(value: number, language = 'es'): string {
+  if (!Number.isFinite(value)) return '—';
+  const abs = Math.abs(value);
+  const digits = abs >= 100 ? 0 : abs >= 10 ? 1 : 2;
+  const factor = 10 ** digits;
+  const rounded = Math.round(value * factor) / factor;
+  const decimal = language.startsWith('es') ? ',' : '.';
+  const [int, frac] = Math.abs(rounded).toFixed(digits).split('.');
+  const grouped = abs >= 10_000 ? int.replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f') : int;
+  const trimmed = frac ? frac.replace(/0+$/, '') : '';
+  return `${rounded < 0 ? '−' : ''}${grouped}${trimmed ? decimal + trimmed : ''}`;
+}

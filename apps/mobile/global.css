@@ -2,57 +2,147 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  HAVEN mobile tokens «Vela 3.1» (X / Linear / Grok structure + Apple system data colours). Source of truth: haven/design/tokens.json
+  (platformMap.mobile) + design/redesign/SPEC.md.
+  - HSL triplets for React Native Reusables (used as hsl(var(--x))). :root = light, .dark:root = dark.
+  - Translucent tokens carry their alpha in the triplet («0 0% 100% / 0.04»).
+  - RNR names kept; shadcn "accent" is the pressed SURFACE. The brand accent «Ion» is --brand.
+  - Mirrored in src/shared/lib/theme.ts (hex, for SVG). Change both together.
+  - Dark is the on-board default: the root layout sets colorScheme 'dark' at startup.
+*/
+
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
+    --foreground: 240 4.8% 4.1%;
+    --surface: 0 0% 98%;
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
+    --card-foreground: 240 4.8% 4.1%;
+    --elevated: 0 0% 100%;
+    --surface-elevated: 0 0% 100%;
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 63%;
-    --radius: 0.625rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --popover-foreground: 240 4.8% 4.1%;
+    --primary: 240 4.8% 4.1%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 4% 95.1%;
+    --secondary-foreground: 240 4.8% 4.1%;
+    --muted: 240 4% 95.1%;
+    --muted-foreground: 240 4.1% 38.4%;
+    --accent: 240 4% 95.1%;
+    --accent-foreground: 240 4.8% 4.1%;
+    --destructive: 354 100% 42.2%;
+    --destructive-foreground: 0 0% 100%;
+    --hover: 0 0% 0% / 0.04;
+    --active: 0 0% 0% / 0.06;
+    --border-subtle: 240 3.4% 94.3%;
+    --border: 240 4.2% 90.6%;
+    --border-strong: 240 4.9% 83.9%;
+    --input: 240 4.9% 83.9%;
+    --ring: 211 100% 50%;
+    --radius: 0.75rem;
+    --text-tertiary: 240 3.9% 44.9%;
+    --text-disabled: 240 4.9% 72%;
+
+    --brand: 211 100% 50%;
+    --brand-subtle: 211 100% 50% / 0.1;
+    --link: 211 100% 50%;
+
+    --chart-1: 240 4.8% 4.1%;
+    --chart-2: 211 100% 50%;
+    --chart-3: 240 4.1% 38.4%;
+    --chart-4: 240 3.9% 44.9%;
+    --chart-5: 240 4.9% 72%;
+
+    --level-green: 135 58.6% 34.1%;
+    --level-green-bg: 135 58.6% 34.1% / 0.12;
+    --level-green-border: 135 58.6% 34.1% / 0.24;
+    --level-amber: 16 100% 39.4%;
+    --level-amber-bg: 16 100% 39.4% / 0.12;
+    --level-amber-border: 16 100% 39.4% / 0.24;
+    --level-red: 354 100% 42.2%;
+    --level-red-bg: 354 100% 42.2% / 0.12;
+    --level-red-border: 354 100% 42.2% / 0.24;
+    --level-pending: 240 1.8% 43.1%;
+    --level-pending-bg: 0 0% 100% / 0;
+    --level-pending-border: 240 4.9% 83.9%;
+
+    --chart-line: 240 4.8% 4.1%;
+    --chart-baseline: 240 3.9% 44.9%;
+    --chart-median: 240 3.9% 44.9%;
+    --chart-band: 240 4.8% 4.1% / 0.06;
+    --chart-grid: 240 3.4% 94.3%;
+    --chart-axis: 240 3.9% 44.9%;
+    --chart-reference: 240 4.9% 83.9%;
+    --chart-cursor: 211 100% 50%;
+    --ring-done: 211 100% 50%;
+    --ring-track: 240 4% 95.1%;
+    --ring-partial: 240 4.1% 38.4%;
   }
 
   .dark:root {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 70.9% 59.4%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 300 0% 45%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --background: 0 0% 0%;
+    --foreground: 240 5.6% 92.9%;
+    --surface: 240 4.8% 4.1%;
+    --card: 240 6.3% 6.3%;
+    --card-foreground: 240 5.6% 92.9%;
+    --elevated: 240 8.3% 9.4%;
+    --surface-elevated: 240 8.3% 9.4%;
+    --popover: 240 8.3% 9.4%;
+    --popover-foreground: 240 5.6% 92.9%;
+    --primary: 240 4.8% 95.9%;
+    --primary-foreground: 0 0% 0%;
+    --secondary: 240 6.7% 11.8%;
+    --secondary-foreground: 240 5.6% 92.9%;
+    --muted: 240 6.7% 11.8%;
+    --muted-foreground: 240 4.2% 62.4%;
+    --accent: 240 6.7% 11.8%;
+    --accent-foreground: 240 5.6% 92.9%;
+    --destructive: 3 100% 61.4%;
+    --destructive-foreground: 0 0% 100%;
+    --hover: 0 0% 100% / 0.04;
+    --active: 0 0% 100% / 0.07;
+    --border-subtle: 240 8.3% 9.4%;
+    --border: 240 5.4% 14.5%;
+    --border-strong: 206 6.9% 19.8%;
+    --input: 206 6.9% 19.8%;
+    --ring: 210 100% 52%;
+    --text-tertiary: 240 4.1% 52.2%;
+    --text-disabled: 240 4.8% 28.4%;
+
+    --brand: 210 100% 52%;
+    --brand-subtle: 210 100% 52% / 0.16;
+    --link: 210 100% 52%;
+
+    --chart-1: 240 5.6% 92.9%;
+    --chart-2: 210 100% 52%;
+    --chart-3: 240 4.2% 62.4%;
+    --chart-4: 240 4.1% 52.2%;
+    --chart-5: 240 4.8% 28.4%;
+
+    --level-green: 135 63.6% 50.4%;
+    --level-green-bg: 135 63.6% 50.4% / 0.12;
+    --level-green-border: 135 63.6% 50.4% / 0.24;
+    --level-amber: 36 100% 52%;
+    --level-amber-bg: 36 100% 52% / 0.12;
+    --level-amber-border: 36 100% 52% / 0.24;
+    --level-red: 3 100% 61.4%;
+    --level-red-bg: 3 100% 61.4% / 0.12;
+    --level-red-border: 3 100% 61.4% / 0.24;
+    --level-pending: 240 2.3% 56.7%;
+    --level-pending-bg: 0 0% 0% / 0;
+    --level-pending-border: 206 6.9% 19.8%;
+
+    --chart-line: 240 5.6% 92.9%;
+    --chart-baseline: 240 4.1% 52.2%;
+    --chart-median: 240 4.1% 52.2%;
+    --chart-band: 240 5.6% 92.9% / 0.06;
+    --chart-grid: 240 8.3% 9.4%;
+    --chart-axis: 240 4.1% 52.2%;
+    --chart-reference: 206 6.9% 19.8%;
+    --chart-cursor: 210 100% 52%;
+    --ring-done: 210 100% 52%;
+    --ring-track: 240 6.7% 11.8%;
+    --ring-partial: 240 4.2% 62.4%;
   }
 }

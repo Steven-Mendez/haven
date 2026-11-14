@@ -2,49 +2,73 @@
   "expo": {
     "name": "HAVEN",
     "slug": "haven",
-    "version": "1.0.0",
+    "version": "0.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "haven",
     "userInterfaceStyle": "automatic",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.haven.app",
+      "bundleIdentifier": "app.haven.mobile",
+      "supportsTablet": false,
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSMotionUsageDescription": "HAVEN cuenta tus pasos como respaldo cuando HealthKit no está disponible."
       }
     },
     "android": {
+      "package": "app.haven.mobile",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "package": "com.haven.app"
+      "predictiveBackGestureEnabled": false,
+      "permissions": ["android.permission.ACTIVITY_RECOGNITION"]
     },
     "web": {
-      "bundler": "metro",
       "output": "static",
+      "bundler": "metro",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
       "expo-router",
+      "@bacons/apple-targets",
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash.png",
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "backgroundColor": "#0A0A0A",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 76
         }
       ],
-      "expo-status-bar",
-      "@bacons/apple-targets",
-      "./plugins/withPodsMinDeploymentTarget"
+      "expo-sqlite",
+      "expo-localization",
+      [
+        "@kingstinct/react-native-healthkit",
+        {
+          "NSHealthShareUsageDescription": "HAVEN lee pasos, distancia y pisos del iPhone para comparar tu actividad con tu línea base personal.",
+          "NSHealthUpdateUsageDescription": "HAVEN guarda las mediciones que ingresas a mano (presión, glucosa, peso y temperatura).",
+          "background": false
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#EF4444"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "HAVEN adjunta fotos al paquete de emergencia que se envía a la Tierra.",
+          "cameraPermission": "HAVEN usa la cámara para adjuntar fotos al paquete de emergencia."
+        }
+      ]
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "reactCompiler": true
     }
   }
 }

@@ -1,0 +1,53 @@
+import { defineTexts } from '@/shared/i18n';
+
+// Profile (crew member using this phone). Interpolation with `format` ({n}, {code}…).
+export const texts = defineTexts({
+  es: {
+    crewMember: 'Tripulante',
+    withWatch: 'Apple Watch vinculado',
+    missionDay: 'Día de misión',
+    streak: 'Racha de registros',
+    streakShort: 'Racha',
+    crew: 'Tripulación',
+    statusSection: 'Estado actual',
+    statusHint: 'Abre Cuerpo para ver cada indicador.',
+    baselineSection: 'Línea base personal',
+    baselineIndicators: 'Indicadores con línea base',
+    baselineCoverage: '{ready} de {total}',
+    daysOfData: 'Datos acumulados',
+    days: '{n} d',
+    noData: 'Sin lecturas',
+    readings: 'Lecturas guardadas',
+    recalculated: 'Último recálculo',
+    baselineHint:
+      'Es la mediana de tus últimas {n} lecturas de cada indicador (mínimo {min}). Se actualiza con cada lectura.',
+    linksSection: 'Datos y ajustes',
+    sources: 'Fuentes de datos',
+    settings: 'Ajustes',
+    openSettings: 'Abrir ajustes',
+  },
+  en: {
+    crewMember: 'Crew member',
+    withWatch: 'Apple Watch paired',
+    missionDay: 'Mission day',
+    streak: 'Reading streak',
+    streakShort: 'Streak',
+    crew: 'Crew',
+    statusSection: 'Current status',
+    statusHint: 'Open Body to see each indicator.',
+    baselineSection: 'Personal baseline',
+    baselineIndicators: 'Indicators with a baseline',
+    baselineCoverage: '{ready} of {total}',
+    daysOfData: 'Data collected',
+    days: '{n} d',
+    noData: 'No readings',
+    readings: 'Saved readings',
+    recalculated: 'Last recalculated',
+    baselineHint:
+      'The median of your last {n} readings of each indicator (at least {min}). Updated with every reading.',
+    linksSection: 'Data and settings',
+    sources: 'Data sources',
+    settings: 'Settings',
+    openSettings: 'Open settings',
+  },
+});
