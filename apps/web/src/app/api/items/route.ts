@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
 import type { CreateItemInput, Item } from "@haven/shared";
 
-export const dynamic = "force-dynamic";
-
 // API consumida por web, la app iOS y el Apple Watch.
 export async function GET() {
   const db = await getDb();
