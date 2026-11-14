@@ -81,7 +81,8 @@
     "prebuild": "expo prebuild --clean",
     "typecheck": "node scripts/typed-routes.js && tsc --noEmit",
     "doctor": "expo-doctor",
-    "test": "vitest run"
+    "test": "vitest run",
+    "testflight": "npx eas-cli@latest workflow:run .eas/workflows/testflight.yml"
   },
   "private": true
 }

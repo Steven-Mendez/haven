@@ -2,7 +2,7 @@
   "expo": {
     "name": "HAVEN",
     "slug": "haven",
-    "version": "0.0.0",
+    "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "haven",
@@ -12,7 +12,8 @@
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSMotionUsageDescription": "HAVEN cuenta tus pasos como respaldo cuando HealthKit no está disponible."
+        "NSMotionUsageDescription": "HAVEN cuenta tus pasos como respaldo cuando HealthKit no está disponible.",
+        "CFBundleLocalizations": ["es", "en"]
       }
     },
     "android": {
@@ -69,6 +70,12 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "56618df4-b743-4b9d-bb2c-1b8772c0388e"
+      }
+    },
+    "owner": "steven-mendez"
   }
 }
