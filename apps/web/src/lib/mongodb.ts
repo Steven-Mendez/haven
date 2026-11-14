@@ -10,10 +10,18 @@ if (!uri) throw new Error("Falta MONGODB_URI en apps/web/.env.local");
 // Reutiliza la conexión entre hot-reloads en dev y entre invocaciones en serverless.
 const globalForMongo = globalThis as unknown as { _mongoClient?: Promise<MongoClient> };
 
-const clientPromise =
-  globalForMongo._mongoClient ?? (globalForMongo._mongoClient = new MongoClient(uri).connect());
+function getClient(): Promise<MongoClient> {
+  if (!globalForMongo._mongoClient) {
+    // Si la conexión falla, se descarta para reintentar en la próxima request.
+    globalForMongo._mongoClient = new MongoClient(uri!).connect().catch((err) => {
+      globalForMongo._mongoClient = undefined;
+      throw err;
+    });
+  }
+  return globalForMongo._mongoClient;
+}
 
 export async function getDb(): Promise<Db> {
-  const client = await clientPromise;
+  const client = await getClient();
   return client.db(process.env.MONGODB_DB ?? "haven");
 }
