@@ -1,16 +1,31 @@
 {
   "name": "haven",
   "private": true,
+  "packageManager": "pnpm@12.18.0",
+  "engines": {
+    "node": ">=24"
+  },
   "scripts": {
+    "feature": "node scripts/new-feature.mjs",
+    "dev": "turbo run dev",
+    "dev:mobile": "pnpm --filter @haven/mobile start",
     "dev:web": "pnpm --filter web dev",
-    "dev:mobile": "pnpm --filter mobile start",
-    "ios": "pnpm --filter mobile ios",
+    "build": "turbo run build",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "lint:swift": "xcrun swift-format lint --strict --recursive apps/mobile/targets",
+    "format:swift": "xcrun swift-format format --in-place --recursive apps/mobile/targets",
     "db:up": "docker compose up -d mongo",
     "db:down": "docker compose down",
-    "typecheck": "pnpm -r --no-bail typecheck",
-    "lint": "pnpm -r --no-bail lint",
-    "check:contract": "node scripts/check-watch-contract.mjs",
-    "check": "pnpm check:contract && pnpm typecheck && pnpm lint"
+    "prepare": "lefthook install"
   },
-  "packageManager": "pnpm@12.18.0"
+  "devDependencies": {
+    "@biomejs/biome": "2.6.4",
+    "lefthook": "2.2.2",
+    "turbo": "2.11.10",
+    "typescript": "~6.0.3"
+  }
 }

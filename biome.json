@@ -1,0 +1,213 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "**",
+      "!**/node_modules",
+      "!**/.expo",
+      "!**/.next",
+      "!**/.turbo",
+      "!**/dist",
+      "!apps/mobile/ios",
+      "!apps/mobile/android",
+      "!**/*.gen.ts",
+      "!**/next-env.d.ts",
+      "!**/expo-env.d.ts",
+      "!**/*.md",
+      "!apps/mobile/targets/**/*.xcassets"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineWidth": 100
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "single",
+      "jsxQuoteStyle": "double",
+      "trailingCommas": "all",
+      "semicolons": "always"
+    }
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    },
+    "formatter": {
+      "enabled": true
+    }
+  },
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
+  },
+  "linter": {
+    "enabled": true,
+    "domains": {
+      "react": "recommended",
+      "next": "recommended"
+    },
+    "rules": {
+      "nursery": {
+        "useTailwindSortedClasses": {
+          "level": "warn",
+          "fix": "safe"
+        }
+      },
+      "preset": "recommended"
+    }
+  },
+  "overrides": [
+    {
+      "includes": [
+        "**/*.config.js",
+        "**/babel.config.js",
+        "**/metro.config.js",
+        "apps/mobile/targets/**/*.js",
+        "**/scripts/*.js"
+      ],
+      "javascript": {
+        "globals": ["module", "require", "__dirname"]
+      }
+    },
+    {
+      "includes": ["apps/mobile/global.css"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noUnknownAtRules": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["apps/mobile/src/**"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noReactNativeRawText": {
+              "level": "error",
+              "options": {
+                "skip": ["Text", "CardTitle", "CardDescription"]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["apps/mobile/src/features/**", "apps/web/src/features/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/features/**"],
+                    "message": "Features never import each other: talk through the event bus or move shared code to shared/ or @haven/core."
+                  },
+                  {
+                    "group": ["@/app/**"],
+                    "message": "Features do not import routes."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "apps/mobile/src/shared/**",
+        "apps/web/src/components/**",
+        "apps/web/src/lib/**",
+        "apps/web/src/server/**"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["@/features/**"],
+                    "message": "shared/ cannot depend on a feature."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["packages/core/src/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "react",
+                      "react-native",
+                      "react-native/**",
+                      "expo",
+                      "expo-*",
+                      "next",
+                      "next/**"
+                    ],
+                    "message": "@haven/core is pure TypeScript: no React, Expo or Next."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["apps/web/src/components/ui/**", "apps/mobile/src/shared/components/ui/**"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noUselessFragments": "off"
+          },
+          "security": {
+            "noDangerouslySetInnerHtml": "off"
+          },
+          "suspicious": {
+            "noArrayIndexKey": "off",
+            "noDoubleEquals": "off",
+            "noDocumentCookie": "off"
+          },
+          "a11y": {
+            "useFocusableInteractive": "off",
+            "useSemanticElements": "off",
+            "noLabelWithoutControl": "off"
+          },
+          "correctness": {
+            "useExhaustiveDependencies": "off"
+          }
+        }
+      }
+    }
+  ]
+}
