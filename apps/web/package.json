@@ -8,6 +8,7 @@
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit",
     "seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/ts-hooks.mjs scripts/seed.ts",
+    "seed:demos": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/ts-hooks.mjs scripts/seed-demos.ts",
     "test:api": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/ts-hooks.mjs scripts/test-api.ts"
   },
   "dependencies": {
