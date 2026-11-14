@@ -1,9 +1,11 @@
+import { Redirect } from 'expo-router';
 import { Tabs } from 'expo-router/js-tabs';
 import { Activity, ChartLine, ListChecks, Rocket } from 'lucide-react-native';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { InTabsProvider } from '@/shared/components/screen';
 import { HavenTabBar, type TabIcons } from '@/shared/components/tab-bar';
+import { useDataReady, usePreferences } from '@/shared/data';
 import { useTexts } from '@/shared/i18n';
 import { navigationTexts } from '@/shared/i18n/navigation';
 import { TourProvider } from '@/shared/tour';
@@ -18,6 +20,10 @@ const ICONS: TabIcons = {
 export default function TabsLayout() {
   const t = useTexts(navigationTexts);
   const insets = useSafeAreaInsets();
+  const ready = useDataReady();
+  const { joined } = usePreferences();
+
+  if (ready && !joined) return <Redirect href="/welcome" />;
 
   return (
     <InTabsProvider>

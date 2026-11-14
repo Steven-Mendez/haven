@@ -26,6 +26,10 @@ export const texts = defineTexts({
       'Tierra no responde. Te uniste a {code} en este teléfono; se comprobará al llegar tu primer paquete.',
     unknownCode: 'No hay ninguna misión con el código {code}. Compruébalo con control de misión.',
     whoTitle: '¿Quién eres?',
+    welcomeTitle: 'Bienvenido a HAVEN',
+    welcomeBody:
+      'Para empezar, únete a tu misión. Control de misión te da un código QR: escanéalo con la cámara de este teléfono y toca «Abrir en HAVEN».',
+    welcomeNoQr: '¿Sin QR? Escribe el código de la misión.',
     whoHint: 'Elige tu nombre: tus paquetes llegarán a Tierra a tu nombre.',
     whoEmpty: 'Control de misión no ha añadido a nadie. Pide que te añadan o escribe tu nombre.',
     whoOffline:
@@ -186,6 +190,10 @@ export const texts = defineTexts({
       'Earth is not responding. You joined {code} on this phone; it is checked when your first packet arrives.',
     unknownCode: 'There is no mission with the code {code}. Check the code with mission control.',
     whoTitle: 'Who are you?',
+    welcomeTitle: 'Welcome to HAVEN',
+    welcomeBody:
+      'To get started, join your mission. Mission control gives you a QR code: scan it with this phone’s camera and tap “Open in HAVEN”.',
+    welcomeNoQr: 'No QR? Type the mission code.',
     whoHint: 'Pick your name: your packets reach Earth under it.',
     whoEmpty: 'Mission control has not added anyone. Ask them to add you, or type your name.',
     whoOffline:

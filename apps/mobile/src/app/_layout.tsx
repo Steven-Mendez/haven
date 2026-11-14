@@ -60,6 +60,7 @@ export default function RootLayout() {
           name="emergency"
           options={{ title: t.emergency, presentation: 'fullScreenModal', headerShown: false }}
         />
+        <Stack.Screen name="welcome" options={{ headerShown: false, animation: 'none' }} />
         <Stack.Screen name="dev" options={{ title: t.dev, presentation: 'modal' }} />
         <Stack.Screen name="send" options={{ title: t.send }} />
         <Stack.Screen name="queue" options={{ title: t.queue }} />

@@ -175,7 +175,7 @@ export function useMissionRecords() {
   }
 
   async function chooseCrewMember(id: string) {
-    await store.setPreferences({ crewMember: id });
+    await store.setPreferences({ crewMember: id, joined: true });
   }
 
   async function addTypedCrewMember(code: string, name: string): Promise<string> {

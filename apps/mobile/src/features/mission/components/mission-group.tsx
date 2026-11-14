@@ -31,7 +31,7 @@ import { WhoGroup } from './who-group';
 
 type Records = ReturnType<typeof useMissionRecords>;
 type Mode = 'idle' | 'join' | 'create' | 'who';
-type Joined = { code: string; message: string; crew: CrewOption[]; offline: boolean };
+export type Joined = { code: string; message: string; crew: CrewOption[]; offline: boolean };
 
 function CodeBoxes({
   value,
@@ -77,7 +77,7 @@ function CodeBoxes({
   );
 }
 
-function JoinForm({
+export function JoinForm({
   records,
   mission,
   onJoined,

@@ -5,6 +5,7 @@ export type Preferences = {
   apiUrl: string;
   crewMember: string;
   appearance: Appearance;
+  joined: boolean;
 };
 
 export type Appearance = 'dark' | 'light' | 'system';
@@ -15,6 +16,7 @@ export function defaultPreferences(): Preferences {
     apiUrl: process.env.EXPO_PUBLIC_API_URL?.trim() || 'http://localhost:3000',
     crewMember: 'elena-vega',
     appearance: 'dark',
+    joined: false,
   };
 }
 
