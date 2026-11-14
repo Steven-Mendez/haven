@@ -1,10 +1,8 @@
 export const PREFLIGHT_INDICATORS = [
   'heart-rate',
-  'hrv',
   'systolic-bp',
   'diastolic-bp',
   'spo2',
-  'weight',
   'reaction-time',
   'sleep',
 ] as const;

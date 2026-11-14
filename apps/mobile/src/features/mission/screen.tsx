@@ -97,7 +97,7 @@ export default function Screen() {
       case 'mission':
         return (
           <DetailView title={t.missionGroup} subtitle={t.qrHint} backLabel={t.title} onBack={back}>
-            <MissionGroup mission={mission} records={records} record={record} />
+            <MissionGroup mission={mission} record={record} />
           </DetailView>
         );
       case 'environment':

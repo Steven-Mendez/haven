@@ -1,3 +1,4 @@
+import { isTracked } from '../config';
 import type { Config, Indicator, Reading, ReadingSource } from '../contracts';
 import { contentConfig } from './config-source';
 import { DEMO_MISSION } from './demo';
@@ -234,6 +235,14 @@ export const SERIES: SeriesDef[] = [
     value: (c) => c.p.weight * 38 + gaussian(c.rng, 120),
   },
   {
+    indicator: 'hydration',
+    unit: 'mL',
+    everyHours: 24,
+    source: 'manual',
+    decimals: 0,
+    value: (c) => Math.round((2600 + gaussian(c.rng, 180)) / 50) * 50,
+  },
+  {
     indicator: 'resistance-exercise',
     unit: 'min',
     everyHours: 24,
@@ -277,9 +286,17 @@ export const SERIES: SeriesDef[] = [
     indicator: 'radiation-dose',
     unit: 'mSv/day',
     everyHours: 24,
-    source: 'ship',
+    source: 'manual',
     decimals: 2,
     value: (c) => 1.6 + gaussian(c.rng, 0.08),
+  },
+  {
+    indicator: 'cabin-pressure',
+    unit: 'kPa',
+    everyHours: 1,
+    source: 'phone',
+    decimals: 1,
+    value: (c) => 101.3 + gaussian(c.rng, 0.25),
   },
   {
     indicator: 'solar-event',
@@ -355,7 +372,7 @@ export function generateSeries(
   options?: GenerateOptions,
 ): Reading[] {
   const def = SERIES_BY_INDICATOR[indicator];
-  if (!def) return [];
+  if (!def || !isTracked(indicator)) return [];
   const config = options?.config;
   const ind = config?.indicators.find((i) => i.id === indicator);
   const p = profileOf(crewMember);
@@ -397,7 +414,7 @@ export type DemoHistoryOptions = GenerateOptions & {
   dailyActions?: boolean;
 };
 
-const DEFAULT_ROUTINE_ZONES = ['lungs'];
+const DEFAULT_ROUTINE_ZONES = ['environment'];
 
 export function demoMissedDays(crewMember: string): number[] {
   const seed = hashSeed(`${crewMember}:missed`);

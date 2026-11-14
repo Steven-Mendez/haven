@@ -41,6 +41,7 @@ import { categoriesOf } from './logic/series';
 
 const ORIGIN_KEY: Partial<Record<Source, keyof IndicatorTexts>> = {
   ship: 'originShip',
+  phone: 'originPhone',
   manual: 'originManual',
   watch: 'originWatch',
   healthkit: 'originHealthkit',

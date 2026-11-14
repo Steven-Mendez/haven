@@ -39,21 +39,9 @@
     {
       "indicator": "diastolic-bp",
       "points": [[0, 76], [4, 94], [7, 54], [10, 52]]
-    },
-    {
-      "indicator": "cabin-co2",
-      "points": [[0, 2.1], [10, 2.1]]
-    },
-    {
-      "indicator": "cabin-noise",
-      "points": [[0, 52], [10, 52]]
     }
   ],
   "categorical": [
-    {
-      "indicator": "heart-rhythm",
-      "points": [[0, "sinus"], [5.5, "irregular"]]
-    },
     {
       "indicator": "symptom",
       "points": [[3, "chest-pain"], [4, "sweating"], [5, "shortness-of-breath"]]
@@ -241,11 +229,7 @@
   ],
   "expected": [
     {
-      "zone": "heart",
-      "level": "red"
-    },
-    {
-      "zone": "lungs",
+      "zone": "vitals",
       "level": "red"
     }
   ]

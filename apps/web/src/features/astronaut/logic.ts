@@ -11,20 +11,13 @@ import type { Language } from '@/lib/i18n';
 import { translate } from '@/lib/i18n';
 import type { AstronautResponse, ReceivedPacket } from '@/server/types';
 
-export const MONITOR_INDICATORS = [
-  'heart-rate',
-  'spo2',
-  'heart-rhythm',
-  'systolic-bp',
-  'diastolic-bp',
-] as const;
+export const MONITOR_INDICATORS = ['heart-rate', 'spo2', 'systolic-bp', 'diastolic-bp'] as const;
 
 export const BAR_INDICATORS = [
   'steps',
-  'distance',
-  'floors',
   'sleep',
   'food-intake',
+  'hydration',
   'resistance-exercise',
 ] as const;
 

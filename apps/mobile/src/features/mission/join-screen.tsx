@@ -15,7 +15,7 @@ import { useMissionRecords } from './hooks/missions';
 import { texts } from './i18n';
 import { cleanCrewName } from './logic/crew';
 import { invitedMember, parseInvite } from './logic/invite';
-import type { MissionRecord } from './logic/mission-record';
+import { type MissionRecord, recordStatus } from './logic/mission-record';
 
 type State =
   | { step: 'joining'; code?: string }
@@ -45,7 +45,7 @@ export default function JoinScreen() {
     const { code, crew, apiUrl } = parsed.invite;
     setState({ step: 'joining', code });
     if (apiUrl) await store.setPreferences({ apiUrl });
-    const result = await records.join(code, { allowOffline: false });
+    const result = await records.join(code);
     if (result.from === 'unknown') {
       setState({ step: 'error', message: format(t.unknownCode, { code }), retry: false });
       return;
@@ -53,6 +53,11 @@ export default function JoinScreen() {
     if (result.from === 'unreachable') {
       const message = format(t.inviteUnreachable, { url: store.preferences().apiUrl });
       setState({ step: 'error', message, retry: true });
+      return;
+    }
+    if (recordStatus(result.record, new Date()) === 'finished') {
+      const message = format(t.inviteFinished, { mission: result.record.name });
+      setState({ step: 'error', message, retry: false });
       return;
     }
     const member = invitedMember(result.record.crew, crew);

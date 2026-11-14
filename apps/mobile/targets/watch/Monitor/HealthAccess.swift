@@ -24,7 +24,7 @@ enum HealthAccess {
         do {
             try await store.requestAuthorization(
                 toShare: share,
-                read: [heartRateType, spo2Type, irregularRhythmType]
+                read: [heartRateType, spo2Type]
             )
         } catch {
             log.error("HealthKit authorization failed: \(error.localizedDescription, privacy: .public)")

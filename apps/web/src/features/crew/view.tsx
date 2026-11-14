@@ -29,7 +29,7 @@ import { texts } from './i18n';
 import { rosterOf } from './roster';
 import { earthUrlForPhones, getCrew } from './server';
 
-export const REFRESH_INTERVAL_SEC = 15;
+export const REFRESH_INTERVAL_SEC = 5;
 
 type Names = {
   environmentName?: string;
@@ -152,6 +152,8 @@ async function CrewContent({ searchParams }: { searchParams: SearchParams }) {
             <StartMission
               mission={code}
               scheduled={data.mission.status === 'scheduled'}
+              ready={data.crew.filter((c) => c.joinedAt !== null || c.lastPacket !== null).length}
+              total={data.crew.length}
               lang={lang}
             />
           ) : undefined

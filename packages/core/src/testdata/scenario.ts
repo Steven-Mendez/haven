@@ -1,3 +1,4 @@
+import { isTracked } from '../config';
 import {
   type Config,
   type Reading,
@@ -133,7 +134,9 @@ export function scenarioTimeline(
     }
   }
 
-  return items.sort((a, b) => a.minute - b.minute);
+  return items
+    .filter((x) => !x.reading || isTracked(x.reading.indicator))
+    .sort((a, b) => a.minute - b.minute);
 }
 
 export function scenarioReadings(

@@ -58,7 +58,7 @@ function packet(mission: string, crewMember: string, over: Record<string, unknow
     readings: [],
     notes: '',
     dailyProgress: [
-      { zone: 'heart', progress: 1 },
+      { zone: 'vitals', progress: 1 },
       { zone: 'mind', progress: 0.5 },
     ],
     mission,
@@ -193,9 +193,9 @@ async function testInstantAndIdempotency() {
     readings: [
       {
         id: `r-${crypto.randomUUID()}`,
-        indicator: 'cabin-co2',
-        value: 2.1,
-        unit: 'mmHg',
+        indicator: 'cabin-pressure',
+        value: 101.3,
+        unit: 'kPa',
         takenAt: old,
         source: 'ship',
         simulated: false,

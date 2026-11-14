@@ -6,7 +6,8 @@ export type ReadingSource =
   | 'manual'
   | 'screen'
   | 'simulator'
-  | 'ship';
+  | 'ship'
+  | 'phone';
 
 export type Reading = {
   id: string;

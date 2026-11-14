@@ -31,6 +31,20 @@ describe('evaluate', () => {
     );
   });
 
+  it('extras are never evaluated, whatever they read', () => {
+    const config = {
+      ...TEST_CONFIG,
+      indicators: TEST_CONFIG.indicators.map((i) =>
+        i.id === 'cabin-co2' ? { ...i, extra: true } : i,
+      ),
+    };
+    const ids = (readings: Reading[]) =>
+      evaluate(readings, config, 'transit', {}, [], NOW).map((a) => a.indicator);
+    expect(ids([])).not.toContain('cabin-co2');
+    expect(ids([reading('cabin-co2', 9, 10)])).not.toContain('cabin-co2');
+    expect(ids([reading('cabin-co2', 9, 10)])).toHaveLength(config.indicators.length - 1);
+  });
+
   it('no reading → pending, never green', () => {
     const a = run([])['heart-rate'];
     expect(a?.level).toBe('pending');

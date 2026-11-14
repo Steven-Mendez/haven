@@ -15,7 +15,7 @@ type Props = {
   className?: string;
 };
 
-const DEFAULT_TOTAL = 7;
+const DEFAULT_TOTAL = 5;
 
 export function DayRing({
   segments,

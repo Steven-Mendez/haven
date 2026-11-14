@@ -75,6 +75,7 @@ export const texts = defineTexts({
     'source.manual': 'Manual',
     'source.screen': 'Pantalla',
     'source.ship': 'Telemetría de la nave',
+    'source.phone': 'Sensor del teléfono',
     tabsLabel: 'Secciones del astronauta',
     tabSummary: 'Resumen',
     tabStates: 'Estados',
@@ -195,6 +196,7 @@ export const texts = defineTexts({
     'source.manual': 'Manual',
     'source.screen': 'Screen',
     'source.ship': 'Spacecraft telemetry',
+    'source.phone': 'Phone sensor',
   },
 });
 

@@ -30,6 +30,7 @@ const SOURCE_ICON: Record<ReadingSource, LucideIcon> = {
   screen: Hand,
   simulator: Database,
   ship: Satellite,
+  phone: Smartphone,
 };
 
 export function sourceLabel(t: HavenTexts, source: ReadingSource | (string & {})): string {
@@ -42,6 +43,7 @@ export function sourceLabel(t: HavenTexts, source: ReadingSource | (string & {})
     screen: t.sourceScreen,
     simulator: t.sourceRecord,
     ship: t.sourceShip,
+    phone: t.sourcePhone,
   };
   return labels[source as ReadingSource] ?? source;
 }

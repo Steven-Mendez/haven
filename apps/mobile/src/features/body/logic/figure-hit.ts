@@ -2,7 +2,7 @@ export const FIGURE_VIEWBOX = { width: 240, height: 440 } as const;
 
 export const SMALL_ZONE_CENTERS: Record<string, { x: number; y: number }> = {
   mind: { x: 120, y: 24 },
-  heart: { x: 146, y: 172 },
+  vitals: { x: 146, y: 172 },
 };
 
 export type HitBox = { zone: string; left: number; top: number; size: number };

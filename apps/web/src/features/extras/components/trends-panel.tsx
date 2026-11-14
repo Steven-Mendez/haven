@@ -12,18 +12,21 @@ import { ExportCsvButton } from './export-buttons';
 import { IndicatorSelect } from './indicator-picker';
 
 export const TREND_OPTIONS = [
-  'bone-loss',
-  'hrv',
+  'heart-rate',
+  'systolic-bp',
+  'spo2',
+  'body-temperature',
   'sleep',
   'mood',
-  'cabin-co2',
   'stress',
-  'heart-rate',
-  'spo2',
-  'weight',
-  'reaction-time',
-  'radiation-dose',
   'steps',
+  'resistance-exercise',
+  'reaction-time',
+  'glucose',
+  'food-intake',
+  'hydration',
+  'radiation-dose',
+  'cabin-pressure',
 ];
 const VISIBLE_ROWS = 5;
 const DAY_MS = 86_400_000;

@@ -26,10 +26,9 @@ export function EmergencyInbox({ crew, now, lang, roles, indicators, delayMin }:
   const t = texts[lang];
   const h = havenTexts[lang];
   const open = crew
-    .filter((m) => m.lastPacket?.type === 'emergency')
+    .filter((m) => m.emergency !== null)
     .sort(
-      (a, b) =>
-        Date.parse(b.lastPacket?.visibleAt ?? '') - Date.parse(a.lastPacket?.visibleAt ?? ''),
+      (a, b) => Date.parse(b.emergency?.visibleAt ?? '') - Date.parse(a.emergency?.visibleAt ?? ''),
     );
   if (!open.length) return null;
 
@@ -41,7 +40,7 @@ export function EmergencyInbox({ crew, now, lang, roles, indicators, delayMin }:
       </h2>
       <ul className="overflow-hidden rounded-xl border">
         {open.map((m) => {
-          const packet = m.lastPacket;
+          const packet = m.emergency;
           if (!packet) return null;
           const href = `/astronaut/${encodeURIComponent(m.id)}/packet/${encodeURIComponent(packet.id)}`;
           return (
@@ -85,7 +84,7 @@ export function EmergencyInbox({ crew, now, lang, roles, indicators, delayMin }:
                     </span>
                   ) : (
                     <span className="text-level-red hidden text-xs font-medium sm:inline">
-                      {h.emergencyOpen}
+                      {packet.status === 'unresponsive' ? h.emergencyUnresponsive : h.emergencyOpen}
                     </span>
                   )}
                   <TimeAgo

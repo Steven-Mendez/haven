@@ -86,6 +86,19 @@ describe('emergency packet', () => {
     expect(list.map((r) => r.id)).toEqual(['onset', 'live', 'spo2']);
   });
 
+  it('carries the emergency state so Earth groups the alert, its updates and the close', () => {
+    expect(buildEmergencyPacket(input()).emergency).toBeUndefined();
+    const alert = buildEmergencyPacket(input({ status: 'open', origin: 'button' }));
+    expect(alert.emergency).toEqual({
+      id: 'p1',
+      status: 'open',
+      startedAt: startedAt.toISOString(),
+      origin: 'button',
+    });
+    const helping = buildEmergencyPacket(input({ status: 'unresponsive', forOther: true }));
+    expect(helping.emergency).toMatchObject({ status: 'unresponsive', forOther: true });
+  });
+
   it('builds a complete emergency packet without artificial delay', () => {
     const symptom = symptomReading('chest-pain', 'elena-vega', new Date(min(2)), 's1');
     const again = symptomReading('chest-pain', 'elena-vega', new Date(min(3)), 's2');

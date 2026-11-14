@@ -6,6 +6,7 @@ import {
   missionDays,
   type Reading,
 } from '@haven/core';
+import { CREW_NOT_READY } from '@/server/types';
 import { missions, packets, rules } from './collections';
 import {
   baseConfig,
@@ -15,6 +16,7 @@ import {
   crewMembers,
   currentAssessments,
   generateCode,
+  latestEmergencyVersions,
   type MissionDoc,
   missionForApi,
   missionFromPacket,
@@ -180,7 +182,7 @@ export async function getAstronaut(
   if (!member) return null;
 
   const card = crewCard(member, visible, now);
-  const list = visible.map(packetForApi);
+  const list = latestEmergencyVersions(visible).map(packetForApi);
 
   return {
     generatedAt: now.toISOString(),
@@ -207,6 +209,14 @@ export async function startMission(code: string, now = new Date()): Promise<Resu
   if (!mission) return fail(404, `Mission ${code} does not exist`);
   const status = missionStatus(mission, now);
   if (status === 'active' || status === 'finished') return fail(409, 'Mission already started');
+  const sending = await (await packets()).distinct('crewMember', { mission: code });
+  const waiting = mission.crew.filter((m) => !m.joinedAt && !sending.includes(m.id));
+  if (mission.crew.length === 0 || waiting.length > 0)
+    return fail(
+      409,
+      CREW_NOT_READY,
+      waiting.map((m) => m.id),
+    );
   const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   await col.updateOne(
     { code },
@@ -277,6 +287,50 @@ async function editableMission(code: string, now = new Date()) {
   return null;
 }
 
+export type SessionEvent = 'join' | 'leave';
+
+export async function recordCrewSession(
+  body: unknown,
+  now = new Date(),
+): Promise<Result<{ mission: string; crewMember: string; joinedAt: string | null }>> {
+  const b = (typeof body === 'object' && body !== null ? body : {}) as Record<string, unknown>;
+  const code = typeof b.mission === 'string' ? b.mission.trim().toUpperCase() : '';
+  const id = typeof b.crewMember === 'string' ? b.crewMember.trim() : '';
+  const event = b.event === 'leave' ? 'leave' : b.event === 'join' ? 'join' : undefined;
+  const errors: string[] = [];
+  if (!code || code.length > 32) errors.push('mission: required code');
+  if (!id || id.length > 60) errors.push('crewMember: required id');
+  if (!event) errors.push("event: 'join' | 'leave'");
+  if (errors.length) return fail(400, 'Invalid session event', errors);
+
+  const col = await missions();
+  const mission = await col.findOne({ code }, NO_ID);
+  if (!mission) return fail(404, `Mission ${code} does not exist`);
+  const member = mission.crew.find((m) => m.id === id);
+  const data = (joinedAt: string | null) => ({
+    ok: true as const,
+    status: 200,
+    data: { mission: code, crewMember: id, joinedAt },
+  });
+
+  if (event === 'leave') {
+    await col.updateOne({ code, 'crew.id': id }, { $unset: { 'crew.$.joinedAt': '' } });
+    return data(null);
+  }
+  if (member?.joinedAt) return data(member.joinedAt);
+  const joinedAt = now.toISOString();
+  if (member) {
+    await col.updateOne({ code, 'crew.id': id }, { $set: { 'crew.$.joinedAt': joinedAt } });
+  } else {
+    const name = typeof b.name === 'string' && b.name.trim() ? b.name.trim().slice(0, 60) : id;
+    await col.updateOne(
+      { code, 'crew.id': { $ne: id } },
+      { $push: { crew: { id, name, hasWatch: false, joinedAt } } },
+    );
+  }
+  return data(joinedAt);
+}
+
 export type CrewInput = { name: string; role?: string };
 
 const roleOf = (role?: string) => (role ? { role: { es: role, en: role } } : {});
@@ -316,6 +370,7 @@ export async function updateCrewMember(
     name: input.name,
     hasWatch: current.hasWatch,
     ...roleOf(input.role),
+    ...(current.joinedAt ? { joinedAt: current.joinedAt } : {}),
   };
   await col.updateOne({ code, 'crew.id': id }, { $set: { 'crew.$': entry } });
   return { ok: true, status: 200, data: entry };

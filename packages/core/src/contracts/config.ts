@@ -22,6 +22,7 @@ export type Indicator = {
   zone: string;
   unit: string;
   suggestedByChallenge: boolean;
+  extra?: boolean;
   everyHours?: number;
   kind: 'number' | 'category';
   categoryLabels?: Record<string, I18n>;

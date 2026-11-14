@@ -1,14 +1,12 @@
 import type { Level } from '@haven/core';
 import {
   Activity,
-  Bone,
   Brain,
-  Eye,
-  Heart,
+  Dumbbell,
+  HeartPulse,
   type LucideIcon,
-  Sun,
+  Radiation,
   Utensils,
-  Wind,
 } from 'lucide-react-native';
 
 import type { ThemeZone } from '@/shared/lib/theme';
@@ -59,13 +57,11 @@ export function levelPhrase(t: HavenTexts, level: Level): string {
 }
 
 export const ZONE_ICON: Record<ThemeZone, LucideIcon> = {
-  heart: Heart,
-  lungs: Wind,
-  head: Eye,
-  metabolism: Utensils,
-  musculoskeletal: Bone,
-  skin: Sun,
+  vitals: HeartPulse,
   mind: Brain,
+  performance: Dumbbell,
+  metabolism: Utensils,
+  environment: Radiation,
 };
 
 export function zoneIcon(zone: string): LucideIcon {
@@ -74,13 +70,11 @@ export function zoneIcon(zone: string): LucideIcon {
 
 export function zoneName(t: HavenTexts, zone: string): string {
   const names: Record<ThemeZone, string> = {
-    heart: t.zoneHeart,
-    lungs: t.zoneLungs,
-    head: t.zoneHead,
-    metabolism: t.zoneMetabolism,
-    musculoskeletal: t.zoneMusculoskeletal,
-    skin: t.zoneSkin,
+    vitals: t.zoneVitals,
     mind: t.zoneMind,
+    performance: t.zonePerformance,
+    metabolism: t.zoneMetabolism,
+    environment: t.zoneEnvironment,
   };
   return names[zone as ThemeZone] ?? zone;
 }

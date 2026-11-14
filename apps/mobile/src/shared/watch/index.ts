@@ -6,6 +6,7 @@ import {
   type WatchEnvelope,
   type WatchMessages,
   type WatchMessageType,
+  type WatchSession,
 } from '@haven/core';
 import { type EventSubscription, requireOptionalNativeModule } from 'expo';
 import { useCallback, useSyncExternalStore } from 'react';
@@ -101,6 +102,11 @@ function receive(envelope: WatchEnvelope) {
   }
   lastReceived = envelope;
   lastReceivedAt = Date.now();
+  if (session() !== 'active') {
+    sendStatus(store.assessments());
+    changed();
+    return;
+  }
   if (envelope.type === 'emergency') {
     const payload = envelope.payload as WatchMessages['emergency'];
     emittingFromWatch = true;
@@ -148,6 +154,13 @@ function send(item: WatchEnvelope): boolean {
   return sent;
 }
 
+function session(): WatchSession {
+  if (!store.preferences().joined) return 'signedOut';
+  const { status } = store.mission();
+  if (status === 'planned' || status === 'scheduled') return 'waiting';
+  return status === 'finished' ? 'signedOut' : 'active';
+}
+
 function sendStatus(assessments: Assessment[]) {
   const pending = assessments.find((a) => a.level === 'pending');
   const nextPending = pending
@@ -156,7 +169,8 @@ function sendStatus(assessments: Assessment[]) {
     : undefined;
   const level = overallLevel(assessments);
   const language = currentLanguage();
-  const sig = `${level}|${nextPending ?? ''}|${language}`;
+  const state = session();
+  const sig = `${level}|${nextPending ?? ''}|${language}|${state}`;
   if (sig === sentSignature) return;
   sentSignature = sig;
   send(
@@ -165,6 +179,7 @@ function sendStatus(assessments: Assessment[]) {
       nextPending,
       evaluatedAt: new Date().toISOString(),
       language,
+      session: state,
     }),
   );
 }
@@ -199,6 +214,8 @@ function start() {
   }
   bus.on('assessments:changed', sendStatus);
   onLanguageChange(() => sendStatus(store.assessments()));
+  bus.on('mission:changed', () => sendStatus(store.assessments()));
+  store.subscribe('preferences', () => sendStatus(store.assessments()));
   bus.on('emergency:open', () => {
     if (!emittingFromWatch) void startWatchMonitor();
   });

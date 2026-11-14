@@ -92,18 +92,54 @@ export function actionById(id: string): Action | undefined {
 
 export type LoadedConfig = Config & { actions: Action[] };
 
-export function loadConfig(): LoadedConfig {
+export const EXTRA_INDICATORS: readonly string[] = (indicators as IndicatorWithoutGuide[])
+  .filter((i) => i.extra)
+  .map((i) => i.id);
+
+export function isTracked(indicator: string): boolean {
+  return !EXTRA_INDICATORS.includes(indicator);
+}
+
+export function loadConfig(options?: { includeExtras?: boolean }): LoadedConfig {
   const guidesById = guides as Record<string, Indicator['guide']>;
+  const kept = (id: string) => options?.includeExtras || isTracked(id);
   return {
     version: version.version,
-    zones: zones as Config['zones'],
+    zones: (zones as Config['zones']).map((z) => ({
+      ...z,
+      indicators: z.indicators.filter(kept),
+    })),
     environments: environments as Config['environments'],
     protocols: protocols as Config['protocols'],
-    indicators: (indicators as IndicatorWithoutGuide[]).map((i) => ({
-      ...i,
-      guide: guidesById[i.id] ?? emptyGuide,
-    })),
+    indicators: (indicators as IndicatorWithoutGuide[])
+      .filter((i) => kept(i.id))
+      .map((i) => ({ ...i, guide: guidesById[i.id] ?? emptyGuide })),
     actions,
+  };
+}
+
+const isRange = (v: unknown): v is [number, number] =>
+  Array.isArray(v) && v.length === 2 && v.every((n) => typeof n === 'number' && Number.isFinite(n));
+
+export function rebaseConfig<T extends Config>(base: T, received: unknown): T {
+  const r = received as Partial<Config> | null | undefined;
+  if (!r || typeof r !== 'object' || !Array.isArray(r.indicators)) return base;
+  const sent = new Map<string, Partial<Indicator>>();
+  for (const i of r.indicators) {
+    if (i && typeof i === 'object' && typeof i.id === 'string') sent.set(i.id, i);
+  }
+  return {
+    ...base,
+    version: typeof r.version === 'string' && r.version ? r.version : base.version,
+    indicators: base.indicators.map((i) => {
+      const s = sent.get(i.id);
+      if (!s || s.kind !== i.kind) return i;
+      return {
+        ...i,
+        green: isRange(s.green) ? [s.green[0], s.green[1]] : i.green,
+        rules: Array.isArray(s.rules) ? s.rules : i.rules,
+      };
+    }),
   };
 }
 

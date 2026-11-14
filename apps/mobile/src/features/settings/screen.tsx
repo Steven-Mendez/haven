@@ -7,10 +7,13 @@ import {
   Database,
   Info,
   Languages,
+  LogOut,
   Moon,
+  Rocket,
   Satellite,
   Send,
   Trash2,
+  User,
   Wifi,
   WifiOff,
 } from 'lucide-react-native';
@@ -24,9 +27,11 @@ import {
   SegmentedControl,
 } from '@/shared/components/haven';
 import { SettingsRow } from '@/shared/components/haven/settings-row';
+import { useCrewMemberName } from '@/shared/components/profile-button';
 import { Screen } from '@/shared/components/screen';
 import { Text } from '@/shared/components/ui/text';
 import { type Appearance, store, useMission, usePendingSends, usePreferences } from '@/shared/data';
+import { bus } from '@/shared/events';
 import { type Language, useTexts } from '@/shared/i18n';
 import { requestTour } from '@/shared/tour';
 import { texts } from './i18n';
@@ -41,6 +46,9 @@ export default function SettingsScreen() {
   const preferences = usePreferences();
   const mission = useMission();
   const queued = usePendingSends();
+  const name = useCrewMemberName();
+  const missionName = mission.name ?? mission.code;
+  const [confirmSignOut, setConfirmSignOut] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleted, setDeleted] = useState(false);
 
@@ -50,6 +58,48 @@ export default function SettingsScreen() {
 
   return (
     <Screen contentClassName="gap-section">
+      <Section title={t.session}>
+        <ListGroup inset={52}>
+          <SettingsRow
+            icon={Rocket}
+            label={t.mission}
+            value={missionName}
+            onPress={() => router.push('/mission')}
+          />
+          <SettingsRow
+            icon={User}
+            label={t.profile}
+            value={name}
+            onPress={() => router.push('/profile')}
+          />
+        </ListGroup>
+        {confirmSignOut ? (
+          <InlineConfirm
+            title={t.signOutTitle}
+            description={format(t.signOutDescription, { mission: missionName, name })}
+            confirmLabel={t.signOutConfirm}
+            confirmVariant="destructive"
+            onCancel={() => setConfirmSignOut(false)}
+            onConfirm={() => {
+              setConfirmSignOut(false);
+              bus.emit('session:signout', {});
+              router.dismissTo('/');
+            }}
+          />
+        ) : (
+          <ListGroup inset={52}>
+            <SettingsRow
+              icon={LogOut}
+              label={t.signOut}
+              hint={t.signOutHint}
+              destructive
+              chevron={false}
+              onPress={() => setConfirmSignOut(true)}
+            />
+          </ListGroup>
+        )}
+      </Section>
+
       <Section title={t.general}>
         <ListGroup inset={52}>
           <SettingsRow

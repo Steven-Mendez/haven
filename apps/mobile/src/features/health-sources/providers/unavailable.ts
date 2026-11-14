@@ -21,11 +21,7 @@ function unavailable(id: SourceId, indicators: string[], reason: string): Source
 }
 
 export function createHealthConnectProvider(): SourceProvider {
-  return unavailable(
-    'healthconnect',
-    ['steps', 'distance', 'floors', 'weight', 'heart-rate', 'sleep'],
-    'reasonHealthConnect',
-  );
+  return unavailable('healthconnect', ['steps', 'heart-rate', 'sleep'], 'reasonHealthConnect');
 }
 
 export function createBleProvider(): SourceProvider {

@@ -1,31 +1,60 @@
-import type { Config, Level, Zone } from '@haven/core';
-import { SEVERITY } from './alerts';
+import type { Config, I18n, Reading, Zone, ZoneProgress } from '@haven/core';
+import { routineSteps } from '../../../shared/routine/steps';
 
 export type NextAction = {
   zone: Zone;
+  label: I18n;
   target: { kind: 'indicator'; id: string } | { kind: 'screen'; id: string };
 };
 
+const COGNITION: I18n = { es: 'Hacer la batería cognitiva', en: 'Do the cognitive test battery' };
+const COGNITION_INDICATOR = 'reaction-time';
+const WELLBEING_INDICATOR = 'mood';
+
 export function nextDailyAction(
-  progress: { zone: string; progress: number }[],
-  zones: { zone: string; level: Level }[],
+  readings: Reading[],
+  progress: ZoneProgress[],
   config: Config,
+  now: Date,
 ): NextAction | undefined {
-  const levelOf = (id: string): Level => zones.find((z) => z.zone === id)?.level ?? 'pending';
-  const open = config.zones
-    .map((zone, order) => ({ zone, order }))
-    .filter(({ zone }) => (progress.find((p) => p.zone === zone.id)?.progress ?? 0) < 1)
-    .sort(
-      (a, b) => SEVERITY[levelOf(b.zone.id)] - SEVERITY[levelOf(a.zone.id)] || a.order - b.order,
-    );
-  const first = open[0]?.zone;
-  if (!first) return undefined;
-  const opens = first.dailyAction.opens;
-  const isIndicator = config.indicators.some((i) => i.id === opens);
-  return {
-    zone: first,
-    target: isIndicator ? { kind: 'indicator', id: opens } : { kind: 'screen', id: opens },
+  const step = routineSteps(readings, config, progress, now)[0];
+  if (!step) return undefined;
+  const zoneOf = (indicator: string) => {
+    const id = config.indicators.find((i) => i.id === indicator)?.zone;
+    return config.zones.find((z) => z.id === id);
   };
+  switch (step.kind) {
+    case 'cognition': {
+      const zone = zoneOf(COGNITION_INDICATOR);
+      return zone && { zone, label: COGNITION, target: { kind: 'screen', id: 'cognition' } };
+    }
+    case 'wellbeing': {
+      const zone = zoneOf(WELLBEING_INDICATOR);
+      return (
+        zone && {
+          zone,
+          label: zone.dailyAction.text,
+          target: { kind: 'screen', id: 'wellbeing' },
+        }
+      );
+    }
+    case 'measure': {
+      const zone = zoneOf(step.indicator);
+      const indicator = config.indicators.find((i) => i.id === step.indicator);
+      if (!zone || !indicator) return undefined;
+      return {
+        zone,
+        label: zone.dailyAction.opens === indicator.id ? zone.dailyAction.text : indicator.name,
+        target: { kind: 'indicator', id: indicator.id },
+      };
+    }
+    case 'check': {
+      const zone = config.zones.find((z) => z.id === step.zone);
+      return (
+        zone && { zone, label: zone.dailyAction.text, target: { kind: 'screen', id: 'routine' } }
+      );
+    }
+  }
 }
 
 export function latestTakenAt(readings: { takenAt: string }[]): string | undefined {

@@ -1,4 +1,4 @@
-import type { Level } from '@haven/core';
+import type { Level, ReadingSource } from '@haven/core';
 import { router, Stack } from 'expo-router';
 import { ChevronDown, ChevronRight, ShieldAlert } from 'lucide-react-native';
 import { Fragment, type ReactNode, useEffect, useMemo, useState } from 'react';
@@ -53,11 +53,17 @@ const STATE_KEY: Record<SourceState, keyof SourcesTexts> = {
 const PROVIDER_NAME: Record<string, keyof SourcesTexts> = {
   healthkit: 'healthkit',
   pedometer: 'pedometer',
+  barometer: 'barometer',
   healthconnect: 'healthconnect',
   ble: 'ble',
 };
 
-const WATCH_INDICATORS = ['heart-rate', 'hrv', 'sleep', 'spo2', 'mood'];
+const PROVIDER_SOURCE: Partial<Record<SourceId, ReadingSource>> = {
+  pedometer: 'healthkit',
+  barometer: 'phone',
+};
+
+const WATCH_INDICATORS = ['heart-rate', 'sleep', 'spo2', 'mood'];
 
 function Group({ title, note, children }: { title: string; note?: string; children: ReactNode }) {
   return (
@@ -132,7 +138,7 @@ export default function Screen() {
   const groupLabel = (plan: IndicatorPlan) => {
     if (plan.mode === 'pending') return t.planPending;
     if (plan.mode === 'provider')
-      return sourceLabel(ht, plan.source === 'pedometer' ? 'healthkit' : plan.source);
+      return sourceLabel(ht, PROVIDER_SOURCE[plan.source] ?? plan.source);
     const last = latest.get(plan.indicator);
     return last ? sourceLabel(ht, last.source) : t.planNoReading;
   };
@@ -145,6 +151,7 @@ export default function Screen() {
   const available = statuses.filter((s) => s.state !== 'unavailable');
   const unavailable = statuses.filter((s) => s.state === 'unavailable');
   const denied = statuses.filter((s) => s.state === 'denied');
+  const motionDenied = denied.find((s) => s.id !== 'healthkit');
   const healthKitPresent = statuses.some((s) => s.id === 'healthkit' && s.state !== 'unavailable');
   const reasonOf = (s: SourceStatus) => (s.reason ? (t[s.reason as keyof SourcesTexts] ?? '') : '');
   const syncAge = (s: SourceStatus) =>
@@ -171,8 +178,8 @@ export default function Screen() {
             .map((s) => (s.id === 'healthkit' ? t.deniedHealthkit : t.deniedPedometer))
             .join('\n\n')}
           action={
-            denied.some((s) => s.id === 'pedometer')
-              ? { label: t.grant, onPress: () => void requestPermission('pedometer') }
+            motionDenied
+              ? { label: t.grant, onPress: () => void requestPermission(motionDenied.id) }
               : undefined
           }
         />

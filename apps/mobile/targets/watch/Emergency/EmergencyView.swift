@@ -36,6 +36,8 @@ struct EmergencyView: View {
         VStack(spacing: Spacing.m) {
             if bridge.isEmergencyActive, let alert = center.lastAlert {
                 SentAlertSummary(alert: alert)
+            } else if bridge.missionSession != .active {
+                SessionNotice(session: bridge.missionSession)
             } else {
                 HoldToConfirm(
                     duration: Self.holdSeconds,
@@ -95,6 +97,42 @@ struct EmergencyView: View {
             AutoTriggerSettings()
                 .padding(.trailing, Spacing.s)
         }
+    }
+}
+
+struct SessionNotice: View {
+    let session: StatusPayload.Session
+
+    var body: some View {
+        VStack(spacing: Spacing.m) {
+            Image(systemName: session == .waiting ? "hourglass" : "qrcode.viewfinder")
+                .font(.title2)
+                .foregroundStyle(Theme.mutedForeground)
+            Text(title)
+                .font(Typography.label.weight(.medium))
+                .foregroundStyle(Theme.foreground)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(detail)
+                .font(Typography.caption)
+                .foregroundStyle(Theme.mutedForeground)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .combine)
+    }
+
+    private var title: String {
+        session == .waiting
+            ? L("La misión aún no empieza", "The mission has not started")
+            : L("Sin sesión en el iPhone", "Not signed in on iPhone")
+    }
+
+    private var detail: String {
+        session == .waiting
+            ? L("El reloj se activa cuando Tierra la inicie.", "The watch turns on when Earth starts it.")
+            : L("Escanea tu QR en el iPhone para unirte.", "Scan your QR on the iPhone to join.")
     }
 }
 

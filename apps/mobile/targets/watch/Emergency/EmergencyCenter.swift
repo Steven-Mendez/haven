@@ -130,6 +130,10 @@ final class EmergencyCenter {
             log.error("send(\(origin.rawValue, privacy: .public)) before start(bridge:)")
             return
         }
+        guard bridge.missionSession == .active else {
+            log.info("Emergency \(origin.rawValue, privacy: .public) ignored: no active mission session")
+            return
+        }
         guard !bridge.isEmergencyActive else {
             log.info("Emergency \(origin.rawValue, privacy: .public) joins the one already open: nothing sent")
             return
@@ -212,6 +216,7 @@ final class EmergencyCenter {
             return
         }
         guard bridge?.isEmergencyActive != true, pendingTrigger == nil else { return }
+        guard testOnly || bridge?.missionSession == .active else { return }
         if let until = snoozedUntil[origin], until > .now { return }
         log.info("Automatic trigger \(origin.rawValue, privacy: .public): 15 s countdown")
         pendingTrigger = PendingTrigger(origin: origin, detectedAt: .now, detail: detail, reading: reading)
@@ -223,9 +228,7 @@ final class EmergencyCenter {
             await HealthAccess.requestAuthorization()
             let recent = HKQuery.predicateForSamples(
                 withStart: .now.addingTimeInterval(-AutoTriggerThresholds.maxReadingAge), end: nil)
-            let types: [HKSampleType] = [
-                HealthAccess.heartRateType, HealthAccess.spo2Type, HealthAccess.irregularRhythmType,
-            ]
+            let types: [HKSampleType] = [HealthAccess.heartRateType, HealthAccess.spo2Type]
             for type in types {
                 let query = HKAnchoredObjectQuery(
                     type: type, predicate: recent, anchor: nil, limit: HKObjectQueryNoLimit
@@ -316,9 +319,9 @@ final class EmergencyCenter {
 }
 
 extension EmergencyPayload.Origin {
-    static let automatic: [Self] = [.heartRate, .spo2, .rhythm, .fall]
+    static let automatic: [Self] = [.heartRate, .spo2, .fall]
 
-    var isAvailable: Bool { self != .fall }
+    var isAvailable: Bool { self != .fall && self != .rhythm }
 
     var title: String {
         switch self {

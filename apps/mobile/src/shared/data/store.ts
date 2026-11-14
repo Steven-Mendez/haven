@@ -4,6 +4,7 @@ import {
   computeBaselines,
   evaluate,
   evaluateZones,
+  isTracked,
   type Level,
   type Mission,
   type Reading,
@@ -164,11 +165,16 @@ function scheduleEvaluation(): Promise<void> {
   return scheduledEvaluation;
 }
 
+function missionStarted(): boolean {
+  return mission.status !== 'planned' && mission.status !== 'scheduled';
+}
+
 function insert(items: Reading[]): Reading[] {
   const accepted: Reading[] = [];
+  if (ready && !missionStarted()) return accepted;
   const now = new Date().toISOString();
   for (const r of items) {
-    if (!r?.id || ids.has(r.id)) continue;
+    if (!r?.id || ids.has(r.id) || !isTracked(r.indicator)) continue;
     ids.add(r.id);
     accepted.push(r.takenAt > now ? { ...r, takenAt: now } : r);
   }
@@ -329,6 +335,7 @@ function levelOf(indicator: string): Level {
 export const store = {
   start,
   isReady: () => ready,
+  missionStarted,
   saveReading,
   saveReadings,
   removeReadings,

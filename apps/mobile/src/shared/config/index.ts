@@ -1,4 +1,4 @@
-import { type Config, loadConfig } from '@haven/core';
+import { type Config, loadConfig, rebaseConfig } from '@haven/core';
 import { useSyncExternalStore } from 'react';
 
 const base: Config = loadConfig();
@@ -22,7 +22,7 @@ export function activeConfig(): Config {
 }
 
 export function setActiveConfig(next: Config | null): void {
-  const value = next ?? base;
+  const value = next ? rebaseConfig(base, next) : base;
   if (value === active) return;
   active = value;
   for (const listener of [...listeners]) listener(active);

@@ -22,6 +22,8 @@ export type ReceivedPacket = Packet & {
 export type ZoneLevel = { zone: string; level: Level };
 export type ZoneProgress = { zone: string; progress: number };
 
+export const CREW_NOT_READY = 'Crew not ready';
+
 export type MissionStatus = 'planned' | 'scheduled' | 'active' | 'finished';
 
 export type MissionHeader = {
@@ -50,6 +52,7 @@ export type CrewCard = {
   name: string;
   hasWatch: boolean;
   role?: I18n;
+  joinedAt: string | null;
   lastDataAt: string | null;
   lastVisibleAt: string | null;
   noRecentData: boolean;
@@ -60,6 +63,14 @@ export type CrewCard = {
   zones: ZoneLevel[];
   alerts: Assessment[];
   lastPacket: { id: string; type: Packet['type']; visibleAt: string } | null;
+  emergency: OpenEmergency | null;
+};
+
+export type OpenEmergency = {
+  id: string;
+  visibleAt: string;
+  status: 'open' | 'unresponsive';
+  forOther?: boolean;
 };
 
 export type MissionSummary = {
@@ -86,8 +97,8 @@ export type AstronautResponse = {
   packets: ReceivedPacket[];
 };
 
-export type StoredMission = Mission & {
-  crew: (Mission['crew'][number] & { role?: I18n })[];
+export type StoredMission = Omit<Mission, 'crew'> & {
+  crew: (Mission['crew'][number] & { role?: I18n; joinedAt?: string })[];
   name: string;
   start: string;
   durationDays: number;

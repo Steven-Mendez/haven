@@ -7,8 +7,8 @@ export function createHealthKitProvider(): SourceProvider {
   const status: SourceStatus = {
     id: 'healthkit',
     state: 'unavailable',
-    indicators: ['steps', 'distance', 'floors'],
-    primary: ['steps', 'distance', 'floors'],
+    indicators: ['steps'],
+    primary: ['steps'],
     withData: [],
     reason: 'reasonIosOnly',
   };

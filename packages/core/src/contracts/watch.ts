@@ -2,12 +2,15 @@ import type { Level } from './assessment';
 
 export const WATCH_CONTRACT_VERSION = 1;
 
+export type WatchSession = 'active' | 'waiting' | 'signedOut';
+
 export type WatchMessages = {
   status: {
     overallLevel: Level;
     nextPending?: string;
     evaluatedAt: string;
     language?: 'es' | 'en';
+    session?: WatchSession;
   };
   mood: { score: 1 | 2 | 3 | 4 | 5; takenAt: string };
   emergency: {

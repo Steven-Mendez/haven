@@ -6,8 +6,8 @@ import {
   worstLevel,
 } from '@haven/core';
 
-export type EvaCategory = 'heart' | 'lungs' | 'cognition' | 'sleep';
-export const EVA_CATEGORIES: EvaCategory[] = ['heart', 'lungs', 'cognition', 'sleep'];
+export type EvaCategory = 'vitals' | 'cognition' | 'sleep' | 'environment';
+export const EVA_CATEGORIES: EvaCategory[] = ['vitals', 'cognition', 'sleep', 'environment'];
 
 export type EvaReadiness = 'fit' | 'review' | 'unfit' | 'no-data';
 
@@ -24,10 +24,10 @@ export type EvaRow = {
 export function categoryIndicators(config: Config): Record<EvaCategory, string[]> {
   const zone = (id: string) => config.zones.find((z) => z.id === id)?.indicators ?? [];
   return {
-    heart: zone('heart'),
-    lungs: zone('lungs'),
+    vitals: zone('vitals'),
     cognition: [...BATTERY_INDICATORS],
     sleep: ['sleep'],
+    environment: zone('environment'),
   };
 }
 

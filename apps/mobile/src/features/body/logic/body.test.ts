@@ -46,7 +46,7 @@ describe('activeAlerts', () => {
     ];
     const alerts = activeAlerts(list, config);
     expect(alerts.map((a) => a.indicator.id)).toEqual(['spo2', 'systolic-bp', 'glucose']);
-    expect(alerts[0]?.zone).toBe('lungs');
+    expect(alerts[0]?.zone).toBe('vitals');
     expect(hasRed(alerts)).toBe(true);
   });
 
@@ -60,27 +60,42 @@ describe('activeAlerts', () => {
 describe('zoneDetail', () => {
   it('lists the zone indicators with their level; missing assessments are pending', () => {
     const list = [assessment('heart-rate', 'amber')];
-    const detail = zoneDetail('heart', evaluateZones(list, config), list, config);
-    expect(detail?.zone.id).toBe('heart');
-    expect(detail?.indicators.map((i) => i.indicator.id)).toEqual(
-      config.zones.find((z) => z.id === 'heart')?.indicators,
-    );
+    const detail = zoneDetail('vitals', evaluateZones(list, config), list, config);
+    expect(detail?.zone.id).toBe('vitals');
+    expect(detail?.indicators.map((i) => i.indicator.id)).toEqual([
+      'heart-rate',
+      'systolic-bp',
+      'diastolic-bp',
+      'spo2',
+      'body-temperature',
+    ]);
     expect(detail?.indicators[0]?.level).toBe('amber');
     expect(detail?.indicators[1]?.level).toBe('pending');
     expect(detail?.indicators[1]?.assessment).toBeUndefined();
   });
 
+  it('never lists the untracked extras, even if an assessment for one arrives', () => {
+    const list = [assessment('solar-event', 'red')];
+    const detail = zoneDetail('environment', evaluateZones(list, config), list, config);
+    expect(detail?.indicators.map((i) => i.indicator.id)).toEqual([
+      'radiation-dose',
+      'cabin-pressure',
+    ]);
+    expect(detail?.level).toBe('pending');
+    expect(activeAlerts(list, config)).toEqual([]);
+  });
+
   it('a zone without data is pending, never green', () => {
-    const detail = zoneDetail('skin', [], [], config);
+    const detail = zoneDetail('environment', [], [], config);
     expect(detail?.level).toBe('pending');
     expect(detail?.indicators.every((i) => i.level === 'pending')).toBe(true);
   });
 
   it('returns undefined for an unknown zone and toggles selection', () => {
     expect(zoneDetail('tail', [], [], config)).toBeUndefined();
-    expect(toggleZone(undefined, 'heart')).toBe('heart');
-    expect(toggleZone('heart', 'heart')).toBeUndefined();
-    expect(toggleZone('heart', 'lungs')).toBe('lungs');
+    expect(toggleZone(undefined, 'vitals')).toBe('vitals');
+    expect(toggleZone('vitals', 'vitals')).toBeUndefined();
+    expect(toggleZone('vitals', 'mind')).toBe('mind');
   });
 });
 
@@ -98,15 +113,15 @@ describe('day ring is independent from health (M01 acceptance)', () => {
 
     const mark: Reading = {
       ...reading('daily-action', 'manual', false),
-      value: 'lungs',
+      value: 'environment',
       takenAt: now.toISOString(),
     };
     const after = [...before, mark];
     const assessmentsAfter = evaluate(after, config, 'transit', {}, [], now);
     const progressAfter = dailyProgress(after, config, now);
 
-    expect(progressBefore.find((p) => p.zone === 'lungs')?.progress).toBe(0);
-    expect(progressAfter.find((p) => p.zone === 'lungs')?.progress).toBe(1);
+    expect(progressBefore.find((p) => p.zone === 'environment')?.progress).toBe(0);
+    expect(progressAfter.find((p) => p.zone === 'environment')?.progress).toBe(1);
     expect(evaluateZones(assessmentsAfter, config)).toEqual(
       evaluateZones(assessmentsBefore, config),
     );
@@ -123,21 +138,21 @@ describe('zoneOrigins', () => {
       ['diastolic-bp', reading('diastolic-bp', 'manual', false)],
     ]);
     const origins = zoneOrigins(config, (id) => latest.get(id));
-    const heart = origins.find((o) => o.zone === 'heart');
-    expect(heart?.sources).toEqual(['watch', 'manual']);
-    expect(heart?.missing).toEqual(['hrv', 'heart-rhythm']);
-    const skin = origins.find((o) => o.zone === 'skin');
-    expect(skin?.sources).toEqual([]);
-    expect(skin?.missing.length).toBeGreaterThan(0);
+    const vitals = origins.find((o) => o.zone === 'vitals');
+    expect(vitals?.sources).toEqual(['watch', 'manual']);
+    expect(vitals?.missing).toEqual(['spo2', 'body-temperature']);
+    const environment = origins.find((o) => o.zone === 'environment');
+    expect(environment?.sources).toEqual([]);
+    expect(environment?.missing).toEqual(['radiation-dose', 'cabin-pressure']);
   });
 });
 
 describe('figure hit targets', () => {
-  it('gives Mind and Heart at least 48 pt, centred on their shapes', () => {
+  it('gives Mind and Vitals at least 48 pt, centred on their shapes', () => {
     const boxes = hitBoxes(300);
-    expect(boxes.map((b) => b.zone).sort()).toEqual(['heart', 'mind']);
+    expect(boxes.map((b) => b.zone).sort()).toEqual(['mind', 'vitals']);
     for (const b of boxes) expect(b.size).toBeGreaterThanOrEqual(48);
-    const heart = boxes.find((b) => b.zone === 'heart');
+    const heart = boxes.find((b) => b.zone === 'vitals');
     expect((heart?.left ?? 0) + 24).toBeCloseTo((146 * 300) / 440);
     expect(hitBoxes(300, 20)[0]?.size).toBe(48);
     expect(figureWidth(440)).toBe(240);

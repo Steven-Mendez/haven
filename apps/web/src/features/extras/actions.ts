@@ -5,6 +5,7 @@ import { refresh } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { setMission } from '@/components/haven/actions';
 import { getMissionCode } from '@/lib/mission';
+import { CREW_NOT_READY } from '@/server/types';
 import { templatePhases } from './logic/plan-options';
 import { applyEdit, engineCheck, parseNumber, type RulesEdit, validateEdit } from './logic/rules';
 import {
@@ -126,9 +127,11 @@ export async function renameMissionAction(
   return { failed: false };
 }
 
-export async function startMissionAction(code: string): Promise<{ failed: boolean }> {
+export async function startMissionAction(
+  code: string,
+): Promise<{ failed: boolean; notReady?: boolean }> {
   const result = await startMission(code);
-  if (!result.ok) return { failed: true };
+  if (!result.ok) return { failed: true, notReady: result.error === CREW_NOT_READY };
   refresh();
   return { failed: false };
 }

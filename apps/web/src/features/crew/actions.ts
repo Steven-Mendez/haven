@@ -1,6 +1,7 @@
 'use server';
 
 import { refresh } from 'next/cache';
+import { CREW_NOT_READY } from '@/server/types';
 import { addCrewMember, removeCrewMember, startMission, updateCrewMember } from './server';
 
 export type RosterFormState =
@@ -51,9 +52,11 @@ export async function removeCrewAction(mission: string, id: string): Promise<Ros
   return { status: 'ok', at: Date.now() };
 }
 
-export async function startMissionAction(mission: string): Promise<{ failed: boolean }> {
+export async function startMissionAction(
+  mission: string,
+): Promise<{ failed: boolean; notReady?: boolean }> {
   const result = await startMission(mission);
-  if (!result.ok) return { failed: true };
+  if (!result.ok) return { failed: true, notReady: result.error === CREW_NOT_READY };
   refresh();
   return { failed: false };
 }

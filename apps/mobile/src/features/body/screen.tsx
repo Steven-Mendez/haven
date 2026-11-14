@@ -91,6 +91,7 @@ const GREETING = {
 
 const ORIGIN_KEY = {
   ship: 'originShip',
+  phone: 'originPhone',
   manual: 'originManual',
   watch: 'originWatch',
   healthkit: 'originHealthkit',
@@ -138,7 +139,10 @@ export default function Screen() {
     [readings, assessments],
   );
   const done = countDone(progress);
-  const next = nextDailyAction(progress, zones, config);
+  const next = useMemo(
+    () => nextDailyAction(readings, progress, config, new Date()),
+    [readings, progress],
+  );
 
   const latest = useMemo(() => new Map(readings.map((r) => [r.indicator, r])), [readings]);
   const origins = useMemo(() => zoneOrigins(config, (id) => latest.get(id)), [latest]);
@@ -247,7 +251,7 @@ export default function Screen() {
           key: step.id,
           icon: 'measure',
           title: t.startMeasure,
-          detail: tr(step.next.zone.dailyAction.text),
+          detail: tr(step.next.label),
           onPress: () => openNext(step.next),
         };
       case 'sources':
@@ -462,7 +466,7 @@ export default function Screen() {
                   <Text className="text-muted-foreground text-caption font-medium uppercase">
                     {t.nextUp}
                   </Text>
-                  <Text className="text-body font-semibold">{tr(next.zone.dailyAction.text)}</Text>
+                  <Text className="text-body font-semibold">{tr(next.label)}</Text>
                 </View>
                 <Button
                   accessibilityRole="button"
@@ -483,7 +487,7 @@ export default function Screen() {
           <Button
             variant="ghost"
             accessibilityRole="button"
-            accessibilityLabel={`${format(h.ringSummary, { n: done })} ${t.openRoutine}`}
+            accessibilityLabel={`${format(h.ringSummary, { n: done, total: config.zones.length })} ${t.openRoutine}`}
             onPress={() => router.push('/routine')}
             className="active:bg-active h-auto justify-start gap-4 rounded-none px-4 py-3 sm:h-auto"
           >
@@ -498,7 +502,7 @@ export default function Screen() {
               />
               <View className="flex-1 gap-1">
                 <Text className="text-body-sm font-semibold tabular-nums">
-                  {format(t.dayOf, { n: done })} · {t.openRoutine}
+                  {format(t.dayOf, { n: done, total: config.zones.length })} · {t.openRoutine}
                 </Text>
                 <View className="flex-row items-center gap-1.5">
                   <RingSpark size={14} strokeWidth={2} />

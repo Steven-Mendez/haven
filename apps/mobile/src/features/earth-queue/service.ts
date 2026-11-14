@@ -1,12 +1,19 @@
-import type { Packet } from '@haven/core';
+import { dailyProgress, type Packet } from '@haven/core';
 import { randomUUID } from 'expo-crypto';
 import { addNetworkStateListener, getNetworkStateAsync } from 'expo-network';
 import { useSyncExternalStore } from 'react';
 import { AppState } from 'react-native';
+import { config } from '@/shared/config';
 import { registerQueueCounter, store } from '@/shared/data';
 import { db } from '@/shared/db';
 import { bus } from '@/shared/events';
-import { applyExclusions, type Exclusions, normalizeIncoming } from './logic/compose';
+import {
+  applyExclusions,
+  composeRoutinePacket,
+  DEFAULT_EXCLUSIONS,
+  type Exclusions,
+  normalizeIncoming,
+} from './logic/compose';
 import {
   applyOutcome,
   canSend,
@@ -27,6 +34,8 @@ const TICK_MS = 2_000;
 const REQUEST_TIMEOUT_MS = 10_000;
 const PROBE_MS = 15_000;
 const PROBE_TIMEOUT_MS = 5_000;
+const AUTO_SEND_MS = 60_000;
+const AUTO_SEND_AFTER_READING_MS = 20_000;
 
 let entries: QueueEntry[] = [];
 let snapshot: QueueEntry[] = [];
@@ -194,6 +203,66 @@ export function flush(): Promise<void> {
   return flushing;
 }
 
+let autoSignature = '';
+let autoPending: { id: string; readings: string[] } | undefined;
+let autoTimer: ReturnType<typeof setTimeout> | undefined;
+const autoSent = new Set<string>();
+
+async function autoSend(): Promise<void> {
+  const { joined, crewMember } = store.preferences();
+  const mission = store.mission();
+  if (!joined || !store.missionStarted() || mission.status === 'finished') return;
+
+  const previous = autoPending;
+  const entry = previous ? entries.find((e) => e.packet.id === previous.id) : undefined;
+  if (previous && entry?.status === 'sent') {
+    for (const id of previous.readings) autoSent.add(id);
+    autoPending = undefined;
+  }
+
+  const signature = [
+    mission.code,
+    crewMember,
+    store.version('readings'),
+    store.version('assessments'),
+    autoSent.size,
+  ].join('|');
+  if (signature === autoSignature) return;
+  if (previous && entry?.status === 'pending') {
+    if (sending.has(previous.id)) return;
+    await discard(previous.id);
+  }
+  autoPending = undefined;
+
+  const now = new Date();
+  const readings = store.readings();
+  const full = applyExclusions(
+    composeRoutinePacket({
+      id: randomUUID(),
+      mission,
+      crewMember,
+      assessments: store.assessments(),
+      readings,
+      dailyProgress: dailyProgress(readings, config, now),
+      now,
+    }),
+    DEFAULT_EXCLUSIONS,
+  );
+  const packet = { ...full, readings: full.readings.filter((r) => !autoSent.has(r.id)) };
+  autoSignature = signature;
+  if (packet.readings.length === 0 && packet.assessments.length === 0) return;
+  autoPending = { id: packet.id, readings: packet.readings.map((r) => r.id) };
+  await enqueue(packet);
+}
+
+function autoSendSoon() {
+  if (autoTimer) return;
+  autoTimer = setTimeout(() => {
+    autoTimer = undefined;
+    autoSend().catch((error) => console.warn('[earth-queue] automatic send failed', error));
+  }, AUTO_SEND_AFTER_READING_MS);
+}
+
 function fromBus(packet: Packet) {
   const normalized = normalizeIncoming(packet, {
     id: randomUUID(),
@@ -206,6 +275,9 @@ function fromBus(packet: Packet) {
 
 export async function resetQueue(): Promise<void> {
   generation++;
+  autoSignature = '';
+  autoPending = undefined;
+  autoSent.clear();
   entries = [];
   sending = new Set();
   sendingSnapshot = sending;
@@ -231,6 +303,7 @@ export async function startEarthQueue(): Promise<void> {
 
   bus.on('data:reset', () => void resetQueue());
 
+  bus.on('emergency:update', ({ packet }) => fromBus(packet));
   bus.on('emergency:close', ({ packet }) => fromBus(packet));
   bus.on('packet:enqueue', ({ packet }) => fromBus(packet));
   let wasDown = store.mission().linkDown;
@@ -267,6 +340,11 @@ export async function startEarthQueue(): Promise<void> {
     if (entries.some((e) => isDue(e, new Date()))) void flush();
   }, TICK_MS);
   setInterval(() => void probe(), PROBE_MS);
+  bus.on('reading:new', autoSendSoon);
+  setInterval(() => {
+    autoSend().catch((error) => console.warn('[earth-queue] automatic send failed', error));
+  }, AUTO_SEND_MS);
+  autoSendSoon();
   AppState.addEventListener('change', (state) => {
     if (state === 'active') void probe();
   });

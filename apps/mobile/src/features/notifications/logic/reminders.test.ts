@@ -19,7 +19,7 @@ const DEFAULT = 'expo.modules.notifications.actions.DEFAULT';
 
 const bp: ReminderTarget = {
   id: 'systolic-bp',
-  zone: 'heart',
+  zone: 'vitals',
   indicators: ['systolic-bp'],
   everyHours: 24,
   kind: 'indicator',
@@ -36,7 +36,7 @@ describe('reminderTargets', () => {
     expect(ids).not.toContain('routine');
     expect(ids).not.toContain('solar-event');
     const cognition = targets.find((t) => t.id === 'cognition');
-    expect(cognition).toMatchObject({ kind: 'screen', acceptsValue: false });
+    expect(cognition).toMatchObject({ kind: 'screen', acceptsValue: false, zone: 'performance' });
     expect(targets.find((t) => t.id === 'glucose')?.acceptsValue).toBe(true);
   });
 });

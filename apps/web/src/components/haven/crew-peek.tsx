@@ -150,8 +150,7 @@ function PeekBody({
   const t = havenTexts[lang];
   const level = crewDisplayLevel(member);
   const stale = member.noRecentData;
-  const packet = member.lastPacket;
-  const emergency = packet?.type === 'emergency' ? packet : null;
+  const emergency = member.emergency;
   const zones = [...member.zones].sort((a, b) => zonePos(a.zone) - zonePos(b.zone));
   const rings = crewRings(member);
   const age = member.lastDataAt

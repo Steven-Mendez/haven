@@ -5,9 +5,10 @@ import { nextDailyAction } from './next-action';
 
 const config = loadConfig();
 const next = nextDailyAction(
-  config.zones.map((z) => ({ zone: z.id, progress: 0 })),
   [],
+  config.zones.map((z) => ({ zone: z.id, progress: 0 })),
   config,
+  new Date('2026-11-01T12:00:00.000Z'),
 );
 const crew = [{ id: 'ana-ruiz' }, { id: 'leo-park' }];
 

@@ -32,10 +32,10 @@ import { getEvaReadiness } from '../server';
 const READINESS: EvaReadiness[] = ['fit', 'review', 'unfit', 'no-data'];
 
 const CATEGORY_TERM: Record<EvaCategory, string> = {
-  heart: 'heart',
-  lungs: 'lungs',
+  vitals: 'vitals',
   cognition: 'cognitive-battery',
   sleep: 'sleep',
+  environment: 'environment',
 };
 
 function readinessLabel(r: EvaReadiness, t: ExtrasTexts) {
@@ -43,7 +43,12 @@ function readinessLabel(r: EvaReadiness, t: ExtrasTexts) {
 }
 
 function categoryLabel(c: EvaCategory, t: ExtrasTexts) {
-  return { heart: t.catHeart, lungs: t.catLungs, cognition: t.catCognition, sleep: t.catSleep }[c];
+  return {
+    vitals: t.catVitals,
+    cognition: t.catCognition,
+    sleep: t.catSleep,
+    environment: t.catEnvironment,
+  }[c];
 }
 
 function reasonText(row: EvaRow, t: ExtrasTexts) {

@@ -100,7 +100,7 @@ function defaultTrend(options: TrendOption[]): string {
   return options.find((o) => o.id === 'heart-rate')?.id ?? options[0]?.id ?? '';
 }
 
-const PREFERRED_VITALS = ['heart-rate', 'spo2', 'systolic-bp', 'body-temperature', 'hrv'];
+const PREFERRED_VITALS = ['heart-rate', 'spo2', 'systolic-bp', 'body-temperature'];
 
 function vitalOptions(options: TrendOption[]): TrendOption[] {
   const rank = (o: TrendOption) => {

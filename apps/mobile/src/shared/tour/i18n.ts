@@ -11,9 +11,9 @@ export const tourTexts = defineTexts({
     nextTitle: 'Tu siguiente acción',
     nextBody:
       'Lo que toca ahora. Toca el botón para hacerlo: cada lectura le enseña a HAVEN qué es normal para ti.',
-    todayTitle: 'Rutina: tus acciones de hoy',
+    todayTitle: 'Rutina: una cosa a la vez',
     todayBody:
-      'Una acción por zona del cuerpo. Toca una para hacerla o marcarla como hecha; con todas, el día suma a tu racha.',
+      'Aquí aparece solo lo siguiente: primero los juegos, luego cómo te sientes y después los valores que hay que escribir.',
     checkinTitle: 'Rutina: cómo estás hoy',
     checkinBody:
       'Dos preguntas, ánimo y estrés. Contéstalas cada día: también son datos de tu salud.',
@@ -27,7 +27,7 @@ export const tourTexts = defineTexts({
     sosBody: 'Tócalo en una emergencia. Mantenlo 3 segundos para empezarla directamente.',
     alertsTitle: 'Para revisar',
     alertsBody: 'Indicadores fuera de tu rango. Toca uno para ver su evolución y qué hacer.',
-    figureTitle: 'Tu cuerpo por zonas',
+    figureTitle: 'Tu salud en cinco grupos',
     figureBody:
       'Cada zona toma el color de su peor indicador: verde en rango, ámbar revisar, rojo emergencia. Toca una para ver sus indicadores.',
     profileTitle: 'Tu perfil',
@@ -49,9 +49,9 @@ export const tourTexts = defineTexts({
     nextTitle: 'Your next action',
     nextBody:
       'What is due now. Tap the button to do it: each reading teaches HAVEN what is normal for you.',
-    todayTitle: 'Routine: your actions for today',
+    todayTitle: 'Routine: one thing at a time',
     todayBody:
-      'One action per body zone. Tap one to do it or mark it done; with all of them, the day adds to your streak.',
+      'Only the next thing shows here: first the games, then how you feel, then the values you type in.',
     checkinTitle: 'Routine: how you feel today',
     checkinBody: 'Two questions, mood and stress. Answer them every day: they are health data too.',
     trendsTitle: 'Trends',
@@ -64,7 +64,7 @@ export const tourTexts = defineTexts({
     sosBody: 'Tap it in an emergency. Hold it 3 seconds to start one right away.',
     alertsTitle: 'To check',
     alertsBody: 'Indicators outside your range. Tap one to see its trend and what to do.',
-    figureTitle: 'Your body by zone',
+    figureTitle: 'Your health in five groups',
     figureBody:
       'Each zone takes the colour of its worst indicator: green in range, amber check, red emergency. Tap one to see its indicators.',
     profileTitle: 'Your profile',

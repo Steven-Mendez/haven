@@ -12,7 +12,7 @@ import { Button } from '@/shared/components/ui/button';
 import { Icon } from '@/shared/components/ui/icon';
 import { Text } from '@/shared/components/ui/text';
 import { config } from '@/shared/config';
-import { store, useMission, usePreferences } from '@/shared/data';
+import { store, useMission, usePendingSends, usePreferences } from '@/shared/data';
 import { takeArmedEmergency } from '@/shared/emergency-arm';
 import { bus, useEvent } from '@/shared/events';
 import { useLanguage, useTexts } from '@/shared/i18n';
@@ -49,10 +49,16 @@ import {
   stepPhase,
   VITALS_STEP_IDS,
 } from './logic/protocol';
+import { type Response, responseOf, secondsLeft } from './logic/response';
 import { manualVitalReadings, type VitalId } from './logic/vitals';
 import { takeOrigin } from './origin';
 
-const DEFAULT_PROTOCOL = 'chest-pain';
+const SELF_PROTOCOL = 'self-sos';
+const HELPER_PROTOCOL = 'chest-pain';
+const UPDATE_DEBOUNCE_MS = 1_200;
+
+const findProtocol = (id?: string) => (id ? config.protocols.find((p) => p.id === id) : undefined);
+const clock = (date: Date) => date.toISOString().slice(11, 19);
 
 const ORIGIN_TEXT: Record<EmergencyOrigin, keyof EmergencyTexts> = {
   button: 'originButton',
@@ -76,11 +82,10 @@ export default function Screen() {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
   const params = useLocalSearchParams<{ protocol?: string; origin?: string }>();
+  const helper = useMemo(() => findProtocol(HELPER_PROTOCOL), []);
   const protocol = useMemo<Protocol | undefined>(
-    () =>
-      config.protocols.find((p) => p.id === (params.protocol ?? DEFAULT_PROTOCOL)) ??
-      config.protocols.find((p) => p.id === DEFAULT_PROTOCOL),
-    [params.protocol],
+    () => findProtocol(params.protocol) ?? findProtocol(SELF_PROTOCOL) ?? helper,
+    [params.protocol, helper],
   );
   if (!protocol) {
     return (
@@ -89,10 +94,24 @@ export default function Screen() {
       </View>
     );
   }
-  return <Episodes protocol={protocol} originParam={params.origin} />;
+  return (
+    <Episodes
+      protocol={protocol}
+      helper={protocol.id === SELF_PROTOCOL ? helper : undefined}
+      originParam={params.origin}
+    />
+  );
 }
 
-function Episodes({ protocol, originParam }: { protocol: Protocol; originParam?: string }) {
+function Episodes({
+  protocol,
+  helper,
+  originParam,
+}: {
+  protocol: Protocol;
+  helper?: Protocol;
+  originParam?: string;
+}) {
   const [episode, setEpisode] = useState<Episode>(() => firstEpisode(takeOrigin(originParam)));
   const [armed, setArmed] = useState<number | null>(() => (takeArmedEmergency() ? 1 : null));
   const [armedPending, setArmedPending] = useState(false);
@@ -119,6 +138,7 @@ function Episodes({ protocol, originParam }: { protocol: Protocol; originParam?:
     <Emergency
       key={episode.number}
       protocol={protocol}
+      helper={helper}
       origin={episode.origin}
       onPacketSent={() => setEpisode(markPacketSent)}
     />
@@ -126,11 +146,13 @@ function Episodes({ protocol, originParam }: { protocol: Protocol; originParam?:
 }
 
 function Emergency({
-  protocol,
+  protocol: own,
+  helper,
   origin,
   onPacketSent,
 }: {
   protocol: Protocol;
+  helper?: Protocol;
   origin: EmergencyOrigin;
   onPacketSent: () => void;
 }) {
@@ -144,9 +166,22 @@ function Emergency({
   const [crewAlerted] = useState(() =>
     watch.send(watch.envelope('crewHaptic', { message: format(t.crewMessage, { n: crewName }) })),
   );
+  const [helping, setHelping] = useState(false);
+  const protocol = helping && helper ? helper : own;
+  const self = own.id === SELF_PROTOCOL && !helping;
   const [run, setRun] = useState<ProtocolRun>(() =>
-    startRun(protocol, mission.environment, startedAt, crewAlerted ? AUTO_STEP_IDS : []),
+    startRun(own, mission.environment, startedAt, crewAlerted ? AUTO_STEP_IDS : []),
   );
+  const [status, setStatus] = useState<'open' | 'unresponsive'>('open');
+  const [ended, setEnded] = useState(false);
+  const [earlier, setEarlier] = useState<string[]>([]);
+  const [events, setEvents] = useState<string[]>([]);
+  const [response, setResponse] = useState<Response>('responding');
+  const [countdown, setCountdown] = useState(0);
+  const lastTouch = useRef(Date.now());
+  const firstUpdate = useRef(true);
+  const sentStatus = useRef(status);
+  const pending = usePendingSends();
   const [view, setView] = useState<'protocol' | 'packet'>('protocol');
   const [packetFrom, setPacketFrom] = useState<'step' | 'end'>('end');
   const [confirmEnd, setConfirmEnd] = useState(false);
@@ -188,7 +223,75 @@ function Emergency({
     if (crewAlerted) buzz('alert');
   }, []);
 
-  function buildPacket(currentNotes = notes, now = new Date()): Packet {
+  const stepSeconds = step?.seconds ?? 0;
+  const watching = self && !ended && view === 'protocol';
+
+  useEffect(() => {
+    if (!watching) {
+      setResponse('responding');
+      return;
+    }
+    const id = setInterval(() => {
+      const now = Date.now();
+      setResponse(responseOf(lastTouch.current, now, stepSeconds));
+      setCountdown(secondsLeft(lastTouch.current, now, stepSeconds));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [watching, stepSeconds]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reacts only to the response changing
+  useEffect(() => {
+    if (response === 'asking') {
+      buzz('alert');
+      say(t.stillThere);
+    }
+    if (response === 'unresponsive' && status !== 'unresponsive') {
+      setStatus('unresponsive');
+      setEvents((list) => [...list, `${clock(new Date())} · ${t.logUnresponsive}`]);
+      watch.send(
+        watch.envelope('crewHaptic', { message: format(t.crewUnresponsive, { n: crewName }) }),
+      );
+    }
+  }, [response]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: sends when the emergency itself changes
+  useEffect(() => {
+    if (ended) return;
+    const send = () => bus.emit('emergency:update', { packet: buildPacket() });
+    const urgent = firstUpdate.current || sentStatus.current !== status;
+    firstUpdate.current = false;
+    sentStatus.current = status;
+    if (urgent) {
+      send();
+      return;
+    }
+    const timer = setTimeout(send, UPDATE_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [ended, status, helping, visit, symptoms.length, vitalsCount, photos.length]);
+
+  function touched() {
+    lastTouch.current = Date.now();
+    if (response !== 'responding') setResponse('responding');
+    if (status === 'unresponsive') {
+      setStatus('open');
+      setEvents((list) => [...list, `${clock(new Date())} · ${t.logResponsive}`]);
+    }
+  }
+
+  function helpSomeone() {
+    if (!helper || helping) return;
+    const now = new Date();
+    setEarlier([...decisionLog(own, run, language), `${clock(now)} · ${t.logHelping}`]);
+    setRun(startRun(helper, mission.environment, now, crewAlerted ? AUTO_STEP_IDS : []));
+    setStatus('open');
+    setHelping(true);
+  }
+
+  function buildPacket(
+    currentNotes = notes,
+    now = new Date(),
+    packetStatus: 'open' | 'unresponsive' | 'closed' = ended ? 'closed' : status,
+  ): Packet {
     return buildEmergencyPacket({
       id: packetId,
       crewMember: preferences.crewMember,
@@ -199,14 +302,18 @@ function Emergency({
       startedAt,
       now,
       notes: currentNotes,
-      decisions: decisionLog(protocol, run, language),
+      decisions: [...earlier, ...decisionLog(protocol, run, language), ...events],
       originLabel: `${t.originLabel}: ${originText}`,
       photos,
+      status: packetStatus,
+      origin,
+      forOther: helping,
     });
   }
 
-  function enqueue(currentNotes = notes) {
-    const packet = buildPacket(currentNotes);
+  function enqueue(currentNotes = notes, final = false) {
+    const packet = buildPacket(currentNotes, new Date(), final || ended ? 'closed' : status);
+    if (final) setEnded(true);
     bus.emit('emergency:close', { packet });
     setQueued(packet);
     onPacketSent();
@@ -242,7 +349,7 @@ function Emergency({
 
   function endEmergency() {
     setConfirmEnd(false);
-    enqueue();
+    enqueue(notes, true);
     setPacketFrom('end');
     setView('packet');
     buzz('tap');
@@ -260,19 +367,7 @@ function Emergency({
   }
 
   function close() {
-    const watchData = store
-      .readings({ since: startedAt.toISOString() })
-      .some((r) => r.source === 'watch');
-    const used =
-      origin !== 'button' ||
-      watchData ||
-      run.visits.length > 1 ||
-      symptoms.length > 0 ||
-      photos.length > 0 ||
-      vitalsCount > 0;
-    if (!queued && used) enqueue();
-    else if (!queued)
-      watch.send(watch.envelope('emergencyEnd', { endedAt: new Date().toISOString() }));
+    if (!ended) enqueue(notes, true);
     if (router.canGoBack()) router.back();
     else router.replace('/');
   }
@@ -281,6 +376,7 @@ function Emergency({
     <View
       className="bg-background flex-1"
       style={{ paddingTop: top, paddingLeft: insets.left, paddingRight: insets.right }}
+      onTouchStart={touched}
     >
       <KeepAwake />
       <View className="gap-1 px-3 pt-1 pb-2">
@@ -301,6 +397,23 @@ function Emergency({
           }
         />
       </View>
+
+      {watching && (response !== 'responding' || status === 'unresponsive') ? (
+        <View
+          className="border-destructive mx-4 mb-2 gap-1 rounded-lg border px-4 py-3"
+          accessible
+          accessibilityLiveRegion="assertive"
+        >
+          <Text className="text-body font-semibold">
+            {status === 'unresponsive' ? t.unresponsive : t.stillThere}
+          </Text>
+          <Text className="text-muted-foreground text-caption">
+            {status === 'unresponsive'
+              ? t.unresponsiveDetail
+              : format(t.stillThereDetail, { n: countdown })}
+          </Text>
+        </View>
+      ) : null}
 
       <ScrollView
         ref={scroll}
@@ -366,6 +479,16 @@ function Emergency({
 
         {view === 'protocol' ? (
           <View className="gap-3">
+            {self && helper && step && !confirmEnd ? (
+              <Button
+                variant="outline"
+                onPress={helpSomeone}
+                accessibilityHint={t.helpingDetail}
+                className="min-h-touch h-auto rounded-full px-4"
+              >
+                <Text className="text-body-sm font-semibold">{t.helpingSomeone}</Text>
+              </Button>
+            ) : null}
             {confirmEnd ? (
               <InlineConfirm
                 title={t.endConfirm}
@@ -379,7 +502,14 @@ function Emergency({
             <View className="border-border flex-row items-center justify-between gap-2 border-t pt-3">
               <View className="flex-1" accessible accessibilityLiveRegion="polite">
                 <Text className="text-tertiary text-caption" numberOfLines={1}>
-                  {originText}
+                  {helping ? t.helpingActive : originText}
+                </Text>
+                <Text className="text-muted-foreground text-caption" numberOfLines={2}>
+                  {mission.linkDown
+                    ? t.earthQueued
+                    : pending > 0
+                      ? t.earthAlerting
+                      : t.earthAlerted}
                 </Text>
                 <Text className="text-muted-foreground text-caption" numberOfLines={2}>
                   {crewAlerted ? t.crewAlerted : t.crewAlertFailed}

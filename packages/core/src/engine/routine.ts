@@ -1,4 +1,4 @@
-import type { Config, Reading, Zone } from '../contracts';
+import type { Config, Reading, ReadingSource, Zone } from '../contracts';
 import { DAY_MS, dayKey, ms, numeric, previousDay } from './util';
 import { zoneIndicatorIds } from './zones';
 
@@ -15,6 +15,12 @@ export const ACTION_SCREENS: Record<string, readonly string[]> = {
   cognition: BATTERY_INDICATORS,
   wellbeing: WELLBEING_INDICATORS,
 };
+const AMBIENT_SOURCES: readonly ReadingSource[] = ['ship', 'phone'];
+
+export function isAmbientSource(source: ReadingSource): boolean {
+  return AMBIENT_SOURCES.includes(source);
+}
+
 const SHELTER_OPENS = new Set(['solar-event', 'radiation-shelter', 'shelter']);
 const SHELTER_SCALE = 2;
 
@@ -50,7 +56,7 @@ function zoneProgress(zone: Zone, todays: Reading[], config: Config): number {
   const opens = zone.dailyAction.opens;
   const has = (id: string) => todays.some((r) => r.indicator === id);
   const ids = zoneIndicatorIds(config, zone.id);
-  if (SHELTER_OPENS.has(opens) || (opens === 'routine' && ids.has('solar-event'))) {
+  if (SHELTER_OPENS.has(opens)) {
     const last = todays
       .filter((r) => r.indicator === 'solar-event')
       .sort((a, b) => ms(a.takenAt) - ms(b.takenAt))
@@ -70,7 +76,7 @@ function zoneProgress(zone: Zone, todays: Reading[], config: Config): number {
   const screen = ACTION_SCREENS[opens];
   if (screen) return screen.filter(has).length / screen.length;
   if (opens === 'routine') return 0;
-  return todays.some((r) => ids.has(r.indicator) && r.source !== 'ship') ? 1 : 0;
+  return todays.some((r) => ids.has(r.indicator) && !isAmbientSource(r.source)) ? 1 : 0;
 }
 
 export function actionsDone(progress: ZoneProgress[]): number {

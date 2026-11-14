@@ -1,5 +1,5 @@
 import 'server-only';
-import type { Config } from '@haven/core';
+import { type Config, rebaseConfig } from '@haven/core';
 import { connection } from 'next/server';
 import { baseConfig } from '@/server/model';
 import {
@@ -104,7 +104,7 @@ export async function getCurrentConfig(
   const list = versions ?? (await listRules(mission)).versions;
   const latest = list.find((v) => isFullConfig(v.config)) ?? null;
   return latest
-    ? { config: latest.config as unknown as Config, fromVersion: latest }
+    ? { config: rebaseConfig(baseConfig(), latest.config), fromVersion: latest }
     : { config: baseConfig(), fromVersion: null };
 }
 

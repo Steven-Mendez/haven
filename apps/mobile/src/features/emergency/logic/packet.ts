@@ -1,5 +1,6 @@
 import {
   type Assessment,
+  type EmergencyStatus,
   type Packet,
   type Reading,
   SYMPTOM_INDICATOR,
@@ -88,6 +89,9 @@ export type PacketInput = {
   originLabel?: string;
   photos: Photo[];
   ecg?: Packet['ecg'];
+  status?: EmergencyStatus;
+  origin?: EmergencyOrigin;
+  forOther?: boolean;
 };
 
 export function buildEmergencyPacket(input: PacketInput): Packet {
@@ -114,6 +118,15 @@ export function buildEmergencyPacket(input: PacketInput): Packet {
     notes,
     photos: input.photos.length > 0 ? input.photos : undefined,
     ecg: input.ecg && input.ecg.microvolts.length > 0 ? input.ecg : undefined,
+    emergency: input.status
+      ? {
+          id: input.id,
+          status: input.status,
+          startedAt: input.startedAt.toISOString(),
+          ...(input.origin ? { origin: input.origin } : {}),
+          ...(input.forOther ? { forOther: true } : {}),
+        }
+      : undefined,
     mission: input.missionCode,
     createdAt: input.startedAt.toISOString(),
     sentAt,

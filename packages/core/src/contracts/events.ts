@@ -9,9 +9,11 @@ export type HavenEvents = {
   'emergency:open': {
     origin: WatchMessages['emergency']['origin'] | 'notification' | 'assessment';
   };
+  'emergency:update': { packet: Packet };
   'emergency:close': { packet: Packet };
   'packet:enqueue': { packet: Packet };
   'packet:queued': Packet;
   'mission:changed': Mission;
   'data:reset': Record<string, never>;
+  'session:signout': Record<string, never>;
 };

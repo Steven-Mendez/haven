@@ -1,4 +1,4 @@
-import type { Reading } from '@haven/core';
+import { isTracked, type Reading } from '@haven/core';
 import { Platform } from 'react-native';
 import { dailyTotalReading, type SourceStatus, sleepNights } from '../logic/sources';
 import { planTestSamples, TEST_QUANTITY_TYPES, TEST_SLEEP_TYPE } from '../logic/test-samples';
@@ -17,7 +17,7 @@ type Mapping = {
   scale?: number;
 };
 
-export const HEALTHKIT_MAPPINGS: Mapping[] = [
+const ALL_MAPPINGS: Mapping[] = [
   {
     indicator: 'steps',
     type: 'HKQuantityTypeIdentifierStepCount',
@@ -101,7 +101,9 @@ export const HEALTHKIT_MAPPINGS: Mapping[] = [
   },
 ];
 
-const PRIMARY = ['steps', 'distance', 'floors'];
+export const HEALTHKIT_MAPPINGS: Mapping[] = ALL_MAPPINGS.filter((m) => isTracked(m.indicator));
+
+const PRIMARY = ['steps'];
 const SLEEP_TYPE = 'HKCategoryTypeIdentifierSleepAnalysis' as const;
 const INDICATORS = [...HEALTHKIT_MAPPINGS.map((m) => m.indicator), 'sleep'];
 const TO_READ = [...HEALTHKIT_MAPPINGS.map((m) => m.type), SLEEP_TYPE];

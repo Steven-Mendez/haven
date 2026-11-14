@@ -1,27 +1,23 @@
 {
   "id": "solar-storm",
   "name": {
-    "es": "Tormenta solar: de S1 a S2",
-    "en": "Solar storm: from S1 to S2"
+    "es": "Tormenta solar: la dosis se dispara",
+    "en": "Solar storm: the dose spikes"
   },
   "durationMin": 10,
   "sources": [
-    "Escala NOAA S1–S5 (https://www.spaceweather.gov/noaa-scales-explanation). Refugio desde S2, actividad exterior hasta <10 pfu y dosis de referencia en tránsito: valores iniciales de P01, referencia provisional. Límite de carrera de 600 mSv: NASA-STD-3001 Vol. 1 (https://www.nasa.gov/wp-content/uploads/2023/11/nasa-std-3001-vol-1-rev-c-with-signature.pdf). Evolución de la dosis escrita como dato de prueba."
+    "Presupuesto de 25 mSv por evento y dosis de referencia en tránsito: valores iniciales de P01, referencia provisional. Límite de carrera de 600 mSv: NASA-STD-3001 Vol. 1 (https://www.nasa.gov/wp-content/uploads/2023/11/nasa-std-3001-vol-1-rev-c-with-signature.pdf). Evolución de la dosis escrita como dato de prueba."
   ],
   "series": [
     {
-      "indicator": "solar-event",
-      "points": [[0, 0], [1, 1], [4, 2], [10, 2]]
-    },
-    {
       "indicator": "radiation-dose",
-      "points": [[0, 1.6], [2, 1.7], [4, 2.6], [6, 4.1], [8, 5.8], [10, 7.2]]
+      "points": [[0, 1.6], [2, 1.9], [4, 6.5], [6, 14], [8, 22], [10, 28]]
     }
   ],
   "events": [],
   "expected": [
     {
-      "zone": "skin",
+      "zone": "environment",
       "level": "red"
     }
   ]

@@ -48,12 +48,12 @@ export function crewMemberLevel(member: Pick<CrewCard, 'noRecentData' | 'zones'>
   return member.noRecentData ? ('no-data' as const) : worstLevel(member.zones.map((z) => z.level));
 }
 
-export function hasOpenEmergency(member: Pick<CrewCard, 'noRecentData' | 'lastPacket'>) {
-  return !member.noRecentData && member.lastPacket?.type === 'emergency';
+export function hasOpenEmergency(member: Pick<CrewCard, 'noRecentData' | 'emergency'>) {
+  return !member.noRecentData && member.emergency !== null;
 }
 
 export function crewDisplayLevel(
-  member: Pick<CrewCard, 'noRecentData' | 'zones' | 'lastPacket'>,
+  member: Pick<CrewCard, 'noRecentData' | 'zones' | 'emergency'>,
 ): VisualLevel {
   return hasOpenEmergency(member) ? 'red' : crewMemberLevel(member);
 }

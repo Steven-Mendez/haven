@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { loadConfig } from '../config';
+import { isTracked, loadConfig } from '../config';
 import {
   computeBaseline,
   computeBaselines,
@@ -31,9 +31,9 @@ describe('demoHistory', () => {
     expect(
       a.every((r) => r.takenAt > new Date(now.getTime() - 30 * 86_400_000).toISOString()),
     ).toBe(true);
-    expect(a.filter((r) => r.indicator === 'cabin-co2').every((r) => r.source === 'ship')).toBe(
-      true,
-    );
+    expect(
+      a.filter((r) => r.indicator === 'cabin-pressure').every((r) => r.source === 'phone'),
+    ).toBe(true);
     expect(a.filter((r) => r.indicator === 'sleep').every((r) => r.source === 'watch')).toBe(true);
     expect(demoHistory('elena-vega', now, { config })).not.toEqual(a);
   });
@@ -44,40 +44,31 @@ describe('demoHistory', () => {
       new Set(a.filter((r) => r.indicator === id).map((r) => r.source));
     const expected: Record<string, string> = {
       'heart-rate': 'watch',
-      hrv: 'watch',
       sleep: 'watch',
       spo2: 'watch',
-      'wrist-temperature': 'watch',
       steps: 'healthkit',
-      distance: 'healthkit',
-      floors: 'healthkit',
       'systolic-bp': 'manual',
       'diastolic-bp': 'manual',
       glucose: 'manual',
-      weight: 'manual',
       'body-temperature': 'manual',
       'food-intake': 'manual',
       'resistance-exercise': 'manual',
-      'bone-loss': 'manual',
       'reaction-time': 'screen',
       'pvt-lapses': 'screen',
       'working-memory': 'screen',
       'go-nogo-accuracy': 'screen',
       mood: 'screen',
       stress: 'screen',
-      'cabin-co2': 'ship',
-      'cabin-noise': 'ship',
-      'radiation-dose': 'ship',
-      'solar-event': 'ship',
+      'radiation-dose': 'manual',
+      'cabin-pressure': 'phone',
+      hydration: 'manual',
       'daily-action': 'screen',
     };
     for (const [id, source] of Object.entries(expected)) {
       expect([...sourceOf(id)], id).toEqual([source]);
     }
     expect(a.some((r) => (r.source as string) === 'simulator')).toBe(false);
-    expect(
-      a.filter((r) => r.indicator === 'cabin-co2').every((r) => r.note?.startsWith('module:')),
-    ).toBe(true);
+    expect(a.some((r) => !isTracked(r.indicator))).toBe(false);
   });
 
   it('series are coherent over 30 days', () => {
@@ -85,10 +76,8 @@ describe('demoHistory', () => {
     const sleep = values(rs, 'sleep');
     expect(sleep.length).toBeGreaterThanOrEqual(29);
     expect(Math.max(...sleep) - Math.min(...sleep)).toBeLessThanOrEqual(0.61);
-    const bone = values(rs, 'bone-loss');
-    expect(bone.at(-1) as number).toBeGreaterThan(bone[0] as number);
-    const hrv = computeBaseline(rs, 'hrv');
-    expect((hrv?.range[1] ?? 0) - (hrv?.range[0] ?? 0)).toBeLessThan(12);
+    const hr = computeBaseline(rs, 'heart-rate');
+    expect((hr?.range[1] ?? 0) - (hr?.range[0] ?? 0)).toBeLessThan(20);
     expect(new Set(values(rs, 'mood'))).toEqual(new Set([4, 5]));
   });
 

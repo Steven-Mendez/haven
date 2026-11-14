@@ -8,6 +8,7 @@ import {
   addCrewMember as queryAddCrewMember,
   getCrew as queryCrew,
   receivePacket as queryReceivePacket,
+  recordCrewSession as queryRecordCrewSession,
   removeCrewMember as queryRemoveCrewMember,
   startMission as queryStartMission,
   updateCrewMember as queryUpdateCrewMember,
@@ -72,4 +73,9 @@ export function joinQrSvg(link: string): Promise<string> {
 export async function startMission(mission: string) {
   await connection();
   return queryStartMission(mission);
+}
+
+export async function recordCrewSession(body: unknown) {
+  await connection();
+  return queryRecordCrewSession(body);
 }

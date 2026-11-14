@@ -18,6 +18,7 @@ export async function rosterOf(
         name: m.name,
         ...(m.role ? { role: translate(m.role, lang) } : {}),
         waiting: m.lastPacket === null,
+        signedIn: m.joinedAt !== null,
         lastPacketAt: m.lastDataAt,
         hasWatch: m.hasWatch,
         invite: { link, qr: await joinQrSvg(link) },

@@ -1,6 +1,13 @@
 import type { Reading, ReadingSource } from '@haven/core';
 
-export type SourceId = 'healthkit' | 'pedometer' | 'healthconnect' | 'ble' | 'watch' | 'manual';
+export type SourceId =
+  | 'healthkit'
+  | 'pedometer'
+  | 'barometer'
+  | 'healthconnect'
+  | 'ble'
+  | 'watch'
+  | 'manual';
 
 export type SourceState = 'connected' | 'needsPermission' | 'denied' | 'unavailable' | 'inactive';
 
@@ -17,6 +24,7 @@ export type SourceStatus = {
 export const REAL_PRIORITY: SourceId[] = [
   'healthkit',
   'pedometer',
+  'barometer',
   'healthconnect',
   'ble',
   'watch',

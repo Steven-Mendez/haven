@@ -2,6 +2,15 @@ import { defineTexts } from '@/shared/i18n';
 
 export const texts = defineTexts({
   es: {
+    session: 'Sesión',
+    mission: 'Misión',
+    profile: 'Perfil',
+    signOut: 'Cerrar sesión',
+    signOutHint: 'Para entrar con otro QR o con el mismo. Al terminar la misión se cierra sola.',
+    signOutTitle: '¿Cerrar sesión?',
+    signOutDescription:
+      'Sales de la misión {mission} como {name}. Para volver necesitas tu QR o el enlace de invitación.',
+    signOutConfirm: 'Cerrar sesión',
     general: 'General',
     language: 'Idioma',
     appearance: 'Apariencia',
@@ -17,7 +26,8 @@ export const texts = defineTexts({
     linkStatus: 'Estado del enlace',
     linkUp: 'Con enlace',
     linkDown: 'Sin enlace',
-    linkDownHint: 'Se detecta solo. Sin enlace, lo que envías se guarda y sale solo cuando vuelve.',
+    linkDownHint:
+      'Tus datos se envían solos a Tierra, más o menos cada minuto. Sin enlace se guardan y salen cuando vuelve.',
     queue: 'Envíos pendientes',
     queued: '{n}',
     nothingQueued: 'Ninguno',
@@ -40,6 +50,16 @@ export const texts = defineTexts({
     credits: 'NASA Space Apps 2026 · equipo CODA',
   },
   en: {
+    session: 'Session',
+    mission: 'Mission',
+    profile: 'Profile',
+    signOut: 'Sign out',
+    signOutHint:
+      'To join with another QR or the same one. It closes by itself when the mission ends.',
+    signOutTitle: 'Sign out?',
+    signOutDescription:
+      'You leave mission {mission} as {name}. To come back you need your QR or the invitation link.',
+    signOutConfirm: 'Sign out',
     general: 'General',
     language: 'Language',
     appearance: 'Appearance',
@@ -56,7 +76,7 @@ export const texts = defineTexts({
     linkUp: 'Link up',
     linkDown: 'No link',
     linkDownHint:
-      'Detected automatically. Without a link, what you send is kept and leaves on its own when it is back.',
+      'Your data goes to Earth by itself, about every minute. With no link it is kept and leaves when the link returns.',
     queue: 'Pending sends',
     queued: '{n}',
     nothingQueued: 'None',

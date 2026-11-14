@@ -9,6 +9,7 @@ export const texts = defineTexts({
     indicatorsSection: 'Fuente por indicador',
     healthkit: 'Apple Salud (HealthKit)',
     pedometer: 'Podómetro del teléfono',
+    barometer: 'Barómetro del teléfono',
     healthconnect: 'Health Connect',
     ble: 'Dispositivos Bluetooth',
     watch: 'Apple Watch',
@@ -29,6 +30,7 @@ export const texts = defineTexts({
       'Apple Salud no entrega pasos, distancia ni pisos: puede que el permiso esté denegado.',
     reasonPedometerAndroid: 'En Android solo cuenta pasos con la app abierta.',
     reasonNoSensor: 'Este dispositivo no tiene sensor de pasos.',
+    reasonNoBarometer: 'Este dispositivo no tiene barómetro. Registra la presión de cabina a mano.',
     reasonMotionDenied: 'Negaste el acceso a Movimiento y forma física.',
     reasonHealthConnect: 'No está instalado en esta versión. Usa el registro manual.',
     reasonBle: 'No está instalado en esta versión. Registra presión y glucosa a mano.',
@@ -42,7 +44,7 @@ export const texts = defineTexts({
     devWrite: 'Escribir muestras de prueba',
     devWriting: 'Escribiendo…',
     devNote:
-      'Escribe 7 días de pasos, distancia, pisos, frecuencia cardíaca, VFC, sueño y SpO₂ en el HealthKit de este dispositivo.',
+      'Escribe 7 días de pasos, frecuencia cardíaca, sueño y SpO₂ en el HealthKit de este dispositivo.',
     devWritten: '{n} muestras escritas en HealthKit.',
   },
   en: {
@@ -54,6 +56,7 @@ export const texts = defineTexts({
     indicatorsSection: 'Source per indicator',
     healthkit: 'Apple Health (HealthKit)',
     pedometer: 'Phone pedometer',
+    barometer: 'Phone barometer',
     healthconnect: 'Health Connect',
     ble: 'Bluetooth devices',
     watch: 'Apple Watch',
@@ -74,6 +77,7 @@ export const texts = defineTexts({
       'Apple Health returns no steps, distance or floors: the permission may be denied.',
     reasonPedometerAndroid: 'On Android it only counts steps while the app is open.',
     reasonNoSensor: 'This device has no step sensor.',
+    reasonNoBarometer: 'This device has no barometer. Enter cabin pressure by hand.',
     reasonMotionDenied: 'You denied access to Motion & Fitness.',
     reasonHealthConnect: 'Not installed in this build. Use manual entry.',
     reasonBle: 'Not installed in this build. Enter blood pressure and glucose by hand.',
@@ -86,8 +90,7 @@ export const texts = defineTexts({
     devSection: 'Development',
     devWrite: 'Write test samples',
     devWriting: 'Writing…',
-    devNote:
-      'Writes 7 days of steps, distance, floors, heart rate, HRV, sleep and SpO₂ into this device’s HealthKit.',
+    devNote: 'Writes 7 days of steps, heart rate, sleep and SpO₂ into this device’s HealthKit.',
     devWritten: '{n} samples written to HealthKit.',
   },
 });

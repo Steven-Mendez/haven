@@ -5,6 +5,7 @@ import { bus } from '@/shared/events';
 import { registerProvider } from '@/shared/health';
 import { dedupe, isSameSample } from './logic/dedupe';
 import type { SourceId, SourceStatus } from './logic/sources';
+import { createBarometerProvider } from './providers/barometer';
 import { createHealthKitProvider } from './providers/healthkit';
 import { createPedometerProvider } from './providers/pedometer';
 import type { SourceProvider } from './providers/types';
@@ -15,9 +16,11 @@ const CHANGE_DEBOUNCE_MS = 5_000;
 
 const healthkit = createHealthKitProvider();
 const pedometer = createPedometerProvider();
+const barometer = createBarometerProvider();
 const providers: SourceProvider[] = [
   healthkit,
   pedometer,
+  barometer,
   createHealthConnectProvider(),
   createBleProvider(),
 ];
@@ -59,6 +62,7 @@ export function syncNow(): Promise<void> {
       if (!healthkit.status().withData.includes('steps')) {
         await save((await pedometer.sync?.(crewMember, now)) ?? []);
       }
+      await save((await barometer.sync?.(crewMember, now)) ?? []);
     } catch (error) {
       console.warn('[health-sources] sync failed', error);
     } finally {

@@ -16,7 +16,7 @@ import { appliedRule, indicatorForEnvironment, ruleConditions } from './rule';
 import { categoriesOf, chartPoints, chartValue, rangeDomain } from './series';
 import { parseSource } from './sources';
 
-const config = loadConfig();
+const config = loadConfig({ includeExtras: true });
 const byId = (id: string) => config.indicators.find((i) => i.id === id) as Indicator;
 const now = new Date('2026-11-01T12:00:00.000Z');
 
@@ -60,8 +60,8 @@ describe('manual entry', () => {
   });
 
   it('knows which zone has the indicator as its daily action', () => {
-    expect(dailyActionZone(config, 'systolic-bp')).toBe('heart');
-    expect(dailyActionZone(config, 'diastolic-bp')).toBe('heart');
+    expect(dailyActionZone(config, 'systolic-bp')).toBe('vitals');
+    expect(dailyActionZone(config, 'diastolic-bp')).toBe('vitals');
     expect(dailyActionZone(config, 'spo2')).toBeUndefined();
   });
 

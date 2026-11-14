@@ -70,7 +70,7 @@ describe('simulatedEcg', () => {
 });
 
 describe('SimulatorProvider.latestSimulatedEcg', () => {
-  it('uses the active scenario rhythm and heart rate', () => {
+  it('follows the scenario heart rate; the untracked rhythm is ignored', () => {
     const queue: (() => void)[] = [];
     const timers: Timers = {
       setTimeout: (fn) => queue.push(fn),
@@ -116,7 +116,7 @@ describe('SimulatorProvider.latestSimulatedEcg', () => {
     while (queue.length > 0) queue.shift()?.();
     const peaks = rPeaks(sim.latestSimulatedEcg({ seconds: 20 }));
     expect(peaks.length).toBeGreaterThan(40);
-    expect(cv(intervals(peaks))).toBeGreaterThan(0.12);
+    expect(cv(intervals(peaks))).toBeLessThan(0.12);
     expect(sim.latestSimulatedEcg()).toEqual(sim.latestSimulatedEcg());
   });
 });

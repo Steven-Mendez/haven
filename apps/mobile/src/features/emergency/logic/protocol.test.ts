@@ -187,3 +187,30 @@ describe('state machine', () => {
     expect(decisionLog(chestPain, run, 'en')[2]).toContain('→ Not breathing or only gasping');
   });
 });
+
+describe('self SOS protocol', () => {
+  const selfSos = loadConfig().protocols.find((p) => p.id === 'self-sos') as Protocol;
+
+  it('starts by asking the astronaut what is wrong and reaches the packet', () => {
+    let run = startRun(selfSos, 'transit', new Date('2026-01-01T00:00:00Z'));
+    expect(currentStep(selfSos, run)?.id).toBe('symptom-check');
+    const seen: string[] = [];
+    for (let i = 0; i < 10 && currentStep(selfSos, run); i++) {
+      const step = currentStep(selfSos, run);
+      seen.push(step?.id ?? '');
+      run = advance(selfSos, run, new Date('2026-01-01T00:01:00Z'), step?.options ? 0 : undefined);
+    }
+    expect(seen).toContain('measure-vitals');
+    expect(seen).toContain('earth-packet');
+  });
+
+  it('getting worse loops back to the status question', () => {
+    let run = startRun(selfSos, 'transit', new Date('2026-01-01T00:00:00Z'));
+    while (currentStep(selfSos, run)?.id !== 'self-status')
+      run = advance(selfSos, run, new Date('2026-01-01T00:01:00Z'));
+    run = advance(selfSos, run, new Date('2026-01-01T00:02:00Z'), 1);
+    expect(currentStep(selfSos, run)?.id).toBe('self-worse');
+    run = advance(selfSos, run, new Date('2026-01-01T00:03:00Z'));
+    expect(currentStep(selfSos, run)?.id).toBe('self-status');
+  });
+});

@@ -2,6 +2,7 @@ import {
   type Assessment,
   type Config,
   evaluateZones,
+  isTracked,
   type Level,
   loadConfig,
   missionDays,
@@ -16,6 +17,7 @@ import type {
   MissionHeader,
   MissionStatus,
   MissionSummary,
+  OpenEmergency,
   ReceivedPacket,
   RulesVersion,
   StoredMission,
@@ -82,6 +84,10 @@ export function validatePacket(
   const sentAt = (body.sentAt as string | undefined) ?? new Date().toISOString();
   const packet = {
     ...body,
+    assessments: (body.assessments as Packet['assessments']).filter((a) => isTracked(a.indicator)),
+    readings: (body.readings as Packet['readings']).filter(
+      (r) => !isObject(r) || !isText(r.indicator) || isTracked(r.indicator),
+    ),
     notes: (body.notes as string | undefined) ?? '',
     createdAt: (body.createdAt as string | undefined) ?? sentAt,
     sentAt,
@@ -217,7 +223,10 @@ const byDataAtDesc = (a: { dataAt: string }, b: { dataAt: string }) =>
 export function currentAssessments(
   packets: Pick<PacketDoc, 'assessments' | 'dataAt'>[],
 ): Assessment[] {
-  const sorted = packets.filter((p) => p.assessments.length > 0).sort(byDataAtDesc);
+  const sorted = packets
+    .map((p) => ({ ...p, assessments: p.assessments.filter((a) => isTracked(a.indicator)) }))
+    .filter((p) => p.assessments.length > 0)
+    .sort(byDataAtDesc);
   const newest = sorted[0];
   if (!newest) return [];
   const since = Date.parse(newest.dataAt) - NO_RECENT_DATA_MS;
@@ -239,11 +248,57 @@ export function currentAssessments(
   return merged;
 }
 
+type EmergencyFields = Pick<PacketDoc, 'id' | 'type' | 'visibleAt' | 'receivedAt' | 'emergency'>;
+
+export function emergencyKey(packet: Pick<PacketDoc, 'id' | 'emergency'>): string {
+  return packet.emergency?.id ?? packet.id.replace(/~v\d+$/, '');
+}
+
+export function openEmergency(newestFirst: EmergencyFields[], now: Date): OpenEmergency | null {
+  const last = newestFirst
+    .filter((p) => p.type === 'emergency')
+    .sort((a, b) => b.receivedAt.localeCompare(a.receivedAt))[0];
+  if (!last) return null;
+  const info = last.emergency;
+  if (!info) {
+    const newest = newestFirst[0];
+    return newest?.type === 'emergency'
+      ? { id: newest.id, visibleAt: newest.visibleAt, status: 'open' }
+      : null;
+  }
+  if (info.status === 'closed') return null;
+  if (now.getTime() - Date.parse(last.receivedAt) > NO_RECENT_DATA_MS) return null;
+  return {
+    id: last.id,
+    visibleAt: last.visibleAt,
+    status: info.status,
+    ...(info.forOther ? { forOther: true } : {}),
+  };
+}
+
+export function latestEmergencyVersions<T extends EmergencyFields>(packets: T[]): T[] {
+  const latest = new Map<string, T>();
+  for (const p of packets) {
+    if (p.type !== 'emergency') continue;
+    const key = emergencyKey(p);
+    const current = latest.get(key);
+    if (!current || p.receivedAt > current.receivedAt) latest.set(key, p);
+  }
+  return packets.filter((p) => p.type !== 'emergency' || latest.get(emergencyKey(p)) === p);
+}
+
 export function crewCard(
   member: CrewEntry,
   visible: Pick<
     PacketDoc,
-    'id' | 'type' | 'assessments' | 'dailyProgress' | 'dataAt' | 'visibleAt'
+    | 'id'
+    | 'type'
+    | 'assessments'
+    | 'dailyProgress'
+    | 'dataAt'
+    | 'visibleAt'
+    | 'receivedAt'
+    | 'emergency'
   >[],
   now: Date,
   config: Config = baseConfig(),
@@ -269,16 +324,18 @@ export function crewCard(
     name: member.name,
     hasWatch: member.hasWatch,
     ...(role ? { role } : {}),
+    joinedAt: member.joinedAt ?? null,
     lastDataAt: latest?.dataAt ?? null,
     lastVisibleAt: latest?.visibleAt ?? null,
     noRecentData: !latest || now.getTime() - Date.parse(latest.dataAt) > NO_RECENT_DATA_MS,
     dailyProgress,
     dailyProgressAt: withProgress?.dataAt ?? null,
     actionsDone: (dailyProgress ?? []).filter((z) => z.progress >= 1).length,
-    actionsTotal: config.zones.length || dailyProgress?.length || 7,
+    actionsTotal: config.zones.length || dailyProgress?.length || 5,
     zones,
     alerts,
     lastPacket: latest ? { id: latest.id, type: latest.type, visibleAt: latest.visibleAt } : null,
+    emergency: openEmergency(sorted, now),
   };
 }
 

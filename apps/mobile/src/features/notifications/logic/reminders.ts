@@ -41,22 +41,34 @@ export function reminderTargets(config: Config): ReminderTarget[] {
       });
       continue;
     }
-    const screen = ACTION_SCREENS[opens];
-    if (!screen) continue;
-    const hours = screen
-      .map((id) => config.indicators.find((i) => i.id === id)?.everyHours)
-      .filter((h): h is number => typeof h === 'number');
-    if (hours.length === 0) continue;
-    out.push({
-      id: opens,
-      zone: zone.id,
-      indicators: [...screen],
-      everyHours: Math.min(...hours),
-      kind: 'screen',
-      acceptsValue: false,
-    });
+    const target = screenTarget(config, opens, zone.id);
+    if (target) out.push(target);
+  }
+  for (const screen of Object.keys(ACTION_SCREENS)) {
+    if (out.some((t) => t.id === screen)) continue;
+    const target = screenTarget(config, screen);
+    if (target) out.push(target);
   }
   return out;
+}
+
+function screenTarget(config: Config, id: string, zone?: string): ReminderTarget | undefined {
+  const screen = ACTION_SCREENS[id];
+  if (!screen) return undefined;
+  const listed = screen
+    .map((indicator) => config.indicators.find((i) => i.id === indicator))
+    .filter((i) => i !== undefined && !i.extra);
+  const hours = listed.map((i) => i?.everyHours).filter((h): h is number => typeof h === 'number');
+  const home = zone ?? listed[0]?.zone;
+  if (hours.length === 0 || !home) return undefined;
+  return {
+    id,
+    zone: home,
+    indicators: [...screen],
+    everyHours: Math.min(...hours),
+    kind: 'screen',
+    acceptsValue: false,
+  };
 }
 
 export type PlannedReminder = { target: ReminderTarget; at: string; overdue: boolean };

@@ -42,6 +42,11 @@ struct StatusPayload: WatchPayload, Equatable {
     let nextPending: String?
     let evaluatedAt: String
     let language: String?
+    var session: Session? = nil
+
+    enum Session: String, Codable {
+        case active, waiting, signedOut
+    }
 }
 
 struct MoodPayload: WatchPayload, Equatable {

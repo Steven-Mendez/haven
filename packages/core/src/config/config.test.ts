@@ -4,13 +4,16 @@ import {
   actionById,
   actions,
   DAILY_ACTION_SCREENS,
+  EXTRA_INDICATORS,
   explainTerm,
   glossary,
+  isTracked,
   loadConfig,
   missionDays,
   missionTemplates,
   phaseAt,
   phaseDelay,
+  rebaseConfig,
   SYMPTOM_INDICATOR,
   SYMPTOMS,
   symptomById,
@@ -55,7 +58,7 @@ function allRules(): { where: string; rule: Rule }[] {
 describe('loadConfig', () => {
   it('joins the files into a tree with a semver version', () => {
     expect(config.version).toMatch(/^\d+\.\d+\.\d+$/);
-    expect(config.zones).toHaveLength(7);
+    expect(config.zones).toHaveLength(5);
     expect(config.environments).toHaveLength(9);
   });
 
@@ -69,7 +72,7 @@ describe('loadConfig', () => {
 describe('zones', () => {
   it('uses the canonical ids', () => {
     expect([...zoneIds].sort()).toEqual(
-      ['heart', 'lungs', 'head', 'metabolism', 'musculoskeletal', 'skin', 'mind'].sort(),
+      ['vitals', 'mind', 'performance', 'metabolism', 'environment'].sort(),
     );
   });
 
@@ -108,6 +111,39 @@ describe('indicators', () => {
     expect(flagged.sort()).toEqual([...CHALLENGE_INDICATORS].sort());
   });
 
+  it('loads only the essential set; the extras stay in the file, unused', () => {
+    const EXTRAS = [
+      'hrv',
+      'heart-rhythm',
+      'wrist-temperature',
+      'visual-acuity',
+      'bone-loss',
+      'distance',
+      'floors',
+      'weight',
+      'cabin-co2',
+      'cabin-noise',
+      'solar-event',
+    ];
+    expect([...EXTRA_INDICATORS].sort()).toEqual([...EXTRAS].sort());
+    expect(config.indicators).toHaveLength(19);
+    for (const id of EXTRAS) {
+      expect(indicatorIds.has(id), id).toBe(false);
+      expect(isTracked(id), id).toBe(false);
+      expect(
+        config.zones.some((z) => z.indicators.includes(id)),
+        id,
+      ).toBe(false);
+    }
+    expect(isTracked('heart-rate')).toBe(true);
+    const full = loadConfig({ includeExtras: true });
+    expect(full.indicators).toHaveLength(30);
+    expect(full.indicators.find((i) => i.id === 'heart-rhythm')?.categoryLabels?.sinus).toEqual({
+      es: 'Sinusal',
+      en: 'Sinus',
+    });
+  });
+
   it('have valid green ranges, names, units and sources', () => {
     for (const i of config.indicators) {
       expectI18n(i.name, `${i.id}.name`);
@@ -140,10 +176,6 @@ describe('indicators', () => {
       ].flatMap((r) => r.categories ?? []);
       for (const c of used) expect(i.categoryLabels?.[c], `${i.id} → ${c}`).toBeDefined();
     }
-    expect(config.indicators.find((i) => i.id === 'heart-rhythm')?.categoryLabels?.sinus).toEqual({
-      es: 'Sinusal',
-      en: 'Sinus',
-    });
   });
 
   it('numeric indicators carry no category labels (symptom names live in symptoms.json)', () => {
@@ -334,9 +366,9 @@ describe('glossary', () => {
       short: glossary['systolic-bp']?.short.es,
       unitHint: glossary['systolic-bp']?.unitHint?.es,
     });
-    expect(explainTerm('heart', 'en')).toEqual({
-      term: 'Heart',
-      short: glossary.heart?.short.en,
+    expect(explainTerm('vitals', 'en')).toEqual({
+      term: 'Vital signs',
+      short: glossary.vitals?.short.en,
     });
     expect(explainTerm('does-not-exist', 'es')).toBeUndefined();
     expect(explainTerm('toString', 'en')).toBeUndefined();
@@ -539,7 +571,7 @@ describe('scenarios', () => {
     const v = scenarios.find((s) => s.id === 'video');
     expect(v?.events.some((e) => e.message === 'emergency')).toBe(true);
     expect(v?.events.filter((e) => e.message === 'monitor').length).toBeGreaterThan(5);
-    expect(v?.expected).toContainEqual({ zone: 'heart', level: 'red' });
+    expect(v?.expected).toContainEqual({ zone: 'vitals', level: 'red' });
   });
 });
 
@@ -579,5 +611,43 @@ describe('copy that must not depend on missing features', () => {
     for (const i of config.indicators) {
       for (const src of i.guide.sources) expect(src, i.id).not.toMatch(spanish);
     }
+  });
+});
+
+describe('rebaseConfig', () => {
+  const full = loadConfig({ includeExtras: true });
+  const old = {
+    ...full,
+    version: '1.0.1-earth.1',
+    zones: [{ ...full.zones[0], id: 'heart', indicators: ['heart-rate', 'hrv'] }],
+    indicators: full.indicators
+      .filter((i) => i.id !== 'hydration')
+      .map((i) => (i.id === 'heart-rate' ? { ...i, green: [55, 95] as [number, number] } : i)),
+  };
+  const rebased = rebaseConfig(config, old);
+
+  it('keeps the current zones and visible indicators', () => {
+    expect(rebased.zones).toEqual(config.zones);
+    expect(rebased.indicators.map((i) => i.id)).toEqual(config.indicators.map((i) => i.id));
+    expect(rebased.indicators.some((i) => EXTRA_INDICATORS.includes(i.id))).toBe(false);
+  });
+
+  it('applies the received thresholds and version', () => {
+    expect(rebased.version).toBe('1.0.1-earth.1');
+    expect(rebased.indicators.find((i) => i.id === 'heart-rate')?.green).toEqual([55, 95]);
+    expect(rebased.indicators.find((i) => i.id === 'hydration')).toEqual(
+      config.indicators.find((i) => i.id === 'hydration'),
+    );
+  });
+
+  it('ignores malformed input', () => {
+    expect(rebaseConfig(config, null)).toBe(config);
+    expect(rebaseConfig(config, { indicators: 'x' })).toBe(config);
+    const bad = rebaseConfig(config, {
+      indicators: [{ id: 'heart-rate', kind: 'number', green: [1] }],
+    });
+    expect(bad.indicators.find((i) => i.id === 'heart-rate')?.green).toEqual(
+      config.indicators.find((i) => i.id === 'heart-rate')?.green,
+    );
   });
 });

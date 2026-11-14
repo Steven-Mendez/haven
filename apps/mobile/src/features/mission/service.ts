@@ -1,6 +1,6 @@
 import { AppState } from 'react-native';
 import { bus } from '@/shared/events';
-import { syncCurrentMission } from './hooks/missions';
+import { signOut, syncCurrentMission } from './hooks/missions';
 
 const POLL_MS = 15_000;
 let started = false;
@@ -15,6 +15,9 @@ export function startMissionSync() {
   setInterval(sync, POLL_MS);
   AppState.addEventListener('change', (state) => {
     if (state === 'active') sync();
+  });
+  bus.on('session:signout', () => {
+    signOut().catch((error) => console.warn('[mission] sign out failed', error));
   });
   let linkDown: boolean | undefined;
   bus.on('mission:changed', (mission) => {

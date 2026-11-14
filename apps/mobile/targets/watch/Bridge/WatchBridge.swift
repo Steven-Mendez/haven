@@ -30,6 +30,8 @@ final class WatchBridge: NSObject {
     private(set) var isActivated = false
     private(set) var lastCrewHaptic: ReceivedCrewHaptic?
     private(set) var crewMember: String
+
+    var missionSession: StatusPayload.Session { status?.payload.session ?? .active }
     var mutesHaptics = false
     private(set) var isEmergencyActive = false
     private(set) var emergencyOrigin: EmergencyPayload.Origin?

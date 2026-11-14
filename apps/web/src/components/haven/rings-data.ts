@@ -6,7 +6,7 @@ export type RingDatum = { id: RingId; value: number; total: number };
 export const RING_ORDER: RingId[] = ['routine', 'measurements', 'wellbeing'];
 
 export const WELLBEING_ZONE = 'mind';
-const ZONES_TOTAL = 7;
+const ZONES_TOTAL = 5;
 
 export function crewRings(
   member: Pick<CrewCard, 'actionsDone' | 'actionsTotal' | 'zones' | 'dailyProgress'>,

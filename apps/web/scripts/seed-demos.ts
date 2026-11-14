@@ -185,8 +185,8 @@ const DEMOS: Record<string, { crew: Member[] }> = {
 
 const NOTES: Partial<Record<Story, string>> = {
   'sleep-debt': 'Llevo varias noches durmiendo mal y me cuesta concentrarme en las pruebas.',
-  'cabin-air': 'El módulo de descanso se siente cargado y hay mucho ruido del ventilador.',
-  radiation: 'Sonó el aviso de tormenta solar durante la salida; volvimos al refugio.',
+  'cabin-air': 'La presión de la cabina lleva días por debajo de lo normal; dormimos peor.',
+  radiation: 'La dosis de radiación subió de golpe durante la salida; volvimos al refugio.',
   deconditioning: 'No he podido completar el ejercicio resistivo por fallos del equipo.',
   'low-oxygen': 'Me falta el aire al subir la rampa del hábitat; la saturación marcó bajo.',
   'chest-pain':
@@ -230,22 +230,18 @@ function withStory(readings: Reading[], story: Story, end: number): Reading[] {
       change('stress', 6, () => 4);
       change('reaction-time', 6, (r, p) => round(r.value * (1.15 + 0.2 * p)));
       change('pvt-lapses', 5, (r) => 2 + Math.round(wave(t(r), DAY)));
-      change('hrv', 6, (r, p) => round(r.value * (0.85 - 0.2 * p)));
       break;
     case 'cabin-air':
-      change('cabin-co2', 4, (r) => round(3.3 + wave(t(r), 6 * HOUR) * 0.9, 1));
-      change('cabin-noise', 4, (r) => round(62 + wave(t(r), 5 * HOUR) * 6));
+      change('cabin-pressure', 4, (r) => round(94.2 + wave(t(r), 6 * HOUR) * 1.8, 1));
       change('sleep', 3, (r) => round(5.6 + wave(t(r), DAY) * 0.8, 1));
       break;
     case 'radiation':
-      change('solar-event', 1, () => 2);
       change('radiation-dose', 1, (_r, p) => round(12 + 22 * p, 1));
       change('radiation-dose', 5, (r) => round(Math.max(r.value, 1.4), 1));
       break;
     case 'deconditioning':
       change('resistance-exercise', 12, (r) => round(18 + wave(t(r), DAY) * 18));
       change('food-intake', 8, (r) => round(1480 + wave(t(r), DAY) * 240));
-      change('weight', 20, (r, p) => round(r.value * (1 - 0.07 * p), 1));
       change('steps', 12, (r) => round(r.value * 0.55));
       break;
     case 'low-oxygen':

@@ -34,7 +34,7 @@ const HR_SERIES: [number, number][] = Array.from({ length: 30 }, (_, i) => [
 ]);
 
 export function DesignShowcase() {
-  const [zone, setZone] = useState<string | undefined>('heart');
+  const [zone, setZone] = useState<string | undefined>('vitals');
   const [mood, setMood] = useState<ScaleValue | null>(null);
   const [running, setRunning] = useState(false);
   const { remaining, reset } = useCountdown(120, running);
@@ -72,13 +72,11 @@ export function DesignShowcase() {
             selected={zone}
             onPressZone={setZone}
             zones={[
-              { zone: 'heart', level: 'amber' },
-              { zone: 'lungs', level: 'green' },
-              { zone: 'head', level: 'green' },
-              { zone: 'metabolism', level: 'pending' },
-              { zone: 'musculoskeletal', level: 'green' },
-              { zone: 'skin', level: 'green' },
+              { zone: 'vitals', level: 'amber' },
               { zone: 'mind', level: 'red' },
+              { zone: 'performance', level: 'green' },
+              { zone: 'metabolism', level: 'pending' },
+              { zone: 'environment', level: 'green' },
             ]}
           />
         </Section>
@@ -87,13 +85,11 @@ export function DesignShowcase() {
           <View className="items-center gap-4">
             <DayRing
               segments={[
-                { zone: 'heart', progress: 1 },
-                { zone: 'lungs', progress: 1 },
-                { zone: 'head', progress: 0.5 },
-                { zone: 'metabolism', progress: 0 },
-                { zone: 'musculoskeletal', progress: 1 },
-                { zone: 'skin', progress: 1 },
+                { zone: 'vitals', progress: 1 },
                 { zone: 'mind', progress: 0 },
+                { zone: 'performance', progress: 0.5 },
+                { zone: 'metabolism', progress: 0 },
+                { zone: 'environment', progress: 1 },
               ]}
             />
             <WeekDots
@@ -109,14 +105,14 @@ export function DesignShowcase() {
               grouped
               title="Presión arterial"
               detail="Vence hace 2 h"
-              zone="heart"
+              zone="vitals"
               onStart={() => {}}
             />
             <ActionRow
               grouped
               title="Ejercicio resistivo"
               detail="45 min"
-              zone="musculoskeletal"
+              zone="performance"
               onDone={() => {}}
               onSkip={() => {}}
             />
@@ -124,7 +120,7 @@ export function DesignShowcase() {
               grouped
               title="Batería cognitiva"
               detail="3 pruebas · menos de 4 min"
-              zone="head"
+              zone="performance"
               startLabel="Empezar"
               onStart={() => {}}
             />

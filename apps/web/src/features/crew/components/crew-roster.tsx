@@ -53,6 +53,7 @@ export type RosterMember = {
   name: string;
   role?: string;
   waiting: boolean;
+  signedIn: boolean;
   lastPacketAt: string | null;
   hasWatch: boolean;
   invite: { link: string; qr: string };
@@ -77,7 +78,15 @@ function RosterError({ state, t }: { state: RosterFormState; t: Texts }) {
   );
 }
 
-function StatusBadge({ waiting, t }: { waiting: boolean; t: Texts }) {
+function StatusBadge({ waiting, signedIn, t }: { waiting: boolean; signedIn: boolean; t: Texts }) {
+  if (waiting && signedIn) {
+    return (
+      <span className="text-foreground inline-flex h-6 items-center gap-1.5 rounded-md border px-2 text-xs whitespace-nowrap">
+        <CircleCheck aria-hidden="true" className="size-3" />
+        {t.statusSignedIn}
+      </span>
+    );
+  }
   return (
     <span
       className={cn(
@@ -206,7 +215,7 @@ function EditPanel({
         <Portrait id={member.id} name={member.name} size={40} />
         <div className="flex min-w-0 flex-col gap-1">
           <SheetTitle>{format(t.editTitle, { name: member.name })}</SheetTitle>
-          <StatusBadge waiting={member.waiting} t={t} />
+          <StatusBadge waiting={member.waiting} signedIn={member.signedIn} t={t} />
         </div>
       </div>
       <SheetDescription>{t.rosterManageBody}</SheetDescription>
@@ -252,10 +261,10 @@ function InvitePanel({
           role="status"
           className={cn(
             'flex items-center gap-1.5 text-sm',
-            member.waiting ? 'text-muted-foreground' : 'text-foreground',
+            member.waiting && !member.signedIn ? 'text-muted-foreground' : 'text-foreground',
           )}
         >
-          {member.waiting ? (
+          {member.waiting && !member.signedIn ? (
             <LoaderCircle
               aria-hidden="true"
               className="size-4 animate-spin motion-reduce:animate-none"
@@ -263,7 +272,11 @@ function InvitePanel({
           ) : (
             <CircleCheck aria-hidden="true" className="size-4" />
           )}
-          {member.waiting ? t.inviteWaitingLive : format(t.inviteJoined, { name: member.name })}
+          {member.waiting
+            ? member.signedIn
+              ? format(t.inviteSignedIn, { name: member.name })
+              : t.inviteWaitingLive
+            : format(t.inviteJoined, { name: member.name })}
         </p>
       </div>
       <figure className="flex flex-col items-center gap-2 rounded-xl border p-4">
@@ -605,7 +618,7 @@ export function RosterManager({
                     {m.role ?? '—'}
                   </TableCell>
                   <TableCell>
-                    <StatusBadge waiting={m.waiting} t={t} />
+                    <StatusBadge waiting={m.waiting} signedIn={m.signedIn} t={t} />
                   </TableCell>
                   <TableCell className="text-muted-foreground tabular-nums">
                     {m.lastPacketAt ? format(t.agoShort, { t: ago(m.lastPacketAt, now) }) : '—'}
@@ -730,7 +743,9 @@ export function WaitingCrew({ members, lang }: { members: RosterMember[]; lang: 
               {m.name}
               {m.role ? <span className="text-muted-foreground"> · {m.role}</span> : null}
             </span>
-            <span className="text-tertiary text-xs">{t.rosterWaiting}</span>
+            <span className="text-tertiary text-xs">
+              {m.signedIn ? t.statusSignedIn : t.rosterWaiting}
+            </span>
           </li>
         ))}
       </ul>

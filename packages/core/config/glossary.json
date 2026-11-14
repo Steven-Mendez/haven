@@ -29,10 +29,7 @@
     }
   },
   "systolic-bp": {
-    "term": {
-      "es": "Presión al latir (sistólica)",
-      "en": "Heartbeat pressure (systolic)"
-    },
+    "term": { "es": "Presión al latir (sistólica)", "en": "Heartbeat pressure (systolic)" },
     "short": {
       "es": "La fuerza de la sangre cuando el corazón late. En el espacio puede cambiar por la falta de gravedad.",
       "en": "How hard blood pushes when the heart beats. It can change in space without gravity."
@@ -199,6 +196,17 @@
       "en": "kcal: kilocalories, the energy food provides"
     }
   },
+  "hydration": {
+    "term": { "es": "Hidratación", "en": "Hydration" },
+    "short": {
+      "es": "Cuánta agua bebes al día. Beber poco en el espacio favorece los cálculos renales.",
+      "en": "How much water you drink each day. Drinking too little in space favors kidney stones."
+    },
+    "unitHint": {
+      "es": "mL: mililitros; 1000 mL son un litro",
+      "en": "mL: milliliters; 1000 mL make one liter"
+    }
+  },
   "resistance-exercise": {
     "term": { "es": "Ejercicio de fuerza", "en": "Strength exercise" },
     "short": {
@@ -265,6 +273,17 @@
       "en": "mSv/day: millisieverts per day, the unit for radiation harm"
     }
   },
+  "cabin-pressure": {
+    "term": { "es": "Presión de cabina", "en": "Cabin pressure" },
+    "short": {
+      "es": "La presión del aire de la nave o del traje. Si cae rápido puede causar enfermedad por descompresión.",
+      "en": "The air pressure in the ship or suit. A fast drop can cause decompression sickness."
+    },
+    "unitHint": {
+      "es": "kPa: kilopascales; a nivel del mar hay 101 kPa (14,7 psi)",
+      "en": "kPa: kilopascals; sea level is 101 kPa (14.7 psi)"
+    }
+  },
   "solar-event": {
     "term": { "es": "Tormenta solar", "en": "Solar storm" },
     "short": {
@@ -309,53 +328,39 @@
       "en": "h: hours"
     }
   },
-  "heart": {
-    "term": { "es": "Corazón", "en": "Heart" },
+  "vitals": {
+    "term": { "es": "Signos vitales", "en": "Vital signs" },
     "short": {
-      "es": "Bombea la sangre con oxígeno. Sin gravedad trabaja distinto y puede perder fuerza.",
-      "en": "Pumps oxygen-rich blood. Without gravity it works differently and can lose strength."
-    }
-  },
-  "lungs": {
-    "term": { "es": "Pulmones y aire", "en": "Lungs and air" },
-    "short": {
-      "es": "Toman oxígeno y sacan CO₂. Dependen de que el aire de la nave esté bien.",
-      "en": "Take in oxygen and get rid of CO₂. They depend on the ship's air being right."
-    }
-  },
-  "head": {
-    "term": { "es": "Cabeza y ojos", "en": "Head and eyes" },
-    "short": {
-      "es": "Cómo piensas, reaccionas y ves. El cansancio y la falta de gravedad pueden afectarlos.",
-      "en": "How you think, react and see. Tiredness and lack of gravity can affect them."
-    }
-  },
-  "metabolism": {
-    "term": { "es": "Abdomen y metabolismo", "en": "Abdomen and metabolism" },
-    "short": {
-      "es": "Cómo tu cuerpo usa la comida y la energía. Comer poco en una misión larga es un gran riesgo.",
-      "en": "How your body uses food and energy. Eating too little on a long mission is a big risk."
-    }
-  },
-  "musculoskeletal": {
-    "term": { "es": "Huesos y músculos", "en": "Bones and muscles" },
-    "short": {
-      "es": "Te sostienen y te mueven. Sin gravedad se debilitan si no haces ejercicio cada día.",
-      "en": "They hold you up and move you. Without gravity they weaken unless you exercise daily."
-    }
-  },
-  "skin": {
-    "term": { "es": "Piel y cuerpo (radiación)", "en": "Skin and body (radiation)" },
-    "short": {
-      "es": "Lo que recibe la radiación del espacio y del Sol. No se siente, pero se acumula.",
-      "en": "What takes the radiation from space and the Sun. You can't feel it, but it adds up."
+      "es": "Pulso, presión, oxígeno y temperatura. Son lo primero que cambia cuando algo va mal.",
+      "en": "Pulse, blood pressure, oxygen and temperature. They change first when something is wrong."
     }
   },
   "mind": {
-    "term": { "es": "Mente", "en": "Mind" },
+    "term": { "es": "Sueño y mente", "en": "Sleep and mind" },
     "short": {
-      "es": "Tu ánimo, estrés y sueño. El aislamiento largo los desgasta y afecta a todo lo demás.",
-      "en": "Your mood, stress and sleep. Long isolation wears them down and affects everything else."
+      "es": "Tu sueño, actividad, ánimo y estrés. El aislamiento largo los desgasta y afecta a todo lo demás.",
+      "en": "Your sleep, activity, mood and stress. Long isolation wears them down and affects everything else."
+    }
+  },
+  "performance": {
+    "term": { "es": "Rendimiento físico", "en": "Physical performance" },
+    "short": {
+      "es": "Fuerza, reacción y coordinación. Sin gravedad se pierden si no entrenas cada día.",
+      "en": "Strength, reaction and coordination. Without gravity they fade unless you train every day."
+    }
+  },
+  "metabolism": {
+    "term": { "es": "Metabolismo y nutrición", "en": "Metabolism and nutrition" },
+    "short": {
+      "es": "Cómo tu cuerpo usa la comida y el agua. Comer o beber poco en una misión larga es un gran riesgo.",
+      "en": "How your body uses food and water. Eating or drinking too little on a long mission is a big risk."
+    }
+  },
+  "environment": {
+    "term": { "es": "Ambiente", "en": "Environment" },
+    "short": {
+      "es": "La radiación y la presión que te rodean. No se sienten, pero explican cambios en tu cuerpo.",
+      "en": "The radiation and pressure around you. You can't feel them, but they explain changes in your body."
     }
   },
   "baseline": {
@@ -500,10 +505,7 @@
     }
   },
   "sans": {
-    "term": {
-      "es": "Cambios oculares (SANS)",
-      "en": "Eye changes (SANS)"
-    },
+    "term": { "es": "Cambios oculares (SANS)", "en": "Eye changes (SANS)" },
     "short": {
       "es": "Sin gravedad, los líquidos presionan el ojo y pueden deformarlo. Lo primero es ver algo peor.",
       "en": "Without gravity, fluids press on the eye and can change its shape. First sign: blurrier vision."
@@ -594,10 +596,7 @@
     }
   },
   "communication-delay": {
-    "term": {
-      "es": "Retardo de comunicación",
-      "en": "Communication delay"
-    },
+    "term": { "es": "Retardo de comunicación", "en": "Communication delay" },
     "short": {
       "es": "Lo que tarda un mensaje en llegar a Tierra. Desde Marte, hasta 22 minutos por trayecto.",
       "en": "How long a message takes to reach Earth. From Mars, up to 22 minutes each way."

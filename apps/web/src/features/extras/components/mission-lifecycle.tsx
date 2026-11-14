@@ -21,10 +21,10 @@ export function MissionLifecycle({
   const t = textsFor(texts, lang);
   const [pending, start] = useTransition();
   const [confirming, setConfirming] = useState(false);
-  const run = (action: (code: string) => Promise<{ failed: boolean }>) =>
+  const run = (action: (code: string) => Promise<{ failed: boolean; notReady?: boolean }>) =>
     start(async () => {
       const result = await action(code);
-      if (result.failed) toast(t.missionActionFailed);
+      if (result.failed) toast(result.notReady ? t.missionCrewNotReady : t.missionActionFailed);
       setConfirming(false);
     });
 

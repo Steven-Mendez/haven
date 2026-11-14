@@ -36,8 +36,8 @@ export function DayRing({ segments, size = 160, thickness, children, className }
     <View
       accessible
       accessibilityRole="progressbar"
-      accessibilityLabel={format(t.ringSummary, { n: done })}
-      accessibilityValue={{ min: 0, max: 7, now: done }}
+      accessibilityLabel={format(t.ringSummary, { n: done, total: ZONES.length })}
+      accessibilityValue={{ min: 0, max: ZONES.length, now: done }}
       className={cn('items-center justify-center', className)}
       style={{ width: size, height: size }}
     >
@@ -63,7 +63,7 @@ export function DayRing({ segments, size = 160, thickness, children, className }
               size >= 140 ? 'text-metric' : size >= 80 ? 'text-title' : 'text-caption',
             )}
           >
-            {done}/7
+            {done}/{ZONES.length}
           </Text>
           {size >= 120 ? (
             <Text className="text-muted-foreground text-caption">{t.actions}</Text>

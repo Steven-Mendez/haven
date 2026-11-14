@@ -12,6 +12,7 @@ import { getLanguage } from '@/lib/language';
 import { getMissionCode } from '@/lib/mission';
 import { AutoRefresh } from './components/auto-refresh';
 import { RosterManager } from './components/crew-roster';
+import { StartMission } from './components/start-mission';
 import { texts } from './i18n';
 import { rosterOf } from './roster';
 import { earthUrlForPhones, getCrew } from './server';
@@ -32,6 +33,8 @@ async function RosterContent() {
   const earthUrl = await earthUrlForPhones();
   const roster = await rosterOf(data.crew, code, earthUrl, lang);
   const sending = roster.filter((m) => !m.waiting).length;
+  const signedIn = roster.filter((m) => m.waiting && m.signedIn).length;
+  const notStarted = data.mission.status === 'planned' || data.mission.status === 'scheduled';
 
   return (
     <>
@@ -42,13 +45,23 @@ async function RosterContent() {
             {format(t.manageSubtitle, { mission: data.mission.name })}
           </p>
         </div>
+        {notStarted ? (
+          <StartMission
+            mission={code}
+            scheduled={data.mission.status === 'scheduled'}
+            ready={data.crew.filter((c) => c.joinedAt !== null || c.lastPacket !== null).length}
+            total={data.crew.length}
+            lang={lang}
+          />
+        ) : null}
       </div>
       <StatStrip
         lang={lang}
         items={[
           { label: t.statTotal, value: roster.length },
           { label: t.statSending, value: sending },
-          { label: t.statInvited, value: roster.length - sending },
+          { label: t.statSignedIn, value: signedIn },
+          { label: t.statInvited, value: roster.length - sending - signedIn },
           { label: t.statWatch, value: roster.filter((m) => m.hasWatch).length },
         ]}
       />

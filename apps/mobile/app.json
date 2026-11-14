@@ -12,7 +12,7 @@
       "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "NSMotionUsageDescription": "HAVEN cuenta tus pasos como respaldo cuando HealthKit no está disponible.",
+        "NSMotionUsageDescription": "HAVEN cuenta tus pasos como respaldo cuando HealthKit no está disponible y mide la presión de la cabina con el barómetro.",
         "CFBundleLocalizations": ["es", "en"]
       }
     },

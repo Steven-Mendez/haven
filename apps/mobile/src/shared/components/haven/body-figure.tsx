@@ -21,43 +21,40 @@ const PENDING = { dark: '#5a5a60', light: '#a1a1aa' } as const;
 
 const VB = { x: 40, y: 92, w: 644, h: 1270 };
 
-const ORGANS: { zone: ThemeZone; d: string }[] = [
+const ORGANS: { id: string; zone: ThemeZone; d: string; outlined?: boolean }[] = [
   {
+    id: 'brain',
     zone: 'mind',
     d: 'M 359 104 C 333 102 310 116 305 140 C 301 160 311 175 331 179 C 344 181 354 178 359 172 Z M 369 104 C 395 102 418 116 423 140 C 427 160 417 175 397 179 C 384 181 374 178 369 172 Z',
   },
   {
-    zone: 'head',
-    d: 'M 330 200 C 336 191 352 191 358 200 C 352 209 336 209 330 200 Z M 370 200 C 376 191 392 191 398 200 C 392 209 376 209 370 200 Z',
-  },
-  {
-    zone: 'lungs',
+    id: 'lungs',
+    zone: 'vitals',
     d: 'M 340 312 C 316 314 292 340 281 378 C 271 414 270 456 278 490 C 296 500 326 494 350 478 C 356 436 357 370 352 334 C 350 320 346 312 340 312 Z M 388 312 C 412 314 436 340 447 378 C 457 414 458 456 450 490 C 445 496 438 498 432 497 C 434 470 430 444 420 422 C 412 404 400 392 393 380 C 388 362 386 340 386 326 C 386 318 387 312 388 312 Z',
   },
   {
-    zone: 'heart',
+    id: 'heart',
+    zone: 'vitals',
     d: 'M 359 410 C 359 390 374 380 390 384 C 405 388 415 400 419 416 C 425 440 425 464 421 488 C 405 486 387 478 373 466 C 363 456 359 434 359 410 Z',
+    outlined: true,
   },
   {
+    id: 'stomach',
     zone: 'metabolism',
     d: 'M 364 522 C 372 506 398 500 418 506 C 440 514 452 536 447 560 C 442 584 418 600 390 600 C 366 600 347 590 343 574 C 340 562 349 553 360 553 C 368 553 372 546 368 538 C 364 532 360 528 364 522 Z',
   },
   {
-    zone: 'musculoskeletal',
+    id: 'legs',
+    zone: 'performance',
     d: 'M 282 770 C 270 760 278 742 294 747 C 304 738 324 745 319 760 C 316 769 311 776 311 787 L 309 886 C 318 891 324 905 314 913 C 306 919 296 915 293 909 C 285 917 270 911 274 899 C 277 891 286 888 289 884 L 289 789 C 289 780 288 774 282 770 Z M 446 770 C 458 760 450 742 434 747 C 424 738 404 745 409 760 C 412 769 417 776 417 787 L 419 886 C 410 891 404 905 414 913 C 422 919 432 915 435 909 C 443 917 458 911 454 899 C 451 891 442 888 439 884 L 439 789 C 439 780 440 774 446 772 Z',
   },
 ];
 
 const HITS: { zone: ThemeZone; points: string }[] = [
-  { zone: 'mind', points: '200,92 528,92 528,184 200,184' },
-  { zone: 'head', points: '200,184 528,184 528,250 200,250' },
-  {
-    zone: 'lungs',
-    points: '240,296 488,296 488,380 432,380 432,496 340,496 340,380 240,380 240,296',
-  },
-  { zone: 'heart', points: '340,380 432,380 432,496 340,496' },
+  { zone: 'mind', points: '200,92 528,92 528,250 200,250' },
+  { zone: 'vitals', points: '240,296 488,296 488,496 240,496' },
   { zone: 'metabolism', points: '240,496 488,496 488,650 240,650' },
-  { zone: 'musculoskeletal', points: '236,700 492,700 492,960 236,960' },
+  { zone: 'performance', points: '236,700 492,700 492,960 236,960' },
 ];
 
 function svgZoneProps(onPress: (() => void) | undefined, label: string): Record<string, unknown> {
@@ -107,15 +104,18 @@ export function BodyFigure({
   };
   const dim = (zone: ThemeZone) => (selected && selected !== zone ? 0.35 : 1);
   const press = (zone: ThemeZone) => (onPressZone ? () => onPressZone(zone) : undefined);
-  const skin = levelOf('skin');
-  const edge = skin === 'amber' || skin === 'red' ? colors.level[skin].fg : EDGE[scheme];
+  const around = levelOf('environment');
+  const edge = around === 'amber' || around === 'red' ? colors.level[around].fg : EDGE[scheme];
   const silhouette = [FRONT_OUTLINE, ...FRONT_HEAD];
 
   return (
     <View className={cn('items-center gap-5', className)}>
       <View accessibilityLabel={t.bodyFigure}>
         <Svg width={width} height={height} viewBox={`${VB.x} ${VB.y} ${VB.w} ${VB.h}`}>
-          <G opacity={dim('skin')} {...svgZoneProps(press('skin'), label('skin'))}>
+          <G
+            opacity={dim('environment')}
+            {...svgZoneProps(press('environment'), label('environment'))}
+          >
             {silhouette.map((d) => (
               <Path key={d.slice(0, 24)} d={d} fill={BASE[scheme]} />
             ))}
@@ -132,12 +132,12 @@ export function BodyFigure({
           </G>
           {ORGANS.map((o) => (
             <Path
-              key={o.zone}
+              key={o.id}
               d={o.d}
               fill={fillOf(o.zone)}
               opacity={dim(o.zone)}
-              stroke={o.zone === 'heart' ? colors.background : undefined}
-              strokeWidth={o.zone === 'heart' ? gap : 0}
+              stroke={o.outlined ? colors.background : undefined}
+              strokeWidth={o.outlined ? gap : 0}
               strokeLinejoin="round"
             />
           ))}

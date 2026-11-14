@@ -65,9 +65,11 @@ export function evaluate(
     now,
     options?.symptomWindowMin,
   );
-  return cfg.indicators.map((ind) =>
-    evaluateIndicator(ind, readings, baseline[ind.id], active, now, catalog, options),
-  );
+  return cfg.indicators
+    .filter((ind) => !ind.extra)
+    .map((ind) =>
+      evaluateIndicator(ind, readings, baseline[ind.id], active, now, catalog, options),
+    );
 }
 
 type Match = 'yes' | 'waiting' | 'no';

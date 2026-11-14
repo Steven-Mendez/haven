@@ -104,15 +104,7 @@ export const LEVEL_SYMBOL: Record<ThemeLevel, string> = {
 
 export const LEVEL_SYMBOL_SIZE = { dot: 6, inline: 8, badge: 10, header: 12 } as const;
 
-export const ZONES = [
-  'heart',
-  'lungs',
-  'head',
-  'metabolism',
-  'musculoskeletal',
-  'skin',
-  'mind',
-] as const;
+export const ZONES = ['vitals', 'mind', 'performance', 'metabolism', 'environment'] as const;
 export type ThemeZone = (typeof ZONES)[number];
 
 type LevelColors = { fg: string; bg: string; border: string };

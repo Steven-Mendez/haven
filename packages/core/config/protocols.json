@@ -1,5 +1,127 @@
 [
   {
+    "id": "self-sos",
+    "name": {
+      "es": "SOS: necesito ayuda",
+      "en": "SOS: I need help"
+    },
+    "start": "symptom-check",
+    "steps": [
+      {
+        "id": "symptom-check",
+        "text": {
+          "es": "¿Qué te pasa? Marca lo que sientes. Tierra y la tripulación ya están avisadas.",
+          "en": "What is wrong? Mark what you feel. Earth and the crew have already been alerted."
+        },
+        "audio": {
+          "es": "¿Qué te pasa? Marca lo que sientes.",
+          "en": "What is wrong? Mark what you feel."
+        },
+        "next": "self-secure"
+      },
+      {
+        "id": "self-secure",
+        "text": {
+          "es": "Sujétate a un punto fijo o siéntate con la espalda apoyada. Afloja la ropa ajustada y no te muevas: la ayuda va en camino.",
+          "en": "Hold on to a fixed point or sit with your back supported. Loosen tight clothing and stay still: help is on the way."
+        },
+        "audio": {
+          "es": "Sujétate y no te muevas. La ayuda va en camino.",
+          "en": "Hold on and stay still. Help is on the way."
+        },
+        "next": "measure-vitals"
+      },
+      {
+        "id": "measure-vitals",
+        "text": {
+          "es": "Si puedes, mide tu oxígeno con el reloj y tu presión con el brazalete, y anótalos aquí. Si llevas el Apple Watch, tu pulso ya sale en el monitor.",
+          "en": "If you can, measure your oxygen with the watch and your blood pressure with the cuff, and enter them here. If you wear the Apple Watch, your pulse already shows on the monitor."
+        },
+        "audio": {
+          "es": "Si puedes, mide tu oxígeno y tu presión, y anótalos.",
+          "en": "If you can, measure your oxygen and pressure, and enter them."
+        },
+        "next": "medication-plan"
+      },
+      {
+        "id": "medication-plan",
+        "text": {
+          "es": "Abre el plan médico de a bordo. Toma solo la medicación que indica para lo que sientes (por ejemplo, aspirina masticada para el dolor en el pecho si no eres alérgico).",
+          "en": "Open the onboard medical plan. Take only the medication it lists for what you feel (for example, chewed aspirin for chest pain if you are not allergic)."
+        },
+        "audio": {
+          "es": "Sigue el plan médico de a bordo antes de tomar cualquier medicamento.",
+          "en": "Follow the onboard medical plan before taking any medication."
+        },
+        "next": "self-status"
+      },
+      {
+        "id": "self-status",
+        "text": {
+          "es": "¿Cómo estás ahora?",
+          "en": "How are you now?"
+        },
+        "audio": {
+          "es": "¿Cómo estás ahora?",
+          "en": "How are you now?"
+        },
+        "options": [
+          {
+            "text": {
+              "es": "Mejor o estable",
+              "en": "Better or stable"
+            },
+            "next": "earth-packet"
+          },
+          {
+            "text": {
+              "es": "Peor",
+              "en": "Worse"
+            },
+            "next": "self-worse"
+          }
+        ]
+      },
+      {
+        "id": "self-worse",
+        "text": {
+          "es": "Quédate quieto y respira despacio: inspira en 4 tiempos y suelta el aire en 6. Llama en voz alta a la tripulación y no te quedes solo.",
+          "en": "Stay still and breathe slowly: in for 4 counts and out for 6. Call out to the crew and do not stay alone."
+        },
+        "audio": {
+          "es": "Quédate quieto, respira despacio y llama a la tripulación.",
+          "en": "Stay still, breathe slowly and call the crew."
+        },
+        "seconds": 120,
+        "next": "self-status"
+      },
+      {
+        "id": "earth-packet",
+        "text": {
+          "es": "Envía el paquete a Tierra con lo que marcaste, tus mediciones y una nota de lo que pasó. Sin enlace, queda en cola y sale solo cuando vuelva.",
+          "en": "Send the packet to Earth with what you marked, your measurements and a note about what happened. With no link, it waits in the queue and goes out when the link returns."
+        },
+        "audio": {
+          "es": "Envía el paquete a Tierra.",
+          "en": "Send the packet to Earth."
+        },
+        "next": "follow-up"
+      },
+      {
+        "id": "follow-up",
+        "text": {
+          "es": "Seguimiento: no te quedes solo. Repite presión, pulso y oxígeno cada 5 minutos. Si empeoras, vuelve a pulsar SOS.",
+          "en": "Follow-up: do not stay alone. Repeat pressure, pulse and oxygen every 5 minutes. If you get worse, press SOS again."
+        },
+        "audio": {
+          "es": "Repite las mediciones cada cinco minutos.",
+          "en": "Repeat the measurements every five minutes."
+        },
+        "seconds": 300
+      }
+    ]
+  },
+  {
     "id": "chest-pain",
     "name": {
       "es": "Dolor torácico y colapso",

@@ -76,15 +76,7 @@ export function countLevels(levels: Level[]): Record<Level, number> {
   return count;
 }
 
-export const ZONE_ORDER = [
-  'heart',
-  'lungs',
-  'head',
-  'metabolism',
-  'musculoskeletal',
-  'skin',
-  'mind',
-] as const;
+export const ZONE_ORDER = ['vitals', 'mind', 'performance', 'metabolism', 'environment'] as const;
 
 export function ago(from: string, now: Now): string {
   return formatDuration(minutesBetween(from, now));

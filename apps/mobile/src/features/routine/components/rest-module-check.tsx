@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { EmptyState, formatMetric, IndicatorCard } from '@/shared/components/haven';
 import { Text } from '@/shared/components/ui/text';
 import { config } from '@/shared/config';
+import { store } from '@/shared/data';
 import { useLanguage, useTexts, useTranslate } from '@/shared/i18n';
 import { texts } from '../i18n';
 
@@ -33,7 +34,7 @@ export function RestModuleCheck({ atmosphere, children }: Props) {
               unit={indicator?.unit}
               level={a.level}
               explanation={translate(a.explanation)}
-              source="ship"
+              source={store.latestReading(a.indicator)?.source}
               ageMin={a.ageMin >= 0 ? a.ageMin : undefined}
               formatValue={(v) => formatMetric(v, language)}
             />

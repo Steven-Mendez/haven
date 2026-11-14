@@ -1,26 +1,19 @@
 import type { Mission } from '@haven/core';
 import { useCallback, useEffect, useState } from 'react';
-import { config } from '@/shared/config';
 import { store, useMission } from '@/shared/data';
 import { db } from '@/shared/db';
-import { generateUniqueMissionCode } from '../logic/code';
 import { type CrewOption, missionCrew, withTypedCrewMember } from '../logic/crew';
-import { defaultDelay } from '../logic/environment';
 import {
   decideJoin,
   type EarthLookup,
   findInApiResponse,
-  type MissionDraft,
   type MissionRecord,
   missionFromRecord,
-  recordFromDraft,
-  startForDay,
-  toApiBody,
 } from '../logic/mission-record';
 
 const collection = db.collection<MissionRecord>('missions');
 const TIMEOUT_MS = 4_000;
-const DEFAULT_DURATION_DAYS = 540;
+const _DEFAULT_DURATION_DAYS = 540;
 
 async function request(url: string, init?: RequestInit): Promise<unknown> {
   const controller = new AbortController();
@@ -51,10 +44,9 @@ export async function testEarthApi(): Promise<'ok' | 'fail' | 'skipped'> {
 }
 
 export type JoinResult =
-  | { record: MissionRecord; from: 'local' | 'earth' | 'offline' }
+  | { record: MissionRecord; from: 'local' | 'earth' }
   | { from: 'unknown' }
   | { from: 'unreachable' };
-export type CreateResult = { record: MissionRecord; registered: boolean };
 
 async function lookUp(code: string): Promise<EarthLookup> {
   const base = apiBase();
@@ -85,7 +77,49 @@ const synced = (m: Mission) =>
     m.crew,
   ]);
 
+let announcedSession: string | undefined;
+
+const sessionKey = () => `${store.mission().code}|${store.preferences().crewMember}`;
+
+export async function announceSession(event: 'join' | 'leave'): Promise<boolean> {
+  const base = apiBase();
+  if (!base) return false;
+  const mission = store.mission();
+  const { crewMember } = store.preferences();
+  const key = sessionKey();
+  try {
+    await request(`${base}/api/crew`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        mission: mission.code,
+        crewMember,
+        event,
+        name: mission.crew.find((c) => c.id === crewMember)?.name,
+      }),
+    });
+    announcedSession = event === 'join' ? key : undefined;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function signOut(): Promise<void> {
+  await announceSession('leave');
+  await endSession();
+}
+
+async function endSession(): Promise<void> {
+  announcedSession = undefined;
+  await store.setPreferences({ joined: false });
+}
+
 export async function syncCurrentMission(): Promise<boolean> {
+  const { joined } = store.preferences();
+  if (joined && store.mission().status !== 'finished' && announcedSession !== sessionKey()) {
+    await announceSession('join');
+  }
   const current = store.mission();
   const local = await collection.get(current.code).catch(() => undefined);
   const lookup = await lookUp(current.code);
@@ -102,8 +136,10 @@ export async function syncCurrentMission(): Promise<boolean> {
   if (!record) return false;
   if (store.mission().code !== record.code) return false;
   const next = missionFromRecord(record, store.mission(), new Date());
-  if (synced(next) === synced(store.mission())) return false;
-  await store.setMission(next);
+  const changed = synced(next) !== synced(store.mission());
+  if (changed) await store.setMission(next);
+  if (next.status === 'finished' && store.preferences().joined) await endSession();
+  if (!changed) return false;
   return true;
 }
 
@@ -145,37 +181,19 @@ export function useMissionRecords() {
     await store.setMission(missionFromRecord(record, store.mission(), new Date()));
   }
 
-  async function join(code: string, { allowOffline = true } = {}): Promise<JoinResult> {
+  async function join(code: string): Promise<JoinResult> {
     const known = recordFor(code) ?? (await collection.get(code).catch(() => undefined));
     const decision = decideJoin(known, await lookUp(code));
     if (decision.from === 'unknown') return { from: 'unknown' };
-    if (decision.from === 'offline' && !allowOffline) return { from: 'unreachable' };
-    if (decision.from !== 'offline') {
-      await save(decision.record);
-      await apply(decision.record);
-      return decision;
-    }
-    const current = store.mission();
-    const environment = config.environments.find((e) => e.id === current.environment);
-    const now = new Date();
-    const offline: MissionRecord = {
-      code,
-      name: code,
-      environment: current.environment,
-      start: startForDay(1, now),
-      durationDays: environment?.destinations?.[0]?.durationDays ?? DEFAULT_DURATION_DAYS,
-      currentDelayMin: environment ? defaultDelay(environment) : current.currentDelayMin,
-      createdAt: now.toISOString(),
-      origin: 'local',
-      crew: [],
-    };
-    await save(offline);
-    await apply(offline);
-    return { record: offline, from: 'offline' };
+    if (decision.from === 'offline') return { from: 'unreachable' };
+    await save(decision.record);
+    await apply(decision.record);
+    return decision;
   }
 
   async function chooseCrewMember(id: string) {
     await store.setPreferences({ crewMember: id, joined: true });
+    void announceSession('join');
   }
 
   async function addTypedCrewMember(code: string, name: string): Promise<string> {
@@ -187,42 +205,11 @@ export function useMissionRecords() {
     return id;
   }
 
-  async function create(draft: MissionDraft): Promise<CreateResult> {
-    const environment = config.environments.find((e) => e.id === draft.environment);
-    if (!environment) throw new Error(`Unknown environment ${draft.environment}`);
-    const taken = [...records.map((r) => r.code), store.mission().code];
-    const destination = environment.destinations?.find((d) => d.id === draft.destination);
-    const record = recordFromDraft(
-      draft,
-      generateUniqueMissionCode(taken),
-      environment,
-      new Date(),
-      destination?.delayMin,
-    );
-    await save(record);
-    await apply(record);
-    let registered = false;
-    const base = apiBase();
-    if (base) {
-      try {
-        await request(`${base}/api/missions`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(toApiBody(record, store.mission().crew)),
-        });
-        registered = true;
-      } catch {
-        registered = false;
-      }
-    }
-    return { record, registered };
-  }
-
   async function update(code: string, changes: Partial<MissionRecord>) {
     const record = recordFor(code);
     if (!record) return;
     await save({ ...record, ...changes });
   }
 
-  return { records, recordFor, join, chooseCrewMember, addTypedCrewMember, create, update };
+  return { records, recordFor, join, chooseCrewMember, addTypedCrewMember, update };
 }

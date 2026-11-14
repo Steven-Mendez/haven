@@ -408,8 +408,8 @@
   },
   "radiation-dose": {
     "howToMeasure": {
-      "es": "La mide en milisieverts (mSv) el dosímetro personal que llevas siempre, también fuera de la nave. Los sensores fijos miden cada módulo; la app recibe ambos por la telemetría de la nave.",
-      "en": "Your personal dosimeter, worn at all times, also outside the ship, measures it in millisieverts (mSv). Fixed sensors measure each module; the app receives both through the ship’s telemetry."
+      "es": "La mide en milisieverts (mSv) el dosímetro personal que llevas siempre, también fuera de la nave. Una vez al día, lee la dosis del día en el dosímetro y escríbela aquí.",
+      "en": "Your personal dosimeter, worn at all times, also outside the ship, measures it in millisieverts (mSv). Once a day, read today’s dose on the dosimeter and type it in here."
     },
     "whyItMatters": {
       "es": "Fuera del campo magnético de la Tierra, la radiación del espacio y del Sol atraviesa el cuerpo sin que lo notes. Se acumula y aumenta el riesgo de cáncer y de daño en el cerebro; NASA fija un límite de 600 mSv para toda la carrera.",
@@ -495,6 +495,43 @@
     "sources": [
       "AASM & SRS, Watson et al. 2015: https://doi.org/10.5665/sleep.4716",
       "Barger et al. 2014: https://doi.org/10.1016/S1474-4422%2814%2970122-X",
+      "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/"
+    ]
+  },
+  "hydration": {
+    "howToMeasure": {
+      "es": "Anota el agua que bebes: las bolsas de bebida de a bordo traen marcado su volumen en mililitros (mL). Suma también sopas y bebidas rehidratadas.",
+      "en": "Log the water you drink: onboard drink bags are marked with their volume in milliliters (mL). Count soups and rehydrated drinks too."
+    },
+    "whyItMatters": {
+      "es": "Sin gravedad sientes menos sed y los huesos sueltan calcio a la orina. Si bebes poco, ese calcio se concentra y pueden formarse cálculos renales.",
+      "en": "Without gravity you feel less thirsty and your bones release calcium into your urine. If you drink little, that calcium concentrates and kidney stones can form."
+    },
+    "whatToDo": {
+      "es": "Bebe a lo largo del día aunque no tengas sed, al menos 2000 mL. Si llevas tres días por debajo, coméntalo con Tierra.",
+      "en": "Drink through the day even if you are not thirsty, at least 2000 mL. If you have been below that for three days, tell Earth."
+    },
+    "sources": [
+      "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/",
+      "NASA-STD-3001 (OCHMO): https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/"
+    ]
+  },
+  "cabin-pressure": {
+    "howToMeasure": {
+      "es": "La mide el barómetro de tu teléfono, en kilopascales (kPa), sin que hagas nada: es la presión del aire donde está el teléfono. Si tu dispositivo no tiene barómetro, lee el manómetro de la cabina y escribe el valor.",
+      "en": "Your phone’s barometer measures it, in kilopascals (kPa), with nothing for you to do: it is the air pressure where the phone is. If your device has no barometer, read the cabin gauge and type the value in."
+    },
+    "whyItMatters": {
+      "es": "Si la presión baja rápido, el nitrógeno disuelto en la sangre forma burbujas: es la enfermedad por descompresión, con dolor en las articulaciones y riesgo para el cerebro.",
+      "en": "If pressure drops fast, the nitrogen dissolved in your blood forms bubbles: this is decompression sickness, with joint pain and a risk to the brain."
+    },
+    "whatToDo": {
+      "es": "Fuera de la referencia: revisa el módulo y pospón la salida. Si cae por debajo del límite rojo, usa la máscara de oxígeno y sigue el protocolo de atmósfera.",
+      "en": "Outside the reference: check the module and postpone the EVA. If it drops below the red limit, use the oxygen mask and follow the atmosphere protocol."
+    },
+    "sources": [
+      "NASA-STD-3001 (OCHMO): https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/",
+      "NASA HRP, Hostile/Closed Environments: https://www.nasa.gov/hrp/hazard-hostile-closed-environments/",
       "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/"
     ]
   }
