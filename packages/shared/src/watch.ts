@@ -1,7 +1,7 @@
 // Contrato iPhone ↔ Apple Watch. Espejo en Swift: apps/mobile/targets/watch/Contract/Contract.swift.
 // El iPhone es el único que habla con la API; el reloj recibe estado y envía acciones.
 
-import type { Item } from './index';
+import type { Item } from './items';
 
 export const WATCH_CONTRACT_VERSION = 1;
 

@@ -8,7 +8,7 @@ Monorepo con pnpm workspaces:
 | `apps/mobile` | App iOS | Expo SDK 58 + Expo Router, NativeWind, **React Native Reusables** (shadcn para RN) |
 | `apps/mobile/targets/watch` | App watchOS | SwiftUI, añadida al proyecto iOS por `@bacons/apple-targets` en cada prebuild |
 | `apps/mobile/modules/haven-watch` | Puente iPhone ↔ Watch | Módulo local de Expo (Swift, WatchConnectivity) |
-| `packages/shared` | Tipos TS compartidos y contrato del Watch (`watch.ts`) | — |
+| `packages/shared` | Tipos TS compartidos, un archivo por dominio (`items.ts`, `watch.ts`, …) reexportado en `index.ts` | — |
 | `docker-compose.yml` | MongoDB local | mongo:8 |
 
 ## Arquitectura
@@ -39,6 +39,18 @@ pnpm ios                   # compila la app iOS + watch (requiere Xcode)
 Para el reloj: `pnpm --filter mobile prebuild`, abre `apps/mobile/ios/HAVEN.xcworkspace`, elige el scheme **HavenWatch** y un simulador de Apple Watch emparejado con el del iPhone.
 
 Lo que edites en Xcode fuera de `targets/` y `modules/` se pierde en el siguiente prebuild.
+
+## Antes de subir cambios
+
+```bash
+pnpm check                 # contrato del Watch + typecheck + lint de todo el monorepo
+```
+
+Es lo mismo que corre el CI (`.github/workflows/ci.yml`) en cada PR y en cada push a `main`. Por separado: `pnpm check:contract`, `pnpm typecheck`, `pnpm lint`.
+
+`pnpm check:contract` compara `packages/shared/src/watch.ts` con `targets/watch/Contract/Contract.swift`: versión, tipos de mensaje y campos de cada payload. Convención: el mensaje `fooBar` usa el struct `FooBarPayload` en Swift.
+
+Tipos nuevos en `packages/shared`: crea `src/<dominio>.ts` y agrégalo a `src/index.ts`; no amontones todo en un archivo.
 
 ## Variables de entorno
 

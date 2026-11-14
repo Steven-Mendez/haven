@@ -10,7 +10,9 @@ export function sendToWatch<T extends WatchMessageType>(type: T, payload: WatchM
 /** Escucha los sobres del reloj mientras el componente está montado. */
 export function useWatchMessages(onMessage: (envelope: WatchEnvelope) => void) {
   const ref = React.useRef(onMessage);
-  ref.current = onMessage;
+  React.useEffect(() => {
+    ref.current = onMessage;
+  });
   React.useEffect(() => HavenWatch.listen((e) => ref.current(e)), []);
 }
 
