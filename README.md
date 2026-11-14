@@ -1,150 +1,203 @@
 # HAVEN
 
-Monorepo del proyecto HAVEN (NASA Space Apps 2026). La documentación de producto vive en el vault de Obsidian (`../obsidian`); este repositorio sigue su [Arquitectura técnica](../obsidian/40%20Proyecto/05%20Arquitectura%20t%C3%A9cnica.md) y sus [Contratos compartidos](../obsidian/40%20Proyecto/04%20Contratos%20compartidos.md).
+Monitoreo de salud para tripulaciones en misiones espaciales (NASA Space Apps 2026). El astronauta lleva la app en el teléfono y en el Apple Watch; el equipo en Tierra sigue a la tripulación desde la web.
+
+HAVEN es una herramienta de apoyo a la decisión. No es un dispositivo médico y no tiene afiliación con la NASA.
+
+Vista de Tierra desplegada: <https://haven-eta-gray.vercel.app>
+
+| Pieza | Qué es | Dónde |
+|---|---|---|
+| Vista de Tierra | Web y API: misiones, tripulación, reglas, tendencias y paquetes recibidos | `apps/web` |
+| App del astronauta | Rutina, indicadores, cognición, emergencias y cola de envío a Tierra | `apps/mobile` |
+| Reloj | Monitor de frecuencia cardíaca y alarma de emergencia (SOS) | `apps/mobile/targets/watch` |
+| Core | Contratos, motor de reglas y configuración versionada que comparten todos | `packages/core` |
+
+## Estructura
 
 ```
-haven/
-  apps/mobile/            React Native + Expo SDK 58 (iOS, Android y web de demo)
-    src/app/              rutas de Expo Router: una línea que reexporta su feature
-    src/features/<x>/     una carpeta por feature (M00…M10), un dueño cada una
-    src/shared/           común del móvil: ui/ (React Native Reusables), bus de eventos, i18n, config
-    targets/watch/        app de Apple Watch en Swift, una carpeta por feature (W00…W04)
-  apps/web/             Next.js 16: API y Vista de Tierra; shadcn/ui; MongoDB
-    src/features/<x>/     T01…T03
-  packages/core/          contracts (tipos), engine (C01), simulator (C02), config JSON por dueño
-  scripts/nueva-feature.mjs   generador: pnpm feature <mobile|earth> <folder> <ID> "<es>" "<en>"
+apps/
+  web/                    Next.js 16: API y Vista de Tierra
+    src/app/              rutas y API (/api/*)
+    src/features/<x>/     astronaut, crew, extras, settings
+    src/server/           MongoDB, modelo y utilidades HTTP
+    scripts/              seed y pruebas de la API
+  mobile/                 Expo SDK 58 (iOS y Android)
+    src/app/              rutas de Expo Router; cada una reexporta su feature
+    src/features/<x>/     una carpeta por feature
+    src/shared/           UI, datos locales, i18n y servicios comunes
+    targets/watch/        app de Apple Watch en SwiftUI
+    targets/watch-widget/ complicación del reloj
+    modules/haven-watch/  módulo nativo que conecta el iPhone con el reloj
+packages/
+  core/                   src/contracts, src/engine, src/config y config/*.json
+scripts/
+  new-feature.mjs         generador de features
+  sim/                    utilidades para los simuladores de iOS y watchOS
 ```
 
 ## Stack
 
 | Pieza | Herramientas |
 |---|---|
-| Monorepo | pnpm 12 workspaces (`nodeLinker: hoisted`, lo pide React Native), Turborepo |
-| Lint y formato | Biome 2 (TS, JSX, JSON, CSS, orden de clases Tailwind) · `swift-format` (Swift) |
+| Monorepo | pnpm 12 workspaces (`nodeLinker: hoisted`, lo pide React Native) y Turborepo |
+| Web | Next.js 16 (Turbopack, Cache Components), Tailwind 4, shadcn/ui sobre Base UI, driver oficial `mongodb` |
+| Base de datos | MongoDB Atlas; MongoDB 8 en Docker como alternativa sin internet |
+| Despliegue | Vercel, con `apps/web` como directorio raíz |
+| Móvil | Expo SDK 58, Expo Router, NativeWind 4, React Native Reusables, SQLite local |
+| Reloj | SwiftUI; el target lo genera `@bacons/apple-targets` en cada prebuild |
+| Lint y formato | Biome 2 para TS, JSX, JSON y CSS; `swift-format` para Swift |
 | Hooks de git | Lefthook: Biome y swift-format en `pre-commit`; typecheck y tests en `pre-push` |
-| Móvil | Expo SDK 58, Expo Router, NativeWind 4 (Tailwind 3), React Native Reusables (shadcn para RN), lucide-react-native |
-| Reloj | SwiftUI, watchOS 11+, target generado por `@bacons/apple-targets` en cada prebuild |
-| Web | Next.js 16 (Turbopack, Cache Components), Tailwind 4, shadcn/ui (Base UI), driver oficial `mongodb` |
-| Base de datos | MongoDB 8 local en Docker (`docker-compose.yml`), sirve en la red de la demo sin internet |
-| Tests | Vitest en `packages/core` |
+| Tests | Vitest en `packages/core` y en la lógica pura del móvil |
+| CI | GitHub Actions: lint, typecheck y tests en cada push y pull request |
 
 ## Requisitos
 
-- Node 24.16+ (`.nvmrc`) y pnpm 12 (`corepack enable` o `brew install pnpm`).
-- MongoDB: Atlas (por defecto) o Docker para trabajar sin internet.
-- iOS y reloj: macOS con Xcode 26.4+ y CocoaPods.
-- Android: Android Studio (SDK y su JDK). Exporta `JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"` y `ANDROID_HOME="$HOME/Library/Android/sdk"`.
+- Node 24 (`.nvmrc`) y pnpm 12 (`corepack enable`).
+- Acceso al clúster de MongoDB Atlas, o Docker para usar MongoDB local.
+- iOS y reloj: macOS con Xcode y CocoaPods.
+- Android: Android Studio, con `JAVA_HOME` y `ANDROID_HOME` exportados.
 
 ## Primeros pasos
 
 ```bash
-pnpm install                       # también instala los hooks de git
-cp apps/web/.env.example apps/web/.env.local   # pon el MONGODB_URI de Atlas (el mismo de Vercel)
-# Sin internet: MONGODB_USE_LOCAL=true en .env.local y `pnpm db:up` (MongoDB en localhost:27017)
+pnpm install                                    # instala dependencias y los hooks de git
+cp apps/web/.env.example apps/web/.env.local    # pon el MONGODB_URI de Atlas
+cp apps/mobile/.env.example apps/mobile/.env    # pon la dirección de Tierra
+pnpm dev:web                                    # http://localhost:3000
+curl localhost:3000/api/health                  # {"ok":true,"mongo":"connected"}
 ```
 
-### Web (Vista de Tierra)
+## Variables de entorno
+
+Los archivos `.env*` no se versionan; solo los `.env.example`, que documentan cada variable.
+
+### Web: `apps/web/.env.local`
+
+| Variable | Obligatoria | Para qué |
+|---|---|---|
+| `MONGODB_URI` | Sí | Cadena de conexión de Atlas |
+| `MONGODB_DB` | No | Nombre de la base de datos; por defecto `haven` |
+| `MONGODB_USE_LOCAL` | No | Con `true` usa `MONGODB_LOCAL_URI` en vez de Atlas |
+| `MONGODB_LOCAL_URI` | No | MongoDB local; por defecto `mongodb://localhost:27017` |
+| `HAVEN_PUBLIC_URL` | No | Dirección de Tierra que va en el QR de invitación; por defecto, el host de la página |
+
+Para trabajar sin internet: `MONGODB_USE_LOCAL=true` y `pnpm db:up`.
+
+### Móvil: `apps/mobile/.env`
+
+| Variable | Obligatoria | Para qué |
+|---|---|---|
+| `EXPO_PUBLIC_API_URL` | No | Dirección de Tierra inicial, normalmente `https://haven-eta-gray.vercel.app`; por defecto `http://localhost:3000` |
+
+Es solo el valor inicial: al unirse a una misión por QR o código, la app guarda la dirección de la invitación, y también se puede cambiar en Ajustes. Expo incrusta las variables `EXPO_PUBLIC_*` al compilar el bundle, así que no deben contener secretos y hay que reiniciar Metro (`pnpm start -c`) al cambiarlas.
+
+### Vercel
+
+El proyecto de Vercel usa `apps/web` como directorio raíz y las mismas variables que `apps/web/.env.local`: `MONGODB_URI` y, si no es `haven`, `MONGODB_DB`. `MONGODB_USE_LOCAL` no debe activarse ahí. En Atlas, el acceso de red tiene que permitir las conexiones desde Vercel.
+
+## Web (Vista de Tierra)
 
 ```bash
-pnpm dev:web                     # http://localhost:3000, escucha en 0.0.0.0 para la red local
-curl localhost:3000/api/health     # {"ok":true,"mongo":...}
-pnpm --filter web seed    # siembra la misión Ares-1 (ARES01)
-pnpm --filter web build
+pnpm dev:web                 # escucha en 0.0.0.0, también para teléfonos en la red local
+pnpm --filter web build      # compilación de producción
+pnpm --filter web seed       # siembra la misión de ejemplo Ares-1 (código ARES01)
+pnpm --filter web test:api   # prueba la API contra un servidor en marcha
 ```
+
+`seed` y `test:api` leen `apps/web/.env.local`, así que escriben en la misma base de datos que la web: en Atlas, salvo que `MONGODB_USE_LOCAL=true`. `test:api` usa `http://localhost:3000` y se puede apuntar a otro servidor con `API_URL`.
 
 Añadir componentes de shadcn: `cd apps/web && pnpm dlx shadcn@latest add <componente>`.
 
-### Móvil
+### API
 
-El proyecto usa librerías nativas, así que se trabaja con una **compilación de desarrollo** (no Expo Go).
+| Ruta | Uso |
+|---|---|
+| `GET /api/health` | Comprueba que la API responde y que MongoDB está accesible |
+| `/api/missions` | Misiones y sus fases |
+| `/api/crew` | Tripulación de una misión |
+| `/api/astronaut/[id]` | Detalle de un astronauta y sus paquetes |
+| `/api/packets` | Paquetes que envía la app del astronauta |
+| `/api/rules` | Reglas vigentes para una misión |
+| `/api/aggregates` | Agregados para las tendencias de la tripulación |
+
+## Móvil
+
+La app usa librerías nativas, así que se trabaja con una compilación de desarrollo, no con Expo Go.
 
 ```bash
 cd apps/mobile
-pnpm ios                           # expo run:ios: prebuild + compila + abre el simulador
-pnpm android                       # expo run:android
-pnpm start                         # solo Metro, para una compilación de desarrollo ya instalada
-pnpm web                           # versión web de demo (solo simulador)
+pnpm ios        # prebuild, compila y abre el simulador
+pnpm android
+pnpm start      # solo Metro, para una compilación ya instalada
 ```
 
-`ios/` y `android/` **no se versionan**: se regeneran con `pnpm prebuild` (Continuous Native Generation). Toda configuración nativa va en `app.json` o en config plugins.
+`ios/` y `android/` no se versionan: se regeneran con `pnpm prebuild`. La configuración nativa va en `app.json` o en config plugins.
 
-Instalar paquetes siempre con `npx expo install <paquete>` (elige la versión compatible con el SDK). Añadir componentes de React Native Reusables: `npx @react-native-reusables/cli@latest add <componente>`.
+Instalar paquetes con `npx expo install <paquete>`, que elige la versión compatible con el SDK. Añadir componentes de React Native Reusables: `npx @react-native-reusables/cli@latest add <componente>`.
+
+### Enlace con Tierra
+
+1. En la web, crear la misión y su tripulación.
+2. En la página de tripulación, mostrar el QR o el código de invitación del astronauta.
+3. En la app, unirse escaneando el QR o escribiendo el código.
+
+A partir de ahí la app envía sus paquetes a `/api/packets`. Sin conexión los guarda en una cola local y los envía cuando vuelve el enlace.
 
 ### Apple Watch
 
-El código vive en `apps/mobile/targets/watch/` y el prebuild lo añade como target `HAVEN Watch` dentro del proyecto iOS (decisión del punto 4 de *Arquitectura técnica*). Para trabajarlo: `pnpm prebuild` y abrir `apps/mobile/ios/HAVEN.xcworkspace` en Xcode; el esquema `HAVEN` compila e incrusta el reloj. Lo editado en Xcode **fuera** de `targets/` se pierde en el siguiente prebuild.
+El código vive en `apps/mobile/targets/watch/` y el prebuild lo añade como target dentro del proyecto de iOS. Para trabajarlo: `pnpm prebuild` y abrir `apps/mobile/ios/HAVEN.xcworkspace` en Xcode; el esquema `HAVEN` compila e incrusta el reloj. Lo que se edite en Xcode fuera de `targets/` se pierde en el siguiente prebuild.
 
-Antes de instalar en dispositivos reales, poner el Team ID de Apple en `ios.appleTeamId` de `apps/mobile/app.json`.
+Para instalar en dispositivos reales hay que poner el Team ID de Apple en `ios.appleTeamId` de `apps/mobile/app.json`.
 
 ### EAS
 
 ```bash
 cd apps/mobile
 npx eas-cli@latest login
-npx eas-cli@latest init            # crea el proyecto y escribe extra.eas.projectId
+npx eas-cli@latest init
+npx eas-cli@latest build --profile development --platform ios
 npx eas-cli@latest build --profile development --platform android
-npx eas-cli@latest build --profile development --platform ios --local   # iOS en la Mac, por las colas del plan gratuito
 ```
 
-## Probar y hacer la demo (simuladores)
+## Probar en simuladores
 
-Todo se prueba en los simuladores de Xcode 27 (visibles en DeviceHub), no en el navegador. Detalles en la cabecera de `scripts/sim/sim.sh`.
+`scripts/sim/sim.sh` automatiza los simuladores de iOS y watchOS: reservar un par iPhone + Apple Watch, abrir rutas, tocar, escribir, capturar pantalla y grabar video.
 
 ```bash
-pnpm dev:web                                   # API + Vista de Tierra en :3000
-pnpm --filter web seed                  # datos de prueba de la misión Ares-1 (ARES01) en MongoDB
-API_URL=http://localhost:3000 pnpm --filter web test:api
-cd apps/mobile && npx expo start --port 8081 --dev-client   # Metro para los simuladores
-scripts/sim/sim.sh acquire watch                 # par iPhone 17 Pro Max + Apple Watch Ultra 4 (instala la app)
-scripts/sim/sim.sh open <udid> dev               # /dev (solo desarrollo): «Cargar datos de prueba» como registros
+pnpm dev:web
+pnpm --filter web seed
+cd apps/mobile && npx expo start --port 8081 --dev-client
+scripts/sim/sim.sh acquire watch
+scripts/sim/sim.sh status
 ```
 
-Demo de punta a punta: SOS en el reloj → el iPhone abre el triaje con la frecuencia cardíaca del reloj → «Terminar»
-→ el paquete llega a la Tierra al instante (`/astronaut/<id>?tab=packets`) → el reloj cierra el monitor.
-HAVEN es el producto real: nada en la interfaz es simulado y no hay retardo artificial; los datos de prueba son
-registros (MongoDB, base local, HealthKit de los simuladores) cargados con herramientas solo de desarrollo.
+Recorrido de punta a punta: SOS en el reloj → el iPhone abre el triaje con la frecuencia cardíaca del reloj → «Terminar» → el paquete aparece en Tierra en `/astronaut/<id>?tab=packets`.
 
 ## Comandos de la raíz
 
 | Comando | Qué hace |
 |---|---|
-| `pnpm feature …` | Crea una feature con su estructura |
-| `pnpm lint` / `pnpm lint:fix` | Biome en todo el repo, incluidas las fronteras entre features |
+| `pnpm dev:web` | Arranca la web en `localhost:3000` |
+| `pnpm dev:mobile` | Arranca Metro para la app móvil |
+| `pnpm build` | Compila la web |
+| `pnpm lint` / `pnpm lint:fix` | Biome en todo el repo |
 | `pnpm format` | Formatea con Biome |
 | `pnpm lint:swift` / `pnpm format:swift` | swift-format sobre `apps/mobile/targets` |
-| `pnpm typecheck` | TypeScript en todos los paquetes (Turborepo) |
-| `pnpm test` | Tests de core (Vitest) y de la lógica pura del móvil |
-| `pnpm lint:swift` | swift-format estricto sobre el reloj y el módulo nativo |
-| `pnpm build` | Compila lo que tenga `build` (hoy, la web) |
-| `pnpm db:up` / `pnpm db:down` | Levanta o para MongoDB |
+| `pnpm typecheck` | TypeScript en todos los paquetes |
+| `pnpm test` | Tests de core y del móvil |
+| `pnpm db:up` / `pnpm db:down` | Levanta o para MongoDB local en Docker |
+| `pnpm feature <mobile\|web> <carpeta> <ID> "<título es>" "<título en>"` | Crea una feature con su estructura |
 
-## Forma de trabajo
+## Cómo trabajamos
 
-Resumen de *Forma de trabajo* del vault: features verticales, dueño único, contratos congelados el primer día.
-
-1. Una feature, una persona, de punta a punta.
-2. Las features no comparten archivos; lo compartido está en `packages/core` y solo cambia por acuerdo anunciado en el Tablero.
-3. Una feature en curso por persona.
-4. La nota de feature es el prompt.
-5. Integrar en `main` varias veces al día, con ramas cortas.
-6. Lo que no existe se simula.
-7. Orden por valor para el jurado.
-
-### Definition of Done
-
-- [ ] Funciona sin conexión; nada depende de un servidor.
-- [ ] Textos en español e inglés, sin jerga médica sin explicar.
-- [ ] Umbrales, textos y protocolos salen de la configuración versionada, no del código.
-- [ ] Cada dato muestra fuente, antigüedad y si es simulado; «sin datos» nunca se ve como «normal».
-- [ ] Detalles como pantallas, sin ventanas emergentes; objetivos táctiles grandes; usable con poca luz.
-- [ ] Descargos visibles: apoyo a la decisión y no sustituto del cirujano de vuelo; no es un dispositivo médico; sin afiliación a la NASA.
-- [ ] Fuentes de NASA citadas donde se muestre contenido médico o datos del OSDR.
-- [ ] Lint y pruebas en verde; se demuestra en 60 segundos; solo tocó sus archivos o los contratos por acuerdo.
-
-## Fuentes y uso de IA
-
-Pendiente de P05 (*Video, pitch y repositorio*): fuentes citadas y declaración de uso de IA.
+- Una feature por carpeta, de punta a punta, con un responsable.
+- Las features no comparten archivos; lo común vive en `packages/core` o en `shared/`.
+- Umbrales, textos y protocolos salen de la configuración de `packages/core/config`, no del código.
+- Textos en español e inglés.
+- La app funciona sin conexión; «sin datos» nunca se muestra como «normal».
+- Ramas cortas hacia `main`, con lint, typecheck y tests en verde.
 
 ## Licencia
 
-Apache 2.0, ver [LICENSE](LICENSE). HAVEN es una herramienta de apoyo a la decisión, no un dispositivo médico, y no tiene afiliación con la NASA.
+Apache 2.0, ver [LICENSE](LICENSE).

@@ -9,9 +9,9 @@ const args = process.argv.slice(2);
 const noScreen = args.includes('--no-screen');
 const [app, folder, id, titleEs, titleEn = titleEs] = args.filter((a) => !a.startsWith('--'));
 
-if (!['mobile', 'earth'].includes(app) || !folder || !id || !titleEs) {
+if (!['mobile', 'web'].includes(app) || !folder || !id || !titleEs) {
   console.error(
-    'Usage: pnpm feature <mobile|earth> <folder> <ID> "<es title>" "<en title>" [--no-screen]',
+    'Usage: pnpm feature <mobile|web> <folder> <ID> "<es title>" "<en title>" [--no-screen]',
   );
   process.exit(1);
 }

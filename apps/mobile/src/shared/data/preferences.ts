@@ -12,7 +12,7 @@ export type Appearance = 'dark' | 'light' | 'system';
 export function defaultPreferences(): Preferences {
   return {
     language: systemLanguage(),
-    apiUrl: 'http://localhost:3000',
+    apiUrl: process.env.EXPO_PUBLIC_API_URL?.trim() || 'http://localhost:3000',
     crewMember: 'elena-vega',
     appearance: 'dark',
   };
