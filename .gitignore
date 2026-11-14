@@ -6,9 +6,7 @@ apps/mobile/ios
 apps/mobile/android
 
 # Secrets
-.env
-.env.local
-.env*.local
+.env*
 !.env.example
 
 # Next.js
