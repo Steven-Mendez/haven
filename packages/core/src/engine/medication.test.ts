@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { medications as cfg } from '../config';
 import type { CrewPlan } from '../contracts';
+import type { Dose } from './medication';
 import {
   adherence,
   asNeededToday,
+  canRecordDose,
   cleanAssignments,
   doseReading,
   dosesForDay,
+  recordableFrom,
   scheduledDoses,
 } from './medication';
 
@@ -34,6 +37,7 @@ describe('medication config', () => {
       ).toEqual(m.schedule);
     }
     expect(cfg.doseWindowHours).toBeGreaterThan(0);
+    expect(cfg.earlyHours).toBeGreaterThanOrEqual(0);
   });
 });
 
@@ -81,6 +85,28 @@ describe('dosesForDay', () => {
       ['vitamin-b-complex', 'due'],
       ['antibiotic', 'upcoming'],
     ]);
+  });
+});
+
+describe('canRecordDose', () => {
+  const dose = (scheduledAt: string, status: Dose['status']): Dose => ({
+    medication: 'antibiotic',
+    scheduledAt,
+    status,
+  });
+
+  it('allows due and missed doses and upcoming ones within the early window', () => {
+    expect(canRecordDose(dose('2026-11-14T11:00:00.000Z', 'due'), cfg, NOW)).toBe(true);
+    expect(canRecordDose(dose('2026-11-14T08:00:00.000Z', 'missed'), cfg, NOW)).toBe(true);
+    expect(canRecordDose(dose('2026-11-14T13:00:00.000Z', 'upcoming'), cfg, NOW)).toBe(true);
+  });
+
+  it('refuses doses far ahead and doses already recorded', () => {
+    expect(canRecordDose(dose('2026-11-14T20:00:00.000Z', 'upcoming'), cfg, NOW)).toBe(false);
+    expect(canRecordDose(dose('2026-11-14T08:00:00.000Z', 'taken'), cfg, NOW)).toBe(false);
+    expect(recordableFrom(dose('2026-11-14T20:00:00.000Z', 'upcoming'), cfg)).toBe(
+      '2026-11-14T19:00:00.000Z',
+    );
   });
 });
 

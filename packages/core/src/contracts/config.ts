@@ -171,6 +171,8 @@ export type Medication = {
 export type MedicationConfig = {
   /** Hours after the scheduled time during which a dose is still due, not missed. */
   doseWindowHours: number;
+  /** How long before its time a scheduled dose can already be logged. */
+  earlyHours: number;
   catalog: Medication[];
   source: string;
 };

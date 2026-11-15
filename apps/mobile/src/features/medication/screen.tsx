@@ -1,11 +1,13 @@
 import {
   asNeededToday,
+  canRecordDose,
   type Dose,
   type DoseStatus,
   doseReading,
   dosesForDay,
   type Level,
   medications,
+  recordableFrom,
 } from '@haven/core';
 import { randomUUID } from 'expo-crypto';
 import { useEffect, useMemo, useState } from 'react';
@@ -99,7 +101,8 @@ export default function Screen() {
 
   const doseRow = (dose: Dose, i: number) => {
     const med = medicationOf(dose.medication);
-    const open = dose.status === 'due' || dose.status === 'missed' || dose.status === 'upcoming';
+    const open = canRecordDose(dose, medications, now);
+    const later = dose.status === 'upcoming' && !open;
     return (
       <View
         key={`${dose.medication}-${dose.scheduledAt}`}
@@ -134,6 +137,10 @@ export default function Screen() {
               }
             />
           </View>
+        ) : later ? (
+          <Text className="text-tertiary text-caption">
+            {format(t.availableFrom, { time: recordableFrom(dose, medications).slice(11, 16) })}
+          </Text>
         ) : null}
       </View>
     );

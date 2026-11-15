@@ -114,6 +114,21 @@ export function dosesForDay(
   });
 }
 
+/**
+ * Whether a scheduled dose can be logged now: when it is due or missed, or
+ * up to `earlyHours` before its time. A recorded dose cannot be logged again.
+ */
+export function canRecordDose(dose: Dose, cfg: MedicationConfig, now: Date): boolean {
+  if (dose.status === 'due' || dose.status === 'missed') return true;
+  if (dose.status !== 'upcoming') return false;
+  return ms(dose.scheduledAt) - now.getTime() <= cfg.earlyHours * HOUR_MS;
+}
+
+/** When an upcoming dose can start being logged. */
+export function recordableFrom(dose: Pick<Dose, 'scheduledAt'>, cfg: MedicationConfig): string {
+  return new Date(ms(dose.scheduledAt) - cfg.earlyHours * HOUR_MS).toISOString();
+}
+
 export function asNeededToday(
   plan: CrewPlan,
   cfg: MedicationConfig,

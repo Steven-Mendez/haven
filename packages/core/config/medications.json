@@ -1,5 +1,6 @@
 {
   "doseWindowHours": 2,
+  "earlyHours": 1,
   "catalog": [
     {
       "id": "vitamin-d",
