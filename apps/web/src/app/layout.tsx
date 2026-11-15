@@ -89,6 +89,7 @@ async function HeaderWithData() {
       lang={lang}
       day={crew?.mission.day}
       linkDown={crew?.mission.linkDown}
+      delayMin={crew?.mission.delayMin}
       crewNames={Object.fromEntries(members.map((m) => [m.id, m.name]))}
       crew={members.map((m) => ({ id: m.id, name: m.name, level: crewDisplayLevel(m) }))}
     />

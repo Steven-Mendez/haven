@@ -131,6 +131,14 @@ export const havenTexts = defineTexts({
     headerDelay: 'Retardo {t} por trayecto',
     headerDelayShort: 'Retardo {t}',
     linkDownShort: 'Sin enlace',
+    linkRealtime: 'En directo',
+    linkDelayed: 'Retardo {t}',
+    linkAutonomous: 'Autónoma · {t}',
+    linkRealtimeHint: 'Comunicación en directo: lo que envíes llega a bordo en segundos.',
+    linkDelayedHint:
+      'Lo que envíes ahora llega a bordo en {t}; una respuesta de la tripulación tarda al menos {rt}.',
+    linkAutonomousHint:
+      'Tripulación autónoma: lo que envíes llega a bordo en {t} ({rt} de ida y vuelta). En una emergencia actúan sin esperar a Tierra.',
     dataAge: 'Antigüedad',
     groupCount: '{n} astronautas',
     keyboardHint: 'j / k para moverte · ↵ para abrir',
@@ -330,6 +338,14 @@ export const havenTexts = defineTexts({
     headerDelay: '{t} one-way delay',
     headerDelayShort: 'Delay {t}',
     linkDownShort: 'No link',
+    linkRealtime: 'Live',
+    linkDelayed: 'Delay {t}',
+    linkAutonomous: 'Autonomous · {t}',
+    linkRealtimeHint: 'Live communication: what you send reaches the crew in seconds.',
+    linkDelayedHint:
+      'What you send now reaches the crew in {t}; a reply from the crew takes at least {rt}.',
+    linkAutonomousHint:
+      'Autonomous crew: what you send reaches them in {t} ({rt} round trip). In an emergency they act without waiting for Earth.',
     dataAge: 'Data age',
     groupCount: '{n} astronauts',
     keyboardHint: 'j / k to move · ↵ to open',
