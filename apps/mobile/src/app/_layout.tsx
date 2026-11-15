@@ -70,6 +70,7 @@ export default function RootLayout() {
         <Stack.Screen name="profile" options={{ title: t.profile }} />
         <Stack.Screen name="settings" options={{ title: t.settings }} />
         <Stack.Screen name="streak" options={{ title: t.streak }} />
+        <Stack.Screen name="eva" options={{ title: t.eva }} />
       </Stack>
       {phase === 'starting' ? (
         <View className="bg-background absolute inset-0 items-center justify-center gap-4">
