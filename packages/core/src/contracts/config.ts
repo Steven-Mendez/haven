@@ -117,3 +117,22 @@ export type Step = {
   options?: { text: I18n; next: string }[];
   next?: string;
 };
+
+export type ReentryCheckItem = { id: string; name: I18n; detail: I18n };
+
+export type ReentryConfig = {
+  /** How far back the preparation readings count, in hours. */
+  windowHours: number;
+  checklist: ReentryCheckItem[];
+  orthostatic: {
+    supineSeconds: number;
+    standingSeconds: number;
+    /** Heart-rate rise on standing, in bpm, that turns the test amber. */
+    amberRise: number;
+    /** Heart-rate rise on standing, in bpm, that turns the test red. */
+    redRise: number;
+    /** Symptoms that turn the test red when they appear while standing. */
+    symptoms: string[];
+  };
+  source: string;
+};
