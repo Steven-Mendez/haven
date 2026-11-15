@@ -231,3 +231,8 @@ export async function saveSampleResult(
   await connection();
   return querySaveSampleResult(mission, input);
 }
+
+export async function getCrewPlan(mission: string, crewMember: string) {
+  await connection();
+  return queryGetPlan(mission, crewMember);
+}
