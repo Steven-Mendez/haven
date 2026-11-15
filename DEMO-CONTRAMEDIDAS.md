@@ -19,16 +19,16 @@ Elige la misión en **Misiones** y abre:
 |---|---|---|
 | `DEMORE` · Demo reentrada (día de reentrada) | **Reentrada** (`/reentry`, atajo `g a`) | Lucía lista; Omar a revisar (+34 lpm); Nina con mareo y poca hidratación (ayuda al levantarse); Tomás sin empezar |
 | `DEMOEV` · Demo EVA lunar (en la Luna) | **Aptitud EVA** (`/eva`) | Kai apto; Sofía a revisar (prerrespiración de 8 de 15 min y O₂ de cabina bajo); Diego no apto (dolor articular tras la salida) |
-| `DEMOMS` · Demo medicación y muestras (día 40 en la estación) | **Medicación** (`/medication`, atajo `g p`) | Inés con adherencia buena; Jonas baja (36 %) y antibiótico en curso; Aiko con 2 de 2 antimareos hoy. el lápiz de cada fila abre el plan en un panel lateral |
+| `DEMOMS` · Demo medicación y muestras (día 40 en la estación) | **Medicación** (`/medication`, atajo `g p`) | Inés con adherencia buena; Jonas baja (36 %) y antibiótico en curso; Aiko con 2 de 2 antimareos hoy. El lápiz de cada fila abre el plan en un panel lateral |
 | `DEMOMS` | **Muestras** (`/samples`, atajo `g s`) | Estado de cada muestra por tripulante; en «Resultados por cargar», la ficha de la saliva de Jonas muestra su nota, fiebre la noche anterior y un historial de herpes en aumento; al escribir los valores se clasifica sola |
 | `DEMOMS` | **Ejercicio** (`/exercise`, atajo `g x`) | Cumplimiento de la pauta de fuerza + aeróbico en los últimos 7 días. Inés cumple y su autoevaluación sugiere subir; Jonas, baja (3 días) y sugiere bajar carga; Aiko tiene una pauta suave ajustada por el mareo y la autoevaluación pendiente. El lápiz abre la pauta en un panel lateral; «Volver a la pauta inicial» quita el ajuste |
 | `DEMOCN` · Demo cinetosis (día 2 en la Luna) | **Cinetosis** (`/motion`, atajo `g v`) | Escala de mareo 0–10 de las últimas 48 h, los últimos 7 días, la ventana de adaptación tras el cambio de gravedad y la prueba de equilibrio. Lucía ya casi sin mareo; Omar con náusea (7/10) y equilibrio muy alterado; Mei con mareo ayer y sin registro hoy |
-| `DEMOMS` | **Carga de trabajo** (`/workload`, atajo `g w`) | Horas de los últimos 7 días, fatiga (Samn-Perelli 1–7) y sueño medio. Inés razonable con un día de descanso; Aiko alta con 3 jornadas largas seguidas; Jonas pide descanso: 73,5 h sin descanso, fatiga 6/7 y noches cortas. Los indicadores nuevos también aparecen en Indicadores y KPI |
+| `DEMOMS` | **Carga de trabajo** (`/workload`, atajo `g w`) | Horas de los últimos 7 días, fatiga (Samn-Perelli 1–7) y sueño medio. Inés razonable con un día de descanso; Aiko alta con 3 jornadas largas seguidas; Jonas pide descanso: más de 70 h sin un día libre, fatiga 6/7 y noches cortas. Los indicadores nuevos también aparecen en Indicadores y KPI |
 | `DEMOMA` · Demo Marte (12 min de retardo) | **Cabecera** de cualquier pestaña | El chip del enlace dice «Autónoma · 12 min» y, al pasar el ratón, cuánto tarda en llegar a bordo lo que envíes y la ida y vuelta. En la Luna dice «En directo». Si hay una emergencia abierta, la bandeja recuerda que la tripulación ya habrá actuado |
 
 ## App (simulador)
 
-1. Únete con el código `DEMORE` o `DEMOEV` y elige **Revisor (tu app)**. La dirección de Tierra por defecto es `http://localhost:3000`.
+1. Únete con el código de la misión que quieras revisar (`DEMORE`, `DEMOEV`, `DEMOMS`, `DEMOCN` o `DEMOMA`) y elige **Revisor (tu app)**. La dirección de Tierra por defecto es `http://localhost:3000`.
 2. **DEMORE**: en **Rutina** aparece «Preparación de reentrada» → marca líquidos y prenda, y haz la prueba ortostática (los temporizadores son orientativos: puedes seguir antes de que terminen).
 3. **DEMOEV**: en **Rutina** aparece «Salida extravehicular (EVA)» → elige el método, empieza la prerrespiración (15 min en la Luna), termina o interrumpe, y haz el chequeo al volver. Marcar «Dolor articular» abre el protocolo de enfermedad por descompresión.
 4. **DEMOMS**: en **Rutina** aparecen «Medicación» (vitamina D y antibiótico ya tocan) y «Muestras» (atrasadas). Marca «Tomé»/«Omití» y registra recogidas; el hisopado pide el módulo. Si cambias tu plan en la web, la app lo descarga en menos de un minuto.
@@ -46,4 +46,4 @@ xcrun simctl openurl booted "haven://join?mission=DEMOMS&crew=revisor&api=http%3
 
 ## Identidad visual
 
-Las pestañas de Tierra de estas funcionalidades (Aptitud EVA, Reentrada, Medicación y Muestras) siguen el rediseño de `main`: tabla en tarjeta con cabecera en mayúsculas pequeñas, icono en cuadro en la primera columna, estados como píldoras sobre los colores de escala y pie con totales. Las piezas comunes están en `apps/web/src/features/extras/components/panel-parts.tsx`.
+Las pestañas de Tierra de estas funcionalidades (Aptitud EVA, Reentrada, Medicación, Muestras, Ejercicio, Cinetosis y Carga de trabajo) siguen el rediseño de `main`: tabla en tarjeta con cabecera en mayúsculas pequeñas, icono en cuadro en la primera columna, estados como píldoras sobre los colores de escala y pie con totales. Las piezas comunes están en `apps/web/src/features/extras/components/panel-parts.tsx`.
