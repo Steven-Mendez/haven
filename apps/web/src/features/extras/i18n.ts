@@ -540,6 +540,10 @@ export const texts = defineTexts({
     overrideAuto: 'Automático',
     overridden: 'corregido a mano',
     pendingTitle: 'Resultados por cargar',
+    pendingDescription:
+      'Abre la ficha de cada muestra para ver cómo se recogió, su contexto y los resultados anteriores, y carga los valores del laboratorio.',
+    flaggedResults: 'Resultados alterados',
+    samplesFooter: '{collected} de {total} muestras recogidas en su fecha',
     samplesEmpty: 'La misión aún no tiene tripulación',
     samplesEmptyDetail: 'Añade la tripulación en Misiones para seguir sus muestras.',
     pendingEmpty: 'No hay muestras esperando resultado.',
@@ -1094,6 +1098,10 @@ export const texts = defineTexts({
     overrideAuto: 'Automatic',
     overridden: 'set by hand',
     pendingTitle: 'Results to enter',
+    pendingDescription:
+      'Open each sample’s record to see how it was collected, its context and earlier results, and enter the lab values.',
+    flaggedResults: 'Abnormal results',
+    samplesFooter: '{collected} of {total} samples collected on time',
     samplesEmpty: 'The mission has no crew yet',
     samplesEmptyDetail: 'Add the crew in Missions to follow their samples.',
     pendingEmpty: 'No sample is waiting for a result.',
