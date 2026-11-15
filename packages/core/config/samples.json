@@ -4,7 +4,10 @@
     {
       "id": "saliva",
       "kind": "biological",
-      "name": { "es": "Saliva seca", "en": "Dried saliva" },
+      "name": {
+        "es": "Saliva seca",
+        "en": "Dried saliva"
+      },
       "detail": {
         "es": "Moja la tarjeta de papel con saliva, déjala secar y guárdala a temperatura ambiente. Sirve para detectar a tiempo la reactivación de virus latentes.",
         "en": "Wet the paper card with saliva, let it dry and store it at room temperature. It detects the reactivation of latent viruses early."
@@ -14,12 +17,74 @@
       "abnormal": {
         "es": "Reactivación de virus latentes (herpes, Epstein-Barr o varicela)",
         "en": "Latent virus reactivation (herpes, Epstein-Barr or varicella)"
-      }
+      },
+      "questions": [
+        {
+          "id": "ate",
+          "label": {
+            "es": "¿Comiste o bebiste en los 30 minutos anteriores?",
+            "en": "Did you eat or drink in the previous 30 minutes?"
+          },
+          "options": [
+            {
+              "id": "yes",
+              "label": {
+                "es": "Sí",
+                "en": "Yes"
+              }
+            },
+            {
+              "id": "no",
+              "label": {
+                "es": "No",
+                "en": "No"
+              }
+            }
+          ]
+        }
+      ],
+      "context": ["body-temperature", "wrist-temperature", "stress", "sleep"],
+      "maxAgeDays": 30,
+      "analytes": [
+        {
+          "id": "ebv",
+          "name": {
+            "es": "ADN de Epstein-Barr",
+            "en": "Epstein-Barr DNA"
+          },
+          "unit": "copias/mL",
+          "green": [0, 1000],
+          "red": [0, 100000]
+        },
+        {
+          "id": "vzv",
+          "name": {
+            "es": "ADN de varicela-zóster",
+            "en": "Varicella-zoster DNA"
+          },
+          "unit": "copias/mL",
+          "green": [0, 10],
+          "red": [0, 10000]
+        },
+        {
+          "id": "hsv1",
+          "name": {
+            "es": "ADN de herpes simple 1",
+            "en": "Herpes simplex 1 DNA"
+          },
+          "unit": "copias/mL",
+          "green": [0, 10],
+          "red": [0, 10000]
+        }
+      ]
     },
     {
       "id": "blood",
       "kind": "biological",
-      "name": { "es": "Sangre", "en": "Blood" },
+      "name": {
+        "es": "Sangre",
+        "en": "Blood"
+      },
       "detail": {
         "es": "Extracción en ayunas con el kit de a bordo; centrifuga y congela el tubo según la tarjeta del kit.",
         "en": "Fasting draw with the onboard kit; spin and freeze the tube as the kit card says."
@@ -29,12 +94,104 @@
       "abnormal": {
         "es": "Cambios inmunitarios o metabólicos que revisar",
         "en": "Immune or metabolic changes to review"
-      }
+      },
+      "questions": [
+        {
+          "id": "fasting",
+          "label": {
+            "es": "¿Estabas en ayunas?",
+            "en": "Were you fasting?"
+          },
+          "options": [
+            {
+              "id": "yes",
+              "label": {
+                "es": "Sí",
+                "en": "Yes"
+              }
+            },
+            {
+              "id": "no",
+              "label": {
+                "es": "No",
+                "en": "No"
+              }
+            }
+          ]
+        },
+        {
+          "id": "storage",
+          "label": {
+            "es": "¿Cómo la guardaste?",
+            "en": "How did you store it?"
+          },
+          "options": [
+            {
+              "id": "frozen",
+              "label": {
+                "es": "Congelada",
+                "en": "Frozen"
+              }
+            },
+            {
+              "id": "cold",
+              "label": {
+                "es": "Refrigerada",
+                "en": "Refrigerated"
+              }
+            },
+            {
+              "id": "room",
+              "label": {
+                "es": "Temperatura ambiente",
+                "en": "Room temperature"
+              }
+            }
+          ]
+        }
+      ],
+      "context": ["glucose", "heart-rate", "food-intake", "sleep"],
+      "maxAgeDays": 14,
+      "analytes": [
+        {
+          "id": "wbc",
+          "name": {
+            "es": "Leucocitos",
+            "en": "White blood cells"
+          },
+          "unit": "10⁹/L",
+          "green": [4, 11],
+          "red": [2, 30]
+        },
+        {
+          "id": "lymphocytes",
+          "name": {
+            "es": "Linfocitos",
+            "en": "Lymphocytes"
+          },
+          "unit": "10⁹/L",
+          "green": [1, 4.8],
+          "red": [0.5, 10]
+        },
+        {
+          "id": "glucose",
+          "name": {
+            "es": "Glucosa en ayunas",
+            "en": "Fasting glucose"
+          },
+          "unit": "mg/dL",
+          "green": [70, 99],
+          "red": [54, 250]
+        }
+      ]
     },
     {
       "id": "urine",
       "kind": "biological",
-      "name": { "es": "Orina", "en": "Urine" },
+      "name": {
+        "es": "Orina",
+        "en": "Urine"
+      },
       "detail": {
         "es": "Primera orina de la mañana en el recipiente del kit; congélala con la etiqueta de la fecha.",
         "en": "First morning urine in the kit container; freeze it with the date label."
@@ -44,12 +201,94 @@
       "abnormal": {
         "es": "Riesgo de cálculos renales o pérdida de hueso alta",
         "en": "Kidney stone risk or high bone loss"
-      }
+      },
+      "questions": [
+        {
+          "id": "first-morning",
+          "label": {
+            "es": "¿Era la primera orina de la mañana?",
+            "en": "Was it the first urine of the morning?"
+          },
+          "options": [
+            {
+              "id": "yes",
+              "label": {
+                "es": "Sí",
+                "en": "Yes"
+              }
+            },
+            {
+              "id": "no",
+              "label": {
+                "es": "No",
+                "en": "No"
+              }
+            }
+          ]
+        },
+        {
+          "id": "storage",
+          "label": {
+            "es": "¿Cómo la guardaste?",
+            "en": "How did you store it?"
+          },
+          "options": [
+            {
+              "id": "frozen",
+              "label": {
+                "es": "Congelada",
+                "en": "Frozen"
+              }
+            },
+            {
+              "id": "cold",
+              "label": {
+                "es": "Refrigerada",
+                "en": "Refrigerated"
+              }
+            },
+            {
+              "id": "room",
+              "label": {
+                "es": "Temperatura ambiente",
+                "en": "Room temperature"
+              }
+            }
+          ]
+        }
+      ],
+      "context": ["hydration", "weight", "food-intake"],
+      "maxAgeDays": 14,
+      "analytes": [
+        {
+          "id": "calcium",
+          "name": {
+            "es": "Calcio",
+            "en": "Calcium"
+          },
+          "unit": "mmol/L",
+          "green": [1, 7.5],
+          "red": [0, 12]
+        },
+        {
+          "id": "specific-gravity",
+          "name": {
+            "es": "Densidad",
+            "en": "Specific gravity"
+          },
+          "unit": "g/mL",
+          "green": [1.005, 1.03],
+          "red": [1.001, 1.04]
+        }
+      ]
     },
     {
       "id": "surface-swab",
       "kind": "environment",
-      "name": { "es": "Hisopado de superficies", "en": "Surface swab" },
+      "name": {
+        "es": "Hisopado de superficies",
+        "en": "Surface swab"
+      },
       "detail": {
         "es": "Pasa el hisopo por las superficies que más se tocan del módulo (asas, paneles, mesa) y ciérralo en su tubo.",
         "en": "Run the swab over the most touched surfaces of the module (handles, panels, table) and seal it in its tube."
@@ -57,16 +296,96 @@
       "everyDays": 14,
       "firstDay": 7,
       "modules": [
-        { "id": "sleep", "name": { "es": "Dormitorio", "en": "Sleep station" } },
-        { "id": "galley", "name": { "es": "Cocina", "en": "Galley" } },
-        { "id": "hygiene", "name": { "es": "Higiene", "en": "Hygiene" } },
-        { "id": "lab", "name": { "es": "Laboratorio", "en": "Lab" } }
+        {
+          "id": "sleep",
+          "name": {
+            "es": "Dormitorio",
+            "en": "Sleep station"
+          }
+        },
+        {
+          "id": "galley",
+          "name": {
+            "es": "Cocina",
+            "en": "Galley"
+          }
+        },
+        {
+          "id": "hygiene",
+          "name": {
+            "es": "Higiene",
+            "en": "Hygiene"
+          }
+        },
+        {
+          "id": "lab",
+          "name": {
+            "es": "Laboratorio",
+            "en": "Lab"
+          }
+        }
       ],
       "abnormal": {
         "es": "Crecimiento de microbios por encima del límite o bacterias resistentes",
         "en": "Microbial growth above the limit or resistant bacteria"
-      }
+      },
+      "questions": [
+        {
+          "id": "surface",
+          "label": {
+            "es": "¿Qué superficie?",
+            "en": "Which surface?"
+          },
+          "options": [
+            {
+              "id": "handles",
+              "label": {
+                "es": "Asas y barandillas",
+                "en": "Handles and rails"
+              }
+            },
+            {
+              "id": "panels",
+              "label": {
+                "es": "Paneles y pantallas",
+                "en": "Panels and screens"
+              }
+            },
+            {
+              "id": "table",
+              "label": {
+                "es": "Mesa o encimera",
+                "en": "Table or counter"
+              }
+            }
+          ]
+        }
+      ],
+      "context": ["cabin-co2"],
+      "maxAgeDays": 7,
+      "analytes": [
+        {
+          "id": "bacteria",
+          "name": {
+            "es": "Bacterias",
+            "en": "Bacteria"
+          },
+          "unit": "UFC/100 cm²",
+          "green": [0, 10000],
+          "red": [0, 100000]
+        },
+        {
+          "id": "fungi",
+          "name": {
+            "es": "Hongos",
+            "en": "Fungi"
+          },
+          "unit": "UFC/100 cm²",
+          "green": [0, 100],
+          "red": [0, 1000]
+        }
+      ]
     }
   ],
-  "source": "Muestras de saliva seca en papel a temperatura ambiente, sangre y orina para vigilar la reactivación viral y los cambios inmunitarios, y muestreo de superficies del hábitat: NASA HRP, Risks of Human Spaceflight (https://www.nasa.gov/hrp/risks/). Frecuencias en días de misión: referencia provisional; el calendario real lo fija el equipo médico."
+  "source": "Muestras de saliva seca en papel a temperatura ambiente, sangre y orina para vigilar la reactivación viral y los cambios inmunitarios, y muestreo de superficies del hábitat: NASA HRP, Risks of Human Spaceflight (https://www.nasa.gov/hrp/risks/). Frecuencias en días de misión: referencia provisional; el calendario real lo fija el equipo médico. Límites de superficie de 10 000 UFC/100 cm² de bacterias y 100 UFC/100 cm² de hongos como en la estación espacial; demás rangos de referencia, umbrales críticos y días de vigencia de cada muestra: referencia provisional."
 }

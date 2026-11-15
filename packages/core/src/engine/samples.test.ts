@@ -1,9 +1,15 @@
 import { describe, expect, it } from 'vitest';
-import { sampleConfig as cfg } from '../config';
+import { sampleConfig as cfg, loadConfig } from '../config';
 import {
   awaitingResults,
+  classifySample,
   collectionDays,
+  parseCollection,
   SAMPLE_INDICATOR,
+  type SampleResult,
+  sampleAge,
+  sampleContext,
+  sampleHistory,
   sampleReading,
   sampleState,
   sampleStates,
@@ -14,6 +20,7 @@ let n = 0;
 const newId = () => `s${++n}`;
 const at = (daysAgo: number, hours = 0) =>
   new Date(NOW.getTime() - daysAgo * 86_400_000 - hours * 3_600_000).toISOString();
+const indicators = new Set(loadConfig().indicators.map((i) => i.id));
 const saliva = cfg.samples.find((s) => s.id === 'saliva');
 if (!saliva) throw new Error('saliva');
 
@@ -26,6 +33,18 @@ describe('sample config', () => {
       expect(s.everyDays, s.id).toBeGreaterThan(0);
       expect(s.firstDay, s.id).toBeGreaterThan(0);
       for (const m of s.modules ?? []) expect(m.name.es && m.name.en, m.id).toBeTruthy();
+      expect(s.maxAgeDays, s.id).toBeGreaterThan(0);
+      expect(s.analytes.length, s.id).toBeGreaterThan(0);
+      for (const a of s.analytes) {
+        expect(a.name.es && a.name.en && a.unit, `${s.id}.${a.id}`).toBeTruthy();
+        expect(a.red[0], a.id).toBeLessThanOrEqual(a.green[0]);
+        expect(a.red[1], a.id).toBeGreaterThanOrEqual(a.green[1]);
+      }
+      for (const q of s.questions) {
+        expect(q.label.es && q.label.en, q.id).toBeTruthy();
+        expect(q.options.length, q.id).toBeGreaterThan(1);
+      }
+      for (const id of s.context) expect(indicators.has(id), `${s.id} → ${id}`).toBe(true);
     }
     expect(cfg.overdueAfterDays).toBeGreaterThan(0);
   });
@@ -80,8 +99,99 @@ describe('awaitingResults', () => {
     const b = sampleReading('saliva', { crewMember: 'ana', takenAt: at(1), newId });
     const other = { ...a, id: 'x', indicator: 'heart-rate' };
     expect(awaitingResults([b, a, other], [{ id: a.id }])).toEqual([
-      { id: b.id, sample: 'saliva', collectedAt: b.takenAt, crewMember: 'ana' },
+      { id: b.id, sample: 'saliva', collectedAt: b.takenAt, crewMember: 'ana', answers: {} },
     ]);
     expect(a.indicator).toBe(SAMPLE_INDICATOR);
+  });
+});
+
+describe('collection details', () => {
+  it('keeps module, answers and comment, and reads them back', () => {
+    const r = sampleReading('blood', {
+      crewMember: 'ana',
+      takenAt: at(0),
+      newId,
+      answers: { fasting: 'no', storage: 'frozen' },
+      comment: 'Costó; 2 intentos = moretón',
+    });
+    expect(parseCollection(r)).toMatchObject({
+      sample: 'blood',
+      answers: { fasting: 'no', storage: 'frozen' },
+      comment: 'Costó; 2 intentos = moretón',
+    });
+    const swab = sampleReading('surface-swab', {
+      crewMember: 'ana',
+      takenAt: at(0),
+      newId,
+      module: 'galley',
+    });
+    expect(parseCollection(swab)).toMatchObject({ module: 'galley', answers: {} });
+  });
+});
+
+describe('classifySample', () => {
+  const blood = cfg.samples.find((s) => s.id === 'blood');
+  if (!blood) throw new Error('blood');
+
+  it('is normal inside the reference, abnormal outside it and critical outside the red range', () => {
+    expect(classifySample(blood, { wbc: 6, glucose: 90 }).level).toBe('normal');
+    expect(classifySample(blood, { wbc: 3, glucose: 90 })).toMatchObject({
+      level: 'abnormal',
+      flags: [
+        { analyte: 'wbc', value: 3, level: 'abnormal' },
+        { analyte: 'glucose', value: 90, level: 'normal' },
+      ],
+    });
+    expect(classifySample(blood, { wbc: 6, glucose: 300 }).level).toBe('critical');
+  });
+
+  it('has no level without values', () => {
+    expect(classifySample(blood, {})).toEqual({ flags: [] });
+  });
+});
+
+describe('sampleContext', () => {
+  it('takes the latest context reading and the symptoms around the collection', () => {
+    const base = { unit: '°C', source: 'manual' as const, simulated: false, crewMember: 'ana' };
+    const rs = [
+      { ...base, id: 'a', indicator: 'body-temperature', value: 36.6, takenAt: at(0, 20) },
+      { ...base, id: 'b', indicator: 'body-temperature', value: 38.1, takenAt: at(0, 4) },
+      { ...base, id: 'c', indicator: 'body-temperature', value: 39, takenAt: at(0, 30) },
+      {
+        ...base,
+        id: 'd',
+        indicator: 'symptom',
+        value: 'fever-chills',
+        unit: '',
+        takenAt: at(0, 3),
+      },
+      { ...base, id: 'e', indicator: 'stress', value: 4, unit: '', takenAt: at(0, -2) },
+    ];
+    expect(sampleContext(saliva, rs, at(0, 2))).toEqual({
+      readings: [{ indicator: 'body-temperature', value: 38.1, unit: '°C', takenAt: at(0, 4) }],
+      symptoms: ['fever-chills'],
+    });
+  });
+});
+
+describe('sampleHistory and sampleAge', () => {
+  const result = (id: string, daysAgo: number, crewMember = 'ana'): SampleResult => ({
+    id,
+    mission: 'M',
+    crewMember,
+    sample: 'saliva',
+    collectedAt: at(daysAgo),
+    result: 'normal',
+    enteredAt: at(daysAgo),
+  });
+
+  it('lists earlier results of the same crew member and sample, newest first', () => {
+    const all = [result('1', 20), result('2', 13), result('3', 6), result('x', 6, 'otro')];
+    expect(sampleHistory(all, 'ana', 'saliva', at(10)).map((r) => r.id)).toEqual(['2', '1']);
+  });
+
+  it('flags a sample older than its limit', () => {
+    expect(sampleAge(saliva, at(3), NOW)).toEqual({ days: 3, stale: false });
+    expect(sampleAge(saliva, at(31), NOW)).toEqual({ days: 31, stale: true });
   });
 });
