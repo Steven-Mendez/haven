@@ -145,6 +145,16 @@ export function NavMain({ lang, crew }: Props) {
                     {m.emergency ? ` · ${t.emergencyOpen}` : ''}
                   </span>
                 </SidebarMenuBadge>
+                {alertDot ? (
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'ring-sidebar pointer-events-none absolute top-1.5 left-5 hidden size-2 rounded-full ring-2 group-data-[collapsible=icon]:block',
+                      alertDot,
+                      m.emergency && 'motion-safe:animate-live',
+                    )}
+                  />
+                ) : null}
               </SidebarMenuItem>
             );
           })}
