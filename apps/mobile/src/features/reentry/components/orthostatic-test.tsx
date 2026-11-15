@@ -22,8 +22,6 @@ import { cn } from '@/shared/lib/utils';
 import { texts } from '../i18n';
 import { nextPhase, parsePulse, recentWatchPulse, type TestPhase } from '../logic/flow';
 
-const O = reentry.orthostatic;
-
 /** The countdown lives apart so its ticks do not re-render the pulse field while typing. */
 function PulseTimer({ seconds }: { seconds: number }) {
   const t = useTexts(texts);
@@ -109,6 +107,9 @@ function PulseStep({
 }
 
 export function OrthostaticTest({ onClose }: { onClose: () => void }) {
+  // Read at render, not at module load: a Fast Refresh that re-evaluates this file while
+  // @haven/core is still reloading would otherwise crash the whole route on import.
+  const O = reentry.orthostatic;
   const t = useTexts(texts);
   const translate = useTranslate();
   const { crewMember } = usePreferences();
