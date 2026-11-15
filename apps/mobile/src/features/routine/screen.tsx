@@ -221,7 +221,8 @@ export default function Screen() {
     () => adaptationWindow(mission, motion, config.environments),
     [mission, config.environments],
   );
-  const motionTile =
+  // The tile is always there: head movements help whenever someone feels sick.
+  const motionActive =
     motionWindow.open || balanceAvailable(mission.environment, config.environments);
   const cognitionDue = steps.some((s) => s.kind === 'cognition');
   const wellbeingDone =
@@ -471,58 +472,56 @@ export default function Screen() {
         />
       </TileGroup>
 
-      {reentryPrep || evaPrep || motionTile ? (
-        <TileGroup title={t.groupMission}>
-          {reentryPrep ? (
-            <Tile
-              icon={PlaneLanding}
-              title={t.tileReentry}
-              state={reentryPrep.readiness === 'ready' ? 'green' : 'amber'}
-              status={
-                reentryPrep.readiness === 'ready'
-                  ? t.stReentryReady
-                  : format(t.stReentryProgress, {
-                      done: reentryPrep.done,
-                      total: reentryPrep.total,
-                    })
-              }
-              onPress={() => router.push('/reentry')}
-            />
-          ) : null}
-          {evaPrep ? (
-            <Tile
-              icon={Footprints}
-              title={t.tileEva}
-              state={
-                evaPrep.readiness === 'symptoms' ? 'red' : evaPrep.prebreathe ? 'green' : 'pending'
-              }
-              status={
-                evaPrep.readiness === 'symptoms'
-                  ? t.stEvaSymptoms
-                  : evaPrep.prebreathe
-                    ? t.stEvaDone
-                    : t.stEvaNone
-              }
-              onPress={() => router.push('/eva')}
-            />
-          ) : null}
-          {motionTile ? (
-            <Tile
-              icon={Waves}
-              title={t.tileMotion}
-              state={motionDue ? 'amber' : 'green'}
-              status={
-                motionDue
-                  ? t.stMotionDue
-                  : motionWindow.open
-                    ? format(t.stMotionWindow, { day: motionWindow.day, of: motionWindow.of })
-                    : t.stMotionBalance
-              }
-              onPress={() => router.push('/motion')}
-            />
-          ) : null}
-        </TileGroup>
-      ) : null}
+      <TileGroup title={t.groupMission}>
+        {reentryPrep ? (
+          <Tile
+            icon={PlaneLanding}
+            title={t.tileReentry}
+            state={reentryPrep.readiness === 'ready' ? 'green' : 'amber'}
+            status={
+              reentryPrep.readiness === 'ready'
+                ? t.stReentryReady
+                : format(t.stReentryProgress, {
+                    done: reentryPrep.done,
+                    total: reentryPrep.total,
+                  })
+            }
+            onPress={() => router.push('/reentry')}
+          />
+        ) : null}
+        {evaPrep ? (
+          <Tile
+            icon={Footprints}
+            title={t.tileEva}
+            state={
+              evaPrep.readiness === 'symptoms' ? 'red' : evaPrep.prebreathe ? 'green' : 'pending'
+            }
+            status={
+              evaPrep.readiness === 'symptoms'
+                ? t.stEvaSymptoms
+                : evaPrep.prebreathe
+                  ? t.stEvaDone
+                  : t.stEvaNone
+            }
+            onPress={() => router.push('/eva')}
+          />
+        ) : null}
+        <Tile
+          icon={Waves}
+          title={t.tileMotion}
+          state={motionDue ? 'amber' : motionActive ? 'green' : 'pending'}
+          status={
+            motionDue
+              ? t.stMotionDue
+              : motionWindow.open
+                ? format(t.stMotionWindow, { day: motionWindow.day, of: motionWindow.of })
+                : motionActive
+                  ? t.stMotionBalance
+                  : t.stMotionAnytime
+          }
+          onPress={() => router.push('/motion')}
+        />
+      </TileGroup>
 
       <More label={t.more}>
         <WhereFrom text={t.whereFrom} />
