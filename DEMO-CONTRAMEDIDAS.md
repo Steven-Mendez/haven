@@ -19,8 +19,8 @@ Elige la misión en **Misiones** y abre:
 |---|---|---|
 | `DEMORE` · Demo reentrada (día de reentrada) | **Reentrada** (`/reentry`, atajo `g a`) | Lucía lista; Omar a revisar (+34 lpm); Nina con mareo y poca hidratación (ayuda al levantarse); Tomás sin empezar |
 | `DEMOEV` · Demo EVA lunar (en la Luna) | **Aptitud EVA** (`/eva`) | Kai apto; Sofía a revisar (prerrespiración de 8 de 15 min y O₂ de cabina bajo); Diego no apto (dolor articular tras la salida) |
-| `DEMOMS` · Demo medicación y muestras (día 40 en la estación) | **Medicación** (`/medication`, atajo `g p`) | Inés con adherencia buena; Jonas baja (36 %) y antibiótico en curso; Aiko con 2 de 2 antimareos hoy. «Editar plan» asigna medicación a cualquiera |
-| `DEMOMS` | **Muestras** (`/samples`, atajo `g s`) | Estado de cada muestra por tripulante; saliva de Jonas alterada (reactivación viral); 3 recogidas esperando resultado con su formulario |
+| `DEMOMS` · Demo medicación y muestras (día 40 en la estación) | **Medicación** (`/medication`, atajo `g p`) | Inés con adherencia buena; Jonas baja (36 %) y antibiótico en curso; Aiko con 2 de 2 antimareos hoy. el lápiz de cada fila abre el plan en un panel lateral |
+| `DEMOMS` | **Muestras** (`/samples`, atajo `g s`) | Estado de cada muestra por tripulante; en «Resultados por cargar», la ficha de la saliva de Jonas muestra su nota, fiebre la noche anterior y un historial de herpes en aumento; al escribir los valores se clasifica sola |
 
 ## App (simulador)
 
@@ -35,3 +35,7 @@ Para unir la app del simulador sin QR:
 ```bash
 xcrun simctl openurl booted "haven://join?mission=DEMOMS&crew=revisor&api=http%3A%2F%2Flocalhost%3A3000"
 ```
+
+## Identidad visual
+
+Las pestañas de Tierra de estas funcionalidades (Aptitud EVA, Reentrada, Medicación y Muestras) siguen el rediseño de `main`: tabla en tarjeta con cabecera en mayúsculas pequeñas, icono en cuadro en la primera columna, estados como píldoras sobre los colores de escala y pie con totales. Las piezas comunes están en `apps/web/src/features/extras/components/panel-parts.tsx`.
