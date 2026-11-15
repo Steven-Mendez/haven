@@ -17,11 +17,18 @@ import {
   getMission,
   listRules,
   mergeMission,
+  saveMedicationPlan,
   saveRules,
   startMission,
   updateMission,
 } from './server';
-import type { JoinFormState, MissionField, MissionFormState, RulesFormState } from './types';
+import type {
+  JoinFormState,
+  MedicationFormState,
+  MissionField,
+  MissionFormState,
+  RulesFormState,
+} from './types';
 
 const text = (v: FormDataEntryValue | null, max = 280) =>
   typeof v === 'string' ? v.trim().slice(0, max) : '';
@@ -209,4 +216,28 @@ export async function exportRulesConfig(versionId: string): Promise<string | nul
   const { versions } = await listRules(mission);
   const version = versions.find((v) => v.id === versionId);
   return version ? `${JSON.stringify(version.config, null, 2)}\n` : null;
+}
+
+export async function sendMedicationPlan(
+  _previous: MedicationFormState,
+  form: FormData,
+): Promise<MedicationFormState> {
+  const mission = await getMissionCode();
+  const crewMember = text(form.get('crewMember'), 60);
+  if (!mission || !crewMember) return { status: 'error', crewMember };
+  const chosen = form.getAll('medication').map((v) => String(v));
+  const assignments = chosen.map((id) => ({
+    medication: id,
+    until: text(form.get(`until-${id}`), 10) || undefined,
+    note: text(form.get(`note-${id}`), 200) || undefined,
+  }));
+  const result = await saveMedicationPlan(
+    mission,
+    crewMember,
+    assignments,
+    havenTexts.es.operatorName,
+  );
+  if (!result.ok) return { status: 'error', crewMember };
+  refresh();
+  return { status: 'ok', crewMember, at: Date.now() };
 }
