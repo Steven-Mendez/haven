@@ -455,6 +455,8 @@ export const texts = defineTexts({
     orthostaticValue: '+{rise} lpm ({supine} → {standing})',
     orthostaticSymptoms: 'con síntomas',
     notDone: 'Sin hacer',
+    reentryFooter: '{ready} de {total} tripulantes listos para la reentrada',
+    levelPending: 'Sin datos',
     reentryEmpty: 'Aún no ha llegado ningún paquete',
     reentryEmptyDetail: 'El estado aparece cuando la tripulación envía sus primeros paquetes.',
     reentrySource:
@@ -1003,6 +1005,8 @@ export const texts = defineTexts({
     orthostaticValue: '+{rise} bpm ({supine} → {standing})',
     orthostaticSymptoms: 'with symptoms',
     notDone: 'Not done',
+    reentryFooter: '{ready} of {total} crew members ready for reentry',
+    levelPending: 'No data',
     reentryEmpty: 'No packet has arrived yet',
     reentryEmptyDetail: 'The status shows up when the crew sends their first packets.',
     reentrySource:

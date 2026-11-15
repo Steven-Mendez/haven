@@ -1,13 +1,6 @@
-import { type Level, type ReentryReadiness, reentry } from '@haven/core';
-import { Check, Info, Minus } from 'lucide-react';
-import {
-  AgeLabel,
-  EmptyState,
-  LevelBadge,
-  LevelGlyph,
-  levelLabel,
-  Section,
-} from '@/components/haven';
+import { type ReentryReadiness, reentry } from '@haven/core';
+import { Activity, Droplets, Info, type LucideIcon, PlaneLanding, Shirt } from 'lucide-react';
+import { AgeLabel, EmptyState, Hint } from '@/components/haven';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   Table,
@@ -23,20 +16,33 @@ import type { StoredMission } from '@/server/types';
 import type { ExtrasTexts } from '../i18n';
 import { daysToReentry, type ReentryRow } from '../logic/reentry';
 import { getReentryReadiness } from '../server';
+import {
+  CrewCell,
+  PanelHeading,
+  panelTable,
+  StatusPill,
+  SummaryChips,
+  type Tone,
+  toneOf,
+} from './panel-parts';
 
 const READINESS: ReentryReadiness[] = ['ready', 'in-progress', 'review', 'unfit', 'not-started'];
 
-const READINESS_LEVEL: Record<ReentryReadiness, Level> = {
+const READINESS_TONE: Record<ReentryReadiness, Tone> = {
   ready: 'green',
-  'in-progress': 'pending',
-  'not-started': 'pending',
+  'in-progress': 'muted',
+  'not-started': 'muted',
   review: 'amber',
   unfit: 'red',
 };
 
-function readinessLabel(r: ReentryReadiness, t: ExtrasTexts) {
-  return t[`reentry-${r}`];
-}
+const ITEM_ICON: Record<string, LucideIcon> = {
+  'fluid-loading': Droplets,
+  'compression-garment': Shirt,
+  'orthostatic-test': Activity,
+};
+
+const readinessLabel = (r: ReentryReadiness, t: ExtrasTexts) => t[`reentry-${r}`];
 
 function phaseText(mission: StoredMission, t: ExtrasTexts) {
   const days = daysToReentry(mission.phases, mission.day);
@@ -48,39 +54,27 @@ function phaseText(mission: StoredMission, t: ExtrasTexts) {
   return format(t.reentryIn, { n: days, day: mission.day + days });
 }
 
-function LevelCell({ level, lang, muted }: { level: Level; lang: Language; muted: boolean }) {
-  return (
-    <span
-      className={cn(
-        'inline-flex items-center gap-1.5 text-xs',
-        muted || level === 'pending' ? 'text-muted-foreground' : 'text-foreground',
-      )}
-    >
-      <LevelGlyph level={level} size={10} muted={muted} />
-      {levelLabel(level, lang)}
-    </span>
-  );
-}
-
+/** The three checklist items as one segmented strip: green when done. */
 function Checklist({ row, lang }: { row: ReentryRow; lang: Language }) {
   return (
-    <ul className="flex flex-col gap-0.5 text-xs">
+    <ul className="bg-surface-elevated/60 inline-flex items-center divide-x rounded-md border">
       {reentry.checklist.map((item) => {
         const done = Boolean(row.status.items.find((i) => i.id === item.id)?.doneAt);
+        const Icon = ITEM_ICON[item.id] ?? Activity;
+        const label = `${item.name[lang]}: ${done ? '✓' : '—'}`;
         return (
-          <li
-            key={item.id}
-            className={cn(
-              'flex items-center gap-1.5',
-              done ? 'text-foreground' : 'text-muted-foreground',
-            )}
-          >
-            {done ? (
-              <Check aria-hidden="true" className="text-brand size-3.5" />
-            ) : (
-              <Minus aria-hidden="true" className="size-3.5" />
-            )}
-            {item.name[lang]}
+          <li key={item.id}>
+            <Hint label={label} side="top">
+              <span
+                className={cn(
+                  'flex size-7 items-center justify-center',
+                  done ? 'text-level-green' : 'text-tertiary',
+                )}
+              >
+                <Icon aria-hidden="true" className="size-3.5" />
+                <span className="sr-only">{label}</span>
+              </span>
+            </Hint>
           </li>
         );
       })}
@@ -99,101 +93,116 @@ export async function ReentryPanel({
 }) {
   const data = await getReentryReadiness(mission.code);
   const rows = data?.rows ?? [];
-  const counts = Object.fromEntries(
-    READINESS.map((r) => [r, rows.filter((x) => x.status.readiness === r).length]),
-  ) as Record<ReentryReadiness, number>;
+  const ready = rows.filter((r) => r.status.readiness === 'ready').length;
 
   return (
-    <Section title={t.reentryTitle} description={t.reentryDescription}>
-      <p className="text-sm" data-testid="reentry-phase">
-        {phaseText(mission, t)}
-      </p>
+    <section aria-labelledby="reentry" className="flex min-w-0 flex-col gap-3">
+      <PanelHeading
+        id="reentry"
+        title={t.reentryTitle}
+        count={rows.length || undefined}
+        description={t.reentryDescription}
+      >
+        <span
+          className="border-brand/30 bg-brand-subtle text-link inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs"
+          data-testid="reentry-phase"
+        >
+          <PlaneLanding aria-hidden="true" className="size-3.5" />
+          {phaseText(mission, t)}
+        </span>
+      </PanelHeading>
+
       {rows.length === 0 || !data ? (
         <EmptyState title={t.reentryEmpty} description={t.reentryEmptyDetail} />
       ) : (
         <>
-          <dl
-            className="bg-border grid grid-cols-2 gap-px overflow-hidden rounded-xl border sm:grid-cols-5"
-            aria-label={t.reentryStatus}
-          >
-            {READINESS.map((r) => (
-              <div key={r} className="bg-background md:bg-surface flex flex-col gap-1.5 px-4 py-3">
-                <dt className="text-muted-foreground flex items-center gap-1.5 text-xs">
-                  <LevelGlyph level={READINESS_LEVEL[r]} size={10} />
-                  {readinessLabel(r, t)}
-                </dt>
-                <dd className="text-[28px] leading-8 font-medium tracking-[-0.02em] tabular-nums">
-                  {counts[r]}
-                  <span className="text-tertiary ml-1 text-sm font-normal">/ {rows.length}</span>
-                </dd>
-              </div>
-            ))}
-          </dl>
-          <div className="overflow-hidden rounded-xl border">
+          <SummaryChips
+            label={t.reentryStatus}
+            items={READINESS.map((r) => ({
+              key: r,
+              tone: READINESS_TONE[r],
+              label: readinessLabel(r, t),
+              count: rows.filter((x) => x.status.readiness === r).length,
+            }))}
+          />
+          <div className={panelTable.card}>
             <Table data-testid="reentry-table">
-              <TableHeader>
-                <TableRow>
+              <TableHeader className={panelTable.header}>
+                <TableRow className={panelTable.headRow}>
                   <TableHead className="pl-4">{t.astronaut}</TableHead>
                   <TableHead>{t.reentryStatus}</TableHead>
                   <TableHead>{t.checklistCol}</TableHead>
                   <TableHead>{t.orthostaticCol}</TableHead>
-                  <TableHead>{t.hydrationCol}</TableHead>
-                  <TableHead>{t.bloodPressureCol}</TableHead>
-                  <TableHead className="pr-4">{t.lastData}</TableHead>
+                  <TableHead className="hidden xl:table-cell">{t.hydrationCol}</TableHead>
+                  <TableHead className="hidden pr-4 xl:table-cell">{t.bloodPressureCol}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {rows.map((row) => {
                   const o = row.status.orthostatic;
                   return (
-                    <TableRow key={row.id}>
-                      <TableCell className="pl-4 font-medium">{row.name}</TableCell>
-                      <TableCell>
-                        <LevelBadge
-                          level={row.status.level}
-                          lang={lang}
-                          label={readinessLabel(row.status.readiness, t)}
+                    <TableRow key={row.id} className={panelTable.row}>
+                      <TableCell className="py-3 pl-4">
+                        <CrewCell
+                          id={row.id}
+                          name={row.name}
+                          detail={
+                            <AgeLabel
+                              lastDataAt={row.lastDataAt}
+                              now={data.generatedAt}
+                              lang={lang}
+                              noRecentData={row.noRecentData}
+                            />
+                          }
                         />
                       </TableCell>
-                      <TableCell>
-                        <Checklist row={row} lang={lang} />
+                      <TableCell className="py-3">
+                        <StatusPill tone={READINESS_TONE[row.status.readiness]}>
+                          {readinessLabel(row.status.readiness, t)}
+                        </StatusPill>
                       </TableCell>
-                      <TableCell className="text-xs whitespace-normal">
+                      <TableCell className="py-3">
+                        <div className="flex items-center gap-2">
+                          <Checklist row={row} lang={lang} />
+                          <span className="text-tertiary text-xs tabular-nums">
+                            {row.status.done}/{row.status.total}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="py-3 text-xs whitespace-normal">
                         {o ? (
-                          <span className="flex flex-col gap-0.5">
-                            <LevelCell level={o.level} lang={lang} muted={row.noRecentData} />
+                          <span className="flex flex-col items-start gap-1">
+                            <StatusPill tone={toneOf(o.level)}>+{o.rise} lpm</StatusPill>
                             <span className="text-muted-foreground tabular-nums">
-                              {format(t.orthostaticValue, {
-                                rise: o.rise,
-                                supine: Number.isFinite(o.supine) ? o.supine : '—',
-                                standing: Number.isFinite(o.standing) ? o.standing : '—',
-                              })}
+                              {Number.isFinite(o.supine) ? o.supine : '—'} →{' '}
+                              {Number.isFinite(o.standing) ? o.standing : '—'} lpm
                               {o.symptoms.length ? ` · ${t.orthostaticSymptoms}` : ''}
                             </span>
                           </span>
                         ) : (
-                          <span className="text-muted-foreground">{t.notDone}</span>
+                          <span className="text-tertiary">{t.notDone}</span>
                         )}
                       </TableCell>
-                      <TableCell>
-                        <LevelCell level={row.hydration} lang={lang} muted={row.noRecentData} />
+                      <TableCell className="hidden py-3 xl:table-cell">
+                        <StatusPill tone={toneOf(row.hydration)}>
+                          {levelText(row.hydration, t)}
+                        </StatusPill>
                       </TableCell>
-                      <TableCell>
-                        <LevelCell level={row.bloodPressure} lang={lang} muted={row.noRecentData} />
-                      </TableCell>
-                      <TableCell className="pr-4">
-                        <AgeLabel
-                          lastDataAt={row.lastDataAt}
-                          now={data.generatedAt}
-                          lang={lang}
-                          noRecentData={row.noRecentData}
-                        />
+                      <TableCell className="hidden py-3 pr-4 xl:table-cell">
+                        <StatusPill tone={toneOf(row.bloodPressure)}>
+                          {levelText(row.bloodPressure, t)}
+                        </StatusPill>
                       </TableCell>
                     </TableRow>
                   );
                 })}
               </TableBody>
             </Table>
+            <div className={panelTable.footer}>
+              <span className="tabular-nums">
+                {format(t.reentryFooter, { ready, total: rows.length })}
+              </span>
+            </div>
           </div>
         </>
       )}
@@ -206,6 +215,10 @@ export async function ReentryPanel({
           {t.reentrySource}
         </CollapsibleContent>
       </Collapsible>
-    </Section>
+    </section>
   );
+}
+
+function levelText(level: string, t: ExtrasTexts) {
+  return { green: t.scaleGreen, amber: t.scaleAmber, red: t.scaleRed }[level] ?? t.levelPending;
 }
