@@ -5,9 +5,12 @@ import {
   type MissionPhase,
   missionDays,
   type Reading,
+  type SampleResult,
+  collections as sampleCollections,
+  sampleConfig,
 } from '@haven/core';
 import { CREW_NOT_READY } from '@/server/types';
-import { missions, packets, rules } from './collections';
+import { missions, packets, rules, sampleResults } from './collections';
 import {
   baseConfig,
   type CrewEntry,
@@ -600,4 +603,41 @@ export async function missionAggregates(
       indicators.map((i) => [i, crewAggregates(byCrewMember, i, { minimum: 1 })]),
     ),
   };
+}
+
+export async function listSampleResults(mission: string): Promise<SampleResult[]> {
+  return (await sampleResults()).find({ mission }, NO_ID).sort({ collectedAt: 1 }).toArray();
+}
+
+/** Stores Earth's lab result for one collection reading that already arrived. */
+export async function saveSampleResult(
+  mission: string,
+  input: { id: string; result: string; detail?: string; author?: string },
+  now = new Date(),
+): Promise<Result<SampleResult>> {
+  if (input.result !== 'normal' && input.result !== 'abnormal')
+    return fail(400, "result: 'normal' | 'abnormal'");
+  const doc = await (await packets()).findOne(
+    { mission, 'readings.id': input.id },
+    { projection: { _id: 0, readings: 1 } },
+  );
+  const reading = doc ? sampleCollections(doc.readings).find((r) => r.id === input.id) : undefined;
+  if (!reading) return fail(404, `Sample ${input.id} has not arrived`);
+  const sample = sampleConfig.samples.find((s) => s.id === reading.value);
+  if (!sample) return fail(400, `Unknown sample ${String(reading.value)}`);
+  const module = /(?:^|;)module=([^;]+)/.exec(reading.note ?? '')?.[1];
+  const result: SampleResult = {
+    id: reading.id,
+    mission,
+    crewMember: reading.crewMember,
+    sample: sample.id,
+    collectedAt: reading.takenAt,
+    ...(module ? { module } : {}),
+    result: input.result,
+    ...(input.detail?.trim() ? { detail: input.detail.trim().slice(0, 280) } : {}),
+    enteredAt: now.toISOString(),
+    ...(input.author ? { author: input.author.slice(0, 80) } : {}),
+  };
+  await (await sampleResults()).updateOne({ id: result.id }, { $set: result }, { upsert: true });
+  return { ok: true, status: 200, data: result };
 }
