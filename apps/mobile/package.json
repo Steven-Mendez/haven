@@ -70,6 +70,9 @@
   "devDependencies": {
     "@bacons/apple-targets": "^5.0.0",
     "@types/react": "~19.3.0",
+    "@typescript-eslint/parser": "^8.72.2",
+    "eslint": "^10.15.0",
+    "eslint-plugin-react-native-a11y": "^3.5.1",
     "tailwindcss": "^3.4.19",
     "typescript": "~6.0.3"
   },
@@ -80,6 +83,7 @@
     "web": "expo start --web",
     "prebuild": "expo prebuild --clean",
     "typecheck": "node scripts/typed-routes.js && tsc --noEmit",
+    "lint:a11y": "eslint .",
     "doctor": "expo-doctor",
     "test": "vitest run",
     "testflight": "npx eas-cli@latest workflow:run .eas/workflows/testflight.yml"

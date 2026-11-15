@@ -5,6 +5,10 @@ pre-commit:
       glob: "*.{js,jsx,ts,tsx,json,jsonc,css}"
       run: pnpm exec biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
       stage_fixed: true
+    - name: eslint-a11y
+      root: apps/mobile/
+      glob: "*.{ts,tsx}"
+      run: pnpm exec eslint --no-warn-ignored {staged_files}
     - name: swift-format
       glob: "*.swift"
       run: xcrun swift-format format --in-place {staged_files}
