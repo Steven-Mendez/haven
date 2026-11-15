@@ -37,7 +37,12 @@ export function medicationRow(
   readings: Reading[],
   now: Date,
 ): MedicationRow {
-  const a = adherence(plan, medications, readings, now);
+  const first = readings.reduce<string | undefined>(
+    (min, r) => (!min || r.takenAt < min ? r.takenAt : min),
+    undefined,
+  );
+  // Without any reading the crew member has not used the app yet: nothing to measure.
+  const a = adherence(plan, medications, readings, now, 7, first ?? now.toISOString());
   return {
     ...member,
     plan,

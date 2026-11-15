@@ -358,6 +358,10 @@ export const texts = defineTexts({
     skippedToday: '{n} omitida',
     adherenceValue: '{percent} % · {taken} de {expected}',
     adherenceNone: 'Sin tomas que medir',
+    adherenceGood: 'Buena',
+    adherenceIrregular: 'Irregular',
+    adherenceLow: 'Baja',
+    adherencePending: 'Sin datos',
     planSaved: 'Plan guardado. Llega a la app en su próxima sincronización.',
     planError: 'No se pudo guardar el plan. Inténtalo de nuevo.',
     untilLabel: 'Hasta (opcional)',
@@ -367,7 +371,7 @@ export const texts = defineTexts({
     scheduleAsNeeded: 'Si lo necesita, máximo {n} al día',
     planUpdated: 'Plan del {date}',
     medicationSource:
-      'La adherencia cuenta las tomas programadas de los últimos 7 días que ya cerraron (2 h después de su hora): tomadas sobre programadas. Verde desde 90 %, atención desde 70 %, por debajo, emergencia (umbrales provisionales). Las tomas «si lo necesita» no cuentan para la adherencia. Las horas son de la misión (UTC).',
+      'La adherencia cuenta las tomas programadas de los últimos 7 días que ya cerraron (2 h después de su hora): tomadas sobre programadas. Buena desde 90 %, irregular desde 70 % y baja por debajo (umbrales provisionales). Solo cuentan las tomas desde el primer dato que envió el tripulante. Las tomas «si lo necesita» no cuentan para la adherencia. Las horas son de la misión (UTC).',
   },
   en: {
     title: 'Earth extras',
@@ -728,6 +732,10 @@ export const texts = defineTexts({
     skippedToday: '{n} skipped',
     adherenceValue: '{percent}% · {taken} of {expected}',
     adherenceNone: 'No doses to measure',
+    adherenceGood: 'Good',
+    adherenceIrregular: 'Irregular',
+    adherenceLow: 'Low',
+    adherencePending: 'No data',
     planSaved: 'Plan saved. It reaches the app on its next sync.',
     planError: 'Could not save the plan. Try again.',
     untilLabel: 'Until (optional)',
@@ -737,7 +745,7 @@ export const texts = defineTexts({
     scheduleAsNeeded: 'As needed, at most {n} a day',
     planUpdated: 'Plan of {date}',
     medicationSource:
-      'Adherence counts the scheduled doses of the last 7 days that already closed (2 h after their time): taken over scheduled. Green from 90%, attention from 70%, emergency below (provisional thresholds). As-needed doses do not count towards adherence. Times are mission time (UTC).',
+      'Adherence counts the scheduled doses of the last 7 days that already closed (2 h after their time): taken over scheduled. Good from 90%, irregular from 70% and low below (provisional thresholds). Only doses since the crew member’s first data count. As-needed doses do not count towards adherence. Times are mission time (UTC).',
   },
 });
 

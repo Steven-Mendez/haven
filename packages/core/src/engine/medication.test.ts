@@ -121,6 +121,11 @@ describe('adherence', () => {
       percent: 33,
     });
     expect(adherence(plan([]), cfg, rs, NOW).percent).toBeNull();
+    expect(adherence(p, cfg, rs, NOW, 3, '2026-11-13T00:00:00.000Z')).toMatchObject({
+      expected: 2,
+      percent: 50,
+    });
+    expect(adherence(p, cfg, [], NOW, 3, NOW.toISOString()).percent).toBeNull();
   });
 });
 
