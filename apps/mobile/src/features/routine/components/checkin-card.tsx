@@ -2,7 +2,7 @@ import type { Reading } from '@haven/core';
 import { randomUUID } from 'expo-crypto';
 import { router } from 'expo-router';
 import { Check, ChevronDown, ChevronRight } from 'lucide-react-native';
-import { useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { View } from 'react-native';
 import {
   ageText,
@@ -32,9 +32,11 @@ const unitOf = (id: string) => config.indicators.find((i) => i.id === id)?.unit 
 type Props = {
   crewMember: string;
   today?: { mood: Reading; stress: Reading };
+  /** "Not now" button from Routine, shown inside the card. */
+  later?: ReactNode;
 };
 
-export function CheckinCard({ crewMember, today }: Props) {
+export function CheckinCard({ crewMember, today, later }: Props) {
   const t = useTexts(texts);
   const h = useTexts(havenTexts);
   const [mood, setMood] = useState<ScaleValue | null>(null);
@@ -125,6 +127,7 @@ export function CheckinCard({ crewMember, today }: Props) {
             </Button>
           </View>
         </CollapsibleContent>
+        {later ? <View className="px-4 pb-3">{later}</View> : null}
       </Collapsible>
     );
   }
@@ -175,6 +178,7 @@ export function CheckinCard({ crewMember, today }: Props) {
         <Text className="text-tertiary text-caption">{t.checkinHint}</Text>
       )}
       {journalLink}
+      {later}
     </View>
   );
 }
