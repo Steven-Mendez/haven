@@ -346,6 +346,21 @@
       "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/"
     ]
   },
+  "aerobic-exercise": {
+    "howToMeasure": {
+      "es": "Al terminar la sesión en el cicloergómetro o en la cinta con arnés, registra los minutos en Ejercicio.",
+      "en": "When you finish your session on the cycle ergometer or the harnessed treadmill, log the minutes in Exercise."
+    },
+    "whyItMatters": {
+      "es": "Sin gravedad el corazón trabaja menos y pierde forma. El ejercicio aeróbico lo mantiene entrenado para el regreso.",
+      "en": "Without gravity the heart works less and gets out of shape. Aerobic exercise keeps it trained for the return."
+    },
+    "whatToDo": {
+      "es": "Completa los minutos que te marca Tierra, 45 por defecto. Si un día no llegas, avísalo en la autoevaluación.",
+      "en": "Complete the minutes Earth sets, 45 by default. If you fall short one day, say so in the self-assessment."
+    },
+    "sources": ["NASA HRP, Gravity Fields: https://www.nasa.gov/hrp/hazard-gravity-fields/"]
+  },
   "resistance-exercise": {
     "howToMeasure": {
       "es": "Al terminar la sesión en el equipo de ejercicio de fuerza de la nave (pesas de vacío), marca los minutos en la Rutina.",

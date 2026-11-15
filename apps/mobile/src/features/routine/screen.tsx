@@ -6,8 +6,11 @@ import {
   dosesForDay,
   eva,
   evaPrepStatus,
+  exercise,
+  exerciseReminder,
   isReentry,
   medications,
+  prescriptionOf,
   reentry,
   reentryStatus,
   sampleConfig,
@@ -193,6 +196,10 @@ export default function Screen() {
       ),
     [mission.day, readings, now],
   );
+  const exerciseDue = useMemo(
+    () => exerciseReminder(readings, prescriptionOf(plan, exercise), exercise, now),
+    [plan, readings, now],
+  );
 
   const week = lastSevenDays(history, today).map((d) => ({
     label: new Date(`${d.date}T12:00:00Z`).toLocaleDateString(language, {
@@ -355,6 +362,19 @@ export default function Screen() {
           )}
           action={t.samplesOpen}
           onAction={() => router.push('/samples')}
+        />
+      ) : null}
+
+      {exerciseDue ? (
+        <StepCard
+          title={t.exerciseTitle}
+          detail={
+            exerciseDue.kind === 'assessment'
+              ? t.exerciseAssessment
+              : format(t.exerciseToday, { done: exerciseDue.done, target: exerciseDue.target })
+          }
+          action={t.exerciseOpen}
+          onAction={() => router.push('/exercise')}
         />
       ) : null}
 

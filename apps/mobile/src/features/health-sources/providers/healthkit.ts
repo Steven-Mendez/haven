@@ -1,6 +1,7 @@
 import { isTracked, type Reading } from '@haven/core';
 import { Platform } from 'react-native';
 import {
+  aerobicMinutes,
   dailyTotalReading,
   resistanceMinutes,
   rhythmFromEcg,
@@ -125,9 +126,13 @@ const IRREGULAR_RHYTHM_TYPE = 'HKCategoryTypeIdentifierIrregularHeartRhythmEvent
 const ECG_TYPE = 'HKElectrocardiogramType' as const;
 const WORKOUT_TYPE = 'HKWorkoutTypeIdentifier' as const;
 const WRIST_HISTORY_DAYS = 35;
-const DERIVED = ['sleep', 'wrist-temperature', 'heart-rhythm', 'resistance-exercise'].filter(
-  isTracked,
-);
+const DERIVED = [
+  'sleep',
+  'wrist-temperature',
+  'heart-rhythm',
+  'resistance-exercise',
+  'aerobic-exercise',
+].filter(isTracked);
 const INDICATORS = [...HEALTHKIT_MAPPINGS.map((m) => m.indicator), ...DERIVED];
 const TO_READ = [
   ...HEALTHKIT_MAPPINGS.map((m) => m.type),
@@ -326,7 +331,13 @@ export function createHealthKitProvider(): SourceProvider {
     return out.sort((a, b) => a.takenAt.localeCompare(b.takenAt));
   }
 
-  async function readResistance(hk: HealthKitModule, since: Date, now: Date, crewMember: string) {
+  async function readWorkouts(
+    hk: HealthKitModule,
+    since: Date,
+    now: Date,
+    crewMember: string,
+    kind: 'resistance' | 'aerobic',
+  ) {
     const workouts = await hk.queryWorkoutSamples({
       limit: 0,
       ascending: true,
@@ -334,7 +345,7 @@ export function createHealthKitProvider(): SourceProvider {
     });
     const toSeconds = (d: { unit: string; quantity: number }) =>
       d.unit === 'min' ? d.quantity * 60 : d.unit === 'hr' ? d.quantity * 3600 : d.quantity;
-    return resistanceMinutes(
+    return (kind === 'resistance' ? resistanceMinutes : aerobicMinutes)(
       workouts.map((w) => ({
         type: Number(w.workoutActivityType),
         end: new Date(w.endDate),
@@ -344,7 +355,7 @@ export function createHealthKitProvider(): SourceProvider {
       dailyTotalReading({
         provider: 'healthkit',
         source: 'healthkit',
-        indicator: 'resistance-exercise',
+        indicator: `${kind}-exercise`,
         unit: 'min',
         total: d.minutes,
         decimals: 0,
@@ -355,11 +366,17 @@ export function createHealthKitProvider(): SourceProvider {
     );
   }
 
+  const readResistance = (hk: HealthKitModule, since: Date, now: Date, crewMember: string) =>
+    readWorkouts(hk, since, now, crewMember, 'resistance');
+  const readAerobic = (hk: HealthKitModule, since: Date, now: Date, crewMember: string) =>
+    readWorkouts(hk, since, now, crewMember, 'aerobic');
+
   const derived: [string, typeof readSleep][] = [
     ['sleep', readSleep],
     ['wrist-temperature', readWristTemperature],
     ['heart-rhythm', readRhythm],
     ['resistance-exercise', readResistance],
+    ['aerobic-exercise', readAerobic],
   ];
 
   const provider: SourceProvider = {

@@ -53,6 +53,7 @@ describe('demoHistory', () => {
       'body-temperature': 'manual',
       'food-intake': 'manual',
       'resistance-exercise': 'manual',
+      'aerobic-exercise': 'manual',
       'reaction-time': 'screen',
       'pvt-lapses': 'screen',
       'working-memory': 'screen',

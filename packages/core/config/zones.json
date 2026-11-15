@@ -60,6 +60,7 @@
     },
     "indicators": [
       "resistance-exercise",
+      "aerobic-exercise",
       "reaction-time",
       "pvt-lapses",
       "working-memory",

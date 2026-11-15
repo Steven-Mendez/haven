@@ -1,4 +1,4 @@
-import type { MedicationSchedule } from './config';
+import type { ExercisePrescription, MedicationSchedule } from './config';
 
 export type MedicationAssignment = {
   medication: string;
@@ -14,6 +14,8 @@ export type CrewPlan = {
   mission: string;
   crewMember: string;
   medications: MedicationAssignment[];
+  /** Exercise Earth prescribed; the config default applies without it. */
+  exercise?: ExercisePrescription;
   updatedAt: string;
   author?: string;
 };

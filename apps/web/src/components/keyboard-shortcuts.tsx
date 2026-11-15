@@ -22,6 +22,7 @@ const GO: Record<string, string> = {
   a: '/reentry',
   p: '/medication',
   s: '/samples',
+  x: '/exercise',
   m: '/missions',
 };
 
@@ -70,6 +71,7 @@ export function KeyboardShortcuts({ lang }: { lang: Language }) {
     { keys: [['g', 'a']], label: t.shortcutGoReentry },
     { keys: [['g', 'p']], label: t.shortcutGoMedication },
     { keys: [['g', 's']], label: t.shortcutGoSamples },
+    { keys: [['g', 'x']], label: t.shortcutGoExercise },
     { keys: [['g', 'm']], label: t.shortcutGoMissions },
     { keys: [['⌘', 'B']], label: t.shortcutSidebar },
     { keys: [['?']], label: t.shortcutHelp },

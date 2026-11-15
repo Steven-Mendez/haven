@@ -4,6 +4,7 @@ export { NewMissionView } from './new-mission-view';
 export { RulesEditView } from './rules-edit-view';
 export {
   EvaView,
+  ExerciseView,
   extrasRedirect,
   KpiView,
   MedicationView,

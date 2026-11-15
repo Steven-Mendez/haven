@@ -8,6 +8,7 @@ import { havenTexts } from '@/components/haven/texts';
 import type { KpiDashboard } from '@/lib/kpi';
 import { getMissionCode } from '@/lib/mission';
 import { CREW_NOT_READY } from '@/server/types';
+import { formInt } from './logic/exercise';
 import { templatePhases } from './logic/plan-options';
 import { applyEdit, engineCheck, parseNumber, type RulesEdit, validateEdit } from './logic/rules';
 import {
@@ -19,6 +20,7 @@ import {
   getMission,
   listRules,
   mergeMission,
+  saveExercisePrescription,
   saveKpiDashboardFor,
   saveMedicationPlan,
   saveRules,
@@ -27,6 +29,7 @@ import {
   updateMission,
 } from './server';
 import type {
+  ExerciseFormState,
   JoinFormState,
   MedicationFormState,
   MissionField,
@@ -287,4 +290,32 @@ export async function saveKpiDashboard(dashboard: KpiDashboard): Promise<{ ok: b
   } catch {
     return { ok: false };
   }
+}
+
+export async function sendExercisePrescription(
+  _previous: ExerciseFormState,
+  form: FormData,
+): Promise<ExerciseFormState> {
+  const mission = await getMissionCode();
+  const crewMember = text(form.get('crewMember'), 60);
+  if (!mission || !crewMember) return { status: 'error', crewMember };
+  // "Reset" clears Earth's change so the starting prescription applies again.
+  const prescription =
+    form.get('intent') === 'reset'
+      ? null
+      : {
+          resistanceMinutes: formInt(form.get('resistanceMinutes')),
+          aerobicMinutes: formInt(form.get('aerobicMinutes')),
+          daysPerWeek: formInt(form.get('daysPerWeek')),
+          note: text(form.get('note'), 200) || undefined,
+        };
+  const result = await saveExercisePrescription(
+    mission,
+    crewMember,
+    prescription,
+    havenTexts.es.operatorName,
+  );
+  if (!result.ok) return { status: 'error', crewMember };
+  refresh();
+  return { status: 'ok', crewMember, at: Date.now() };
 }

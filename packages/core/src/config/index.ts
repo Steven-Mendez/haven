@@ -1,6 +1,7 @@
 import actionsJson from '../../config/actions.json';
 import environments from '../../config/environments.json';
 import evaJson from '../../config/eva.json';
+import exerciseJson from '../../config/exercise.json';
 import glossaryJson from '../../config/glossary.json';
 import guides from '../../config/guides.json';
 import indicators from '../../config/indicators.json';
@@ -18,6 +19,7 @@ import type {
   Config,
   Environment,
   EvaConfig,
+  ExerciseConfig,
   I18n,
   Indicator,
   MedicationConfig,
@@ -103,6 +105,7 @@ export const reentry: ReentryConfig = reentryJson as ReentryConfig;
 export const eva: EvaConfig = evaJson as EvaConfig;
 export const medications: MedicationConfig = medicationsJson as MedicationConfig;
 export const sampleConfig: SampleConfig = samplesJson as SampleConfig;
+export const exercise: ExerciseConfig = exerciseJson as ExerciseConfig;
 
 export type LoadedConfig = Config & { actions: Action[] };
 

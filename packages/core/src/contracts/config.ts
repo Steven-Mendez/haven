@@ -168,6 +168,32 @@ export type Medication = {
   schedule: MedicationSchedule;
 };
 
+export type ExerciseKind = 'resistance' | 'aerobic';
+
+/** Daily minutes of each kind and training days a week; Earth can change it per crew member. */
+export type ExercisePrescription = {
+  resistanceMinutes: number;
+  aerobicMinutes: number;
+  daysPerWeek: number;
+  note?: string;
+};
+
+export type ExerciseDevice = { id: string; kind: ExerciseKind; name: I18n };
+
+export type ExerciseConfig = {
+  /** Default prescription when Earth has not set one. */
+  prescription: ExercisePrescription;
+  limits: {
+    minutes: [number, number];
+    daysPerWeek: [number, number];
+    sessionMinutes: [number, number];
+  };
+  devices: ExerciseDevice[];
+  /** Weekly self-assessment; effort is perceived exertion on a 0–10 scale. */
+  assessment: { everyDays: number; easyEffort: number; hardEffort: number };
+  source: string;
+};
+
 export type MedicationConfig = {
   /** Hours after the scheduled time during which a dose is still due, not missed. */
   doseWindowHours: number;
