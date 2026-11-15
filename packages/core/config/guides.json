@@ -130,6 +130,24 @@
       "NASA HRP, Hostile/Closed Environments: https://www.nasa.gov/hrp/hazard-hostile-closed-environments/"
     ]
   },
+  "cabin-o2": {
+    "howToMeasure": {
+      "es": "Lo miden los analizadores de aire de cada módulo como presión parcial de oxígeno, en kilopascales (kPa). Anota el valor que muestra el panel del módulo.",
+      "en": "The air analyzers in each module measure it as oxygen partial pressure, in kilopascals (kPa). Log the value shown on the module panel."
+    },
+    "whyItMatters": {
+      "es": "Lo que importa al cuerpo es cuánto oxígeno llega al pulmón, no el porcentaje. Si baja, aparecen mareo, confusión y falta de aire sin que lo notes; si sube mucho, aumenta el riesgo de incendio.",
+      "en": "What matters to the body is how much oxygen reaches the lungs, not the percentage. If it drops, dizziness, confusion and breathlessness appear without you noticing; if it rises a lot, fire risk goes up."
+    },
+    "whatToDo": {
+      "es": "Fuera de 19–23,5 kPa: revisa el aire del módulo y pospón la salida. Por debajo de 16 kPa: máscara de oxígeno y cambia de módulo.",
+      "en": "Outside 19–23.5 kPa: check the module air and postpone the EVA. Below 16 kPa: oxygen mask and move to another module."
+    },
+    "sources": [
+      "NASA-STD-3001 (OCHMO): https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/",
+      "NASA HRP, Hostile/Closed Environments: https://www.nasa.gov/hrp/hazard-hostile-closed-environments/"
+    ]
+  },
   "cabin-noise": {
     "howToMeasure": {
       "es": "Lo miden dosímetros acústicos (medidores de ruido) de la nave, en decibelios (dB); la app lo recibe por la telemetría de la nave.",

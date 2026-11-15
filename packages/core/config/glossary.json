@@ -75,6 +75,17 @@
       "en": "mmHg: millimetres of mercury; here, how much CO₂ is in the air"
     }
   },
+  "cabin-o2": {
+    "term": { "es": "Oxígeno de la cabina", "en": "Cabin oxygen" },
+    "short": {
+      "es": "Cuánto oxígeno hay en el aire del módulo. Si baja, mareo y confusión; si sube, riesgo de fuego.",
+      "en": "How much oxygen the module air holds. Too low causes dizziness; too high raises fire risk."
+    },
+    "unitHint": {
+      "es": "kPa: kilopascales; aquí, la presión del oxígeno dentro del aire",
+      "en": "kPa: kilopascals; here, the pressure of the oxygen within the air"
+    }
+  },
   "cabin-noise": {
     "term": { "es": "Ruido de la cabina", "en": "Cabin noise" },
     "short": {

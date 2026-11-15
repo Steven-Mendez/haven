@@ -143,6 +143,14 @@ export const SERIES: SeriesDef[] = [
     note: (c) => (inRestModule(c.hour) ? 'module:rest' : 'module:lab'),
   },
   {
+    indicator: 'cabin-o2',
+    unit: 'kPa',
+    everyHours: 1,
+    source: 'ship',
+    decimals: 1,
+    value: (c) => 21.2 + gaussian(c.rng, 0.25),
+  },
+  {
     indicator: 'cabin-noise',
     unit: 'dB',
     everyHours: 1,

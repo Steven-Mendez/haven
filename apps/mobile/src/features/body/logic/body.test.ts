@@ -84,6 +84,7 @@ describe('zoneDetail', () => {
       'radiation-dose',
       'cabin-pressure',
       'cabin-co2',
+      'cabin-o2',
       'cabin-noise',
       'solar-event',
     ]);
@@ -159,6 +160,7 @@ describe('zoneOrigins', () => {
       'radiation-dose',
       'cabin-pressure',
       'cabin-co2',
+      'cabin-o2',
       'cabin-noise',
       'solar-event',
     ]);
