@@ -196,8 +196,10 @@ export function CrewTable({
                     // biome-ignore lint/suspicious/noArrayIndexKey: one cell per column
                     key={n}
                     className={cn(
-                      'py-3 text-xs',
-                      n === 0 && 'pl-4 group-hover/row:shadow-[inset_2px_0_0_var(--brand)]',
+                      'py-3',
+                      n === 0
+                        ? 'pl-4 whitespace-normal group-hover/row:shadow-[inset_2px_0_0_var(--brand)]'
+                        : 'text-xs',
                       n === row.cells.length - 1 && 'pr-3',
                       columns[n]?.className,
                     )}
