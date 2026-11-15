@@ -1,4 +1,4 @@
-import { type SampleResult, sampleConfig, symptomById } from '@haven/core';
+import { type SampleResult, sampleConfig, symptomById, unitLabel } from '@haven/core';
 import { CircleAlert } from 'lucide-react';
 import { LevelGlyph } from '@/components/haven';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -116,7 +116,7 @@ export function SampleFile({
                 const indicator = indicators.find((i) => i.id === r.indicator);
                 return (
                   <span key={r.indicator} className="tabular-nums">
-                    {indicator?.name[lang] ?? r.indicator}: {r.value} {r.unit}
+                    {indicator?.name[lang] ?? r.indicator}: {r.value} {unitLabel(r.unit, lang)}
                     <span className="text-muted-foreground"> · {dateText(r.takenAt, lang)}</span>
                   </span>
                 );
