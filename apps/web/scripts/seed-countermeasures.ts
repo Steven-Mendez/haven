@@ -535,6 +535,36 @@ const DEMOS: Demo[] = [
       REVIEWER,
     ],
   },
+  {
+    // Mars mission for the pitch video: same setup as DEMOMA, with a crew seat
+    // for the phone that records the captures instead of the reviewer.
+    code: 'VIKING',
+    name: 'Viking III',
+    template: 'mars-conjunction',
+    today: 'mars',
+    phaseDay: 120,
+    delayMin: 12,
+    crew: [
+      {
+        id: 'nadia-okafor',
+        name: 'Nadia Okafor',
+        role: ['Comandante', 'Commander'],
+        note: 'Todo en orden. Recibimos vuestro mensaje de ayer con 12 minutos de retraso.',
+      },
+      {
+        id: 'pavel-ivanov',
+        name: 'Pavel Ivanov',
+        role: ['Ingeniero de vuelo', 'Flight engineer'],
+        note: 'Revisamos el soporte vital por nuestra cuenta; os enviamos el informe.',
+      },
+      {
+        id: 'lucia-herrera',
+        name: 'Lucía Herrera',
+        role: ['Médica de a bordo', 'Flight surgeon'],
+        empty: true,
+      },
+    ],
+  },
 ];
 
 function assess(readings: Reading[], environment: string, at: number): Assessment[] {
