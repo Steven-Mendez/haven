@@ -150,9 +150,6 @@ export function RulesEditor({
           {error ? <CircleAlert aria-label={t.errorIcon} className="size-4 shrink-0" /> : null}
           <span className="font-medium">{format(t.ruleRange, { n: n + 1 })}</span>
           <span className="numeric text-muted-foreground">{rangeText(prefix)}</span>
-          {r.withSymptoms ? (
-            <span className="text-muted-foreground hidden text-xs sm:inline">{t.withSymptoms}</span>
-          ) : null}
           <ChevronRight
             aria-hidden="true"
             className={cn(
