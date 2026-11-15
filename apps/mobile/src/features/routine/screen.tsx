@@ -1,4 +1,4 @@
-import { actionsDone, dailyProgress, dayHistory } from '@haven/core';
+import { actionsDone, dailyProgress, dayHistory, sampleConfig, sampleStates } from '@haven/core';
 import { randomUUID } from 'expo-crypto';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Check, ChevronRight } from 'lucide-react-native';
@@ -153,6 +153,13 @@ export default function Screen() {
     [readings, config, mission.environment, now],
   );
   const checkin = useMemo(() => todayCheckin(readings, today), [readings, today]);
+  const pendingSamples = useMemo(
+    () =>
+      sampleStates(sampleConfig, Math.max(1, mission.day), readings, now).filter(
+        (s) => s.status === 'due' || s.status === 'overdue',
+      ),
+    [mission.day, readings, now],
+  );
 
   const week = lastSevenDays(history, today).map((d) => ({
     label: new Date(`${d.date}T12:00:00Z`).toLocaleDateString(language, {
@@ -263,6 +270,22 @@ export default function Screen() {
           )}
         </Section>
       </TourAnchor>
+
+      {pendingSamples.length ? (
+        <StepCard
+          title={t.samplesTitle}
+          detail={format(
+            pendingSamples.some((s) => s.status === 'overdue') ? t.samplesOverdue : t.samplesDue,
+            {
+              names: pendingSamples
+                .map((s) => translate(sampleConfig.samples.find((x) => x.id === s.sample)?.name))
+                .join(', '),
+            },
+          )}
+          action={t.samplesOpen}
+          onAction={() => router.push('/samples')}
+        />
+      ) : null}
 
       <Collapsible open={guideOpen} onOpenChange={setGuideOpen} className="gap-8">
         <CollapsibleTrigger
