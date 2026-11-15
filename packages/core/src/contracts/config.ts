@@ -117,3 +117,24 @@ export type Step = {
   options?: { text: I18n; next: string }[];
   next?: string;
 };
+
+export type SampleType = {
+  id: string;
+  kind: 'biological' | 'environment';
+  name: I18n;
+  detail: I18n;
+  /** Collected on mission day `firstDay` and then every `everyDays` days. */
+  everyDays: number;
+  firstDay: number;
+  /** Habitat modules to choose from when collecting (surface swabs). */
+  modules?: { id: string; name: I18n }[];
+  /** What an abnormal lab result means. */
+  abnormal: I18n;
+};
+
+export type SampleConfig = {
+  /** Days after the due day before an uncollected sample counts as overdue. */
+  overdueAfterDays: number;
+  samples: SampleType[];
+  source: string;
+};

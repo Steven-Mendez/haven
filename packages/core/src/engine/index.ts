@@ -15,6 +15,7 @@ export * from './evaluate';
 export * from './protocols';
 export * from './radiation';
 export * from './routine';
+export * from './samples';
 export { LEVEL_ORDER, worstLevel } from './util';
 export * from './visible-at';
 export * from './watch-readings';
