@@ -1,6 +1,7 @@
 // Demo of the countermeasure features: reentry preparation (DEMORE), EVA
 // prebreathe with the post-EVA decompression check (DEMOEV), and the medication
-// plan with biological and habitat samples (DEMOMS).
+// plan with biological and habitat samples, and the exercise prescription with
+// its weekly self-assessment (DEMOMS).
 //
 //   pnpm --filter web seed:countermeasures            # the three missions
 //   pnpm --filter web seed:countermeasures DEMOMS     # only the ones named
@@ -10,12 +11,14 @@
 import { fileURLToPath } from 'node:url';
 import {
   type Assessment,
+  assessmentReading,
   type CrewPlan,
   classifySample,
   computeBaseline,
   dailyProgress,
   doseReading,
   dosesForDay,
+  type ExercisePrescription,
   eva,
   evaluate,
   type MedicationAssignment,
@@ -71,6 +74,8 @@ type Member = {
   empty?: boolean;
   /** Medication plan Earth assigned. */
   plan?: MedicationAssignment[];
+  /** Exercise prescription Earth changed; the default applies without it. */
+  exercise?: ExercisePrescription;
 };
 
 type Demo = {
@@ -107,6 +112,34 @@ const lastDay = (readings: Reading[], at: number, indicator: string, value: numb
     if (r.indicator === indicator && t > at - DAY && t <= at) r.value = value;
   }
 };
+
+/**
+ * Sets the exercise minutes of the days `daysAgo` before `at` (0 is today);
+ * 0 minutes removes that day's session.
+ */
+function exerciseDays(
+  readings: Reading[],
+  at: number,
+  indicator: 'resistance-exercise' | 'aerobic-exercise',
+  minutesByDaysAgo: Record<number, number>,
+) {
+  for (let i = readings.length - 1; i >= 0; i--) {
+    const r = readings[i];
+    if (!r || r.indicator !== indicator) continue;
+    const minutes = minutesByDaysAgo[Math.floor((at - Date.parse(r.takenAt)) / DAY)];
+    if (minutes === undefined) continue;
+    if (minutes === 0) readings.splice(i, 1);
+    else r.value = minutes;
+  }
+}
+
+const selfAssessment = (
+  member: string,
+  at: number,
+  effort: number,
+  pain: 'none' | 'mild' | 'strong',
+  completion: 'full' | 'partial' | 'none',
+) => assessmentReading({ effort, pain, completion }, opts(member, at));
 
 const results: SampleResult[] = [];
 
@@ -319,6 +352,7 @@ const DEMOS: Demo[] = [
         note: 'Todo al día: suplementos tomados y muestras de esta semana entregadas.',
         plan: BONE_PLAN,
         extra: (m, at) => [
+          selfAssessment(m, at - 2 * DAY, 2, 'none', 'full'),
           ...doseHistory(m, BONE_PLAN, at),
           sample(m, at - 9 * DAY, 'saliva', {
             answers: { ate: 'no' },
@@ -355,7 +389,12 @@ const DEMOS: Demo[] = [
             note: 'Infección de piel: 7 días.',
           },
         ],
+        tweak: (rs, at) => {
+          exerciseDays(rs, at, 'aerobic-exercise', { 1: 0, 2: 15, 4: 0, 5: 20 });
+          exerciseDays(rs, at, 'resistance-exercise', { 1: 30, 4: 0 });
+        },
         extra: (m, at) => [
+          selfAssessment(m, at - DAY, 8, 'mild', 'partial'),
           ...doseHistory(m, [...BONE_PLAN, { medication: 'antibiotic' }], at, (n) =>
             n % 3 === 0 ? 'taken' : n % 3 === 1 ? 'missed' : 'skipped',
           ),
@@ -381,7 +420,19 @@ const DEMOS: Demo[] = [
         role: ['Médica de vuelo', 'Flight surgeon'],
         note: 'Mareo fuerte hoy tras el cambio de órbita: dos antimareos.',
         plan: [{ medication: 'motion-sickness' }, { medication: 'melatonin' }],
+        exercise: {
+          resistanceMinutes: 30,
+          aerobicMinutes: 30,
+          daysPerWeek: 5,
+          note: 'Mientras dure el mareo, intensidad suave y sin carrera.',
+        },
+        tweak: (rs, at) => {
+          exerciseDays(rs, at, 'aerobic-exercise', { 0: 0, 1: 0, 3: 10 });
+          exerciseDays(rs, at, 'resistance-exercise', { 0: 20 });
+        },
         extra: (m, at) => [
+          // Last self-assessment over a week ago: the next one is due.
+          selfAssessment(m, at - 8 * DAY, 4, 'none', 'full'),
           doseReading('motion-sickness', { status: 'taken' }, opts(m, at - 5 * HOUR)),
           doseReading('motion-sickness', { status: 'taken' }, opts(m, at - HOUR)),
           sample(m, at - 2 * DAY, 'saliva', { answers: { ate: 'yes' } }),
@@ -500,11 +551,12 @@ try {
       db.collection(COLLECTIONS.sampleResults).deleteMany({ mission: demo.code }),
     ]);
     const plans = demo.crew
-      .filter((m) => m.plan)
+      .filter((m) => m.plan || m.exercise)
       .map((m) => ({
         mission: demo.code,
         crewMember: m.id,
         medications: m.plan ?? [],
+        ...(m.exercise ? { exercise: m.exercise } : {}),
         updatedAt: iso(now - 7 * DAY),
         author: 'Control de misión',
       }));
