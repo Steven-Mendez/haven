@@ -1,9 +1,10 @@
 // Demo of the countermeasure features: reentry preparation (DEMORE), EVA
 // prebreathe with the post-EVA decompression check (DEMOEV), and the medication
 // plan with biological and habitat samples, and the exercise prescription with
-// its weekly self-assessment (DEMOMS).
+// its weekly self-assessment (DEMOMS), and motion sickness with the balance test
+// on the second day after landing on the Moon (DEMOCN).
 //
-//   pnpm --filter web seed:countermeasures            # the three missions
+//   pnpm --filter web seed:countermeasures            # the four missions
 //   pnpm --filter web seed:countermeasures DEMOMS     # only the ones named
 //
 // Each mission has crew members in every state plus an empty "Revisor" seat to
@@ -12,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import {
   type Assessment,
   assessmentReading,
+  balanceReading,
   type CrewPlan,
   classifySample,
   computeBaseline,
@@ -26,6 +28,7 @@ import {
   medications,
   missionDays,
   missionTemplates,
+  motionReading,
   orthostaticReadings,
   type Packet,
   postEvaReadings,
@@ -84,6 +87,8 @@ type Demo = {
   template: string;
   /** Phase environment the mission is in today. */
   today: string;
+  /** Day within today's phase (1 is the first); 3 without it, 1 in reentry. */
+  phaseDay?: number;
   crew: Member[];
 };
 
@@ -456,6 +461,48 @@ const DEMOS: Demo[] = [
       },
     ],
   },
+  {
+    code: 'DEMOCN',
+    name: 'Demo cinetosis',
+    template: 'lunar-landing',
+    today: 'moon',
+    phaseDay: 2,
+    crew: [
+      {
+        id: 'lucia-ferrer',
+        name: 'Lucía Ferrer',
+        role: ['Comandante', 'Commander'],
+        note: 'Ayer me mareé al bajar del módulo; hoy ya casi nada.',
+        extra: (m, at) => [
+          motionReading(4, opts(m, at - DAY - 2 * HOUR)),
+          motionReading(1, opts(m, at - 3 * HOUR)),
+          balanceReading({ open: 9, closed: 18 }, opts(m, at - 2 * HOUR)),
+        ],
+      },
+      {
+        id: 'omar-haddad',
+        name: 'Omar Haddad',
+        role: ['Piloto', 'Pilot'],
+        note: 'Náuseas desde la llegada; he vomitado una vez esta mañana.',
+        extra: (m, at) => [
+          motionReading(6, opts(m, at - DAY - HOUR)),
+          motionReading(7, opts(m, at - 4 * HOUR)),
+          balanceReading({ open: 14, closed: 48 }, opts(m, at - 3 * HOUR)),
+        ],
+      },
+      {
+        id: 'mei-lin',
+        name: 'Mei Lin',
+        role: ['Especialista de misión', 'Mission specialist'],
+        note: 'Algo de dolor de cabeza ayer. Hoy aún no he anotado nada.',
+        extra: (m, at) => [
+          motionReading(2, opts(m, at - DAY - 3 * HOUR)),
+          balanceReading({ open: 8, closed: 22 }, opts(m, at - DAY - 2 * HOUR)),
+        ],
+      },
+      REVIEWER,
+    ],
+  },
 ];
 
 function assess(readings: Reading[], environment: string, at: number): Assessment[] {
@@ -517,7 +564,9 @@ try {
     const day =
       demo.today === 'station'
         ? 40
-        : firstDayOf(phases, demo.today) + (demo.today === 'reentry' ? 0 : 2);
+        : firstDayOf(phases, demo.today) +
+          (demo.phaseDay ?? (demo.today === 'reentry' ? 1 : 3)) -
+          1;
     const docs = demo.crew
       .filter((m) => !m.empty)
       .flatMap((m, i) => packetsFor(demo, m, now - (10 + i * 7) * MINUTE));
