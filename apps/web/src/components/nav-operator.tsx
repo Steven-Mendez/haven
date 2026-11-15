@@ -3,7 +3,7 @@ import type { Language } from '@/lib/i18n';
 
 export function NavOperator({ lang }: { lang: Language }) {
   return (
-    <div className="flex items-center border-t pt-2 group-data-[collapsible=icon]:border-t-0">
+    <div className="flex items-center">
       <OperatorMenu lang={lang} />
     </div>
   );
