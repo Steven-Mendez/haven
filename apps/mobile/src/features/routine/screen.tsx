@@ -1,6 +1,7 @@
 import {
   actionsDone,
   adaptationWindow,
+  balanceAvailable,
   canPerformEva,
   dailyProgress,
   dayHistory,
@@ -18,34 +19,38 @@ import {
   reentryStatus,
   sampleConfig,
   sampleStates,
+  workDays,
   workload,
   workloadReminder,
 } from '@haven/core';
 import { randomUUID } from 'expo-crypto';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Check, ChevronRight } from 'lucide-react-native';
+import {
+  Brain,
+  BriefcaseBusiness,
+  Check,
+  Dumbbell,
+  Footprints,
+  Pill,
+  PlaneLanding,
+  SmilePlus,
+  TestTube,
+  Waves,
+} from 'lucide-react-native';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ScrollViewInstance } from 'react-native';
 import { ScrollView, View } from 'react-native';
 import {
-  ActivityRings,
   BigButton,
   format,
   type RingDatum,
-  RingLegend,
-  RingSpark,
   ScreenHeader,
   Section,
 } from '@/shared/components/haven';
 import { ProfileButton } from '@/shared/components/profile-button';
 import { Button } from '@/shared/components/ui/button';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/shared/components/ui/collapsible';
 import { Icon } from '@/shared/components/ui/icon';
-import { Text, TextClassContext } from '@/shared/components/ui/text';
+import { Text } from '@/shared/components/ui/text';
 import { useConfig } from '@/shared/config';
 import { store, useMission, usePreferences, useReadings } from '@/shared/data';
 import {
@@ -56,11 +61,10 @@ import {
   useGamification,
 } from '@/shared/gamification';
 import { useLanguage, useTexts, useTranslate } from '@/shared/i18n';
-import { useLayout } from '@/shared/lib/layout';
-import { cn } from '@/shared/lib/utils';
 import { usePlan } from '@/shared/plan';
 import { TourAnchor, useTourScroll } from '@/shared/tour';
 import { CheckinCard } from './components/checkin-card';
+import { ProgressTile, StreakTile, Tile, TileGroup } from './components/dashboard';
 import { ActionsGuide } from './components/guide';
 import { MilestoneSheet } from './components/milestone-sheet';
 import { More } from './components/more';
@@ -124,7 +128,6 @@ function duration(t: T, minutes: number): string {
 
 export default function Screen() {
   const t = useTexts(texts);
-  const { scale } = useLayout();
   const translate = useTranslate();
   const language = useLanguage();
   const config = useConfig();
@@ -210,8 +213,28 @@ export default function Screen() {
     [readings, mission, config.environments, now],
   );
   const workloadDue = useMemo(() => workloadReminder(readings, workload, now), [readings, now]);
+  const workloadLogged = useMemo(
+    () => workDays(readings, now, 1).at(-1)?.hours !== null,
+    [readings, now],
+  );
+  const motionWindow = useMemo(
+    () => adaptationWindow(mission, motion, config.environments),
+    [mission, config.environments],
+  );
+  const motionTile =
+    motionWindow.open || balanceAvailable(mission.environment, config.environments);
+  const cognitionDue = steps.some((s) => s.kind === 'cognition');
+  const wellbeingDone =
+    g.today.wellbeing.total > 0 && g.today.wellbeing.done >= g.today.wellbeing.total;
+  const doseNames = [...new Set(pendingDoses.map((d) => d.medication))]
+    .map((id) => translate(medications.catalog.find((m) => m.id === id)?.name) || id)
+    .join(', ');
+  const sampleNames = pendingSamples
+    .map((s) => translate(sampleConfig.samples.find((x) => x.id === s.sample)?.name))
+    .join(', ');
 
   const week = lastSevenDays(history, today).map((d) => ({
+    date: d.date,
     label: new Date(`${d.date}T12:00:00Z`).toLocaleDateString(language, {
       weekday: 'narrow',
       timeZone: 'UTC',
@@ -321,167 +344,185 @@ export default function Screen() {
         </Section>
       </TourAnchor>
 
-      {reentryPrep ? (
-        <StepCard
-          title={t.reentryTitle}
-          detail={
-            reentryPrep.readiness === 'ready'
-              ? t.reentryReady
-              : format(t.reentryDetail, { done: reentryPrep.done, total: reentryPrep.total })
+      <View className="flex-row gap-3">
+        <ProgressTile
+          title={t.progressTitle}
+          rings={rings}
+          done={doneCount}
+          total={total}
+          hint={t.progressHint}
+          accessibilityLabel={format(t.ringsLabel, {
+            a: `${g.today.routine.done}/${g.today.routine.total}`,
+            b: `${g.today.measurements.done}/${g.today.measurements.total}`,
+            c: `${g.today.wellbeing.done}/${g.today.wellbeing.total}`,
+          })}
+          onPress={() => setGuideOpen((open) => !open)}
+        />
+        <StreakTile
+          title={t.streakTitle}
+          streak={g.streak}
+          unit={g.streak === 1 ? t.streakDay : t.streakDays}
+          best={format(t.bestStreak, { n: Math.max(g.best, g.streak) })}
+          week={week}
+          hint={t.openStreak}
+          onPress={() => router.push('/streak')}
+        />
+      </View>
+      {guideOpen ? <ActionsGuide /> : null}
+
+      <TileGroup title={t.groupDaily}>
+        <Tile
+          icon={SmilePlus}
+          title={t.tileWellbeing}
+          state={wellbeingDone ? 'green' : 'pending'}
+          status={wellbeingDone ? t.stDoneToday : t.stWellbeingDue}
+          onPress={() => router.push('/wellbeing')}
+        />
+        <Tile
+          icon={Brain}
+          title={t.tileCognition}
+          state={cognitionDue ? 'pending' : 'green'}
+          status={cognitionDue ? t.stCognitionDue : t.stDoneToday}
+          onPress={() => openTarget({ kind: 'screen', screen: 'cognition' })}
+        />
+        <Tile
+          icon={BriefcaseBusiness}
+          title={t.tileWorkload}
+          state={
+            workloadDue === 'rest'
+              ? 'red'
+              : workloadDue === 'log'
+                ? 'amber'
+                : workloadLogged
+                  ? 'green'
+                  : 'pending'
           }
-          action={t.reentryOpen}
-          onAction={() => router.push('/reentry')}
-        />
-      ) : null}
-
-      {evaPrep ? (
-        <StepCard
-          title={t.evaTitle}
-          detail={evaPrep.readiness === 'symptoms' ? t.evaSymptoms : t.evaDetail}
-          action={t.evaOpen}
-          onAction={() => router.push('/eva')}
-        />
-      ) : null}
-
-      {pendingDoses.length ? (
-        <StepCard
-          title={t.medicationTitle}
-          detail={format(
-            pendingDoses.some((d) => d.status === 'due') ? t.medicationDue : t.medicationMissed,
-            {
-              names: [...new Set(pendingDoses.map((d) => d.medication))]
-                .map((id) => translate(medications.catalog.find((m) => m.id === id)?.name) || id)
-                .join(', '),
-            },
-          )}
-          action={t.medicationOpen}
-          onAction={() => router.push('/medication')}
-        />
-      ) : null}
-
-      {pendingSamples.length ? (
-        <StepCard
-          title={t.samplesTitle}
-          detail={format(
-            pendingSamples.some((s) => s.status === 'overdue') ? t.samplesOverdue : t.samplesDue,
-            {
-              names: pendingSamples
-                .map((s) => translate(sampleConfig.samples.find((x) => x.id === s.sample)?.name))
-                .join(', '),
-            },
-          )}
-          action={t.samplesOpen}
-          onAction={() => router.push('/samples')}
-        />
-      ) : null}
-
-      {exerciseDue ? (
-        <StepCard
-          title={t.exerciseTitle}
-          detail={
-            exerciseDue.kind === 'assessment'
-              ? t.exerciseAssessment
-              : format(t.exerciseToday, { done: exerciseDue.done, target: exerciseDue.target })
+          status={
+            workloadDue === 'rest'
+              ? t.stWorkloadRest
+              : workloadDue === 'log'
+                ? t.stWorkloadLog
+                : workloadLogged
+                  ? t.stDoneToday
+                  : t.stWorkloadLater
           }
-          action={t.exerciseOpen}
-          onAction={() => router.push('/exercise')}
+          onPress={() => router.push('/workload')}
         />
-      ) : null}
+      </TileGroup>
 
-      {motionDue ? (
-        <StepCard
-          title={t.motionTitle}
-          detail={t.motionDue}
-          action={t.motionOpen}
-          onAction={() => router.push('/motion')}
+      <TileGroup title={t.groupCare}>
+        <Tile
+          icon={Pill}
+          title={t.tileMedication}
+          state={
+            pendingDoses.some((d) => d.status === 'missed')
+              ? 'red'
+              : pendingDoses.length
+                ? 'amber'
+                : plan?.medications.length
+                  ? 'green'
+                  : 'pending'
+          }
+          status={
+            pendingDoses.length
+              ? format(pendingDoses.some((d) => d.status === 'due') ? t.stDue : t.stMissed, {
+                  names: doseNames,
+                })
+              : plan?.medications.length
+                ? t.stUpToDate
+                : t.stNoPlan
+          }
+          onPress={() => router.push('/medication')}
         />
-      ) : null}
-
-      {workloadDue ? (
-        <StepCard
-          title={t.workloadTitle}
-          detail={workloadDue === 'rest' ? t.workloadRest : t.workloadLog}
-          action={t.workloadOpen}
-          onAction={() => router.push('/workload')}
+        <Tile
+          icon={Dumbbell}
+          title={t.tileExercise}
+          state={exerciseDue ? 'amber' : 'green'}
+          status={
+            !exerciseDue
+              ? t.stDoneToday
+              : exerciseDue.kind === 'assessment'
+                ? t.stExerciseAssessment
+                : format(t.stExerciseMinutes, {
+                    done: exerciseDue.done,
+                    target: exerciseDue.target,
+                  })
+          }
+          onPress={() => router.push('/exercise')}
         />
+        <Tile
+          icon={TestTube}
+          title={t.tileSamples}
+          state={
+            pendingSamples.some((s) => s.status === 'overdue')
+              ? 'red'
+              : pendingSamples.length
+                ? 'amber'
+                : 'green'
+          }
+          status={
+            pendingSamples.length
+              ? format(pendingSamples.some((s) => s.status === 'overdue') ? t.stOverdue : t.stDue, {
+                  names: sampleNames,
+                })
+              : t.stUpToDate
+          }
+          onPress={() => router.push('/samples')}
+        />
+      </TileGroup>
+
+      {reentryPrep || evaPrep || motionTile ? (
+        <TileGroup title={t.groupMission}>
+          {reentryPrep ? (
+            <Tile
+              icon={PlaneLanding}
+              title={t.tileReentry}
+              state={reentryPrep.readiness === 'ready' ? 'green' : 'amber'}
+              status={
+                reentryPrep.readiness === 'ready'
+                  ? t.stReentryReady
+                  : format(t.stReentryProgress, {
+                      done: reentryPrep.done,
+                      total: reentryPrep.total,
+                    })
+              }
+              onPress={() => router.push('/reentry')}
+            />
+          ) : null}
+          {evaPrep ? (
+            <Tile
+              icon={Footprints}
+              title={t.tileEva}
+              state={
+                evaPrep.readiness === 'symptoms' ? 'red' : evaPrep.prebreathe ? 'green' : 'pending'
+              }
+              status={
+                evaPrep.readiness === 'symptoms'
+                  ? t.stEvaSymptoms
+                  : evaPrep.prebreathe
+                    ? t.stEvaDone
+                    : t.stEvaNone
+              }
+              onPress={() => router.push('/eva')}
+            />
+          ) : null}
+          {motionTile ? (
+            <Tile
+              icon={Waves}
+              title={t.tileMotion}
+              state={motionDue ? 'amber' : 'green'}
+              status={
+                motionDue
+                  ? t.stMotionDue
+                  : motionWindow.open
+                    ? format(t.stMotionWindow, { day: motionWindow.day, of: motionWindow.of })
+                    : t.stMotionBalance
+              }
+              onPress={() => router.push('/motion')}
+            />
+          ) : null}
+        </TileGroup>
       ) : null}
-
-      <Collapsible open={guideOpen} onOpenChange={setGuideOpen} className="gap-8">
-        <CollapsibleTrigger
-          accessibilityHint={t.howToRead}
-          className="flex-row items-center gap-5 active:opacity-80"
-        >
-          <ActivityRings
-            rings={rings}
-            size={Math.round(168 * scale)}
-            accessibilityLabel={format(t.ringsLabel, {
-              a: `${g.today.routine.done}/${g.today.routine.total}`,
-              b: `${g.today.measurements.done}/${g.today.measurements.total}`,
-              c: `${g.today.wellbeing.done}/${g.today.wellbeing.total}`,
-            })}
-          >
-            <Text className="text-title font-bold tabular-nums">{`${doneCount}/${total}`}</Text>
-          </ActivityRings>
-          <RingLegend rings={rings} className="flex-1" />
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <ActionsGuide />
-        </CollapsibleContent>
-      </Collapsible>
-
-      <Button
-        variant="ghost"
-        accessibilityRole="button"
-        accessibilityHint={t.openStreak}
-        onPress={() => router.push('/streak')}
-        className="border-border active:bg-active h-auto flex-col items-stretch justify-start gap-4 rounded-lg border p-4 sm:h-auto"
-      >
-        <TextClassContext.Provider value={undefined}>
-          <View className="flex-row items-end justify-between gap-3">
-            <View className="flex-row items-baseline gap-2">
-              <RingSpark size={20} />
-              <Text className="text-metric font-bold tabular-nums">{g.streak}</Text>
-              <Text className="text-muted-foreground text-body-sm">
-                {g.streak === 1 ? t.streakDay : t.streakDays}
-              </Text>
-            </View>
-            <View className="flex-row items-center gap-1">
-              <Text className="text-tertiary text-caption tabular-nums">
-                {format(t.bestStreak, { n: Math.max(g.best, g.streak) })}
-              </Text>
-              <Icon as={ChevronRight} size={16} className="text-tertiary -mr-1" />
-            </View>
-          </View>
-          <View className="flex-row justify-between">
-            {g.week.map((day, i) => {
-              const isToday = i === g.week.length - 1;
-              return (
-                <View key={day.date} className="items-center gap-1.5">
-                  <ActivityRings
-                    size={30}
-                    animate={false}
-                    rings={[
-                      { id: 'routine', ...day.routine },
-                      { id: 'measurements', ...day.measurements },
-                      { id: 'wellbeing', ...day.wellbeing },
-                    ]}
-                    accessibilityLabel={`${week[i]?.label ?? ''}: ${day.routine.done}/${day.routine.total}`}
-                  />
-                  <Text
-                    className={cn(
-                      'text-[11px] leading-[14px]',
-                      isToday ? 'text-foreground font-bold' : 'text-tertiary',
-                    )}
-                  >
-                    {week[i]?.label}
-                  </Text>
-                </View>
-              );
-            })}
-          </View>
-          <Text className="text-tertiary text-caption">{t.streakHint}</Text>
-        </TextClassContext.Provider>
-      </Button>
 
       <More label={t.more}>
         <WhereFrom text={t.whereFrom} />
