@@ -25,7 +25,8 @@ import { rangeLong } from './texts';
 export const DRAG_HANDLE = 'kpi-drag-handle';
 export const NO_DRAG = 'kpi-no-drag';
 
-function Body({ model, env }: { model: ResolvedPanel; env: KpiEnv }) {
+/** What a panel draws, without its frame: the chat reuses it for Orion's charts. */
+export function KpiPanelBody({ model, env }: { model: ResolvedPanel; env: KpiEnv }) {
   if (!model.hasData) return <NoData t={env.t} />;
   switch (model.panel.type) {
     case 'timeseries':
@@ -145,7 +146,7 @@ export function KpiPanel({
         ) : null}
       </header>
       <div className="flex min-h-0 min-w-0 flex-1 flex-col px-3 pb-3">
-        <Body model={model} env={env} />
+        <KpiPanelBody model={model} env={env} />
       </div>
     </section>
   );

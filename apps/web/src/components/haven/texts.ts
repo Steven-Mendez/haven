@@ -4,6 +4,7 @@ export const havenTexts = defineTexts({
   es: {
     app: 'Vista de Tierra',
     navCrew: 'Tripulación',
+    navOrion: 'Orion AI',
     navMissions: 'Misiones',
     navSettings: 'Ajustes',
     navProfile: 'Perfil',
@@ -186,6 +187,7 @@ export const havenTexts = defineTexts({
     shortcutMove: 'Moverse por la lista de tripulación',
     shortcutOpen: 'Abrir la fila seleccionada',
     shortcutGoCrew: 'Ir a Tripulación',
+    shortcutGoOrion: 'Ir a Orion AI',
     shortcutGoRules: 'Ir a Reglas',
     shortcutGoKpi: 'Ir a KPI',
     shortcutGoEva: 'Ir a Aptitud EVA',
@@ -229,6 +231,7 @@ export const havenTexts = defineTexts({
   en: {
     app: 'Ground View',
     navCrew: 'Crew',
+    navOrion: 'Orion AI',
     navMissions: 'Missions',
     navSettings: 'Settings',
     navProfile: 'Profile',
@@ -411,6 +414,7 @@ export const havenTexts = defineTexts({
     shortcutMove: 'Move through the crew list',
     shortcutOpen: 'Open the selected row',
     shortcutGoCrew: 'Go to Crew',
+    shortcutGoOrion: 'Go to Orion AI',
     shortcutGoRules: 'Go to Rules',
     shortcutGoKpi: 'Go to KPIs',
     shortcutGoEva: 'Go to EVA readiness',

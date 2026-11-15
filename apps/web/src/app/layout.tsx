@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { cache, Suspense } from 'react';
+import { OrionBridge } from '@/assistant';
 import { AppHeader, AppHeaderSkeleton } from '@/components/app-header';
 import { AppSidebar, MissionSwitcherSkeleton, NavOperatorSkeleton } from '@/components/app-sidebar';
 import { crewDisplayLevel, hasOpenEmergency } from '@/components/haven/astronaut-card';
@@ -81,6 +82,11 @@ async function ProductTourWithData() {
   return <ProductTour lang={lang} />;
 }
 
+async function OrionBridgeWithData() {
+  const { lang } = await loadShell();
+  return <OrionBridge lang={lang} />;
+}
+
 async function HeaderWithData() {
   const { lang, crew } = await loadShell();
   const members = crew?.crew ?? [];
@@ -142,6 +148,9 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           <Toaster />
           <Suspense>
             <ProductTourWithData />
+          </Suspense>
+          <Suspense>
+            <OrionBridgeWithData />
           </Suspense>
         </TooltipProvider>
       </body>
