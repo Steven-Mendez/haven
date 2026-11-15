@@ -256,7 +256,12 @@ export async function getSampleOverview(mission = DEFAULT_MISSION): Promise<{
   const rows = await Promise.all(
     crew.crew.map(async (member) => {
       const detail = await queryGetAstronaut(mission, member.id);
-      const readings = detail?.packets.flatMap((p) => p.readings) ?? [];
+      // Each routine packet repeats the last 24 h: keep every reading once.
+      const readings = [
+        ...new Map(
+          (detail?.packets ?? []).flatMap((p) => p.readings).map((r) => [r.id, r]),
+        ).values(),
+      ];
       for (const c of awaitingResults(readings, results)) {
         const sample = sampleConfig.samples.find((s) => s.id === c.sample);
         if (!sample) continue;
