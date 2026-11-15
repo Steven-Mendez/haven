@@ -188,7 +188,7 @@ export async function WorkloadPanel({
                           ) : null}
                         </span>
                       </TableCell>
-                      <TableCell className="py-3 text-xs">
+                      <TableCell className="py-3 text-xs whitespace-normal">
                         {s.latestFatigue === null ? (
                           <span className="text-tertiary">{t.wlNoFatigue}</span>
                         ) : (
