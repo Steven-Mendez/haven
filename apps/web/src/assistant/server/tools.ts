@@ -37,7 +37,18 @@ import {
   type KpiPanel,
 } from '@/lib/kpi';
 import type { CrewCard } from '@/server/types';
-import type { AssistantContext, PanelView } from '../types';
+import type { AssistantContext, CountermeasureCardView, PanelView } from '../types';
+import {
+  commsCard,
+  commsStatus,
+  evaCard,
+  exerciseCard,
+  medicationCard,
+  motionCard,
+  reentryCard,
+  samplesCard,
+  workloadCard,
+} from './countermeasures';
 import { checkSeries, panelView, summarize } from './panels';
 import { errorText, type Fail, fail, findCrew, findMission, NO_MISSION } from './shared';
 import { createWriteTools, type WriteTools } from './writes';
@@ -50,7 +61,19 @@ const AREAS = [
   'exercise',
   'motion',
   'workload',
+  'comms',
 ] as const;
+
+const AREA_PAGE: Record<(typeof AREAS)[number], string> = {
+  eva: '/eva',
+  reentry: '/reentry',
+  medication: '/medication',
+  samples: '/samples',
+  exercise: '/exercise',
+  motion: '/motion',
+  workload: '/workload',
+  comms: '/',
+};
 const CATALOGS = ['environments', 'templates', 'medications', 'samples', 'exercise'] as const;
 
 const seriesSchema = z.object({
@@ -192,26 +215,81 @@ export function createAssistantTools(ctx: AssistantContext) {
 
     getCountermeasures: tool({
       description:
-        'One countermeasure area of the active mission, one row per crew member: eva (readiness for a spacewalk), reentry (preparation), medication (plan and adherence), samples (collections, pending lab results and loaded results), exercise (prescription and weekly compliance), motion (motion sickness and balance) or workload (hours, fatigue, sleep).',
+        "One countermeasure area of the active mission, one row per crew member: eva (readiness for a spacewalk), reentry (preparation), medication (plan and adherence), samples (collections, pending lab results and loaded results), exercise (prescription and weekly compliance), motion (motion sickness and balance), workload (hours, fatigue, sleep) or comms (the link with the crew: live, delayed, autonomous or down, the one-way and round-trip delay and when something sent now reaches the crew). The chat draws a card with each crew member's state and a link to the tab.",
       inputSchema: z.object({ area: z.enum(AREAS) }),
       execute: ({ area }) =>
         safely(async () => {
           if (!ctx.mission) return fail(NO_MISSION);
           const mission = ctx.mission;
-          const result = await {
-            eva: () => getEvaReadiness(mission),
-            reentry: () => getReentryReadiness(mission),
-            medication: () => getMedicationOverview(mission),
-            exercise: () => getExerciseOverview(mission),
-            motion: () => getMotionOverview(mission),
-            workload: () => getWorkloadOverview(mission),
-            samples: async () => {
-              const samples = await getSampleOverview(mission);
-              return samples ? { ...samples, results: samples.results.slice(0, 20) } : null;
-            },
-          }[area]();
-          return result ? { area, ...result } : fail(`Mission ${mission} does not exist.`);
+          const title =
+            area === 'comms'
+              ? et.commsTitle
+              : {
+                  eva: et.tabEva,
+                  reentry: et.tabReentry,
+                  medication: et.tabMedication,
+                  samples: et.tabSamples,
+                  exercise: et.tabExercise,
+                  motion: et.tabMotion,
+                  workload: et.tabWorkload,
+                }[area];
+          const card = (rows: CountermeasureCardView['rows']): CountermeasureCardView => ({
+            area,
+            title,
+            page: AREA_PAGE[area],
+            rows,
+          });
+          const missing = fail(`Mission ${mission} does not exist.`);
+          switch (area) {
+            case 'comms': {
+              const found = await findMission(mission);
+              if (!found.ok) return found;
+              const status = commsStatus(found.mission, new Date());
+              return { area, ...status, card: card(commsCard(found.mission, status, lang)) };
+            }
+            case 'eva': {
+              const r = await getEvaReadiness(mission);
+              return r ? { area, ...r, card: card(evaCard(r.rows, et)) } : missing;
+            }
+            case 'reentry': {
+              const r = await getReentryReadiness(mission);
+              return r ? { area, ...r, card: card(reentryCard(r.rows, et)) } : missing;
+            }
+            case 'medication': {
+              const r = await getMedicationOverview(mission);
+              return r ? { area, ...r, card: card(medicationCard(r.rows, et)) } : missing;
+            }
+            case 'exercise': {
+              const r = await getExerciseOverview(mission);
+              return r ? { area, ...r, card: card(exerciseCard(r.rows, et)) } : missing;
+            }
+            case 'motion': {
+              const r = await getMotionOverview(mission);
+              return r ? { area, ...r, card: card(motionCard(r.rows, et)) } : missing;
+            }
+            case 'workload': {
+              const r = await getWorkloadOverview(mission);
+              return r ? { area, ...r, card: card(workloadCard(r.rows, et)) } : missing;
+            }
+            case 'samples': {
+              const r = await getSampleOverview(mission);
+              return r
+                ? {
+                    area,
+                    ...r,
+                    results: r.results.slice(0, 20),
+                    card: card(samplesCard(r.rows, et)),
+                  }
+                : missing;
+            }
+          }
         }),
+      // The card is for the operator; the model reads the data without it.
+      toModelOutput: ({ output }) => {
+        if ('error' in output) return { type: 'error-text', value: output.error };
+        const { card: _card, ...data } = output;
+        return { type: 'json', value: { ...data, cardShown: true } };
+      },
     }),
 
     listIndicators: tool({
