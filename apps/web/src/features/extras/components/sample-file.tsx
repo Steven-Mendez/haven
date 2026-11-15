@@ -1,14 +1,31 @@
 import { type SampleResult, sampleConfig, symptomById, unitLabel } from '@haven/core';
-import { CircleAlert } from 'lucide-react';
+import {
+  ChevronDown,
+  CircleAlert,
+  Droplet,
+  FlaskConical,
+  type LucideIcon,
+  Microscope,
+  Syringe,
+} from 'lucide-react';
 import { LevelGlyph } from '@/components/haven';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { format, type Language } from '@/lib/i18n';
 import { baseConfig } from '@/server/model';
 import type { ExtrasTexts } from '../i18n';
 import { type PendingSample, RESULT_LEVEL } from '../logic/samples';
+import { IconTile, StatusPill } from './panel-parts';
 import { SampleResultForm } from './sample-result-form';
 
 const sampleOf = (id: string) => sampleConfig.samples.find((s) => s.id === id);
+
+/** One icon per sample type, used in tiles and table headers. */
+export const SAMPLE_ICON: Record<string, LucideIcon> = {
+  saliva: Droplet,
+  blood: Syringe,
+  urine: FlaskConical,
+  'surface-swab': Microscope,
+};
 
 export function dateText(iso: string, lang: Language) {
   return new Date(iso).toLocaleString(lang, {
@@ -37,7 +54,7 @@ export function valuesText(result: SampleResult, lang: Language) {
 
 function Block({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-1.5">
+    <section className="bg-surface/40 flex flex-col gap-1.5 rounded-lg border p-3">
       <h4 className="text-muted-foreground text-[11px] font-semibold tracking-wide uppercase">
         {title}
       </h4>
@@ -66,24 +83,34 @@ export function SampleFile({
   });
 
   return (
-    <li className="flex flex-col gap-2 px-4 py-3" data-testid={`pending-${item.id}`}>
-      <span className="text-sm">
-        <span className="font-medium">{item.name}</span> · {sample.name[lang]}
-        {module ? ` · ${format(t.moduleLabel, { module })}` : ''}
-        <span className="text-muted-foreground">
-          {' '}
-          · {format(t.collectedOn, { date: dateText(item.collectedAt, lang) })} ·{' '}
+    <li className="group/row flex flex-col gap-3 px-4 py-3" data-testid={`pending-${item.id}`}>
+      <div className="flex flex-wrap items-center gap-3">
+        <IconTile icon={SAMPLE_ICON[sample.id]} />
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <span className="text-sm">
+            <span className="font-medium">{item.name}</span>
+            <span className="text-muted-foreground"> · {sample.name[lang]}</span>
+            {module ? (
+              <span className="text-muted-foreground"> · {format(t.moduleLabel, { module })}</span>
+            ) : null}
+          </span>
+          <span className="text-tertiary text-2xs">
+            {format(t.collectedDay, { day: item.day, date: dateText(item.collectedAt, lang) })}
+          </span>
+        </div>
+        <StatusPill
+          tone={item.age.stale ? 'amber' : 'muted'}
+          icon={item.age.stale ? CircleAlert : undefined}
+        >
           {item.age.days === 0 ? t.ageToday : format(t.ageDays, { n: item.age.days })}
-        </span>
-        {item.age.stale ? (
-          <CircleAlert
-            aria-label={format(t.staleWarning, { max: sample.maxAgeDays })}
-            className="text-level-amber ml-1.5 inline size-3.5 align-[-2px]"
-          />
-        ) : null}
-      </span>
+        </StatusPill>
+      </div>
       <Collapsible>
-        <CollapsibleTrigger className="text-link self-start text-xs hover:underline">
+        <CollapsibleTrigger className="group/trigger text-link inline-flex items-center gap-1 self-start text-xs hover:underline">
+          <ChevronDown
+            aria-hidden="true"
+            className="size-3.5 transition-transform group-data-[panel-open]/trigger:rotate-180"
+          />
           {t.fileOpen}
         </CollapsibleTrigger>
         <CollapsibleContent className="flex flex-col gap-4 pt-3">
