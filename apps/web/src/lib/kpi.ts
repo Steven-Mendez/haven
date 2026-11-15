@@ -50,6 +50,8 @@ export const KPI_INDICATORS = [
   'sleep',
   'mood',
   'stress',
+  'work-hours',
+  'fatigue',
   'steps',
   'resistance-exercise',
   'reaction-time',

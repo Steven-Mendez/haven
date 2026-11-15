@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  BriefcaseBusiness,
   ChartNoAxesCombined,
   Footprints,
   Rocket,
@@ -78,6 +79,12 @@ export function NavMain({ lang, crew }: Props) {
       active: pathname === '/kpi',
     },
     { href: '/eva', label: t.navEvaShort, icon: Footprints, active: pathname === '/eva' },
+    {
+      href: '/workload',
+      label: t.navWorkloadShort,
+      icon: BriefcaseBusiness,
+      active: pathname === '/workload',
+    },
     {
       href: '/missions',
       label: t.navMissions,

@@ -19,6 +19,7 @@ const GO: Record<string, string> = {
   k: '/kpi',
   t: '/kpi',
   e: '/eva',
+  w: '/workload',
   m: '/missions',
 };
 
@@ -64,6 +65,7 @@ export function KeyboardShortcuts({ lang }: { lang: Language }) {
     { keys: [['g', 'r']], label: t.shortcutGoRules },
     { keys: [['g', 'k']], label: t.shortcutGoKpi },
     { keys: [['g', 'e']], label: t.shortcutGoEva },
+    { keys: [['g', 'w']], label: t.shortcutGoWorkload },
     { keys: [['g', 'm']], label: t.shortcutGoMissions },
     { keys: [['⌘', 'B']], label: t.shortcutSidebar },
     { keys: [['?']], label: t.shortcutHelp },

@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  BriefcaseBusiness,
   ChartNoAxesCombined,
   Compass,
   Footprints,
@@ -147,6 +148,7 @@ export function CommandMenu({ lang, crew }: Props) {
     { href: '/rules', label: t.navRules, icon: SlidersHorizontal },
     { href: '/kpi', label: t.navKpi, icon: ChartNoAxesCombined },
     { href: '/eva', label: t.navEva, icon: Footprints },
+    { href: '/workload', label: t.navWorkload, icon: BriefcaseBusiness },
     { href: '/missions', label: t.navMissions, icon: Rocket },
     { href: '/settings', label: t.navSettings, icon: Settings },
   ];

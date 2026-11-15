@@ -11,6 +11,7 @@ import { EvaPanel } from './components/eva-panel';
 import { KpiDashboardPanel } from './components/kpi/kpi-dashboard-panel';
 import { RulesPanel } from './components/rules-panel';
 import { TrendsPanel } from './components/trends-panel';
+import { WorkloadPanel } from './components/workload-panel';
 import { type ExtrasTexts, texts } from './i18n';
 import { getMission } from './server';
 import { EXTRAS_TABS, type ExtrasTab } from './types';
@@ -70,6 +71,7 @@ const TITLES = {
   rules: { title: 'tabRules', subtitle: 'rulesSubtitle' },
   kpi: { title: 'kpiTitle', subtitle: 'kpiSubtitle' },
   eva: { title: 'tabEva', subtitle: 'evaSubtitle' },
+  workload: { title: 'tabWorkload', subtitle: 'workloadSubtitle' },
 } as const;
 
 async function ExtrasContent({
@@ -143,6 +145,7 @@ async function ExtrasContent({
       {header}
       {section === 'rules' ? <RulesPanel mission={mission} lang={lang} t={t} /> : null}
       {section === 'eva' ? <EvaPanel mission={code} lang={lang} t={t} /> : null}
+      {section === 'workload' ? <WorkloadPanel mission={code} lang={lang} t={t} /> : null}
     </>
   );
 }
@@ -167,6 +170,10 @@ export const KpiView = ({ searchParams }: PageProps) => (
 );
 export const EvaView = ({ searchParams }: PageProps) => (
   <ExtrasPage section="eva" searchParams={searchParams} />
+);
+
+export const WorkloadView = ({ searchParams }: PageProps) => (
+  <ExtrasPage section="workload" searchParams={searchParams} />
 );
 
 export function extrasRedirect(tab: unknown): `/${ExtrasTab}` {
