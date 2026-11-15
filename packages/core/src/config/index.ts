@@ -1,4 +1,5 @@
 import actionsJson from '../../config/actions.json';
+import commsJson from '../../config/comms.json';
 import environments from '../../config/environments.json';
 import glossaryJson from '../../config/glossary.json';
 import guides from '../../config/guides.json';
@@ -11,6 +12,7 @@ import version from '../../config/version.json';
 import zones from '../../config/zones.json';
 import type {
   Action,
+  CommsConfig,
   Config,
   Environment,
   I18n,
@@ -89,6 +91,8 @@ export const actions: Action[] = actionsJson as Action[];
 export function actionById(id: string): Action | undefined {
   return actions.find((a) => a.id === id);
 }
+
+export const comms: CommsConfig = commsJson as CommsConfig;
 
 export type LoadedConfig = Config & { actions: Action[] };
 

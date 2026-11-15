@@ -78,6 +78,14 @@ export type Environment = {
   destinations?: Destination[];
 };
 
+export type CommsConfig = {
+  /** Up to this one-way delay (minutes) a conversation still feels live. */
+  realtimeMaxMin: number;
+  /** From this one-way delay (minutes) the crew acts on its own and Earth supports later. */
+  autonomousFromMin: number;
+  source: string;
+};
+
 export type MissionPhase = {
   environment: EnvironmentId | (string & {});
   days: number;
