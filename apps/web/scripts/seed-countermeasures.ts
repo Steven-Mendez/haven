@@ -1,7 +1,7 @@
 // Demo of the countermeasure features: reentry preparation (DEMORE), EVA
 // prebreathe with the post-EVA decompression check (DEMOEV), and the medication
 // plan with biological and habitat samples, and the exercise prescription with
-// its weekly self-assessment (DEMOMS), and motion sickness with the balance test
+// its weekly self-assessment and the workload of a station crew (DEMOMS), and motion sickness with the balance test
 // on the second day after landing on the Moon (DEMOCN).
 //
 //   pnpm --filter web seed:countermeasures            # the four missions
@@ -119,13 +119,13 @@ const lastDay = (readings: Reading[], at: number, indicator: string, value: numb
 };
 
 /**
- * Sets the exercise minutes of the days `daysAgo` before `at` (0 is today);
- * 0 minutes removes that day's session.
+ * Sets the value of an indicator on the days `daysAgo` before `at` (0 is
+ * today); 0 removes that day's reading.
  */
-function exerciseDays(
+function setDays(
   readings: Reading[],
   at: number,
-  indicator: 'resistance-exercise' | 'aerobic-exercise',
+  indicator: string,
   minutesByDaysAgo: Record<number, number>,
 ) {
   for (let i = readings.length - 1; i >= 0; i--) {
@@ -356,6 +356,7 @@ const DEMOS: Demo[] = [
         role: ['Comandante', 'Commander'],
         note: 'Todo al día: suplementos tomados y muestras de esta semana entregadas.',
         plan: BONE_PLAN,
+        tweak: (rs, at) => setDays(rs, at, 'work-hours', { 2: 3 }),
         extra: (m, at) => [
           selfAssessment(m, at - 2 * DAY, 2, 'none', 'full'),
           ...doseHistory(m, BONE_PLAN, at),
@@ -395,8 +396,11 @@ const DEMOS: Demo[] = [
           },
         ],
         tweak: (rs, at) => {
-          exerciseDays(rs, at, 'aerobic-exercise', { 1: 0, 2: 15, 4: 0, 5: 20 });
-          exerciseDays(rs, at, 'resistance-exercise', { 1: 30, 4: 0 });
+          setDays(rs, at, 'aerobic-exercise', { 1: 0, 2: 15, 4: 0, 5: 20 });
+          setDays(rs, at, 'resistance-exercise', { 1: 30, 4: 0 });
+          setDays(rs, at, 'work-hours', { 0: 12, 1: 11.5, 2: 11, 3: 11, 4: 10.5 });
+          setDays(rs, at, 'fatigue', { 0: 6, 1: 5 });
+          setDays(rs, at, 'sleep', { 0: 5.2, 1: 5.8 });
         },
         extra: (m, at) => [
           selfAssessment(m, at - DAY, 8, 'mild', 'partial'),
@@ -432,8 +436,10 @@ const DEMOS: Demo[] = [
           note: 'Mientras dure el mareo, intensidad suave y sin carrera.',
         },
         tweak: (rs, at) => {
-          exerciseDays(rs, at, 'aerobic-exercise', { 0: 0, 1: 0, 3: 10 });
-          exerciseDays(rs, at, 'resistance-exercise', { 0: 20 });
+          setDays(rs, at, 'aerobic-exercise', { 0: 0, 1: 0, 3: 10 });
+          setDays(rs, at, 'resistance-exercise', { 0: 20 });
+          setDays(rs, at, 'work-hours', { 0: 10.5, 1: 11, 2: 10.5, 5: 4 });
+          setDays(rs, at, 'fatigue', { 0: 4 });
         },
         extra: (m, at) => [
           // Last self-assessment over a week ago: the next one is due.
