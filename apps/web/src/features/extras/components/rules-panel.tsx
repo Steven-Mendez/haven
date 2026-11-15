@@ -1,6 +1,6 @@
 import { isTracked, loadConfig, unitLabel } from '@haven/core';
 import { ChevronRight } from 'lucide-react';
-import { havenTexts, TimeAgo } from '@/components/haven';
+import { TimeAgo } from '@/components/haven';
 import { explain } from '@/components/haven/term';
 import {
   Accordion,
@@ -101,7 +101,6 @@ export async function RulesPanel({
         zones={loadConfig().zones.map((z) => ({ id: z.id, name: translate(z.name, lang) }))}
         currentVersion={fromVersion?.version ?? config.version}
         environmentNames={environmentNames}
-        defaultAuthor={havenTexts[lang].operatorName}
         explanations={Object.fromEntries(
           editableIndicators(config).map((i) => [i.id, explain(i.id, lang)]),
         )}

@@ -1,20 +1,16 @@
 'use client';
 
-import { ChevronRight, CircleAlert, CircleHelp, Send } from 'lucide-react';
-import { type ReactNode, useActionState, useState } from 'react';
+import { ChevronRight, CircleAlert, CircleHelp } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { type ReactNode, useActionState, useEffect, useState } from 'react';
+import { toast } from 'sonner';
 import { havenTexts, LevelBadge } from '@/components/haven';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Field, FieldLabel } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { format, type Language, textsFor, translate } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
@@ -26,18 +22,15 @@ import { FormError, INVALID_INPUT } from './form-error';
 
 type Props = {
   lang: Language;
-  indicators: EditableIndicator[];
-  currentVersion: string;
+  indicator: EditableIndicator;
   environmentNames: Record<string, string>;
-  defaultAuthor: string;
-  initialIndicator?: string;
-  bare?: boolean;
+  author: string;
+  backHref: string;
 };
 
 const INITIAL: RulesFormState = { status: 'idle' };
 
-function initialValues(indicator: EditableIndicator | undefined): Record<string, string> {
-  if (!indicator) return {};
+function initialValues(indicator: EditableIndicator): Record<string, string> {
   const values: Record<string, string> = {
     'green-min': String(indicator.green[0]),
     'green-max': String(indicator.green[1]),
@@ -49,34 +42,21 @@ function initialValues(indicator: EditableIndicator | undefined): Record<string,
   return values;
 }
 
-export function RulesEditor({
-  lang,
-  indicators,
-  currentVersion,
-  environmentNames,
-  defaultAuthor,
-  initialIndicator,
-  bare,
-}: Props) {
+export function RulesEditor({ lang, indicator, environmentNames, author, backHref }: Props) {
   const t = textsFor(texts, lang);
+  const router = useRouter();
   const [state, action, pending] = useActionState(sendRulesVersion, INITIAL);
-  const [indicatorId, setIndicatorId] = useState(
-    indicators.find((i) => i.id === initialIndicator)?.id ??
-      indicators.find((i) => i.id === 'glucose')?.id ??
-      indicators[0]?.id ??
-      '',
-  );
-  const indicator = indicators.find((i) => i.id === indicatorId);
   const [values, setValues] = useState(() => initialValues(indicator));
   const [open, setOpen] = useState<string | null>(null);
   const [note, setNote] = useState('');
-  const [author, setAuthor] = useState(defaultAuthor);
 
-  const choose = (id: string) => {
-    setIndicatorId(id);
-    setValues(initialValues(indicators.find((i) => i.id === id)));
-    setOpen(null);
-  };
+  const sent = state.status === 'ok' ? state.version : undefined;
+  useEffect(() => {
+    if (!sent) return;
+    toast.success(format(t.rulesSent, { version: sent }));
+    router.push(backHref);
+  }, [sent, t, router, backHref]);
+
   const errors: ThresholdError[] = state.status === 'error' ? state.errors : [];
   const errorFor = (field: string) => {
     const e = errors.find((x) => x.field === field);
@@ -101,9 +81,8 @@ export function RulesEditor({
         ? t.errSave
         : (errorFor('indicator') ?? (errors.length ? t.errReview : undefined));
 
-  const unit = indicator?.unit ?? '';
-  const items = indicators.map((i) => ({ value: i.id, label: translate(i.name, lang) }));
-  const overrides = indicator?.overrides.map((e) => environmentNames[e] ?? e) ?? [];
+  const unit = indicator.unit;
+  const overrides = indicator.overrides.map((e) => environmentNames[e] ?? e);
   const rangeText = (prefix: string) =>
     `${values[`${prefix}-min`] ?? '?'}–${values[`${prefix}-max`] ?? '?'}${unit ? ` ${unit}` : ''}`;
 
@@ -189,126 +168,70 @@ export function RulesEditor({
   const greenError = errorFor('green');
 
   return (
-    <Card
-      className={cn(
-        'gap-0 pb-0',
-        bare && 'min-h-0 flex-1 overflow-y-auto rounded-none bg-transparent pt-0 ring-0',
-      )}
-    >
-      <CardHeader className={cn('pb-4', bare && 'sr-only')}>
-        <CardTitle>{t.editorTitle}</CardTitle>
-        <CardDescription>
-          {format(t.editorDescription, { version: currentVersion })}
-        </CardDescription>
-      </CardHeader>
-      <form action={action} className="flex flex-col">
-        <CardContent className="flex flex-col gap-5 pb-5">
-          <Field>
-            <FieldLabel htmlFor="rules-indicator">{t.indicator}</FieldLabel>
-            <Select
-              name="indicator"
-              items={items}
-              value={indicatorId}
-              onValueChange={(v) => {
-                if (typeof v === 'string') choose(v);
-              }}
-            >
-              <SelectTrigger id="rules-indicator" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {items.map((i) => (
-                  <SelectItem key={i.value} value={i.value}>
-                    {i.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {overrides.length ? (
-              <p className="text-muted-foreground text-xs">
-                {format(t.overrideNotice, { environments: overrides.join(', ') })}
-              </p>
-            ) : null}
-          </Field>
+    <form action={action} className="flex max-w-2xl flex-col gap-6">
+      <input type="hidden" name="indicator" value={indicator.id} />
+      {overrides.length ? (
+        <p className="text-muted-foreground text-xs">
+          {format(t.overrideNotice, { environments: overrides.join(', ') })}
+        </p>
+      ) : null}
 
-          {indicator ? (
-            <SettingsGroup title={t.greenRange} hint={t.greenRangeHint}>
-              <div className="flex flex-col gap-2 p-4">
-                {inputs('green', greenError)}
-                {greenError ? <FormError>{greenError}</FormError> : null}
-              </div>
-            </SettingsGroup>
-          ) : null}
-
-          {indicator ? (
-            <SettingsGroup title={t.rulesTitle} hint={t.rulesHint}>
-              {indicator.rules.length ? (
-                indicator.rules.map(ruleRow)
-              ) : (
-                <p className="text-muted-foreground p-4 text-sm">{t.noRangeRules}</p>
-              )}
-            </SettingsGroup>
-          ) : null}
-
-          <div className="grid gap-4 sm:grid-cols-[2fr_1fr]">
-            <Field>
-              <FieldLabel htmlFor="rules-note">{t.note}</FieldLabel>
-              <Input
-                id="rules-note"
-                name="note"
-                maxLength={500}
-                placeholder={t.notePlaceholder}
-                value={note}
-                onChange={(e) => setNote(e.target.value)}
-              />
-            </Field>
-            <Field>
-              <FieldLabel htmlFor="rules-author">{t.author}</FieldLabel>
-              <Input
-                id="rules-author"
-                name="author"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                maxLength={80}
-              />
-            </Field>
-          </div>
-        </CardContent>
-
-        <div
-          className={cn(
-            'bg-card sticky bottom-0 flex flex-wrap items-center gap-3 border-t px-4 py-3',
-            bare ? 'bg-popover' : 'rounded-b-xl',
-          )}
-        >
-          {pending || !indicator ? (
-            <Tooltip>
-              <TooltipTrigger render={<Button type="submit" disabled focusableWhenDisabled />}>
-                <Send data-icon="inline-start" />
-                {pending ? t.submittingRules : t.submitRules}
-              </TooltipTrigger>
-              <TooltipContent>
-                {pending ? havenTexts[lang].disabledSending : havenTexts[lang].disabledNoIndicator}
-              </TooltipContent>
-            </Tooltip>
-          ) : (
-            <Button type="submit">
-              <Send data-icon="inline-start" />
-              {t.submitRules}
-            </Button>
-          )}
-          <div aria-live="polite" className="text-sm">
-            {state.status === 'ok' ? (
-              <span className="text-muted-foreground">
-                {format(t.rulesSent, { version: state.version })}
-              </span>
-            ) : formMessage ? (
-              <FormError>{formMessage}</FormError>
-            ) : null}
-          </div>
+      <SettingsGroup title={t.greenRange} hint={t.greenRangeHint}>
+        <div className="flex flex-col gap-2 p-4">
+          {inputs('green', greenError)}
+          {greenError ? <FormError>{greenError}</FormError> : null}
         </div>
-      </form>
-    </Card>
+      </SettingsGroup>
+
+      <SettingsGroup title={t.rulesTitle} hint={t.rulesHint}>
+        {indicator.rules.length ? (
+          indicator.rules.map(ruleRow)
+        ) : (
+          <p className="text-muted-foreground p-4 text-sm">{t.noRangeRules}</p>
+        )}
+      </SettingsGroup>
+
+      <Field>
+        <FieldLabel htmlFor="rules-author">{t.author}</FieldLabel>
+        <Input id="rules-author" value={author} disabled readOnly className="sm:w-64" />
+      </Field>
+
+      <Field>
+        <FieldLabel htmlFor="rules-note">
+          {t.note}
+          <span className="text-muted-foreground font-normal">({t.optional})</span>
+        </FieldLabel>
+        <Textarea
+          id="rules-note"
+          name="note"
+          maxLength={500}
+          rows={4}
+          className="min-h-28"
+          placeholder={t.notePlaceholder}
+          value={note}
+          onChange={(e) => setNote(e.target.value)}
+        />
+      </Field>
+
+      <div className="flex flex-wrap items-center justify-end gap-3">
+        <div aria-live="polite" className="mr-auto text-sm">
+          {formMessage ? <FormError>{formMessage}</FormError> : null}
+        </div>
+        <Link href={backHref} className={buttonVariants({ variant: 'ghost' })}>
+          {t.cancelEdit}
+        </Link>
+        {pending ? (
+          <Tooltip>
+            <TooltipTrigger render={<Button type="submit" disabled focusableWhenDisabled />}>
+              {t.submittingRules}
+            </TooltipTrigger>
+            <TooltipContent>{havenTexts[lang].disabledSending}</TooltipContent>
+          </Tooltip>
+        ) : (
+          <Button type="submit">{t.submitRules}</Button>
+        )}
+      </div>
+    </form>
   );
 }
 

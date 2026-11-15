@@ -111,8 +111,8 @@ export function RangeScale({
                   )}
                   style={{
                     background: worse
-                      ? `repeating-linear-gradient(135deg, var(--level-red) 0 3px, var(--level-${s.level}) 3px 6px)`
-                      : `var(--level-${s.level})`,
+                      ? `repeating-linear-gradient(135deg, var(--scale-red) 0 3px, var(--scale-${s.level}) 3px 6px)`
+                      : `var(--scale-${s.level})`,
                     opacity: s.level === 'green' ? 0.9 : 1,
                   }}
                 />

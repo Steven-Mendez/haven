@@ -47,6 +47,8 @@ export function AppHeader({ lang, day, linkDown, crewNames, crew = [] }: Props) 
 
   const crumbs: Crumb[] = [];
   if (pathname === '/rules') crumbs.push({ label: t.navRulesShort });
+  else if (pathname.startsWith('/rules/'))
+    crumbs.push({ label: t.navRulesShort, href: '/rules' }, { label: t.editThresholdsCrumb });
   else if (pathname === '/trends') crumbs.push({ label: t.navTrendsShort });
   else if (pathname === '/eva') crumbs.push({ label: t.navEvaShort });
   else if (pathname === '/missions/new')

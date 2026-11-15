@@ -62,7 +62,7 @@ export function NavMain({ lang, crew }: Props) {
       href: '/rules',
       label: t.navRulesShort,
       icon: SlidersHorizontal,
-      active: pathname === '/rules',
+      active: pathname === '/rules' || pathname.startsWith('/rules/'),
     },
     { href: '/trends', label: t.navTrendsShort, icon: Activity, active: pathname === '/trends' },
     { href: '/eva', label: t.navEvaShort, icon: Footprints, active: pathname === '/eva' },

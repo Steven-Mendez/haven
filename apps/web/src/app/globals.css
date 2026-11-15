@@ -193,6 +193,10 @@
   --link: #007aff;
   --ring: #007aff;
 
+  /* Relleno de las barras de umbral: igual en claro y oscuro. */
+  --scale-green: #30d158;
+  --scale-amber: #ff9f0a;
+  --scale-red: #ff453a;
   --level-green: #248a3d;
   --level-green-bg: rgba(36, 138, 61, 0.12);
   --level-green-border: rgba(36, 138, 61, 0.24);

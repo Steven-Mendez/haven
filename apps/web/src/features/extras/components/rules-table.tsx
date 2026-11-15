@@ -1,18 +1,12 @@
 'use client';
 
-import { Pencil, Search, X } from 'lucide-react';
+import { Pencil, Search } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { Hint, levelLabel, type TermExplanation, TermTip } from '@/components/haven';
-import { Button } from '@/components/ui/button';
+import { Hint, type TermExplanation, TermTip } from '@/components/haven';
+import { buttonVariants } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
 import {
   Table,
   TableBody,
@@ -22,10 +16,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { format, type Language, textsFor, translate } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 import { texts } from '../i18n';
 import type { EditableIndicator } from '../logic/rules';
 import { RangeScale } from './range-scale';
-import { RulesEditor } from './rules-editor';
 
 type Props = {
   lang: Language;
@@ -33,7 +27,6 @@ type Props = {
   zones: { id: string; name: string }[];
   currentVersion: string;
   environmentNames: Record<string, string>;
-  defaultAuthor: string;
   explanations?: Record<string, TermExplanation | undefined>;
   rangeExplain?: TermExplanation;
 };
@@ -46,12 +39,11 @@ export function RulesTable({
   zones,
   currentVersion,
   environmentNames,
-  defaultAuthor,
   explanations,
   rangeExplain,
 }: Props) {
   const t = textsFor(texts, lang);
-  const [open, setOpen] = useState<string | null>(null);
+  const router = useRouter();
   const [query, setQuery] = useState('');
   const q = query.trim().toLowerCase();
   const shown = q
@@ -62,26 +54,23 @@ export function RulesTable({
     ...zones.map((z) => ({ ...z, items: shown.filter((i) => i.zone === z.id) })),
     { id: '', name: t.otherCategory, items: shown.filter((i) => !known.has(i.zone)) },
   ].filter((g) => g.items.length > 0);
-  const current = indicators.find((i) => i.id === open);
+  const scaleLevels = { green: t.scaleGreen, amber: t.scaleAmber, red: t.scaleRed };
   const scaleTexts = {
     below: t.scaleBelow,
     above: t.scaleAbove,
     between: t.scaleBetween,
     withSymptoms: t.scaleWithSymptoms,
-    levels: {
-      green: levelLabel('green', lang),
-      amber: levelLabel('amber', lang),
-      red: levelLabel('red', lang),
-    },
+    levels: scaleLevels,
   };
 
   const row = (i: EditableIndicator) => {
     const name = translate(i.name, lang);
+    const href = `/rules/${encodeURIComponent(i.id)}`;
     return (
       <TableRow
         key={i.id}
         className="cursor-pointer"
-        onClick={() => setOpen(i.id)}
+        onClick={() => router.push(href)}
         data-indicator={i.id}
       >
         <TableCell className="pl-4 font-medium whitespace-normal">
@@ -98,7 +87,7 @@ export function RulesTable({
               label={i.rules
                 .map(
                   (r) =>
-                    `${levelLabel(r.level, lang)}: ${format(t.outsideRange, { range: range(r.outside, i.unit) })}${r.withSymptoms ? ` (${t.withSymptoms})` : ''}`,
+                    `${scaleLevels[r.level]}: ${format(t.outsideRange, { range: range(r.outside, i.unit) })}${r.withSymptoms ? ` (${t.withSymptoms})` : ''}`,
                 )
                 .join('; ')}
             />
@@ -115,19 +104,14 @@ export function RulesTable({
         </TableCell>
         <TableCell className="pr-4 text-right">
           <Hint label={`${t.edit} · ${name}`} side="left">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              className="hit-area"
+            <Link
+              href={href}
+              className={cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }), 'hit-area')}
               aria-label={`${t.edit} · ${name}`}
-              onClick={(e) => {
-                e.stopPropagation();
-                setOpen(i.id);
-              }}
+              onClick={(e) => e.stopPropagation()}
             >
               <Pencil />
-            </Button>
+            </Link>
           </Hint>
         </TableCell>
       </TableRow>
@@ -151,22 +135,11 @@ export function RulesTable({
                 <span
                   aria-hidden="true"
                   className="h-2 w-4 rounded-full"
-                  style={{ background: `var(--level-${level})` }}
+                  style={{ background: `var(--scale-${level})` }}
                 />
-                {levelLabel(level, lang)}
+                {scaleLevels[level]}
               </li>
             ))}
-            <li className="flex items-center gap-1.5">
-              <span
-                aria-hidden="true"
-                className="h-2 w-4 rounded-full"
-                style={{
-                  background:
-                    'repeating-linear-gradient(135deg, var(--level-red) 0 3px, var(--level-amber) 3px 6px)',
-                }}
-              />
-              {t.legendSymptoms}
-            </li>
           </ul>
         </div>
         <div className="relative w-full sm:w-64">
@@ -227,57 +200,6 @@ export function RulesTable({
           </TableBody>
         </Table>
       </div>
-
-      <Sheet open={Boolean(open)} onOpenChange={(next) => (next ? null : setOpen(null))}>
-        <SheetContent
-          side="right"
-          showCloseButton={false}
-          className="gap-0 rounded-l-2xl p-0 data-[side=right]:w-full data-[side=right]:sm:max-w-[480px]"
-        >
-          <SheetHeader className="flex-row items-start justify-between gap-3 border-b px-4 py-3">
-            <div className="flex flex-col gap-0.5">
-              <SheetTitle className="text-sm font-semibold">
-                {t.editorTitle}
-                {current ? (
-                  <span className="text-muted-foreground font-normal">
-                    {' · '}
-                    {translate(current.name, lang)}
-                  </span>
-                ) : null}
-              </SheetTitle>
-              <SheetDescription className="text-xs">
-                {format(t.editorDescription, { version: currentVersion })}
-              </SheetDescription>
-            </div>
-            <Hint label={t.close} kbd="esc" side="left">
-              <SheetClose
-                render={
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    className="hit-area"
-                    aria-label={t.close}
-                  />
-                }
-              >
-                <X />
-              </SheetClose>
-            </Hint>
-          </SheetHeader>
-          {current ? (
-            <RulesEditor
-              key={current.id}
-              lang={lang}
-              indicators={indicators}
-              currentVersion={currentVersion}
-              environmentNames={environmentNames}
-              defaultAuthor={defaultAuthor}
-              initialIndicator={current.id}
-              bare
-            />
-          ) : null}
-        </SheetContent>
-      </Sheet>
     </section>
   );
 }

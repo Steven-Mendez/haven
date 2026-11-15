@@ -4,6 +4,7 @@ import type { I18n, MissionPhase } from '@haven/core';
 import { refresh } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { setMission } from '@/components/haven/actions';
+import { havenTexts } from '@/components/haven/texts';
 import { getMissionCode } from '@/lib/mission';
 import { CREW_NOT_READY } from '@/server/types';
 import { templatePhases } from './logic/plan-options';
@@ -62,7 +63,7 @@ export async function sendRulesVersion(
     config: next as unknown as Record<string, unknown>,
     version,
     note: text(form.get('note'), 500),
-    author: text(form.get('author'), 80) || 'mission-control',
+    author: havenTexts.es.operatorName,
   });
   if (!result.ok) return { status: 'error', errors: [], message: 'save' };
   refresh();

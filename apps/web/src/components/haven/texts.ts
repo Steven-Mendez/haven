@@ -83,6 +83,7 @@ export const havenTexts = defineTexts({
     manageCrewCrumb: 'Gestionar',
     missionCrumb: 'Misión',
     planCrumb: 'Plan',
+    editThresholdsCrumb: 'Editar',
     firstMissionTitle: 'Crea tu primera misión',
     firstMissionBody:
       'HAVEN acompaña la salud de una tripulación durante una misión. Crea una, eligiendo un plan real como punto de partida, o únete a una existente con su código de seis caracteres.',
@@ -124,7 +125,7 @@ export const havenTexts = defineTexts({
     navRules: 'Reglas de umbral',
     navTrends: 'Tendencias de la tripulación',
     navEva: 'Aptitud para EVA',
-    navRulesShort: 'Reglas',
+    navRulesShort: 'Umbrales',
     navTrendsShort: 'Tendencias',
     navEvaShort: 'Aptitud EVA',
     headerDelay: 'Retardo {t} por trayecto',
@@ -281,6 +282,7 @@ export const havenTexts = defineTexts({
     manageCrewCrumb: 'Manage',
     missionCrumb: 'Mission',
     planCrumb: 'Plan',
+    editThresholdsCrumb: 'Edit',
     firstMissionTitle: 'Create your first mission',
     firstMissionBody:
       'HAVEN follows a crew’s health through a mission. Create one, starting from a real mission plan, or join an existing one with its six-character code.',
@@ -322,7 +324,7 @@ export const havenTexts = defineTexts({
     navRules: 'Threshold rules',
     navTrends: 'Crew trends',
     navEva: 'EVA readiness',
-    navRulesShort: 'Rules',
+    navRulesShort: 'Thresholds',
     navTrendsShort: 'Trends',
     navEvaShort: 'EVA readiness',
     headerDelay: '{t} one-way delay',
