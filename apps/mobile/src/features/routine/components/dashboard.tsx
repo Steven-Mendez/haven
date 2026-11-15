@@ -1,6 +1,6 @@
 import type { LucideIcon } from 'lucide-react-native';
 import { ChevronRight } from 'lucide-react-native';
-import type { ReactNode } from 'react';
+import { Children, isValidElement, type ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 import { ActivityRings, type RingDatum, RingLegend, RingSpark } from '@/shared/components/haven';
 import { Icon } from '@/shared/components/ui/icon';
@@ -20,7 +20,7 @@ const DOT: Record<TileState, string> = {
   pending: 'border-muted-foreground border',
 };
 
-const TILE = 'border-border active:bg-active min-w-[46%] flex-1 rounded-lg border p-3';
+const TILE = 'border-border active:bg-active flex-1 rounded-lg border p-3';
 
 export function Tile({
   icon,
@@ -68,6 +68,14 @@ export function Tile({
   );
 }
 
+/** Rows of two; Yoga lays out explicit rows reliably, unlike flex-wrap with growing tiles. */
+function pairs(children: ReactNode) {
+  const items = Children.toArray(children).filter(isValidElement);
+  const rows: (typeof items)[] = [];
+  for (let i = 0; i < items.length; i += 2) rows.push(items.slice(i, i + 2));
+  return rows;
+}
+
 /** A titled two-column grid; an odd last tile takes the full width. */
 export function TileGroup({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -79,7 +87,11 @@ export function TileGroup({ title, children }: { title: string; children: ReactN
       >
         {title}
       </Text>
-      <View className="flex-row flex-wrap gap-3">{children}</View>
+      {pairs(children).map((row) => (
+        <View key={row.map((c) => c.key).join('|')} className="flex-row gap-3">
+          {row}
+        </View>
+      ))}
     </View>
   );
 }
