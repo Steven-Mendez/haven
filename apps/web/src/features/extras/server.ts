@@ -342,7 +342,12 @@ export async function getMotionOverview(
   const rows = await Promise.all(
     crew.crew.map(async (member) => {
       const detail = await queryGetAstronaut(mission, member.id);
-      const readings = detail?.packets.flatMap((p) => p.readings) ?? [];
+      // Each routine packet repeats the last 24 h: keep every reading once.
+      const readings = [
+        ...new Map(
+          (detail?.packets ?? []).flatMap((p) => p.readings).map((r) => [r.id, r]),
+        ).values(),
+      ];
       return motionRow(member, readings, stored, environments, now);
     }),
   );
