@@ -1,4 +1,11 @@
-import { actionsDone, dailyProgress, dayHistory } from '@haven/core';
+import {
+  actionsDone,
+  adaptationWindow,
+  dailyProgress,
+  dayHistory,
+  motion,
+  motionCheckDue,
+} from '@haven/core';
 import { randomUUID } from 'expo-crypto';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Check, ChevronRight } from 'lucide-react-native';
@@ -153,6 +160,10 @@ export default function Screen() {
     [readings, config, mission.environment, now],
   );
   const checkin = useMemo(() => todayCheckin(readings, today), [readings, today]);
+  const motionDue = useMemo(
+    () => motionCheckDue(readings, adaptationWindow(mission, motion, config.environments), now),
+    [readings, mission, config.environments, now],
+  );
 
   const week = lastSevenDays(history, today).map((d) => ({
     label: new Date(`${d.date}T12:00:00Z`).toLocaleDateString(language, {
@@ -263,6 +274,15 @@ export default function Screen() {
           )}
         </Section>
       </TourAnchor>
+
+      {motionDue ? (
+        <StepCard
+          title={t.motionTitle}
+          detail={t.motionDue}
+          action={t.motionOpen}
+          onAction={() => router.push('/motion')}
+        />
+      ) : null}
 
       <Collapsible open={guideOpen} onOpenChange={setGuideOpen} className="gap-8">
         <CollapsibleTrigger
