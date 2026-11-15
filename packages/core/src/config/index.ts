@@ -1,4 +1,5 @@
 import actionsJson from '../../config/actions.json';
+import commsJson from '../../config/comms.json';
 import environments from '../../config/environments.json';
 import evaJson from '../../config/eva.json';
 import exerciseJson from '../../config/exercise.json';
@@ -18,6 +19,7 @@ import workloadJson from '../../config/workload.json';
 import zones from '../../config/zones.json';
 import type {
   Action,
+  CommsConfig,
   Config,
   Environment,
   EvaConfig,
@@ -112,6 +114,7 @@ export const sampleConfig: SampleConfig = samplesJson as SampleConfig;
 export const exercise: ExerciseConfig = exerciseJson as ExerciseConfig;
 export const motion: MotionConfig = motionJson as MotionConfig;
 export const workload: WorkloadConfig = workloadJson as WorkloadConfig;
+export const comms: CommsConfig = commsJson as CommsConfig;
 
 export type LoadedConfig = Config & { actions: Action[] };
 

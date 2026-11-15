@@ -1,4 +1,4 @@
-import type { Packet } from '@haven/core';
+import { comms, commsMode, linkTimes, type Packet } from '@haven/core';
 import { useState } from 'react';
 import { Image, View } from 'react-native';
 import { BigButton, format, ScreenHeader, Section } from '@/shared/components/haven';
@@ -40,11 +40,16 @@ export function PacketView({ packet, linkDown, delayMin, primary, onSaveNote }: 
   const time = (iso: string) =>
     new Date(iso).toLocaleTimeString(language, { hour: '2-digit', minute: '2-digit' });
   const sent = !linkDown && pending === 0;
+  const times = linkTimes(new Date(packet.sentAt), delayMin);
+  const arrival =
+    commsMode({ currentDelayMin: delayMin, linkDown }, comms) === 'realtime'
+      ? t.arrivesSoon
+      : format(t.arrivesAt, { arrives: time(times.arrivesAt), reply: time(times.replyAt) });
   const log: { label: string; detail?: string; state: 'done' | 'current' | 'next' }[] = [
     { label: t.logCreated, detail: `${time(packet.createdAt)} · ${contents}`, state: 'done' },
     {
       label: linkDown ? t.queuedOffline : sent ? t.sent : t.sending,
-      detail: linkDown ? undefined : format(t.linkUp, { n: delayMin }),
+      detail: linkDown ? undefined : arrival,
       state: sent ? 'done' : 'current',
     },
   ];

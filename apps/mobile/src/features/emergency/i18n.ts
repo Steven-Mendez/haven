@@ -100,6 +100,13 @@ export const texts = defineTexts({
     queuedOffline: 'Se enviará al recuperar el enlace',
     linkDownShort: 'Sin enlace',
     linkUp: 'Con enlace · retardo de la misión {n} min',
+    arrivesSoon: 'Llega a Tierra en segundos.',
+    arrivesAt: 'Llega a Tierra hacia las {arrives}; respuesta como pronto a las {reply}.',
+    aloneTitle: 'Decide a bordo',
+    aloneDelay:
+      'Tierra no podrá responder antes de las {reply} ({n} min de ida y vuelta). Sigue el protocolo sin esperar y decide con la tripulación.',
+    aloneOffline:
+      'Sin enlace con Tierra. Sigue el protocolo y decide con la tripulación; el paquete sale solo al volver el enlace.',
     followUp: 'Seguimiento',
     close: 'Cerrar emergencia',
     holdTitle: 'Mantén pulsado para empezar',
@@ -216,6 +223,13 @@ export const texts = defineTexts({
     queuedOffline: 'It will be sent when the link is back',
     linkDownShort: 'No link',
     linkUp: 'Link up · mission delay {n} min',
+    arrivesSoon: 'It reaches Earth in seconds.',
+    arrivesAt: 'It reaches Earth around {arrives}; the earliest reply around {reply}.',
+    aloneTitle: 'Decide on board',
+    aloneDelay:
+      'Earth cannot answer before {reply} ({n} min round trip). Follow the protocol without waiting and decide with the crew.',
+    aloneOffline:
+      'No link with Earth. Follow the protocol and decide with the crew; the packet goes out on its own when the link is back.',
     followUp: 'Follow-up',
     close: 'Close emergency',
     holdTitle: 'Hold to start',

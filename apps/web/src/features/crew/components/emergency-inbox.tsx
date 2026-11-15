@@ -1,3 +1,4 @@
+import { comms, commsMode } from '@haven/core';
 import { ArrowRight } from 'lucide-react';
 import {
   type CrewCard,
@@ -10,7 +11,7 @@ import {
   RowContextMenu,
   TimeAgo,
 } from '@/components/haven';
-import { formatClock, formatDate, type Language } from '@/lib/i18n';
+import { format, formatClock, formatDate, formatDelay, type Language } from '@/lib/i18n';
 import { texts } from '../i18n';
 
 type Props = {
@@ -31,6 +32,7 @@ export function EmergencyInbox({ crew, now, lang, roles, indicators, delayMin }:
       (a, b) => Date.parse(b.emergency?.visibleAt ?? '') - Date.parse(a.emergency?.visibleAt ?? ''),
     );
   if (!open.length) return null;
+  const mode = commsMode({ currentDelayMin: delayMin ?? 0, linkDown: false }, comms);
 
   return (
     <section aria-labelledby="emergency-inbox" className="flex flex-col gap-2">
@@ -38,6 +40,14 @@ export function EmergencyInbox({ crew, now, lang, roles, indicators, delayMin }:
         {t.emergenciesTitle}
         <span className="text-tertiary ml-2 font-normal tabular-nums">{open.length}</span>
       </h2>
+      {mode === 'delayed' || mode === 'autonomous' ? (
+        <p className="text-muted-foreground max-w-3xl text-xs" data-testid="emergency-delay">
+          {format(mode === 'autonomous' ? t.emergenciesAutonomous : t.emergenciesDelayed, {
+            t: formatDelay(delayMin ?? 0),
+            rt: formatDelay((delayMin ?? 0) * 2),
+          })}
+        </p>
+      ) : null}
       <ul className="overflow-hidden rounded-xl border">
         {open.map((m) => {
           const packet = m.emergency;

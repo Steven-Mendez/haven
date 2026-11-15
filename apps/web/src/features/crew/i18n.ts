@@ -110,6 +110,9 @@ export const texts = defineTexts({
     rosterErrName: 'Escribe el nombre del astronauta.',
     rosterErrSave: 'No se pudo guardar. Inténtalo de nuevo.',
     emergenciesTitle: 'Emergencias abiertas',
+    emergenciesDelayed: 'Tu respuesta tarda {t} en llegar a bordo.',
+    emergenciesAutonomous:
+      'Con {t} por trayecto, tu respuesta llega a bordo al menos {rt} después de la alerta: la tripulación ya habrá actuado con el protocolo. Apoya la decisión y planifica lo siguiente.',
     receivedOnEarth: 'recibido en Tierra',
   },
   en: {
@@ -222,6 +225,9 @@ export const texts = defineTexts({
     rosterErrName: 'Type the astronaut’s name.',
     rosterErrSave: 'Could not save. Try again.',
     emergenciesTitle: 'Open emergencies',
+    emergenciesDelayed: 'Your reply takes {t} to reach the crew.',
+    emergenciesAutonomous:
+      'With {t} one way, your reply reaches the crew at least {rt} after the alert: they will already have acted with the protocol. Support the decision and plan what comes next.',
     receivedOnEarth: 'received on Earth',
   },
 });
