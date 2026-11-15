@@ -11,6 +11,7 @@ export * from './aggregates';
 export * from './baseline';
 export * from './categories';
 export * from './cognition';
+export * from './eva';
 export * from './evaluate';
 export * from './protocols';
 export * from './radiation';

@@ -78,5 +78,13 @@
       "es": "Notas el corazón muy rápido, fuerte o irregular.",
       "en": "You feel your heart beating very fast, hard or irregularly."
     }
+  },
+  {
+    "id": "joint-pain",
+    "name": { "es": "Dolor articular", "en": "Joint pain" },
+    "description": {
+      "es": "Dolor profundo en hombros, codos, rodillas o muñecas que empeora al moverlos, sobre todo después de una salida.",
+      "en": "Deep pain in the shoulders, elbows, knees or wrists that gets worse when moving them, especially after an EVA."
+    }
   }
 ]
