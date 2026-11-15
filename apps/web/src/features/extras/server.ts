@@ -15,7 +15,6 @@ import {
   missionKpiSeries as queryKpiSeries,
   listMissions as queryListMissions,
   listRules as queryListRules,
-  mergeMission as queryMergeMission,
   saveDashboard as querySaveDashboard,
   saveRules as querySaveRules,
   startMission as queryStartMission,
@@ -64,11 +63,6 @@ export async function startMission(code: string) {
 export async function finishMission(code: string) {
   await connection();
   return queryFinishMission(code);
-}
-
-export async function mergeMission(from: string, into: string) {
-  await connection();
-  return queryMergeMission(from, into);
 }
 
 export async function listRules(mission = DEFAULT_MISSION): Promise<RulesResponse> {

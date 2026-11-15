@@ -374,25 +374,6 @@ export async function removeCrewMember(
   return { ok: true, status: 200, data: { id, packets: removed.deletedCount } };
 }
 
-export async function mergeMission(from: string, into: string): Promise<Result<{ code: string }>> {
-  if (from === into) return fail(400, 'Cannot merge a mission into itself');
-  const col = await missions();
-  const [source, target] = await Promise.all([
-    col.findOne({ code: from }, NO_ID),
-    col.findOne({ code: into }, NO_ID),
-  ]);
-  if (!source || !target) return fail(404, 'Mission does not exist');
-  if (source.origin !== 'packet')
-    return fail(409, 'Only missions created by a packet can be merged');
-  await (await packets()).updateMany({ mission: from }, { $set: { mission: into } });
-  const known = new Set(target.crew.map((m) => m.id));
-  const newcomers = source.crew.filter((m) => !known.has(m.id));
-  if (newcomers.length)
-    await col.updateOne({ code: into }, { $push: { crew: { $each: newcomers } } });
-  await col.deleteOne({ code: from });
-  return { ok: true, status: 200, data: { code: into } };
-}
-
 const FALLBACK_ENVIRONMENTS = ['transit', 'station', 'moon', 'mars', 'rover'];
 
 const MAX_MISSION_DAYS = 3000;
