@@ -2,25 +2,19 @@ import { type SampleResult, sampleConfig } from '@haven/core';
 import { CalendarDays, Info } from 'lucide-react';
 import { AgeLabel, EmptyState } from '@/components/haven';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { format, type Language } from '@/lib/i18n';
 import type { ExtrasTexts } from '../i18n';
 import { STATUS_LEVEL } from '../logic/samples';
 import { getSampleOverview } from '../server';
+import { CrewTable } from './crew-table';
 import {
   CrewCell,
+  crewHref,
+  crewTableTexts,
   IconTile,
   PanelHeading,
   panelTable,
   StatusPill,
-  SummaryChips,
   type Tone,
   toneOf,
 } from './panel-parts';
@@ -65,121 +59,103 @@ export async function SamplesPanel({
 
   return (
     <div className="flex min-w-0 flex-col gap-8">
-      <section aria-labelledby="samples" className="flex min-w-0 flex-col gap-3">
-        <PanelHeading
-          id="samples"
-          title={t.samplesTitle}
-          count={rows.length || undefined}
-          description={t.samplesDescription}
-        >
-          {data ? (
-            <span className="border-brand/30 bg-brand-subtle text-link inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs">
-              <CalendarDays aria-hidden="true" className="size-3.5" />
-              {format(t.samplesDay, { day: data.day })}
-            </span>
-          ) : null}
-        </PanelHeading>
+      <div className="flex min-w-0 flex-col gap-3">
         {rows.length === 0 || !data ? (
           <EmptyState title={t.samplesEmpty} description={t.samplesEmptyDetail} />
         ) : (
-          <>
-            <SummaryChips
-              label={t.samplesTitle}
-              items={[
-                {
-                  key: 'overdue',
-                  tone: 'red',
-                  label: t['sample-overdue'],
-                  count: count('overdue'),
-                },
-                { key: 'due', tone: 'amber', label: t['sample-due'], count: count('due') },
-                {
-                  key: 'collected',
-                  tone: 'green',
-                  label: t['sample-collected'],
-                  count: count('collected'),
-                },
-                {
-                  key: 'pending',
-                  tone: 'muted',
-                  label: t.pendingTitle,
-                  count: data.pending.length,
-                },
-                { key: 'flagged', tone: 'amber', label: t.flaggedResults, count: flagged },
-              ]}
-            />
-            <div className={panelTable.card}>
-              <Table data-testid="samples-table">
-                <TableHeader className={panelTable.header}>
-                  <TableRow className={panelTable.headRow}>
-                    <TableHead className="pl-4">{t.astronaut}</TableHead>
-                    {sampleConfig.samples.map((s) => {
-                      const Icon = SAMPLE_ICON[s.id];
-                      return (
-                        <TableHead key={s.id}>
-                          <span className="inline-flex items-center gap-1.5">
-                            {Icon ? <Icon aria-hidden="true" className="size-3.5" /> : null}
-                            {s.name[lang]}
-                          </span>
-                        </TableHead>
-                      );
-                    })}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {rows.map((row) => (
-                    <TableRow key={row.id} className={panelTable.row}>
-                      <TableCell className="py-3 pl-4">
-                        <CrewCell
-                          id={row.id}
-                          name={row.name}
-                          detail={
-                            <AgeLabel
-                              lastDataAt={row.lastDataAt}
-                              now={data.generatedAt}
-                              lang={lang}
-                              noRecentData={row.noRecentData}
-                            />
-                          }
-                        />
-                      </TableCell>
-                      {row.states.map((state) => {
-                        const result = row.results[state.sample];
-                        const module = moduleName(state.sample, state.last?.module, lang);
-                        return (
-                          <TableCell key={state.sample} className="py-3 text-xs whitespace-normal">
-                            <span className="flex flex-col items-start gap-1">
-                              <StatusPill tone={toneOf(STATUS_LEVEL[state.status])}>
-                                {t[`sample-${state.status}`]}
-                              </StatusPill>
-                              {state.last ? (
-                                <span className="text-muted-foreground">
-                                  {dateText(state.last.takenAt, lang)}
-                                  {module ? ` · ${module}` : ''}
-                                </span>
-                              ) : null}
-                              <span className="text-tertiary">
-                                {format(t.nextDay, { day: state.nextDay })}
-                              </span>
-                              {result ? <ResultPill result={result} t={t} /> : null}
-                            </span>
-                          </TableCell>
-                        );
-                      })}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-              <div className={panelTable.footer}>
-                <span className="tabular-nums">
-                  {format(t.samplesFooter, {
-                    collected: count('collected'),
-                    total: states.length,
-                  })}
-                </span>
-              </div>
-            </div>
-          </>
+          <CrewTable
+            id="samples"
+            testId="samples-table"
+            title={t.samplesTitle}
+            description={t.samplesDescription}
+            aside={
+              <span className="border-brand/30 bg-brand-subtle text-link inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs">
+                <CalendarDays aria-hidden="true" className="size-3.5" />
+                {format(t.samplesDay, { day: data.day })}
+              </span>
+            }
+            legend={
+              <ul className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+                <li className="tabular-nums">
+                  {t.pendingTitle}: {data.pending.length}
+                </li>
+                <li className="tabular-nums">
+                  {t.flaggedResults}: {flagged}
+                </li>
+              </ul>
+            }
+            groups={[
+              { key: 'overdue', tone: 'red', label: t['sample-overdue'] },
+              { key: 'due', tone: 'amber', label: t['sample-due'] },
+              { key: 'ok', tone: 'green', label: t.samplesUpToDate },
+            ]}
+            columns={[
+              { label: t.astronaut },
+              ...sampleConfig.samples.map((s) => {
+                const Icon = SAMPLE_ICON[s.id];
+                return {
+                  label: (
+                    <span className="inline-flex items-center gap-1.5">
+                      {Icon ? <Icon aria-hidden="true" className="size-3.5" /> : null}
+                      {s.name[lang]}
+                    </span>
+                  ),
+                  className: 'whitespace-normal',
+                };
+              }),
+            ]}
+            rows={rows.map((row) => ({
+              id: row.id,
+              name: row.name,
+              group: row.states.some((s) => s.status === 'overdue')
+                ? 'overdue'
+                : row.states.some((s) => s.status === 'due')
+                  ? 'due'
+                  : 'ok',
+              href: crewHref(row.id),
+              cells: [
+                <CrewCell
+                  key="crew"
+                  id={row.id}
+                  name={row.name}
+                  detail={
+                    <AgeLabel
+                      lastDataAt={row.lastDataAt}
+                      now={data.generatedAt}
+                      lang={lang}
+                      noRecentData={row.noRecentData}
+                    />
+                  }
+                />,
+                ...row.states.map((state) => {
+                  const result = row.results[state.sample];
+                  const module = moduleName(state.sample, state.last?.module, lang);
+                  return (
+                    <span key={state.sample} className="flex flex-col items-start gap-1">
+                      <StatusPill tone={toneOf(STATUS_LEVEL[state.status])}>
+                        {t[`sample-${state.status}`]}
+                      </StatusPill>
+                      {state.last ? (
+                        <span className="text-muted-foreground">
+                          {dateText(state.last.takenAt, lang)}
+                          {module ? ` · ${module}` : ''}
+                        </span>
+                      ) : null}
+                      <span className="text-tertiary">
+                        {format(t.nextDay, { day: state.nextDay })}
+                      </span>
+                      {result ? <ResultPill result={result} t={t} /> : null}
+                    </span>
+                  );
+                }),
+              ],
+            }))}
+            summary={format(t.samplesFooter, {
+              collected: count('collected'),
+              total: states.length,
+            })}
+            texts={crewTableTexts(t)}
+          />
         )}
         <Collapsible>
           <CollapsibleTrigger className="text-muted-foreground hover:text-foreground hit-area flex min-h-8 items-center gap-1.5 text-xs">
@@ -190,7 +166,7 @@ export async function SamplesPanel({
             {t.samplesSource} {sampleConfig.source}
           </CollapsibleContent>
         </Collapsible>
-      </section>
+      </div>
 
       {data ? (
         <section aria-labelledby="pending" className="flex min-w-0 flex-col gap-3">

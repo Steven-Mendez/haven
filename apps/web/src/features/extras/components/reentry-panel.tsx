@@ -2,29 +2,14 @@ import { type ReentryReadiness, reentry } from '@haven/core';
 import { Activity, Droplets, Info, type LucideIcon, PlaneLanding, Shirt } from 'lucide-react';
 import { AgeLabel, EmptyState, Hint } from '@/components/haven';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { format, type Language } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import type { StoredMission } from '@/server/types';
 import type { ExtrasTexts } from '../i18n';
 import { daysToReentry, type ReentryRow } from '../logic/reentry';
 import { getReentryReadiness } from '../server';
-import {
-  CrewCell,
-  PanelHeading,
-  panelTable,
-  StatusPill,
-  SummaryChips,
-  type Tone,
-  toneOf,
-} from './panel-parts';
+import { CrewTable } from './crew-table';
+import { CrewCell, crewHref, crewTableTexts, StatusPill, type Tone, toneOf } from './panel-parts';
 
 const READINESS: ReentryReadiness[] = ['ready', 'in-progress', 'review', 'unfit', 'not-started'];
 
@@ -96,115 +81,93 @@ export async function ReentryPanel({
   const ready = rows.filter((r) => r.status.readiness === 'ready').length;
 
   return (
-    <section aria-labelledby="reentry" className="flex min-w-0 flex-col gap-3">
-      <PanelHeading
-        id="reentry"
-        title={t.reentryTitle}
-        count={rows.length || undefined}
-        description={t.reentryDescription}
-      >
-        <span
-          className="border-brand/30 bg-brand-subtle text-link inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs"
-          data-testid="reentry-phase"
-        >
-          <PlaneLanding aria-hidden="true" className="size-3.5" />
-          {phaseText(mission, t)}
-        </span>
-      </PanelHeading>
-
+    <div className="flex min-w-0 flex-col gap-3">
       {rows.length === 0 || !data ? (
         <EmptyState title={t.reentryEmpty} description={t.reentryEmptyDetail} />
       ) : (
-        <>
-          <SummaryChips
-            label={t.reentryStatus}
-            items={READINESS.map((r) => ({
-              key: r,
-              tone: READINESS_TONE[r],
-              label: readinessLabel(r, t),
-              count: rows.filter((x) => x.status.readiness === r).length,
-            }))}
-          />
-          <div className={panelTable.card}>
-            <Table data-testid="reentry-table">
-              <TableHeader className={panelTable.header}>
-                <TableRow className={panelTable.headRow}>
-                  <TableHead className="pl-4">{t.astronaut}</TableHead>
-                  <TableHead>{t.reentryStatus}</TableHead>
-                  <TableHead>{t.checklistCol}</TableHead>
-                  <TableHead>{t.orthostaticCol}</TableHead>
-                  <TableHead className="hidden xl:table-cell">{t.hydrationCol}</TableHead>
-                  <TableHead className="hidden pr-4 xl:table-cell">{t.bloodPressureCol}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.map((row) => {
-                  const o = row.status.orthostatic;
-                  return (
-                    <TableRow key={row.id} className={panelTable.row}>
-                      <TableCell className="py-3 pl-4">
-                        <CrewCell
-                          id={row.id}
-                          name={row.name}
-                          detail={
-                            <AgeLabel
-                              lastDataAt={row.lastDataAt}
-                              now={data.generatedAt}
-                              lang={lang}
-                              noRecentData={row.noRecentData}
-                            />
-                          }
-                        />
-                      </TableCell>
-                      <TableCell className="py-3">
-                        <StatusPill tone={READINESS_TONE[row.status.readiness]}>
-                          {readinessLabel(row.status.readiness, t)}
-                        </StatusPill>
-                      </TableCell>
-                      <TableCell className="py-3">
-                        <div className="flex items-center gap-2">
-                          <Checklist row={row} lang={lang} />
-                          <span className="text-tertiary text-xs tabular-nums">
-                            {row.status.done}/{row.status.total}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-3 text-xs whitespace-normal">
-                        {o ? (
-                          <span className="flex flex-col items-start gap-1">
-                            <StatusPill tone={toneOf(o.level)}>+{o.rise} lpm</StatusPill>
-                            <span className="text-muted-foreground tabular-nums">
-                              {Number.isFinite(o.supine) ? o.supine : '—'} →{' '}
-                              {Number.isFinite(o.standing) ? o.standing : '—'} lpm
-                              {o.symptoms.length ? ` · ${t.orthostaticSymptoms}` : ''}
-                            </span>
-                          </span>
-                        ) : (
-                          <span className="text-tertiary">{t.notDone}</span>
-                        )}
-                      </TableCell>
-                      <TableCell className="hidden py-3 xl:table-cell">
-                        <StatusPill tone={toneOf(row.hydration)}>
-                          {levelText(row.hydration, t)}
-                        </StatusPill>
-                      </TableCell>
-                      <TableCell className="hidden py-3 pr-4 xl:table-cell">
-                        <StatusPill tone={toneOf(row.bloodPressure)}>
-                          {levelText(row.bloodPressure, t)}
-                        </StatusPill>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-            <div className={panelTable.footer}>
-              <span className="tabular-nums">
-                {format(t.reentryFooter, { ready, total: rows.length })}
-              </span>
-            </div>
-          </div>
-        </>
+        <CrewTable
+          id="reentry"
+          testId="reentry-table"
+          title={t.reentryTitle}
+          description={t.reentryDescription}
+          aside={
+            <span
+              className="border-brand/30 bg-brand-subtle text-link inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs"
+              data-testid="reentry-phase"
+            >
+              <PlaneLanding aria-hidden="true" className="size-3.5" />
+              {phaseText(mission, t)}
+            </span>
+          }
+          groups={READINESS.map((r) => ({
+            key: r,
+            tone: READINESS_TONE[r],
+            label: readinessLabel(r, t),
+          }))}
+          columns={[
+            { label: t.astronaut },
+            { label: t.reentryStatus },
+            { label: t.checklistCol },
+            { label: t.orthostaticCol, className: 'whitespace-normal' },
+            { label: t.hydrationCol, className: 'hidden xl:table-cell' },
+            { label: t.bloodPressureCol, className: 'hidden xl:table-cell' },
+          ]}
+          rows={rows.map((row) => {
+            const o = row.status.orthostatic;
+            return {
+              id: row.id,
+              name: row.name,
+              group: row.status.readiness,
+              href: crewHref(row.id),
+              cells: [
+                <CrewCell
+                  key="crew"
+                  id={row.id}
+                  name={row.name}
+                  detail={
+                    <AgeLabel
+                      lastDataAt={row.lastDataAt}
+                      now={data.generatedAt}
+                      lang={lang}
+                      noRecentData={row.noRecentData}
+                    />
+                  }
+                />,
+                <StatusPill key="status" tone={READINESS_TONE[row.status.readiness]}>
+                  {readinessLabel(row.status.readiness, t)}
+                </StatusPill>,
+                <div key="checklist" className="flex items-center gap-2">
+                  <Checklist row={row} lang={lang} />
+                  <span className="text-tertiary tabular-nums">
+                    {row.status.done}/{row.status.total}
+                  </span>
+                </div>,
+                o ? (
+                  <span key="orthostatic" className="flex flex-col items-start gap-1">
+                    <StatusPill tone={toneOf(o.level)}>+{o.rise} lpm</StatusPill>
+                    <span className="text-muted-foreground tabular-nums">
+                      {Number.isFinite(o.supine) ? o.supine : '—'} →{' '}
+                      {Number.isFinite(o.standing) ? o.standing : '—'} lpm
+                      {o.symptoms.length ? ` · ${t.orthostaticSymptoms}` : ''}
+                    </span>
+                  </span>
+                ) : (
+                  <span key="orthostatic" className="text-tertiary">
+                    {t.notDone}
+                  </span>
+                ),
+                <StatusPill key="hydration" tone={toneOf(row.hydration)}>
+                  {levelText(row.hydration, t)}
+                </StatusPill>,
+                <StatusPill key="pressure" tone={toneOf(row.bloodPressure)}>
+                  {levelText(row.bloodPressure, t)}
+                </StatusPill>,
+              ],
+            };
+          })}
+          summary={format(t.reentryFooter, { ready, total: rows.length })}
+          texts={crewTableTexts(t)}
+        />
       )}
       <Collapsible>
         <CollapsibleTrigger className="text-muted-foreground hover:text-foreground hit-area flex min-h-8 items-center gap-1.5 text-xs">
@@ -215,7 +178,7 @@ export async function ReentryPanel({
           {t.reentrySource}
         </CollapsibleContent>
       </Collapsible>
-    </section>
+    </div>
   );
 }
 
