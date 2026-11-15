@@ -7,15 +7,14 @@ import { cn } from '@/lib/utils';
 import type { EditableIndicator } from '../logic/rules';
 
 type ScaleLevel = 'green' | 'amber' | 'red';
-type Segment = { level: ScaleLevel; withSymptoms: ScaleLevel; from?: number; to?: number };
+type Segment = { level: ScaleLevel; from?: number; to?: number };
 
-const RANK: Record<ScaleLevel, number> = { green: 0, amber: 1, red: 2 };
-
-function levelAt(v: number, indicator: EditableIndicator, symptoms: boolean): ScaleLevel {
+// Nivel que fija el valor por sí solo: las reglas que además piden síntomas no cuentan.
+function levelAt(v: number, indicator: EditableIndicator): ScaleLevel {
   const [lo, hi] = indicator.green;
   if (v >= lo && v <= hi) return 'green';
   for (const r of indicator.rules) {
-    if (r.withSymptoms && !symptoms) continue;
+    if (r.withSymptoms) continue;
     if (v < r.outside[0] || v > r.outside[1]) return r.level;
   }
   return 'amber';
@@ -33,9 +32,8 @@ export function scaleOf(indicator: EditableIndicator) {
   const segments: Segment[] = [];
   const cuts: number[] = [];
   probes.forEach((v, i) => {
-    const seg = { level: levelAt(v, indicator, false), withSymptoms: levelAt(v, indicator, true) };
-    const last = segments.at(-1);
-    if (last && last.level === seg.level && last.withSymptoms === seg.withSymptoms) return;
+    const seg = { level: levelAt(v, indicator) };
+    if (segments.at(-1)?.level === seg.level) return;
     if (i > 0) cuts.push(bounds[i - 1] as number);
     segments.push(seg);
   });
@@ -67,7 +65,6 @@ export type ScaleTexts = {
   below: string;
   above: string;
   between: string;
-  withSymptoms: string;
   levels: Record<ScaleLevel, string>;
 };
 
@@ -94,7 +91,6 @@ export function RangeScale({
     <div role="img" aria-label={label} className="flex w-full max-w-80 min-w-56 flex-col gap-1">
       <div className="flex gap-0.5">
         {segments.map((s, i) => {
-          const worse = RANK[s.withSymptoms] > RANK[s.level];
           return (
             <Tooltip
               // biome-ignore lint/suspicious/noArrayIndexKey: stretches are positional
@@ -110,9 +106,7 @@ export function RangeScale({
                     i === n - 1 && 'rounded-r-full',
                   )}
                   style={{
-                    background: worse
-                      ? `repeating-linear-gradient(135deg, var(--scale-red) 0 3px, var(--scale-${s.level}) 3px 6px)`
-                      : `var(--scale-${s.level})`,
+                    background: `var(--scale-${s.level})`,
                     opacity: s.level === 'green' ? 0.9 : 1,
                   }}
                 />
@@ -123,12 +117,6 @@ export function RangeScale({
                   <LevelGlyph level={s.level} size={10} />
                   {texts.levels[s.level]}
                 </span>
-                {worse ? (
-                  <span className="flex items-center gap-1.5">
-                    <LevelGlyph level={s.withSymptoms} size={10} />
-                    {format(texts.withSymptoms, { level: texts.levels[s.withSymptoms] })}
-                  </span>
-                ) : null}
               </TooltipContent>
             </Tooltip>
           );

@@ -59,7 +59,6 @@ export function RulesTable({
     below: t.scaleBelow,
     above: t.scaleAbove,
     between: t.scaleBetween,
-    withSymptoms: t.scaleWithSymptoms,
     levels: scaleLevels,
   };
 
