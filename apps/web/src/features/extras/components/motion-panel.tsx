@@ -172,10 +172,10 @@ export async function MotionPanel({
                 <TableRow className={panelTable.headRow}>
                   <TableHead className="pl-4">{t.astronaut}</TableHead>
                   <TableHead>{t.moScoreCol}</TableHead>
-                  <TableHead>{t.moDaysCol}</TableHead>
+                  <TableHead className="hidden xl:table-cell">{t.moDaysCol}</TableHead>
                   <TableHead>{t.moWindowCol}</TableHead>
                   <TableHead>{t.moBalanceCol}</TableHead>
-                  <TableHead className="hidden pr-4 xl:table-cell">{t.moAdviceCol}</TableHead>
+                  <TableHead className="hidden pr-4 2xl:table-cell">{t.moAdviceCol}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -207,7 +207,7 @@ export async function MotionPanel({
                         <span className="text-tertiary">{t.moNoRecent}</span>
                       )}
                     </TableCell>
-                    <TableCell className="py-3">
+                    <TableCell className="hidden py-3 xl:table-cell">
                       <DayStrip row={row} lang={lang} t={t} />
                     </TableCell>
                     <TableCell className="py-3 text-xs">
@@ -216,7 +216,7 @@ export async function MotionPanel({
                     <TableCell className="py-3 text-xs">
                       <BalanceCell row={row} t={t} />
                     </TableCell>
-                    <TableCell className="text-muted-foreground hidden min-w-52 py-3 pr-4 text-xs whitespace-normal xl:table-cell">
+                    <TableCell className="text-muted-foreground hidden min-w-52 py-3 pr-4 text-xs whitespace-normal 2xl:table-cell">
                       {adviceText(row, t)}
                     </TableCell>
                   </TableRow>
