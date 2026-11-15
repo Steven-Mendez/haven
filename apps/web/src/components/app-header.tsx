@@ -49,7 +49,7 @@ export function AppHeader({ lang, day, linkDown, crewNames, crew = [] }: Props) 
   if (pathname === '/rules') crumbs.push({ label: t.navRulesShort });
   else if (pathname.startsWith('/rules/'))
     crumbs.push({ label: t.navRulesShort, href: '/rules' }, { label: t.editThresholdsCrumb });
-  else if (pathname === '/trends') crumbs.push({ label: t.navTrendsShort });
+  else if (pathname === '/kpi') crumbs.push({ label: t.navKpiShort });
   else if (pathname === '/eva') crumbs.push({ label: t.navEvaShort });
   else if (pathname === '/missions/new')
     crumbs.push({ label: t.navMissions, href: '/missions' }, { label: t.newMissionCrumb });

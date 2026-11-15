@@ -5,6 +5,7 @@ import { refresh } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { setMission } from '@/components/haven/actions';
 import { havenTexts } from '@/components/haven/texts';
+import type { KpiDashboard } from '@/lib/kpi';
 import { getMissionCode } from '@/lib/mission';
 import { CREW_NOT_READY } from '@/server/types';
 import { templatePhases } from './logic/plan-options';
@@ -17,6 +18,7 @@ import {
   getMission,
   listRules,
   mergeMission,
+  saveKpiDashboardFor,
   saveRules,
   startMission,
   updateMission,
@@ -209,4 +211,14 @@ export async function exportRulesConfig(versionId: string): Promise<string | nul
   const { versions } = await listRules(mission);
   const version = versions.find((v) => v.id === versionId);
   return version ? `${JSON.stringify(version.config, null, 2)}\n` : null;
+}
+
+export async function saveKpiDashboard(dashboard: KpiDashboard): Promise<{ ok: boolean }> {
+  const mission = await getMissionCode();
+  if (!mission) return { ok: false };
+  try {
+    return { ok: (await saveKpiDashboardFor(mission, dashboard)).ok };
+  } catch {
+    return { ok: false };
+  }
 }

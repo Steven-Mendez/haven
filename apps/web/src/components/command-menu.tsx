@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  Activity,
+  ChartNoAxesCombined,
   Compass,
   Footprints,
   Languages,
@@ -145,7 +145,7 @@ export function CommandMenu({ lang, crew }: Props) {
   const pages = [
     { href: '/', label: t.navCrew, icon: Users },
     { href: '/rules', label: t.navRules, icon: SlidersHorizontal },
-    { href: '/trends', label: t.navTrends, icon: Activity },
+    { href: '/kpi', label: t.navKpi, icon: ChartNoAxesCombined },
     { href: '/eva', label: t.navEva, icon: Footprints },
     { href: '/missions', label: t.navMissions, icon: Rocket },
     { href: '/settings', label: t.navSettings, icon: Settings },

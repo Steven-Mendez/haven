@@ -1,6 +1,13 @@
 'use client';
 
-import { Activity, Footprints, Rocket, SlidersHorizontal, UserRound, Users } from 'lucide-react';
+import {
+  ChartNoAxesCombined,
+  Footprints,
+  Rocket,
+  SlidersHorizontal,
+  UserRound,
+  Users,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
@@ -64,7 +71,12 @@ export function NavMain({ lang, crew }: Props) {
       icon: SlidersHorizontal,
       active: pathname === '/rules' || pathname.startsWith('/rules/'),
     },
-    { href: '/trends', label: t.navTrendsShort, icon: Activity, active: pathname === '/trends' },
+    {
+      href: '/kpi',
+      label: t.navKpiShort,
+      icon: ChartNoAxesCombined,
+      active: pathname === '/kpi',
+    },
     { href: '/eva', label: t.navEvaShort, icon: Footprints, active: pathname === '/eva' },
     {
       href: '/missions',

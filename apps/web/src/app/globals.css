@@ -231,6 +231,11 @@
   --chart-3: #8a909a;
   --chart-4: #c93400;
   --chart-5: #248a3d;
+  --kpi-series-1: #2a78d6;
+  --kpi-series-2: #eb6834;
+  --kpi-series-3: #1baf7a;
+  --kpi-series-4: #eda100;
+  --kpi-series-5: #e87ba4;
   --ecg-minor: #f1f3f6;
   --ecg-major: #e5e8ed;
   --ring-done: #2f6fde;
@@ -325,6 +330,11 @@
   --chart-3: #8a8f99;
   --chart-4: #ff9f0a;
   --chart-5: #30d158;
+  --kpi-series-1: #3987e5;
+  --kpi-series-2: #d95926;
+  --kpi-series-3: #199e70;
+  --kpi-series-4: #c98500;
+  --kpi-series-5: #d55181;
   --ecg-minor: #121316;
   --ecg-major: #191b1f;
   --ring-done: #5b93f5;

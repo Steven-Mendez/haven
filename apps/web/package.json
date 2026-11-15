@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "next typegen && tsc --noEmit",
+    "test": "vitest run",
     "seed": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/ts-hooks.mjs scripts/seed.ts",
     "seed:demos": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/ts-hooks.mjs scripts/seed-demos.ts",
     "test:api": "node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/ts-hooks.mjs scripts/test-api.ts"
@@ -25,6 +26,7 @@
     "qrcode": "1.5.4",
     "react": "19.3.0",
     "react-dom": "19.3.0",
+    "react-grid-layout": "2.3.0",
     "recharts": "3.8.0",
     "server-only": "^0.0.1",
     "sonner": "^2.0.8",
@@ -39,6 +41,7 @@
     "@types/react-dom": "^19",
     "shadcn": "^4.23.0",
     "tailwindcss": "^4",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "vitest": "^4.1.12"
   }
 }

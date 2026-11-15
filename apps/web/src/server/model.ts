@@ -10,6 +10,7 @@ import {
   phaseAt,
   phaseDelay,
 } from '@haven/core';
+import type { KpiDashboard } from '@/lib/kpi';
 import type {
   CrewCard,
   CurrentPhase,
@@ -28,6 +29,7 @@ export const COLLECTIONS = {
   packets: 'packets',
   missions: 'missions',
   rules: 'rules',
+  dashboards: 'dashboards',
 } as const;
 
 export type PacketDoc = Packet & {
@@ -36,6 +38,12 @@ export type PacketDoc = Packet & {
 };
 export type MissionDoc = StoredMission;
 export type RulesDoc = Omit<RulesVersion, 'status'>;
+export type DashboardDoc = {
+  mission: string;
+  key: string;
+  dashboard: KpiDashboard;
+  updatedAt: string;
+};
 
 export const INDEXES: Record<
   keyof typeof COLLECTIONS,
@@ -44,6 +52,7 @@ export const INDEXES: Record<
   packets: [{ key: { id: 1 }, unique: true }, { key: { mission: 1, crewMember: 1, dataAt: -1 } }],
   missions: [{ key: { code: 1 }, unique: true }],
   rules: [{ key: { id: 1 }, unique: true }, { key: { mission: 1, sentAt: -1 } }],
+  dashboards: [{ key: { mission: 1, key: 1 }, unique: true }],
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;
