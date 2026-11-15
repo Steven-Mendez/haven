@@ -33,5 +33,5 @@
     "redRise": 40,
     "symptoms": ["dizziness", "fainting", "blurred-vision", "nausea"]
   },
-  "source": "Carga de líquidos de 1 L de agua con 8 g de sal antes del aterrizaje y prendas de compresión contra la intolerancia ortostática: NASA HRP, Risk of Orthostatic Intolerance During Re-exposure to Gravity (https://humanresearchroadmap.nasa.gov/risks/risk.aspx?i=87). Aumento de 30 lpm al ponerse de pie como criterio de intolerancia: Sheldon et al. 2015, Heart Rhythm (https://doi.org/10.1016/j.hrthm.2015.03.029). Rojo desde 40 lpm o con síntomas, tiempos de 5 min acostado y 3 min de pie: referencia provisional."
+  "source": "Carga de líquidos de 1 L de agua con 8 g de sal antes del aterrizaje y prendas de compresión contra la intolerancia ortostática: NASA HRP, Gravity Fields (https://www.nasa.gov/hrp/hazard-gravity-fields/), referencia provisional para las cantidades. Aumento de 30 lpm al ponerse de pie como criterio de intolerancia: Sheldon et al. 2015, Heart Rhythm (https://doi.org/10.1016/j.hrthm.2015.03.029). Rojo desde 40 lpm o con síntomas, tiempos de 5 min acostado y 3 min de pie: referencia provisional."
 }
