@@ -8,6 +8,7 @@ import medicationsJson from '../../config/medications.json';
 import templatesJson from '../../config/mission-templates.json';
 import protocols from '../../config/protocols.json';
 import reentryJson from '../../config/reentry.json';
+import samplesJson from '../../config/samples.json';
 import symptomsJson from '../../config/symptoms.json';
 import unitsJson from '../../config/units.json';
 import version from '../../config/version.json';
@@ -23,6 +24,7 @@ import type {
   MissionPhase,
   MissionTemplate,
   ReentryConfig,
+  SampleConfig,
 } from '../contracts';
 
 type IndicatorWithoutGuide = Omit<Indicator, 'guide'>;
@@ -100,6 +102,7 @@ export function actionById(id: string): Action | undefined {
 export const reentry: ReentryConfig = reentryJson as ReentryConfig;
 export const eva: EvaConfig = evaJson as EvaConfig;
 export const medications: MedicationConfig = medicationsJson as MedicationConfig;
+export const sampleConfig: SampleConfig = samplesJson as SampleConfig;
 
 export type LoadedConfig = Config & { actions: Action[] };
 

@@ -7,6 +7,7 @@ import {
   type PacketDoc,
   type PlanDoc,
   type RulesDoc,
+  type SampleResultDoc,
 } from './model';
 import { getDb } from './mongodb';
 
@@ -34,3 +35,4 @@ export const packets = () => collection<PacketDoc>(COLLECTIONS.packets);
 export const missions = () => collection<MissionDoc>(COLLECTIONS.missions);
 export const rules = () => collection<RulesDoc>(COLLECTIONS.rules);
 export const plans = () => collection<PlanDoc>(COLLECTIONS.plans);
+export const sampleResults = () => collection<SampleResultDoc>(COLLECTIONS.sampleResults);

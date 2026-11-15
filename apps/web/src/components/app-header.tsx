@@ -53,6 +53,7 @@ export function AppHeader({ lang, day, linkDown, crewNames, crew = [] }: Props) 
   else if (pathname === '/eva') crumbs.push({ label: t.navEvaShort });
   else if (pathname === '/reentry') crumbs.push({ label: t.navReentryShort });
   else if (pathname === '/medication') crumbs.push({ label: t.navMedicationShort });
+  else if (pathname === '/samples') crumbs.push({ label: t.navSamplesShort });
   else if (pathname === '/missions/new')
     crumbs.push({ label: t.navMissions, href: '/missions' }, { label: t.newMissionCrumb });
   else if (/^\/missions\/[^/]+\/plan$/.test(pathname))

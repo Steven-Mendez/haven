@@ -8,5 +8,6 @@ export {
   MedicationView,
   ReentryView,
   RulesView,
+  SamplesView,
   TrendsView,
 } from './view';

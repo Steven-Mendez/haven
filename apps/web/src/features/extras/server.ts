@@ -1,5 +1,5 @@
 import 'server-only';
-import { type Config, rebaseConfig } from '@haven/core';
+import { awaitingResults, type Config, rebaseConfig, type SampleResult } from '@haven/core';
 import { connection } from 'next/server';
 import { baseConfig } from '@/server/model';
 import {
@@ -13,9 +13,11 @@ import {
   getPlan as queryGetPlan,
   listMissions as queryListMissions,
   listRules as queryListRules,
+  listSampleResults as queryListSampleResults,
   mergeMission as queryMergeMission,
   savePlan as querySavePlan,
   saveRules as querySaveRules,
+  saveSampleResult as querySaveSampleResult,
   startMission as queryStartMission,
   updateMission as queryUpdateMission,
 } from '@/server/queries';
@@ -35,6 +37,7 @@ import { type EvaRow, evaRow } from './logic/eva';
 import { type MedicationRow, medicationRow } from './logic/medication';
 import { type ReentryRow, reentryRow } from './logic/reentry';
 import { isFullConfig } from './logic/rules';
+import { type PendingSample, type SampleRow, sampleRow } from './logic/samples';
 
 export async function listMissions(): Promise<MissionsResponse> {
   await connection();
@@ -180,4 +183,51 @@ export async function saveMedicationPlan(
 ) {
   await connection();
   return querySavePlan(mission, crewMember, medications, author);
+}
+
+export async function getSampleOverview(mission = DEFAULT_MISSION): Promise<{
+  generatedAt: string;
+  day: number;
+  rows: SampleRow[];
+  pending: PendingSample[];
+  results: SampleResult[];
+} | null> {
+  await connection();
+  const [crew, stored, results] = await Promise.all([
+    queryGetCrew(mission),
+    queryGetMission(mission),
+    queryListSampleResults(mission),
+  ]);
+  if (!crew || !stored) return null;
+  const now = new Date(crew.generatedAt);
+  const names = new Map(crew.crew.map((m) => [m.id, m.name]));
+  const pending: PendingSample[] = [];
+  const rows = await Promise.all(
+    crew.crew.map(async (member) => {
+      const detail = await queryGetAstronaut(mission, member.id);
+      const readings = detail?.packets.flatMap((p) => p.readings) ?? [];
+      pending.push(
+        ...awaitingResults(readings, results).map((p) => ({
+          ...p,
+          name: names.get(p.crewMember) ?? p.crewMember,
+        })),
+      );
+      return sampleRow(member, Math.max(1, stored.day), readings, results, now);
+    }),
+  );
+  return {
+    generatedAt: crew.generatedAt,
+    day: stored.day,
+    rows: rows.sort((a, b) => a.name.localeCompare(b.name)),
+    pending: pending.sort((a, b) => a.collectedAt.localeCompare(b.collectedAt)),
+    results: [...results].reverse(),
+  };
+}
+
+export async function saveSampleResult(
+  mission: string,
+  input: { id: string; result: string; detail?: string; author?: string },
+) {
+  await connection();
+  return querySaveSampleResult(mission, input);
 }

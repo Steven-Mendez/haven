@@ -14,6 +14,7 @@ import {
   Search,
   Settings,
   SlidersHorizontal,
+  TestTube,
   Users,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -151,6 +152,7 @@ export function CommandMenu({ lang, crew }: Props) {
     { href: '/eva', label: t.navEva, icon: Footprints },
     { href: '/reentry', label: t.navReentry, icon: PlaneLanding },
     { href: '/medication', label: t.navMedication, icon: Pill },
+    { href: '/samples', label: t.navSamples, icon: TestTube },
     { href: '/missions', label: t.navMissions, icon: Rocket },
     { href: '/settings', label: t.navSettings, icon: Settings },
   ];

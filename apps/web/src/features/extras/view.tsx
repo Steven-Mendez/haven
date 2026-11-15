@@ -9,6 +9,7 @@ import { EvaPanel } from './components/eva-panel';
 import { MedicationPanel } from './components/medication-panel';
 import { ReentryPanel } from './components/reentry-panel';
 import { RulesPanel } from './components/rules-panel';
+import { SamplesPanel } from './components/samples-panel';
 import { TrendsPanel } from './components/trends-panel';
 import { texts } from './i18n';
 import { getMission } from './server';
@@ -34,6 +35,7 @@ const TITLES = {
   eva: { title: 'tabEva', subtitle: 'evaSubtitle' },
   reentry: { title: 'tabReentry', subtitle: 'reentrySubtitle' },
   medication: { title: 'tabMedication', subtitle: 'medicationSubtitle' },
+  samples: { title: 'tabSamples', subtitle: 'samplesSubtitle' },
 } as const;
 
 async function ExtrasContent({
@@ -96,6 +98,7 @@ async function ExtrasContent({
       {section === 'eva' ? <EvaPanel mission={code} lang={lang} t={t} /> : null}
       {section === 'reentry' ? <ReentryPanel mission={mission} lang={lang} t={t} /> : null}
       {section === 'medication' ? <MedicationPanel mission={code} lang={lang} t={t} /> : null}
+      {section === 'samples' ? <SamplesPanel mission={code} lang={lang} t={t} /> : null}
     </>
   );
 }
@@ -128,6 +131,10 @@ export const ReentryView = ({ searchParams }: PageProps) => (
 
 export const MedicationView = ({ searchParams }: PageProps) => (
   <ExtrasPage section="medication" searchParams={searchParams} />
+);
+
+export const SamplesView = ({ searchParams }: PageProps) => (
+  <ExtrasPage section="samples" searchParams={searchParams} />
 );
 
 export function extrasRedirect(tab: unknown): `/${ExtrasTab}` {

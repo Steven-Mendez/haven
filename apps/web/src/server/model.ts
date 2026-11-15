@@ -10,6 +10,7 @@ import {
   type Packet,
   phaseAt,
   phaseDelay,
+  type SampleResult,
 } from '@haven/core';
 import type {
   CrewCard,
@@ -30,6 +31,7 @@ export const COLLECTIONS = {
   missions: 'missions',
   rules: 'rules',
   plans: 'plans',
+  sampleResults: 'sampleResults',
 } as const;
 
 export type PacketDoc = Packet & {
@@ -39,6 +41,7 @@ export type PacketDoc = Packet & {
 export type MissionDoc = StoredMission;
 export type RulesDoc = Omit<RulesVersion, 'status'>;
 export type PlanDoc = CrewPlan;
+export type SampleResultDoc = SampleResult;
 
 export const INDEXES: Record<
   keyof typeof COLLECTIONS,
@@ -48,6 +51,7 @@ export const INDEXES: Record<
   missions: [{ key: { code: 1 }, unique: true }],
   rules: [{ key: { id: 1 }, unique: true }, { key: { mission: 1, sentAt: -1 } }],
   plans: [{ key: { mission: 1, crewMember: 1 }, unique: true }],
+  sampleResults: [{ key: { id: 1 }, unique: true }, { key: { mission: 1, crewMember: 1 } }],
 };
 
 const DAY_MS = 24 * 60 * 60 * 1000;

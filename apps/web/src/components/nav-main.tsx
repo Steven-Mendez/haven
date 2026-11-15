@@ -7,6 +7,7 @@ import {
   PlaneLanding,
   Rocket,
   SlidersHorizontal,
+  TestTube,
   Users,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -86,6 +87,7 @@ export function NavMain({ lang, crew }: Props) {
       icon: Pill,
       active: pathname === '/medication',
     },
+    { href: '/samples', label: t.navSamplesShort, icon: TestTube, active: pathname === '/samples' },
     {
       href: '/missions',
       label: t.navMissions,

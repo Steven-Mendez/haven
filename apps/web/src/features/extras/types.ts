@@ -1,6 +1,6 @@
 import type { ThresholdError } from './logic/rules';
 
-export const EXTRAS_TABS = ['rules', 'trends', 'eva', 'reentry', 'medication'] as const;
+export const EXTRAS_TABS = ['rules', 'trends', 'eva', 'reentry', 'medication', 'samples'] as const;
 export type ExtrasTab = (typeof EXTRAS_TABS)[number];
 
 export type RulesFormState =
@@ -23,3 +23,8 @@ export type MedicationFormState =
   | { status: 'idle' }
   | { status: 'error'; crewMember: string }
   | { status: 'ok'; crewMember: string; at: number };
+
+export type SampleResultFormState =
+  | { status: 'idle' }
+  | { status: 'error'; id: string }
+  | { status: 'ok'; id: string; at: number };

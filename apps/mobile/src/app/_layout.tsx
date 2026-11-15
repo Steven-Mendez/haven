@@ -75,6 +75,7 @@ export default function RootLayout() {
         <Stack.Screen name="reentry" options={{ title: t.reentry }} />
         <Stack.Screen name="eva" options={{ title: t.eva }} />
         <Stack.Screen name="medication" options={{ title: t.medication }} />
+        <Stack.Screen name="samples" options={{ title: t.samples }} />
       </Stack>
       {phase === 'starting' ? (
         <View className="bg-background absolute inset-0 items-center justify-center gap-4">

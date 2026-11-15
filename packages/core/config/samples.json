@@ -1,0 +1,72 @@
+{
+  "overdueAfterDays": 2,
+  "samples": [
+    {
+      "id": "saliva",
+      "kind": "biological",
+      "name": { "es": "Saliva seca", "en": "Dried saliva" },
+      "detail": {
+        "es": "Moja la tarjeta de papel con saliva, déjala secar y guárdala a temperatura ambiente. Sirve para detectar a tiempo la reactivación de virus latentes.",
+        "en": "Wet the paper card with saliva, let it dry and store it at room temperature. It detects the reactivation of latent viruses early."
+      },
+      "everyDays": 7,
+      "firstDay": 3,
+      "abnormal": {
+        "es": "Reactivación de virus latentes (herpes, Epstein-Barr o varicela)",
+        "en": "Latent virus reactivation (herpes, Epstein-Barr or varicella)"
+      }
+    },
+    {
+      "id": "blood",
+      "kind": "biological",
+      "name": { "es": "Sangre", "en": "Blood" },
+      "detail": {
+        "es": "Extracción en ayunas con el kit de a bordo; centrifuga y congela el tubo según la tarjeta del kit.",
+        "en": "Fasting draw with the onboard kit; spin and freeze the tube as the kit card says."
+      },
+      "everyDays": 30,
+      "firstDay": 5,
+      "abnormal": {
+        "es": "Cambios inmunitarios o metabólicos que revisar",
+        "en": "Immune or metabolic changes to review"
+      }
+    },
+    {
+      "id": "urine",
+      "kind": "biological",
+      "name": { "es": "Orina", "en": "Urine" },
+      "detail": {
+        "es": "Primera orina de la mañana en el recipiente del kit; congélala con la etiqueta de la fecha.",
+        "en": "First morning urine in the kit container; freeze it with the date label."
+      },
+      "everyDays": 30,
+      "firstDay": 5,
+      "abnormal": {
+        "es": "Riesgo de cálculos renales o pérdida de hueso alta",
+        "en": "Kidney stone risk or high bone loss"
+      }
+    },
+    {
+      "id": "surface-swab",
+      "kind": "environment",
+      "name": { "es": "Hisopado de superficies", "en": "Surface swab" },
+      "detail": {
+        "es": "Pasa el hisopo por las superficies que más se tocan del módulo (asas, paneles, mesa) y ciérralo en su tubo.",
+        "en": "Run the swab over the most touched surfaces of the module (handles, panels, table) and seal it in its tube."
+      },
+      "everyDays": 14,
+      "firstDay": 7,
+      "modules": [
+        { "id": "sleep", "name": { "es": "Dormitorio", "en": "Sleep station" } },
+        { "id": "galley", "name": { "es": "Cocina", "en": "Galley" } },
+        { "id": "hygiene", "name": { "es": "Higiene", "en": "Hygiene" } },
+        { "id": "lab", "name": { "es": "Laboratorio", "en": "Lab" } }
+      ],
+      "abnormal": {
+        "es": "Crecimiento de microbios por encima del límite o bacterias resistentes",
+        "en": "Microbial growth above the limit or resistant bacteria"
+      }
+    }
+  ],
+  "source": "Muestras de saliva seca en papel a temperatura ambiente, sangre y orina para vigilar la reactivación viral y los cambios inmunitarios, y muestreo de superficies del hábitat: NASA HRP, Risks of Human Spaceflight (https://www.nasa.gov/hrp/risks/). Frecuencias en días de misión: referencia provisional; el calendario real lo fija el equipo médico."
+}

@@ -19,6 +19,7 @@ import {
   mergeMission,
   saveMedicationPlan,
   saveRules,
+  saveSampleResult,
   startMission,
   updateMission,
 } from './server';
@@ -28,6 +29,7 @@ import type {
   MissionField,
   MissionFormState,
   RulesFormState,
+  SampleResultFormState,
 } from './types';
 
 const text = (v: FormDataEntryValue | null, max = 280) =>
@@ -240,4 +242,22 @@ export async function sendMedicationPlan(
   if (!result.ok) return { status: 'error', crewMember };
   refresh();
   return { status: 'ok', crewMember, at: Date.now() };
+}
+
+export async function sendSampleResult(
+  _previous: SampleResultFormState,
+  form: FormData,
+): Promise<SampleResultFormState> {
+  const mission = await getMissionCode();
+  const id = text(form.get('id'), 200);
+  if (!mission || !id) return { status: 'error', id };
+  const result = await saveSampleResult(mission, {
+    id,
+    result: text(form.get('result'), 10),
+    detail: text(form.get('detail'), 280),
+    author: havenTexts.es.operatorName,
+  });
+  if (!result.ok) return { status: 'error', id };
+  refresh();
+  return { status: 'ok', id, at: Date.now() };
 }
