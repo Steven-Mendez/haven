@@ -1,13 +1,17 @@
 import 'server-only';
 import {
+  type CrewPlan,
+  cleanAssignments,
   crewAggregates,
+  emptyPlan,
   type Mission,
   type MissionPhase,
+  medications as medicationConfig,
   missionDays,
   type Reading,
 } from '@haven/core';
 import { CREW_NOT_READY } from '@/server/types';
-import { missions, packets, rules } from './collections';
+import { missions, packets, plans, rules } from './collections';
 import {
   baseConfig,
   type CrewEntry,
@@ -600,4 +604,32 @@ export async function missionAggregates(
       indicators.map((i) => [i, crewAggregates(byCrewMember, i, { minimum: 1 })]),
     ),
   };
+}
+
+export async function getPlan(mission: string, crewMember: string): Promise<CrewPlan> {
+  const doc = await (await plans()).findOne({ mission, crewMember }, NO_ID);
+  return doc ?? emptyPlan(mission, crewMember);
+}
+
+export async function listPlans(mission: string): Promise<CrewPlan[]> {
+  return (await plans()).find({ mission }, NO_ID).toArray();
+}
+
+export async function savePlan(
+  mission: string,
+  crewMember: string,
+  medications: unknown,
+  author?: string,
+  now = new Date(),
+): Promise<Result<CrewPlan>> {
+  if (!(await findMission(mission, now))) return fail(404, `Mission ${mission} does not exist`);
+  const plan: CrewPlan = {
+    mission,
+    crewMember,
+    medications: cleanAssignments(medications, medicationConfig),
+    updatedAt: now.toISOString(),
+    ...(author ? { author: author.slice(0, 80) } : {}),
+  };
+  await (await plans()).updateOne({ mission, crewMember }, { $set: plan }, { upsert: true });
+  return { ok: true, status: 200, data: plan };
 }

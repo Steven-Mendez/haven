@@ -3,9 +3,11 @@ import {
   canPerformEva,
   dailyProgress,
   dayHistory,
+  dosesForDay,
   eva,
   evaPrepStatus,
   isReentry,
+  medications,
   reentry,
   reentryStatus,
 } from '@haven/core';
@@ -46,6 +48,7 @@ import {
 import { useLanguage, useTexts, useTranslate } from '@/shared/i18n';
 import { useLayout } from '@/shared/lib/layout';
 import { cn } from '@/shared/lib/utils';
+import { usePlan } from '@/shared/plan';
 import { TourAnchor, useTourScroll } from '@/shared/tour';
 import { CheckinCard } from './components/checkin-card';
 import { ActionsGuide } from './components/guide';
@@ -170,6 +173,16 @@ export default function Screen() {
   const evaPrep = useMemo(
     () => (canPerformEva(mission.environment, eva) ? evaPrepStatus(readings, eva, now) : undefined),
     [readings, mission.environment, now],
+  );
+  const plan = usePlan();
+  const pendingDoses = useMemo(
+    () =>
+      plan
+        ? dosesForDay(plan, medications, readings, now).filter(
+            (d) => d.status === 'due' || d.status === 'missed',
+          )
+        : [],
+    [plan, readings, now],
   );
 
   const week = lastSevenDays(history, today).map((d) => ({
@@ -301,6 +314,22 @@ export default function Screen() {
           detail={evaPrep.readiness === 'symptoms' ? t.evaSymptoms : t.evaDetail}
           action={t.evaOpen}
           onAction={() => router.push('/eva')}
+        />
+      ) : null}
+
+      {pendingDoses.length ? (
+        <StepCard
+          title={t.medicationTitle}
+          detail={format(
+            pendingDoses.some((d) => d.status === 'due') ? t.medicationDue : t.medicationMissed,
+            {
+              names: [...new Set(pendingDoses.map((d) => d.medication))]
+                .map((id) => translate(medications.catalog.find((m) => m.id === id)?.name) || id)
+                .join(', '),
+            },
+          )}
+          action={t.medicationOpen}
+          onAction={() => router.push('/medication')}
         />
       ) : null}
 

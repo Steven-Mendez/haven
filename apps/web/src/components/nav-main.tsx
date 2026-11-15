@@ -1,6 +1,14 @@
 'use client';
 
-import { Activity, Footprints, PlaneLanding, Rocket, SlidersHorizontal, Users } from 'lucide-react';
+import {
+  Activity,
+  Footprints,
+  Pill,
+  PlaneLanding,
+  Rocket,
+  SlidersHorizontal,
+  Users,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
@@ -71,6 +79,12 @@ export function NavMain({ lang, crew }: Props) {
       label: t.navReentryShort,
       icon: PlaneLanding,
       active: pathname === '/reentry',
+    },
+    {
+      href: '/medication',
+      label: t.navMedicationShort,
+      icon: Pill,
+      active: pathname === '/medication',
     },
     {
       href: '/missions',

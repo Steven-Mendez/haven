@@ -4,6 +4,7 @@ import evaJson from '../../config/eva.json';
 import glossaryJson from '../../config/glossary.json';
 import guides from '../../config/guides.json';
 import indicators from '../../config/indicators.json';
+import medicationsJson from '../../config/medications.json';
 import templatesJson from '../../config/mission-templates.json';
 import protocols from '../../config/protocols.json';
 import reentryJson from '../../config/reentry.json';
@@ -18,6 +19,7 @@ import type {
   EvaConfig,
   I18n,
   Indicator,
+  MedicationConfig,
   MissionPhase,
   MissionTemplate,
   ReentryConfig,
@@ -97,6 +99,7 @@ export function actionById(id: string): Action | undefined {
 
 export const reentry: ReentryConfig = reentryJson as ReentryConfig;
 export const eva: EvaConfig = evaJson as EvaConfig;
+export const medications: MedicationConfig = medicationsJson as MedicationConfig;
 
 export type LoadedConfig = Config & { actions: Action[] };
 

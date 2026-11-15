@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { View } from 'react-native';
 import { startEarthQueue } from '@/features/earth-queue';
 import { startHealthSources } from '@/features/health-sources';
+import { startPlanSync } from '@/features/medication';
 import { startMissionSync } from '@/features/mission';
 import { startNotifications } from '@/features/notifications';
 import { InfoSheetHost } from '@/shared/components/info-sheet';
@@ -34,6 +35,7 @@ export default function RootLayout() {
         startNotifications,
         startEarthQueue,
         startMissionSync,
+        startPlanSync,
       ])
         void start();
   }, [phase]);
@@ -72,6 +74,7 @@ export default function RootLayout() {
         <Stack.Screen name="streak" options={{ title: t.streak }} />
         <Stack.Screen name="reentry" options={{ title: t.reentry }} />
         <Stack.Screen name="eva" options={{ title: t.eva }} />
+        <Stack.Screen name="medication" options={{ title: t.medication }} />
       </Stack>
       {phase === 'starting' ? (
         <View className="bg-background absolute inset-0 items-center justify-center gap-4">

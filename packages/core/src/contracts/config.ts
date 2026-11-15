@@ -153,3 +153,24 @@ export type EvaConfig = {
   postEva: { symptoms: string[]; protocol: string };
   source: string;
 };
+
+export type MedicationSchedule =
+  | { kind: 'daily'; times: string[] }
+  | { kind: 'weekly'; weekday: number; times: string[] }
+  | { kind: 'as-needed'; maxPerDay: number };
+
+export type Medication = {
+  id: string;
+  name: I18n;
+  purpose: I18n;
+  instructions: I18n;
+  /** Default schedule; times are mission time (UTC), HH:MM. Weekday 0 is Sunday. */
+  schedule: MedicationSchedule;
+};
+
+export type MedicationConfig = {
+  /** Hours after the scheduled time during which a dose is still due, not missed. */
+  doseWindowHours: number;
+  catalog: Medication[];
+  source: string;
+};

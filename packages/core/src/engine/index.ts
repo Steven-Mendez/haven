@@ -13,6 +13,7 @@ export * from './categories';
 export * from './cognition';
 export * from './eva';
 export * from './evaluate';
+export * from './medication';
 export * from './protocols';
 export * from './radiation';
 export * from './reentry';

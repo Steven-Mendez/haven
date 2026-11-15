@@ -7,6 +7,7 @@ import {
   Languages,
   LogIn,
   Moon,
+  Pill,
   PlaneLanding,
   Plus,
   Rocket,
@@ -149,6 +150,7 @@ export function CommandMenu({ lang, crew }: Props) {
     { href: '/trends', label: t.navTrends, icon: Activity },
     { href: '/eva', label: t.navEva, icon: Footprints },
     { href: '/reentry', label: t.navReentry, icon: PlaneLanding },
+    { href: '/medication', label: t.navMedication, icon: Pill },
     { href: '/missions', label: t.navMissions, icon: Rocket },
     { href: '/settings', label: t.navSettings, icon: Settings },
   ];

@@ -1,0 +1,81 @@
+{
+  "doseWindowHours": 2,
+  "catalog": [
+    {
+      "id": "vitamin-d",
+      "name": { "es": "Vitamina D 800 UI", "en": "Vitamin D 800 IU" },
+      "purpose": {
+        "es": "Sin luz solar el cuerpo no fabrica vitamina D; ayuda a conservar el hueso.",
+        "en": "Without sunlight the body makes no vitamin D; it helps preserve bone."
+      },
+      "instructions": { "es": "1 comprimido con el desayuno.", "en": "1 tablet with breakfast." },
+      "schedule": { "kind": "daily", "times": ["08:00"] }
+    },
+    {
+      "id": "vitamin-b-complex",
+      "name": { "es": "Complejo vitamínico B", "en": "Vitamin B complex" },
+      "purpose": {
+        "es": "Suplemento en estudio para reducir los cambios en el ojo y el cerebro (SANS).",
+        "en": "Supplement under study to reduce eye and brain changes (SANS)."
+      },
+      "instructions": { "es": "1 cápsula con el desayuno.", "en": "1 capsule with breakfast." },
+      "schedule": { "kind": "daily", "times": ["08:00"] }
+    },
+    {
+      "id": "alendronate",
+      "name": { "es": "Alendronato 70 mg", "en": "Alendronate 70 mg" },
+      "purpose": {
+        "es": "Frena la pérdida de hueso junto con el ejercicio resistivo.",
+        "en": "Slows bone loss together with resistance exercise."
+      },
+      "instructions": {
+        "es": "En ayunas, con un vaso de agua. No te acuestes ni comas en 30 minutos.",
+        "en": "On an empty stomach with a glass of water. Do not lie down or eat for 30 minutes."
+      },
+      "schedule": { "kind": "weekly", "weekday": 1, "times": ["07:00"] }
+    },
+    {
+      "id": "antibiotic",
+      "name": { "es": "Antibiótico del botiquín", "en": "Medical kit antibiotic" },
+      "purpose": {
+        "es": "Tratamiento de una infección indicado por el médico de vuelo en Tierra.",
+        "en": "Treatment of an infection prescribed by the flight surgeon on Earth."
+      },
+      "instructions": {
+        "es": "Cada 12 horas hasta terminar el tratamiento, aunque te sientas mejor.",
+        "en": "Every 12 hours until the course ends, even if you feel better."
+      },
+      "schedule": { "kind": "daily", "times": ["08:00", "20:00"] }
+    },
+    {
+      "id": "motion-sickness",
+      "name": {
+        "es": "Antimareo (prometazina 25 mg)",
+        "en": "Motion sickness (promethazine 25 mg)"
+      },
+      "purpose": {
+        "es": "Alivia el mareo y las náuseas al cambiar de gravedad.",
+        "en": "Relieves dizziness and nausea when gravity changes."
+      },
+      "instructions": {
+        "es": "Si tienes mareo o náuseas. Da sueño: no la tomes antes de una salida o de pilotar.",
+        "en": "If you feel dizzy or nauseous. It causes drowsiness: not before an EVA or piloting."
+      },
+      "schedule": { "kind": "as-needed", "maxPerDay": 2 }
+    },
+    {
+      "id": "melatonin",
+      "name": { "es": "Melatonina 3 mg", "en": "Melatonin 3 mg" },
+      "purpose": {
+        "es": "Ayuda a dormir cuando el horario de la misión desajusta el reloj del cuerpo.",
+        "en": "Helps you sleep when the mission schedule shifts the body clock."
+      },
+      "instructions": {
+        "es": "30 minutos antes de dormir, solo si lo necesitas.",
+        "en": "30 minutes before sleep, only if you need it."
+      },
+      "schedule": { "kind": "as-needed", "maxPerDay": 1 }
+    }
+  ],
+  "source": "Los horarios usan la hora de la misión (UTC), como la estación espacial. Medicamentos, dosis y horarios de ejemplo: referencia provisional; el plan real lo decide el médico de vuelo. Riesgos que cubren (hueso, SANS, mareo, sueño, infecciones): NASA HRP, Risks of Human Spaceflight (https://www.nasa.gov/hrp/risks/)."
+}
