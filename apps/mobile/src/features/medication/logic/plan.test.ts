@@ -25,4 +25,18 @@ describe('parsePlanResponse', () => {
     expect(parsePlanResponse({ ...body, updatedAt: 'x' }, who, medications)).toBeUndefined();
     expect(parsePlanResponse(null, who, medications)).toBeUndefined();
   });
+
+  it('keeps a valid exercise prescription and drops one outside the limits', () => {
+    const prescription = { resistanceMinutes: 60, aerobicMinutes: 30, daysPerWeek: 7 };
+    expect(
+      parsePlanResponse({ ...body, exercise: prescription }, who, medications)?.exercise,
+    ).toEqual(prescription);
+    expect(
+      parsePlanResponse(
+        { ...body, exercise: { ...prescription, daysPerWeek: 12 } },
+        who,
+        medications,
+      ),
+    ).not.toHaveProperty('exercise');
+  });
 });

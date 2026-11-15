@@ -1,6 +1,7 @@
 import type { Reading } from '@haven/core';
 import { describe, expect, it } from 'vitest';
 import {
+  aerobicMinutes,
   dailyTotalReading,
   latestByIndicator,
   localDay,
@@ -156,5 +157,17 @@ describe('resistanceMinutes', () => {
       { day: at(3, 0), minutes: 46, end: at(3, 18) },
       { day: at(4, 0), minutes: 10, end: at(4, 8) },
     ]);
+  });
+});
+
+describe('aerobicMinutes', () => {
+  it('adds cycling, running and other cardio workouts, not strength', () => {
+    const at = (hour: number) => new Date(2026, 10, 3, hour, 0);
+    const out = aerobicMinutes([
+      { type: 13, end: at(9), seconds: 1800 },
+      { type: 37, end: at(18), seconds: 900 },
+      { type: 50, end: at(19), seconds: 3600 },
+    ]);
+    expect(out).toEqual([{ day: new Date(2026, 10, 3), minutes: 45, end: at(18) }]);
   });
 });
