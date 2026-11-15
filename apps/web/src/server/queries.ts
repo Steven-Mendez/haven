@@ -2,8 +2,10 @@ import 'server-only';
 import {
   type CrewPlan,
   cleanAssignments,
+  cleanPrescription,
   crewAggregates,
   emptyPlan,
+  exercise as exerciseConfig,
   type Mission,
   type MissionPhase,
   medications as medicationConfig,
@@ -684,4 +686,31 @@ export async function savePlan(
   };
   await (await plans()).updateOne({ mission, crewMember }, { $set: plan }, { upsert: true });
   return { ok: true, status: 200, data: plan };
+}
+
+/**
+ * Sets or clears (with null) the exercise prescription of one crew member.
+ * Only the exercise field changes: the medication plan stays as it is.
+ */
+export async function savePrescription(
+  mission: string,
+  crewMember: string,
+  input: unknown,
+  author?: string,
+  now = new Date(),
+): Promise<Result<CrewPlan>> {
+  if (!(await findMission(mission, now))) return fail(404, `Mission ${mission} does not exist`);
+  const prescription = input === null ? undefined : cleanPrescription(input, exerciseConfig);
+  if (input !== null && !prescription) return fail(400, 'Invalid exercise prescription');
+  const meta = { updatedAt: now.toISOString(), ...(author ? { author: author.slice(0, 80) } : {}) };
+  await (await plans()).updateOne(
+    { mission, crewMember },
+    {
+      $set: prescription ? { ...meta, exercise: prescription } : meta,
+      ...(prescription ? {} : { $unset: { exercise: '' } }),
+      $setOnInsert: { mission, crewMember, medications: [] },
+    },
+    { upsert: true },
+  );
+  return { ok: true, status: 200, data: await getPlan(mission, crewMember) };
 }
