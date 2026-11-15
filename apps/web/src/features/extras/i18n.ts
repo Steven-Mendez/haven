@@ -15,14 +15,14 @@ export const texts = defineTexts({
     howCalculated: '¿Cómo se calcula?',
     joinWithCode: 'Unirse con código',
     cancel: 'Cancelar',
-    rulesSubtitle: 'Umbrales versionados de {mission}: la primera regla que salta fija el nivel.',
+    rulesSubtitle: 'Umbrales versionados de {mission}: el primer umbral que salta fija el nivel.',
     trendsSubtitle: 'Cómo evoluciona el grupo de {mission}, indicador a indicador.',
     evaSubtitle: 'Quién de {mission} está en condiciones de salir a una EVA.',
     unknownMission: 'Misión desconocida',
     unknownMissionDetail: 'La misión {mission} no existe. Elige otra en el selector del sidebar.',
     loadError: 'No se pudieron cargar los datos',
     loadErrorDetail: 'La base de datos no responde. Vuelve a intentarlo en unos segundos.',
-    tabRules: 'Reglas',
+    tabRules: 'Umbrales',
     tabTrends: 'Tendencias de tripulación',
     tabTrendsShort: 'Tendencias',
     tabMissions: 'Misiones',
@@ -79,6 +79,12 @@ export const texts = defineTexts({
     ruleRangeHint: 'Salta si el valor queda fuera de este rango.',
     withSymptoms: 'solo con síntomas',
     noRangeRules: 'Este indicador no tiene umbrales con rango: solo se edita el rango normal.',
+    levelGreenHint: 'Dentro de este rango el valor es óptimo.',
+    levelAmberHint:
+      'Fuera de estos rangos el valor pide revisión. Si saltan varios, manda el de número menor.',
+    levelRedHint:
+      'Fuera de estos rangos el valor es una emergencia. Si saltan varios, manda el de número menor.',
+    noLevelRules: 'Este indicador no tiene umbrales en este nivel.',
     overrideNotice:
       'En {environments} este indicador usa un ajuste propio del entorno que sustituye a esta referencia base.',
     note: 'Nota de la versión',
@@ -334,7 +340,8 @@ export const texts = defineTexts({
     howCalculated: 'How is it calculated?',
     joinWithCode: 'Join with code',
     cancel: 'Cancel',
-    rulesSubtitle: 'Versioned thresholds for {mission}: the first rule that fires sets the level.',
+    rulesSubtitle:
+      'Versioned thresholds for {mission}: the first threshold that fires sets the level.',
     trendsSubtitle: 'How the {mission} crew is evolving, indicator by indicator.',
     evaSubtitle: 'Who in {mission} is fit to go out on an EVA.',
     unknownMission: 'Unknown mission',
@@ -342,7 +349,7 @@ export const texts = defineTexts({
       'Mission {mission} does not exist. Pick another one in the sidebar switcher.',
     loadError: 'Could not load the data',
     loadErrorDetail: 'The database is not responding. Try again in a few seconds.',
-    tabRules: 'Rules',
+    tabRules: 'Thresholds',
     tabTrends: 'Crew trends',
     tabTrendsShort: 'Trends',
     tabMissions: 'Missions',
@@ -399,6 +406,12 @@ export const texts = defineTexts({
     ruleRangeHint: 'Fires when the value falls outside this range.',
     withSymptoms: 'only with symptoms',
     noRangeRules: 'This indicator has no range thresholds: only the normal range can be edited.',
+    levelGreenHint: 'Within this range the value is optimal.',
+    levelAmberHint:
+      'Outside these ranges the value needs review. If several fire, the lowest number wins.',
+    levelRedHint:
+      'Outside these ranges the value is an emergency. If several fire, the lowest number wins.',
+    noLevelRules: 'This indicator has no thresholds at this level.',
     overrideNotice:
       'In {environments} this indicator uses its own environment adjustment, which replaces this base reference.',
     note: 'Version note',

@@ -1,6 +1,16 @@
 'use client';
 
-import { Pencil, Search } from 'lucide-react';
+import {
+  Activity,
+  Brain,
+  Dumbbell,
+  HeartPulse,
+  type LucideIcon,
+  Pencil,
+  Search,
+  Thermometer,
+  Utensils,
+} from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -15,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { format, type Language, textsFor, translate } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { texts } from '../i18n';
@@ -29,6 +40,14 @@ type Props = {
   environmentNames: Record<string, string>;
   explanations?: Record<string, TermExplanation | undefined>;
   rangeExplain?: TermExplanation;
+};
+
+const zoneIcons: Record<string, LucideIcon> = {
+  vitals: HeartPulse,
+  mind: Brain,
+  performance: Dumbbell,
+  metabolism: Utensils,
+  environment: Thermometer,
 };
 
 const range = (r: [number, number], unit: string) => `${r[0]}–${r[1]}${unit ? ` ${unit}` : ''}`;
@@ -54,6 +73,8 @@ export function RulesTable({
     ...zones.map((z) => ({ ...z, items: shown.filter((i) => i.zone === z.id) })),
     { id: '', name: t.otherCategory, items: shown.filter((i) => !known.has(i.zone)) },
   ].filter((g) => g.items.length > 0);
+  const [selected, setSelected] = useState<string>();
+  const active = groups.find((g) => g.id === selected) ?? groups[0];
   const scaleLevels = { green: t.scaleGreen, amber: t.scaleAmber, red: t.scaleRed };
   const scaleTexts = {
     below: t.scaleBelow,
@@ -157,6 +178,28 @@ export function RulesTable({
         </div>
       </div>
 
+      {groups.length > 0 ? (
+        <Tabs value={active?.id} onValueChange={(v) => setSelected(String(v))} className="mt-2">
+          <TabsList variant="line" className="h-auto max-w-full flex-wrap justify-start">
+            {groups.map((g) => {
+              const Icon = zoneIcons[g.id] ?? Activity;
+              return (
+                <TabsTrigger
+                  key={g.id || 'other'}
+                  value={g.id}
+                  data-zone={g.id}
+                  className="flex-none"
+                >
+                  <Icon aria-hidden="true" />
+                  {g.name}
+                  <span className="text-tertiary font-normal tabular-nums">{g.items.length}</span>
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
+        </Tabs>
+      ) : null}
+
       <div className="overflow-hidden rounded-xl border">
         <Table data-testid="rules-thresholds">
           <TableHeader>
@@ -173,22 +216,7 @@ export function RulesTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {groups.flatMap((group) => [
-              <TableRow key={`zone-${group.id}`} className="bg-muted/40 hover:bg-muted/40">
-                <TableHead
-                  scope="colgroup"
-                  colSpan={5}
-                  className="text-foreground h-8 pl-4 text-xs font-semibold"
-                  data-zone={group.id}
-                >
-                  {group.name}
-                  <span className="text-tertiary ml-2 font-normal tabular-nums">
-                    {group.items.length}
-                  </span>
-                </TableHead>
-              </TableRow>,
-              ...group.items.map(row),
-            ])}
+            {active?.items.map(row)}
             {shown.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-muted-foreground h-16 text-center">

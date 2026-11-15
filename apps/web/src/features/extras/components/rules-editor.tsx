@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { type ReactNode, useActionState, useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { havenTexts, LevelBadge } from '@/components/haven';
+import { havenTexts } from '@/components/haven';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Field, FieldLabel } from '@/components/ui/field';
@@ -16,13 +16,17 @@ import { format, type Language, textsFor, translate } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { sendRulesVersion } from '../actions';
 import { texts } from '../i18n';
+import type { RangeControl } from '../logic/range-control';
 import type { EditableIndicator, EditableRule, ThresholdError } from '../logic/rules';
 import type { RulesFormState } from '../types';
-import { FormError, INVALID_INPUT } from './form-error';
+import { FormError } from './form-error';
+import { RangeScale } from './range-scale';
+import { ThresholdRangeInput } from './threshold-range-input';
 
 type Props = {
   lang: Language;
   indicator: EditableIndicator;
+  control: RangeControl;
   environmentNames: Record<string, string>;
   author: string;
   backHref: string;
@@ -42,7 +46,14 @@ function initialValues(indicator: EditableIndicator): Record<string, string> {
   return values;
 }
 
-export function RulesEditor({ lang, indicator, environmentNames, author, backHref }: Props) {
+export function RulesEditor({
+  lang,
+  indicator,
+  control,
+  environmentNames,
+  author,
+  backHref,
+}: Props) {
   const t = textsFor(texts, lang);
   const router = useRouter();
   const [state, action, pending] = useActionState(sendRulesVersion, INITIAL);
@@ -86,32 +97,38 @@ export function RulesEditor({ lang, indicator, environmentNames, author, backHre
   const rangeText = (prefix: string) =>
     `${values[`${prefix}-min`] ?? '?'}–${values[`${prefix}-max`] ?? '?'}${unit ? ` ${unit}` : ''}`;
 
-  const inputs = (prefix: string, error?: string) => (
-    <div className="grid grid-cols-2 gap-3">
-      {(['min', 'max'] as const).map((side) => {
-        const name = `${prefix}-${side}`;
-        return (
-          <Field key={name}>
-            <FieldLabel htmlFor={name} className="text-muted-foreground text-xs font-normal">
-              {side === 'min' ? t.min : t.max}
-              {unit ? ` · ${unit}` : ''}
-            </FieldLabel>
-            <Input
-              id={name}
-              name={name}
-              inputMode="decimal"
-              autoComplete="off"
-              className={cn('tabular-nums', INVALID_INPUT)}
-              aria-invalid={error ? true : undefined}
-              value={values[name] ?? ''}
-              onChange={(e) => setValues((v) => ({ ...v, [name]: e.target.value }))}
-              required
-            />
-          </Field>
-        );
-      })}
-    </div>
+  const inputs = (prefix: string, error?: string, tone?: 'green' | 'amber' | 'red') => (
+    <ThresholdRangeInput
+      prefix={prefix}
+      control={control}
+      values={values}
+      onChange={(name, value) => setValues((v) => ({ ...v, [name]: value }))}
+      labels={{ min: t.min, max: t.max }}
+      unit={unit}
+      invalid={Boolean(error)}
+      tone={tone}
+    />
   );
+
+  // Vista previa en vivo: la misma barra de la tabla, con los valores que se están editando.
+  const num = (k: string, fallback: number) => {
+    const n = Number(String(values[k] ?? '').replace(',', '.'));
+    return values[k]?.trim() && Number.isFinite(n) ? n : fallback;
+  };
+  const preview: EditableIndicator = {
+    ...indicator,
+    green: [num('green-min', indicator.green[0]), num('green-max', indicator.green[1])],
+    rules: indicator.rules.map((r) => ({
+      ...r,
+      outside: [num(`rule-${r.index}-min`, r.outside[0]), num(`rule-${r.index}-max`, r.outside[1])],
+    })),
+  };
+  const scaleTexts = {
+    below: t.scaleBelow,
+    above: t.scaleAbove,
+    between: t.scaleBetween,
+    levels: { green: t.scaleGreen, amber: t.scaleAmber, red: t.scaleRed },
+  };
 
   const ruleRow = (r: EditableRule, n: number) => {
     const prefix = `rule-${r.index}`;
@@ -132,7 +149,6 @@ export function RulesEditor({ lang, indicator, environmentNames, author, backHre
         >
           {error ? <CircleAlert aria-label={t.errorIcon} className="size-4 shrink-0" /> : null}
           <span className="font-medium">{format(t.ruleRange, { n: n + 1 })}</span>
-          <LevelBadge level={r.level} lang={lang} size="sm" />
           <span className="numeric text-muted-foreground">{rangeText(prefix)}</span>
           {r.withSymptoms ? (
             <span className="text-muted-foreground hidden text-xs sm:inline">{t.withSymptoms}</span>
@@ -147,7 +163,7 @@ export function RulesEditor({ lang, indicator, environmentNames, author, backHre
         </CollapsibleTrigger>
         <CollapsibleContent keepMounted className="flex flex-col gap-3 px-4 pb-4">
           <p className="text-muted-foreground text-xs">{t.ruleRangeHint}</p>
-          {inputs(prefix, error)}
+          {inputs(prefix, error, r.level)}
           {error ? <FormError>{error}</FormError> : null}
           <Collapsible>
             <CollapsibleTrigger
@@ -176,20 +192,38 @@ export function RulesEditor({ lang, indicator, environmentNames, author, backHre
         </p>
       ) : null}
 
-      <SettingsGroup title={t.greenRange} hint={t.greenRangeHint}>
+      {indicator.rules.length ? (
+        <div className="bg-background sticky top-2 z-10 flex flex-col gap-1 rounded-lg border px-4 py-3 shadow-sm">
+          <span className="text-muted-foreground text-xs">{t.colCondition}</span>
+          <RangeScale indicator={preview} label={t.colCondition} texts={scaleTexts} />
+        </div>
+      ) : null}
+
+      <SettingsGroup title={t.scaleGreen} hint={t.levelGreenHint} level="green">
         <div className="flex flex-col gap-2 p-4">
           {inputs('green', greenError)}
           {greenError ? <FormError>{greenError}</FormError> : null}
         </div>
       </SettingsGroup>
 
-      <SettingsGroup title={t.rulesTitle} hint={t.rulesHint}>
-        {indicator.rules.length ? (
-          indicator.rules.map(ruleRow)
-        ) : (
-          <p className="text-muted-foreground p-4 text-sm">{t.noRangeRules}</p>
-        )}
-      </SettingsGroup>
+      {(['amber', 'red'] as const).map((level) => {
+        const rules = indicator.rules.filter((r) => r.level === level);
+        const name = level === 'amber' ? t.scaleAmber : t.scaleRed;
+        return (
+          <SettingsGroup
+            key={level}
+            title={name}
+            hint={level === 'amber' ? t.levelAmberHint : t.levelRedHint}
+            level={level}
+          >
+            {rules.length ? (
+              rules.map((r) => ruleRow(r, indicator.rules.indexOf(r)))
+            ) : (
+              <p className="text-muted-foreground p-4 text-sm">{t.noLevelRules}</p>
+            )}
+          </SettingsGroup>
+        );
+      })}
 
       <Field>
         <FieldLabel htmlFor="rules-author">{t.author}</FieldLabel>
@@ -238,16 +272,27 @@ export function RulesEditor({ lang, indicator, environmentNames, author, backHre
 function SettingsGroup({
   title,
   hint,
+  level,
   children,
 }: {
   title: string;
   hint: string;
+  level?: 'green' | 'amber' | 'red';
   children: ReactNode;
 }) {
   return (
     <section className="flex flex-col gap-2">
       <div className="flex flex-col">
-        <h3 className="text-sm font-medium">{title}</h3>
+        <h3 className="flex items-center gap-2 text-sm font-medium">
+          {level ? (
+            <span
+              aria-hidden="true"
+              className="h-2 w-4 rounded-full"
+              style={{ background: `var(--scale-${level})` }}
+            />
+          ) : null}
+          {title}
+        </h3>
         <p className="text-muted-foreground text-xs">{hint}</p>
       </div>
       <div className="overflow-hidden rounded-lg border">{children}</div>

@@ -10,6 +10,7 @@ import { getTexts } from '@/lib/language';
 import { getMissionCode } from '@/lib/mission';
 import { RulesEditor } from './components/rules-editor';
 import { texts } from './i18n';
+import { rangeControlFor } from './logic/range-control';
 import { editableIndicators } from './logic/rules';
 import { getCurrentConfig, getMission, listRules } from './server';
 
@@ -56,6 +57,7 @@ async function RulesEditContent({ params }: { params: Promise<{ indicator: strin
     return <EmptyState icon={<CircleOff />} title={t.indicatorNotFound} action={backLink} />;
   }
   const indicator = { ...found, unit: unitLabel(found.unit, lang) };
+  const control = rangeControlFor(found);
   const environmentNames = Object.fromEntries(
     loadConfig().environments.map((e) => [e.id, translate(e.name, lang)]),
   );
@@ -71,6 +73,7 @@ async function RulesEditContent({ params }: { params: Promise<{ indicator: strin
         </p>
       </header>
       <RulesEditor
+        control={control}
         lang={lang}
         indicator={indicator}
         environmentNames={environmentNames}
