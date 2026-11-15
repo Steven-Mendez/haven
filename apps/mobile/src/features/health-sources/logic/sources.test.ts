@@ -5,8 +5,11 @@ import {
   latestByIndicator,
   localDay,
   planIndicator,
+  resistanceMinutes,
+  rhythmFromEcg,
   type SourceStatus,
   sleepNights,
+  wristTemperatureDeviations,
 } from './sources';
 
 function status(partial: Partial<SourceStatus> & Pick<SourceStatus, 'id' | 'state'>): SourceStatus {
@@ -104,5 +107,54 @@ describe('sleepNights', () => {
       { start: h(1, 22), end: h(2, 7), value: 0 },
     ]);
     expect(nights).toEqual([{ day: '2026-11-02', hours: 6, end: h(2, 6) }]);
+  });
+});
+
+describe('wristTemperatureDeviations', () => {
+  const night = (n: number, value: number) => ({
+    id: `n${n}`,
+    value,
+    end: new Date(2026, 10, n, 7, 0),
+  });
+
+  it('needs five earlier nights before it reports a deviation', () => {
+    const nights = [1, 2, 3, 4, 5].map((n) => night(n, 35));
+    expect(wristTemperatureDeviations(nights)).toEqual([]);
+    const out = wristTemperatureDeviations([...nights, night(6, 36.24)]);
+    expect(out).toEqual([{ id: 'n6', deviation: 1.2, end: night(6, 0).end }]);
+  });
+
+  it('compares each night with the nights before it, whatever the input order', () => {
+    const nights = [night(7, 34.5), ...[1, 2, 3, 4, 5, 6].map((n) => night(n, 35))];
+    expect(wristTemperatureDeviations(nights).map((d) => [d.id, d.deviation])).toEqual([
+      ['n6', 0],
+      ['n7', -0.5],
+    ]);
+  });
+});
+
+describe('rhythmFromEcg', () => {
+  it('maps only conclusive ECG classifications', () => {
+    expect(rhythmFromEcg('sinusRhythm')).toBe('sinus');
+    expect(rhythmFromEcg('atrialFibrillation')).toBe('irregular');
+    expect(rhythmFromEcg('inconclusivePoorReading')).toBeUndefined();
+    expect(rhythmFromEcg('notSet')).toBeUndefined();
+  });
+});
+
+describe('resistanceMinutes', () => {
+  it('adds the strength workouts of each local day and ignores the rest', () => {
+    const at = (day: number, hour: number) => new Date(2026, 10, day, hour, 0);
+    const out = resistanceMinutes([
+      { type: 50, end: at(3, 9), seconds: 1500 },
+      { type: 20, end: at(3, 18), seconds: 1230 },
+      { type: 37, end: at(3, 20), seconds: 3600 },
+      { type: 59, end: at(4, 8), seconds: 600 },
+      { type: 50, end: at(4, 9), seconds: 0 },
+    ]);
+    expect(out).toEqual([
+      { day: at(3, 0), minutes: 46, end: at(3, 18) },
+      { day: at(4, 0), minutes: 10, end: at(4, 8) },
+    ]);
   });
 });

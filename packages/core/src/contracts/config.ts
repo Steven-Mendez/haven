@@ -18,6 +18,9 @@ export type Zone = {
 
 export type IndicatorInput = 'watch' | 'health' | 'phone' | 'test' | 'check-in' | 'manual';
 
+/** NASA RIDGE hazard of human spaceflight. */
+export type RidgeHazard = 'radiation' | 'isolation' | 'distance' | 'gravity' | 'environment';
+
 export type Indicator = {
   id: string;
   name: I18n;
@@ -25,6 +28,8 @@ export type Indicator = {
   unit: string;
   inputs: IndicatorInput[];
   suggestedByChallenge: boolean;
+  /** RIDGE hazards the indicator watches; the first one is the main one. */
+  ridge: RidgeHazard[];
   extra?: boolean;
   everyHours?: number;
   kind: 'number' | 'category';

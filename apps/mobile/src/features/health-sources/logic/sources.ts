@@ -114,3 +114,53 @@ export function sleepNights(
     .map(([day, n]) => ({ day, hours: Math.round((n.ms / 3_600_000) * 10) / 10, end: n.end }))
     .sort((a, b) => a.day.localeCompare(b.day));
 }
+
+export const WRIST_BASELINE_NIGHTS = 5;
+const WRIST_BASELINE_WINDOW = 30;
+
+export function wristTemperatureDeviations(
+  samples: { id: string; value: number; end: Date }[],
+): { id: string; deviation: number; end: Date }[] {
+  const sorted = [...samples].sort((a, b) => a.end.getTime() - b.end.getTime());
+  const out: { id: string; deviation: number; end: Date }[] = [];
+  sorted.forEach((sample, index) => {
+    const previous = sorted.slice(Math.max(0, index - WRIST_BASELINE_WINDOW), index);
+    if (previous.length < WRIST_BASELINE_NIGHTS) return;
+    const baseline = previous.reduce((sum, p) => sum + p.value, 0) / previous.length;
+    out.push({
+      id: sample.id,
+      deviation: Math.round((sample.value - baseline) * 10) / 10,
+      end: sample.end,
+    });
+  });
+  return out;
+}
+
+export function rhythmFromEcg(classification: string): 'sinus' | 'irregular' | undefined {
+  if (classification === 'sinusRhythm') return 'sinus';
+  if (classification === 'atrialFibrillation') return 'irregular';
+  return undefined;
+}
+
+export const RESISTANCE_WORKOUT_TYPES: readonly number[] = [20, 50, 59];
+
+export function resistanceMinutes(
+  workouts: { type: number; end: Date; seconds: number }[],
+): { day: Date; minutes: number; end: Date }[] {
+  const days = new Map<string, { day: Date; seconds: number; end: Date }>();
+  for (const w of workouts) {
+    if (!RESISTANCE_WORKOUT_TYPES.includes(w.type) || !(w.seconds > 0)) continue;
+    const key = localDay(w.end);
+    const day = days.get(key) ?? {
+      day: new Date(w.end.getFullYear(), w.end.getMonth(), w.end.getDate()),
+      seconds: 0,
+      end: w.end,
+    };
+    day.seconds += w.seconds;
+    if (w.end > day.end) day.end = w.end;
+    days.set(key, day);
+  }
+  return [...days.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, d]) => ({ day: d.day, minutes: Math.round(d.seconds / 60), end: d.end }));
+}

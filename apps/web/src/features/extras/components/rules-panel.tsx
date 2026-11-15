@@ -104,7 +104,6 @@ export async function RulesPanel({
         explanations={Object.fromEntries(
           editableIndicators(config).map((i) => [i.id, explain(i.id, lang)]),
         )}
-        rangeExplain={explain('reference-range', lang)}
       />
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <section aria-labelledby="versions" className="flex flex-col gap-2">

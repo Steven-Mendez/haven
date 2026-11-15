@@ -13,6 +13,7 @@ function indicator(p: Partial<Indicator> & Pick<Indicator, 'id' | 'zone' | 'unit
     name: t(p.id),
     inputs: ['manual'],
     suggestedByChallenge: true,
+    ridge: ['gravity'],
     kind: 'number',
     green: [0, 0],
     rules: [],

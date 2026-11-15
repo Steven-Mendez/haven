@@ -45,7 +45,6 @@ type Props = {
   currentVersion: string;
   environmentNames: Record<string, string>;
   explanations?: Record<string, TermExplanation | undefined>;
-  rangeExplain?: TermExplanation;
 };
 
 const zoneIcons: Record<string, LucideIcon> = {
@@ -64,7 +63,14 @@ const inputIcons = {
   'check-in': { Icon: SmilePlus, text: 'inputCheckIn' },
   manual: { Icon: Keyboard, text: 'inputManual' },
 } as const;
-const inputOrder = Object.keys(inputIcons) as (keyof typeof inputIcons)[];
+
+const ridgeHazards = {
+  radiation: { letter: 'R', text: 'ridgeRadiation' },
+  isolation: { letter: 'I', text: 'ridgeIsolation' },
+  distance: { letter: 'D', text: 'ridgeDistance' },
+  gravity: { letter: 'G', text: 'ridgeGravity' },
+  environment: { letter: 'E', text: 'ridgeEnvironment' },
+} as const;
 
 const range = (r: [number, number], unit: string) => `${r[0]}–${r[1]}${unit ? ` ${unit}` : ''}`;
 
@@ -75,7 +81,6 @@ export function RulesTable({
   currentVersion,
   environmentNames,
   explanations,
-  rangeExplain,
 }: Props) {
   const t = textsFor(texts, lang);
   const router = useRouter();
@@ -122,6 +127,31 @@ export function RulesTable({
                     <span className="text-muted-foreground flex size-6 items-center justify-center rounded-md border">
                       <Icon aria-hidden="true" className="size-3.5" />
                       <span className="sr-only">{t[text]}</span>
+                    </span>
+                  </Hint>
+                </li>
+              );
+            })}
+          </ul>
+        </TableCell>
+        <TableCell>
+          <ul className="flex items-center gap-1" data-ridge={i.ridge.join(' ')}>
+            {i.ridge.map((hazard, n) => {
+              const { letter, text } = ridgeHazards[hazard];
+              const label = n === 0 ? `${t[text]} (${t.ridgeMain})` : t[text];
+              return (
+                <li key={hazard}>
+                  <Hint label={label} side="top">
+                    <span
+                      className={cn(
+                        'flex size-6 items-center justify-center rounded-md border text-xs font-semibold',
+                        n === 0
+                          ? 'bg-foreground text-background border-foreground'
+                          : 'text-muted-foreground',
+                      )}
+                    >
+                      <span aria-hidden="true">{letter}</span>
+                      <span className="sr-only">{label}</span>
                     </span>
                   </Hint>
                 </li>
@@ -194,22 +224,6 @@ export function RulesTable({
               </li>
             ))}
           </ul>
-          <ul
-            aria-label={t.inputsLegend}
-            className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs"
-          >
-            {inputOrder
-              .filter((input) => indicators.some((i) => i.inputs.includes(input)))
-              .map((input) => {
-                const { Icon, text } = inputIcons[input];
-                return (
-                  <li key={input} className="flex items-center gap-1.5">
-                    <Icon aria-hidden="true" className="size-3.5" />
-                    {t[text]}
-                  </li>
-                );
-              })}
-          </ul>
         </div>
         <div className="relative w-full sm:w-64">
           <Search
@@ -255,9 +269,8 @@ export function RulesTable({
             <TableRow>
               <TableHead className="pl-4">{t.indicator}</TableHead>
               <TableHead>{t.colInput}</TableHead>
-              <TableHead>
-                <TermTip explanation={rangeExplain}>{t.greenRange}</TermTip>
-              </TableHead>
+              <TableHead>{t.colRidge}</TableHead>
+              <TableHead>{t.greenRange}</TableHead>
               <TableHead>{t.colCondition}</TableHead>
               <TableHead className="hidden lg:table-cell">{t.colScope}</TableHead>
               <TableHead className="w-12 pr-4">
@@ -269,7 +282,7 @@ export function RulesTable({
             {active?.items.map(row)}
             {shown.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className="text-muted-foreground h-16 text-center">
+                <TableCell colSpan={7} className="text-muted-foreground h-16 text-center">
                   {t.noMatches}
                 </TableCell>
               </TableRow>

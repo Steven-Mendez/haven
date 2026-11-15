@@ -111,6 +111,15 @@ describe('indicators', () => {
     expect(flagged.sort()).toEqual([...CHALLENGE_INDICATORS].sort());
   });
 
+  it('map each indicator to one or more distinct RIDGE hazards', () => {
+    const RIDGE = ['radiation', 'isolation', 'distance', 'gravity', 'environment'];
+    for (const i of config.indicators) {
+      expect(i.ridge.length, i.id).toBeGreaterThan(0);
+      expect(new Set(i.ridge).size, i.id).toBe(i.ridge.length);
+      for (const h of i.ridge) expect(RIDGE, i.id).toContain(h);
+    }
+  });
+
   it('tracks every indicator in the file: none is hidden and each one says how it is obtained', () => {
     expect([...EXTRA_INDICATORS]).toEqual([]);
     expect(config.indicators).toHaveLength(30);

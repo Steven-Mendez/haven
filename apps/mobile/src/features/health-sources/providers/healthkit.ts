@@ -1,6 +1,14 @@
 import { isTracked, type Reading } from '@haven/core';
 import { Platform } from 'react-native';
-import { dailyTotalReading, type SourceStatus, sleepNights } from '../logic/sources';
+import {
+  dailyTotalReading,
+  resistanceMinutes,
+  rhythmFromEcg,
+  type SourceStatus,
+  sleepNights,
+  WRIST_BASELINE_NIGHTS,
+  wristTemperatureDeviations,
+} from '../logic/sources';
 import { planTestSamples, TEST_QUANTITY_TYPES, TEST_SLEEP_TYPE } from '../logic/test-samples';
 import type { SourceProvider } from './types';
 
@@ -112,8 +120,23 @@ export const HEALTHKIT_MAPPINGS: Mapping[] = ALL_MAPPINGS.filter((m) => isTracke
 
 const PRIMARY = ['steps'];
 const SLEEP_TYPE = 'HKCategoryTypeIdentifierSleepAnalysis' as const;
-const INDICATORS = [...HEALTHKIT_MAPPINGS.map((m) => m.indicator), 'sleep'];
-const TO_READ = [...HEALTHKIT_MAPPINGS.map((m) => m.type), SLEEP_TYPE];
+const WRIST_TYPE = 'HKQuantityTypeIdentifierAppleSleepingWristTemperature' as const;
+const IRREGULAR_RHYTHM_TYPE = 'HKCategoryTypeIdentifierIrregularHeartRhythmEvent' as const;
+const ECG_TYPE = 'HKElectrocardiogramType' as const;
+const WORKOUT_TYPE = 'HKWorkoutTypeIdentifier' as const;
+const WRIST_HISTORY_DAYS = 35;
+const DERIVED = ['sleep', 'wrist-temperature', 'heart-rhythm', 'resistance-exercise'].filter(
+  isTracked,
+);
+const INDICATORS = [...HEALTHKIT_MAPPINGS.map((m) => m.indicator), ...DERIVED];
+const TO_READ = [
+  ...HEALTHKIT_MAPPINGS.map((m) => m.type),
+  SLEEP_TYPE,
+  WRIST_TYPE,
+  IRREGULAR_RHYTHM_TYPE,
+  ECG_TYPE,
+  WORKOUT_TYPE,
+];
 const HISTORY_DAYS = 7;
 const DAY_MS = 86_400_000;
 
@@ -243,6 +266,102 @@ export function createHealthKitProvider(): SourceProvider {
     );
   }
 
+  async function readWristTemperature(
+    hk: HealthKitModule,
+    since: Date,
+    now: Date,
+    crewMember: string,
+  ) {
+    const samples = await hk.queryQuantitySamples(WRIST_TYPE, {
+      limit: 0,
+      ascending: true,
+      unit: 'degC',
+      filter: {
+        date: { startDate: new Date(now.getTime() - WRIST_HISTORY_DAYS * DAY_MS), endDate: now },
+      },
+    });
+    if (samples.length <= WRIST_BASELINE_NIGHTS) return [];
+    return wristTemperatureDeviations(
+      samples.map((x) => ({ id: x.uuid, value: x.quantity, end: new Date(x.endDate) })),
+    )
+      .filter((d) => d.end >= since)
+      .map(
+        (d): Reading => ({
+          id: `healthkit:${d.id}`,
+          indicator: 'wrist-temperature',
+          value: d.deviation,
+          unit: 'Δ°C',
+          takenAt: d.end.toISOString(),
+          source: 'healthkit',
+          simulated: false,
+          crewMember,
+        }),
+      );
+  }
+
+  async function readRhythm(hk: HealthKitModule, since: Date, now: Date, crewMember: string) {
+    const filter = { date: { startDate: since, endDate: now } };
+    const reading = (uuid: string, value: string, end: Date): Reading => ({
+      id: `healthkit:${uuid}`,
+      indicator: 'heart-rhythm',
+      value,
+      unit: 'category',
+      takenAt: end.toISOString(),
+      source: 'healthkit',
+      simulated: false,
+      crewMember,
+    });
+    const out: Reading[] = [];
+    const ecgs = await hk.queryElectrocardiogramSamples({ limit: 50, ascending: true, filter });
+    for (const ecg of ecgs) {
+      const rhythm = rhythmFromEcg(ecg.classification);
+      if (rhythm) out.push(reading(ecg.uuid, rhythm, new Date(ecg.endDate)));
+    }
+    const events = await hk.queryCategorySamples(IRREGULAR_RHYTHM_TYPE, {
+      limit: 50,
+      ascending: true,
+      filter,
+    });
+    for (const event of events) out.push(reading(event.uuid, 'irregular', new Date(event.endDate)));
+    return out.sort((a, b) => a.takenAt.localeCompare(b.takenAt));
+  }
+
+  async function readResistance(hk: HealthKitModule, since: Date, now: Date, crewMember: string) {
+    const workouts = await hk.queryWorkoutSamples({
+      limit: 0,
+      ascending: true,
+      filter: { date: { startDate: startOfDay(since), endDate: now } },
+    });
+    const toSeconds = (d: { unit: string; quantity: number }) =>
+      d.unit === 'min' ? d.quantity * 60 : d.unit === 'hr' ? d.quantity * 3600 : d.quantity;
+    return resistanceMinutes(
+      workouts.map((w) => ({
+        type: Number(w.workoutActivityType),
+        end: new Date(w.endDate),
+        seconds: toSeconds(w.duration),
+      })),
+    ).map((d) =>
+      dailyTotalReading({
+        provider: 'healthkit',
+        source: 'healthkit',
+        indicator: 'resistance-exercise',
+        unit: 'min',
+        total: d.minutes,
+        decimals: 0,
+        day: d.day,
+        takenAt: d.end,
+        crewMember,
+      }),
+    );
+  }
+
+  const derived: [string, typeof readSleep][] = [
+    ['sleep', readSleep],
+    ['wrist-temperature', readWristTemperature],
+    ['heart-rhythm', readRhythm],
+    ['resistance-exercise', readResistance],
+  ];
+
   const provider: SourceProvider = {
     id: 'healthkit',
     status: () => status,
@@ -319,12 +438,15 @@ export function createHealthKitProvider(): SourceProvider {
           console.warn(`[health-sources] HealthKit read failed: ${m.indicator}`, error);
         }
       }
-      try {
-        const sleep = await readSleep(hk, since, now, crewMember);
-        if (sleep.length > 0) withData.add('sleep');
-        all.push(...sleep);
-      } catch (error) {
-        console.warn('[health-sources] HealthKit read failed: sleep', error);
+      for (const [indicator, read] of derived) {
+        if (!isTracked(indicator)) continue;
+        try {
+          const list = await read(hk, since, now, crewMember);
+          if (list.length > 0) withData.add(indicator);
+          all.push(...list);
+        } catch (error) {
+          console.warn(`[health-sources] HealthKit read failed: ${indicator}`, error);
+        }
       }
       lastSync = now;
       update({ lastSyncAt: now.toISOString() });

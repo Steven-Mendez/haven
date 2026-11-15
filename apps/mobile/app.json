@@ -48,7 +48,7 @@
       [
         "@kingstinct/react-native-healthkit",
         {
-          "NSHealthShareUsageDescription": "HAVEN lee pasos, distancia y pisos del iPhone para comparar tu actividad con tu línea base personal.",
+          "NSHealthShareUsageDescription": "HAVEN lee de Salud tu actividad, sueño, signos vitales, ritmo cardíaco, temperatura de muñeca y entrenamientos para compararlos con tu línea base personal.",
           "NSHealthUpdateUsageDescription": "HAVEN guarda las mediciones que ingresas a mano (presión, glucosa, peso y temperatura).",
           "background": false
         }
