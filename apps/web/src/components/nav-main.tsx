@@ -9,6 +9,7 @@ import {
   PlaneLanding,
   Rocket,
   SlidersHorizontal,
+  Sparkles,
   TestTube,
   UserRound,
   Users,
@@ -71,6 +72,7 @@ export function NavMain({ lang, crew }: Props) {
 
   const pages = [
     { href: '/', label: t.navCrew, icon: Users, active: pathname === '/' },
+    { href: '/orion', label: t.navOrion, icon: Sparkles, active: pathname === '/orion' },
     {
       href: '/rules',
       label: t.navRulesShort,

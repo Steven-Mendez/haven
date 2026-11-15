@@ -80,7 +80,8 @@ export function AppHeader({ lang, day, linkDown, delayMin, crewNames, crew = [] 
   const pathname = usePathname();
 
   const crumbs: Crumb[] = [];
-  if (pathname === '/rules') crumbs.push({ label: t.navRulesShort });
+  if (pathname === '/orion') crumbs.push({ label: t.navOrion });
+  else if (pathname === '/rules') crumbs.push({ label: t.navRulesShort });
   else if (pathname.startsWith('/rules/'))
     crumbs.push({ label: t.navRulesShort, href: '/rules' }, { label: t.editThresholdsCrumb });
   else if (pathname === '/kpi') crumbs.push({ label: t.navKpiShort });

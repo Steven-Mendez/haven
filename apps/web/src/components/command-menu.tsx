@@ -16,6 +16,7 @@ import {
   Search,
   Settings,
   SlidersHorizontal,
+  Sparkles,
   TestTube,
   Users,
   Waves,
@@ -150,6 +151,7 @@ export function CommandMenu({ lang, crew }: Props) {
 
   const pages = [
     { href: '/', label: t.navCrew, icon: Users },
+    { href: '/orion', label: t.navOrion, icon: Sparkles },
     { href: '/rules', label: t.navRules, icon: SlidersHorizontal },
     { href: '/kpi', label: t.navKpi, icon: ChartNoAxesCombined },
     { href: '/eva', label: t.navEva, icon: Footprints },

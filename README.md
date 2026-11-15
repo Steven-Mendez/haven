@@ -20,6 +20,7 @@ apps/
   web/                    Next.js 16: API y Vista de Tierra
     src/app/              rutas y API (/api/*)
     src/features/<x>/     astronaut, crew, extras, settings
+    src/assistant/        Orion AI: el chat que maneja todos los features con sus herramientas
     src/server/           MongoDB, modelo y utilidades HTTP
     scripts/              seed y pruebas de la API
   mobile/                 Expo SDK 58 (iOS y Android)
@@ -41,7 +42,7 @@ scripts/
 | Pieza | Herramientas |
 |---|---|
 | Monorepo | pnpm 12 workspaces (`nodeLinker: hoisted`, lo pide React Native) y Turborepo |
-| Web | Next.js 16 (Turbopack, Cache Components), Tailwind 4, shadcn/ui sobre Base UI, driver oficial `mongodb` |
+| Web | Next.js 16 (Turbopack, Cache Components), Tailwind 4, shadcn/ui sobre Base UI, driver oficial `mongodb`, AI SDK 7 con OpenAI para Orion AI |
 | Base de datos | MongoDB Atlas; MongoDB 8 en Docker como alternativa sin internet |
 | Despliegue | Vercel, con `apps/web` como directorio raíz |
 | Móvil | Expo SDK 58, Expo Router, NativeWind 4, React Native Reusables, SQLite local |
@@ -81,6 +82,8 @@ Los archivos `.env*` no se versionan; solo los `.env.example`, que documentan ca
 | `MONGODB_USE_LOCAL` | No | Con `true` usa `MONGODB_LOCAL_URI` en vez de Atlas |
 | `MONGODB_LOCAL_URI` | No | MongoDB local; por defecto `mongodb://localhost:27017` |
 | `HAVEN_PUBLIC_URL` | No | Dirección de Tierra que va en el QR de invitación; por defecto, el host de la página |
+| `OPENAI_API_KEY` | No | Clave de OpenAI para Orion AI (`/orion`); sin ella el chat avisa de que falta |
+| `HAVEN_ASSISTANT_SECRET` | No | Secreto que firma las confirmaciones de cambios de Orion AI; por defecto se deriva de `OPENAI_API_KEY` |
 
 Para trabajar sin internet: `MONGODB_USE_LOCAL=true` y `pnpm db:up`.
 
