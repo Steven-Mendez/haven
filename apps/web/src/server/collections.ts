@@ -1,6 +1,13 @@
 import 'server-only';
 import type { Collection, Db, Document } from 'mongodb';
-import { COLLECTIONS, INDEXES, type MissionDoc, type PacketDoc, type RulesDoc } from './model';
+import {
+  COLLECTIONS,
+  type DashboardDoc,
+  INDEXES,
+  type MissionDoc,
+  type PacketDoc,
+  type RulesDoc,
+} from './model';
 import { getDb } from './mongodb';
 
 const globalIndexes = globalThis as unknown as { _havenIndexes?: Promise<void> };
@@ -26,3 +33,4 @@ async function collection<T extends Document>(name: string): Promise<Collection<
 export const packets = () => collection<PacketDoc>(COLLECTIONS.packets);
 export const missions = () => collection<MissionDoc>(COLLECTIONS.missions);
 export const rules = () => collection<RulesDoc>(COLLECTIONS.rules);
+export const dashboards = () => collection<DashboardDoc>(COLLECTIONS.dashboards);

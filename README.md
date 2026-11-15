@@ -8,7 +8,7 @@ Vista de Tierra desplegada: <https://haven-eta-gray.vercel.app>
 
 | Pieza | Qué es | Dónde |
 |---|---|---|
-| Vista de Tierra | Web y API: misiones, tripulación, reglas, tendencias y paquetes recibidos | `apps/web` |
+| Vista de Tierra | Web y API: misiones, tripulación, reglas, KPI y paquetes recibidos | `apps/web` |
 | App del astronauta | Rutina, indicadores, cognición, emergencias y cola de envío a Tierra | `apps/mobile` |
 | Reloj | Monitor de frecuencia cardíaca y alarma de emergencia (SOS) | `apps/mobile/targets/watch` |
 | Core | Contratos, motor de reglas y configuración versionada que comparten todos | `packages/core` |
@@ -119,7 +119,7 @@ Añadir componentes de shadcn: `cd apps/web && pnpm dlx shadcn@latest add <compo
 | `/api/astronaut/[id]` | Detalle de un astronauta y sus paquetes |
 | `/api/packets` | Paquetes que envía la app del astronauta |
 | `/api/rules` | Reglas vigentes para una misión |
-| `/api/aggregates` | Agregados para las tendencias de la tripulación |
+| `/api/aggregates` | Agregados diarios de la tripulación que alimentan las vistas de KPI |
 
 ## Móvil
 

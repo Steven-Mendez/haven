@@ -31,7 +31,7 @@ type Props = {
 type Crumb = { label: string; href?: string };
 
 const HEADER =
-  'bg-surface/80 sticky top-0 z-30 flex h-[calc(2.75rem_+_env(safe-area-inset-top))] shrink-0 items-center gap-2 border-b pt-[env(safe-area-inset-top)] pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] backdrop-blur-md md:rounded-t-xl';
+  'bg-surface/80 sticky top-0 z-30 flex h-[calc(3.25rem_+_env(safe-area-inset-top))] shrink-0 items-center gap-2 border-b pt-[env(safe-area-inset-top)] pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] backdrop-blur-md md:rounded-tl-3xl md:pr-5 md:pl-5';
 
 export function AppHeaderSkeleton() {
   return (
@@ -49,7 +49,7 @@ export function AppHeader({ lang, day, linkDown, crewNames, crew = [] }: Props) 
   if (pathname === '/rules') crumbs.push({ label: t.navRulesShort });
   else if (pathname.startsWith('/rules/'))
     crumbs.push({ label: t.navRulesShort, href: '/rules' }, { label: t.editThresholdsCrumb });
-  else if (pathname === '/trends') crumbs.push({ label: t.navTrendsShort });
+  else if (pathname === '/kpi') crumbs.push({ label: t.navKpiShort });
   else if (pathname === '/eva') crumbs.push({ label: t.navEvaShort });
   else if (pathname === '/reentry') crumbs.push({ label: t.navReentryShort });
   else if (pathname === '/missions/new')

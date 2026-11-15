@@ -216,7 +216,7 @@ export function MissionBuilder({
                 className={cn(
                   'grid size-5 shrink-0 place-items-center rounded-full border text-[10px] tabular-nums',
                   step === n && 'border-brand text-brand',
-                  done && 'bg-brand border-brand text-white',
+                  done && 'bg-brand border-brand text-primary-foreground',
                 )}
               >
                 {done ? <Check aria-hidden="true" className="size-3" /> : n}

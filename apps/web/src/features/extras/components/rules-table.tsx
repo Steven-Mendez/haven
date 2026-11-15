@@ -4,12 +4,16 @@ import {
   Activity,
   Brain,
   Dumbbell,
+  Globe,
   Heart,
   HeartPulse,
   Keyboard,
   type LucideIcon,
+  MapPin,
+  MousePointerClick,
   Pencil,
   Search,
+  SearchX,
   Smartphone,
   SmilePlus,
   Thermometer,
@@ -107,24 +111,49 @@ export function RulesTable({
   const row = (i: EditableIndicator) => {
     const name = translate(i.name, lang);
     const href = `/rules/${encodeURIComponent(i.id)}`;
+    const ZoneIcon = zoneIcons[i.zone] ?? Activity;
+    const count = i.rules.length;
+    const overrides = i.overrides.map((e) => environmentNames[e] ?? e);
     return (
       <TableRow
         key={i.id}
-        className="cursor-pointer"
+        className="group/row cursor-pointer"
         onClick={() => router.push(href)}
         data-indicator={i.id}
       >
-        <TableCell className="pl-4 font-medium whitespace-normal">
-          <TermTip explanation={explanations?.[i.id]}>{name}</TermTip>
+        <TableCell className="py-3 pl-4 whitespace-normal group-hover/row:shadow-[inset_2px_0_0_var(--brand)]">
+          <div className="flex items-center gap-3">
+            <span
+              aria-hidden="true"
+              className="bg-surface-elevated text-muted-foreground group-hover/row:text-brand flex size-8 shrink-0 items-center justify-center rounded-lg border transition-colors"
+            >
+              <ZoneIcon className="size-4" />
+            </span>
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <span className="font-medium">
+                <TermTip explanation={explanations?.[i.id]}>{name}</TermTip>
+              </span>
+              <span className="text-tertiary text-2xs">
+                {i.unit || t.unitless}
+                <span aria-hidden="true" className="mx-1.5">
+                  ·
+                </span>
+                {count === 1 ? t.thresholdsOne : format(t.thresholdsMany, { n: String(count) })}
+              </span>
+            </div>
+          </div>
         </TableCell>
         <TableCell>
-          <ul className="flex items-center gap-1.5" data-inputs={i.inputs.join(' ')}>
+          <ul
+            className="bg-surface-elevated/60 inline-flex items-center divide-x rounded-md border"
+            data-inputs={i.inputs.join(' ')}
+          >
             {i.inputs.map((input) => {
               const { Icon, text } = inputIcons[input];
               return (
                 <li key={input}>
                   <Hint label={t[text]} side="top">
-                    <span className="text-muted-foreground flex size-6 items-center justify-center rounded-md border">
+                    <span className="text-muted-foreground hover:text-foreground flex size-7 items-center justify-center transition-colors">
                       <Icon aria-hidden="true" className="size-3.5" />
                       <span className="sr-only">{t[text]}</span>
                     </span>
@@ -144,10 +173,10 @@ export function RulesTable({
                   <Hint label={label} side="top">
                     <span
                       className={cn(
-                        'flex size-6 items-center justify-center rounded-md border text-xs font-semibold',
+                        'flex h-6 items-center justify-center rounded-md text-xs font-semibold',
                         n === 0
-                          ? 'bg-foreground text-background border-foreground'
-                          : 'text-muted-foreground',
+                          ? 'bg-brand-subtle text-link ring-brand/30 min-w-7 px-1.5 ring-1 ring-inset'
+                          : 'text-tertiary w-5',
                       )}
                     >
                       <span aria-hidden="true">{letter}</span>
@@ -159,10 +188,25 @@ export function RulesTable({
             })}
           </ul>
         </TableCell>
-        <TableCell className="text-muted-foreground tabular-nums">
-          {range(i.green, i.unit)}
+        <TableCell>
+          <span
+            className="inline-flex items-center gap-1.5 rounded-full py-0.5 pr-2.5 pl-2 text-xs tabular-nums"
+            style={{
+              background: 'color-mix(in oklab, var(--scale-green) 12%, transparent)',
+            }}
+          >
+            <span
+              aria-hidden="true"
+              className="size-1.5 rounded-full"
+              style={{ background: 'var(--scale-green)' }}
+            />
+            <span className="text-foreground font-medium">
+              {i.green[0]}–{i.green[1]}
+            </span>
+            {i.unit ? <span className="text-muted-foreground">{i.unit}</span> : null}
+          </span>
         </TableCell>
-        <TableCell className="py-2.5">
+        <TableCell className="py-3">
           {i.rules.length ? (
             <RangeScale
               indicator={i}
@@ -178,22 +222,41 @@ export function RulesTable({
             <span className="text-tertiary text-xs">—</span>
           )}
         </TableCell>
-        <TableCell className="text-muted-foreground hidden max-w-56 text-xs whitespace-normal lg:table-cell">
-          {i.overrides.length
-            ? format(t.scopeOverrides, {
-                environments: i.overrides.map((e) => environmentNames[e] ?? e).join(', '),
-              })
-            : t.scopeAll}
+        <TableCell className="hidden lg:table-cell">
+          {overrides.length ? (
+            <Hint
+              label={format(t.scopeOverrides, { environments: overrides.join(', ') })}
+              side="top"
+            >
+              <span className="border-brand/30 bg-brand-subtle text-link inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs">
+                <MapPin aria-hidden="true" className="size-3" />
+                {overrides.length === 1
+                  ? t.environmentsOne
+                  : format(t.environmentsMany, { n: String(overrides.length) })}
+                <span className="sr-only">
+                  {format(t.scopeOverrides, { environments: overrides.join(', ') })}
+                </span>
+              </span>
+            </Hint>
+          ) : (
+            <span className="text-muted-foreground inline-flex items-center gap-1.5 text-xs">
+              <Globe aria-hidden="true" className="text-tertiary size-3.5" />
+              {t.scopeAll}
+            </span>
+          )}
         </TableCell>
-        <TableCell className="pr-4 text-right">
+        <TableCell className="pr-3 text-right">
           <Hint label={`${t.edit} · ${name}`} side="left">
             <Link
               href={href}
-              className={cn(buttonVariants({ variant: 'ghost', size: 'icon-sm' }), 'hit-area')}
+              className={cn(
+                buttonVariants({ variant: 'ghost', size: 'icon-sm' }),
+                'hit-area text-tertiary group-hover/row:text-foreground group-hover/row:bg-hover',
+              )}
               aria-label={`${t.edit} · ${name}`}
               onClick={(e) => e.stopPropagation()}
             >
-              <Pencil />
+              <Pencil className="transition-opacity" />
             </Link>
           </Hint>
         </TableCell>
@@ -251,11 +314,13 @@ export function RulesTable({
                   key={g.id || 'other'}
                   value={g.id}
                   data-zone={g.id}
-                  className="flex-none"
+                  className="group/tab data-active:[&_svg]:text-brand flex-none"
                 >
                   <Icon aria-hidden="true" />
                   {g.name}
-                  <span className="text-tertiary font-normal tabular-nums">{g.items.length}</span>
+                  <span className="bg-muted text-muted-foreground group-data-active/tab:bg-brand-subtle group-data-active/tab:text-link text-2xs rounded-full px-1.5 font-medium tabular-nums">
+                    {g.items.length}
+                  </span>
                 </TabsTrigger>
               );
             })}
@@ -263,10 +328,10 @@ export function RulesTable({
         </Tabs>
       ) : null}
 
-      <div className="overflow-hidden rounded-xl border">
+      <div className="bg-card overflow-hidden rounded-xl border shadow-xs">
         <Table data-testid="rules-thresholds">
-          <TableHeader>
-            <TableRow>
+          <TableHeader className="bg-surface/60">
+            <TableRow className="[&>th]:text-2xs [&>th]:h-9 [&>th]:tracking-wider [&>th]:uppercase">
               <TableHead className="pl-4">{t.indicator}</TableHead>
               <TableHead>{t.colInput}</TableHead>
               <TableHead>{t.colRidge}</TableHead>
@@ -281,14 +346,31 @@ export function RulesTable({
           <TableBody>
             {active?.items.map(row)}
             {shown.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="text-muted-foreground h-16 text-center">
-                  {t.noMatches}
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={7} className="h-28 text-center">
+                  <div className="text-muted-foreground flex flex-col items-center gap-2">
+                    <SearchX aria-hidden="true" className="text-tertiary size-5" />
+                    {t.noMatches}
+                  </div>
                 </TableCell>
               </TableRow>
             ) : null}
           </TableBody>
         </Table>
+        {active ? (
+          <div className="bg-surface/40 text-tertiary flex items-center justify-between gap-3 border-t px-4 py-2 text-xs">
+            <span className="tabular-nums">
+              {format(t.tableFooter, {
+                shown: String(active.items.length),
+                total: String(indicators.length),
+              })}
+            </span>
+            <span className="hidden items-center gap-1.5 sm:inline-flex">
+              <MousePointerClick aria-hidden="true" className="size-3.5" />
+              {t.tableFooterHint}
+            </span>
+          </div>
+        ) : null}
       </div>
     </section>
   );

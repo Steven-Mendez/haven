@@ -16,7 +16,8 @@ import type { Language } from '@/lib/i18n';
 const GO: Record<string, string> = {
   c: '/',
   r: '/rules',
-  t: '/trends',
+  k: '/kpi',
+  t: '/kpi',
   e: '/eva',
   a: '/reentry',
   m: '/missions',
@@ -62,7 +63,7 @@ export function KeyboardShortcuts({ lang }: { lang: Language }) {
     { keys: [['↵']], label: t.shortcutOpen },
     { keys: [['g', 'c']], label: t.shortcutGoCrew },
     { keys: [['g', 'r']], label: t.shortcutGoRules },
-    { keys: [['g', 't']], label: t.shortcutGoTrends },
+    { keys: [['g', 'k']], label: t.shortcutGoKpi },
     { keys: [['g', 'e']], label: t.shortcutGoEva },
     { keys: [['g', 'a']], label: t.shortcutGoReentry },
     { keys: [['g', 'm']], label: t.shortcutGoMissions },
