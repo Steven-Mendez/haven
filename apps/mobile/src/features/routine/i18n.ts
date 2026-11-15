@@ -77,6 +77,7 @@ export const texts = defineTexts({
     stMotionDue: 'Anota el mareo de hoy',
     stMotionWindow: 'Día {day} de {of} de adaptación',
     stMotionBalance: 'Prueba de equilibrio',
+    stMotionAnytime: 'Si te mareas: movimientos de cabeza',
     reentryTitle: 'Preparación de reentrada',
     reentryDetail:
       'Líquidos con sal, prenda de compresión y prueba ortostática · {done} de {total}',
@@ -229,6 +230,7 @@ export const texts = defineTexts({
     stMotionDue: 'Log today’s sickness',
     stMotionWindow: 'Day {day} of {of} adapting',
     stMotionBalance: 'Balance test',
+    stMotionAnytime: 'If you feel sick: head movements',
     reentryTitle: 'Reentry preparation',
     reentryDetail: 'Fluids with salt, compression garment and orthostatic test · {done} of {total}',
     reentryReady: 'All set for reentry.',
