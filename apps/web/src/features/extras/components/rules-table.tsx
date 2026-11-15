@@ -30,6 +30,7 @@ import { RulesEditor } from './rules-editor';
 type Props = {
   lang: Language;
   indicators: EditableIndicator[];
+  zones: { id: string; name: string }[];
   currentVersion: string;
   environmentNames: Record<string, string>;
   defaultAuthor: string;
@@ -42,6 +43,7 @@ const range = (r: [number, number], unit: string) => `${r[0]}–${r[1]}${unit ? 
 export function RulesTable({
   lang,
   indicators,
+  zones,
   currentVersion,
   environmentNames,
   defaultAuthor,
@@ -55,6 +57,11 @@ export function RulesTable({
   const shown = q
     ? indicators.filter((i) => translate(i.name, lang).toLowerCase().includes(q))
     : indicators;
+  const known = new Set(zones.map((z) => z.id));
+  const groups = [
+    ...zones.map((z) => ({ ...z, items: shown.filter((i) => i.zone === z.id) })),
+    { id: '', name: t.otherCategory, items: shown.filter((i) => !known.has(i.zone)) },
+  ].filter((g) => g.items.length > 0);
   const current = indicators.find((i) => i.id === open);
   const scaleTexts = {
     below: t.scaleBelow,
@@ -66,6 +73,65 @@ export function RulesTable({
       amber: levelLabel('amber', lang),
       red: levelLabel('red', lang),
     },
+  };
+
+  const row = (i: EditableIndicator) => {
+    const name = translate(i.name, lang);
+    return (
+      <TableRow
+        key={i.id}
+        className="cursor-pointer"
+        onClick={() => setOpen(i.id)}
+        data-indicator={i.id}
+      >
+        <TableCell className="pl-4 font-medium whitespace-normal">
+          <TermTip explanation={explanations?.[i.id]}>{name}</TermTip>
+        </TableCell>
+        <TableCell className="text-muted-foreground tabular-nums">
+          {range(i.green, i.unit)}
+        </TableCell>
+        <TableCell className="py-2.5">
+          {i.rules.length ? (
+            <RangeScale
+              indicator={i}
+              texts={scaleTexts}
+              label={i.rules
+                .map(
+                  (r) =>
+                    `${levelLabel(r.level, lang)}: ${format(t.outsideRange, { range: range(r.outside, i.unit) })}${r.withSymptoms ? ` (${t.withSymptoms})` : ''}`,
+                )
+                .join('; ')}
+            />
+          ) : (
+            <span className="text-tertiary text-xs">—</span>
+          )}
+        </TableCell>
+        <TableCell className="text-muted-foreground hidden max-w-56 text-xs whitespace-normal lg:table-cell">
+          {i.overrides.length
+            ? format(t.scopeOverrides, {
+                environments: i.overrides.map((e) => environmentNames[e] ?? e).join(', '),
+              })
+            : t.scopeAll}
+        </TableCell>
+        <TableCell className="pr-4 text-right">
+          <Hint label={`${t.edit} · ${name}`} side="left">
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-sm"
+              className="hit-area"
+              aria-label={`${t.edit} · ${name}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpen(i.id);
+              }}
+            >
+              <Pencil />
+            </Button>
+          </Hint>
+        </TableCell>
+      </TableRow>
+    );
   };
 
   return (
@@ -135,64 +201,22 @@ export function RulesTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {shown.map((i) => {
-              const name = translate(i.name, lang);
-              return (
-                <TableRow
-                  key={i.id}
-                  className="cursor-pointer"
-                  onClick={() => setOpen(i.id)}
-                  data-indicator={i.id}
+            {groups.flatMap((group) => [
+              <TableRow key={`zone-${group.id}`} className="bg-muted/40 hover:bg-muted/40">
+                <TableHead
+                  scope="colgroup"
+                  colSpan={5}
+                  className="text-foreground h-8 pl-4 text-xs font-semibold"
+                  data-zone={group.id}
                 >
-                  <TableCell className="pl-4 font-medium whitespace-normal">
-                    <TermTip explanation={explanations?.[i.id]}>{name}</TermTip>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground tabular-nums">
-                    {range(i.green, i.unit)}
-                  </TableCell>
-                  <TableCell className="py-2.5">
-                    {i.rules.length ? (
-                      <RangeScale
-                        indicator={i}
-                        texts={scaleTexts}
-                        label={i.rules
-                          .map(
-                            (r) =>
-                              `${levelLabel(r.level, lang)}: ${format(t.outsideRange, { range: range(r.outside, i.unit) })}${r.withSymptoms ? ` (${t.withSymptoms})` : ''}`,
-                          )
-                          .join('; ')}
-                      />
-                    ) : (
-                      <span className="text-tertiary text-xs">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-muted-foreground hidden max-w-56 text-xs whitespace-normal lg:table-cell">
-                    {i.overrides.length
-                      ? format(t.scopeOverrides, {
-                          environments: i.overrides.map((e) => environmentNames[e] ?? e).join(', '),
-                        })
-                      : t.scopeAll}
-                  </TableCell>
-                  <TableCell className="pr-4 text-right">
-                    <Hint label={`${t.edit} · ${name}`} side="left">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon-sm"
-                        className="hit-area"
-                        aria-label={`${t.edit} · ${name}`}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setOpen(i.id);
-                        }}
-                      >
-                        <Pencil />
-                      </Button>
-                    </Hint>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+                  {group.name}
+                  <span className="text-tertiary ml-2 font-normal tabular-nums">
+                    {group.items.length}
+                  </span>
+                </TableHead>
+              </TableRow>,
+              ...group.items.map(row),
+            ])}
             {shown.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="text-muted-foreground h-16 text-center">

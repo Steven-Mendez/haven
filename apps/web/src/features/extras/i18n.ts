@@ -65,6 +65,7 @@ export const texts = defineTexts({
     close: 'Cerrar',
     filterIndicators: 'Filtrar indicadores…',
     noMatches: 'Ningún indicador coincide.',
+    otherCategory: 'Otras',
     editorTitle: 'Editar umbrales',
     editorDescription:
       'Parte de la configuración actual ({version}). Cambia el rango normal y los rangos de cada regla.',
@@ -379,6 +380,7 @@ export const texts = defineTexts({
     close: 'Close',
     filterIndicators: 'Filter indicators…',
     noMatches: 'No indicator matches.',
+    otherCategory: 'Other',
     editorTitle: 'Edit thresholds',
     editorDescription:
       'Starts from the current configuration ({version}). Change the normal range and each rule’s range.',

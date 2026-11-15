@@ -1,4 +1,4 @@
-import { loadConfig, unitLabel } from '@haven/core';
+import { isTracked, loadConfig, unitLabel } from '@haven/core';
 import { ChevronRight } from 'lucide-react';
 import { havenTexts, TimeAgo } from '@/components/haven';
 import { explain } from '@/components/haven/term';
@@ -95,10 +95,10 @@ export async function RulesPanel({
     <div className="flex min-w-0 flex-col gap-6">
       <RulesTable
         lang={lang}
-        indicators={editableIndicators(config).map((i) => ({
-          ...i,
-          unit: unitLabel(i.unit, lang),
-        }))}
+        indicators={editableIndicators(config)
+          .filter((i) => isTracked(i.id))
+          .map((i) => ({ ...i, unit: unitLabel(i.unit, lang) }))}
+        zones={loadConfig().zones.map((z) => ({ id: z.id, name: translate(z.name, lang) }))}
         currentVersion={fromVersion?.version ?? config.version}
         environmentNames={environmentNames}
         defaultAuthor={havenTexts[lang].operatorName}

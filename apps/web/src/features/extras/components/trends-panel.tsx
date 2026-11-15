@@ -3,7 +3,6 @@ import { ChartLine, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { type ChartMarker, EmptyState, Section, SeriesChart, Sparkline } from '@/components/haven';
 import { explain } from '@/components/haven/term';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { format, formatNumber, type Language, translate } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import type { ExtrasTexts } from '../i18n';
@@ -28,7 +27,6 @@ export const TREND_OPTIONS = [
   'radiation-dose',
   'cabin-pressure',
 ];
-const VISIBLE_ROWS = 5;
 const DAY_MS = 86_400_000;
 
 type Point = { date: string; mean: number };
@@ -61,6 +59,7 @@ export async function TrendsPanel({
     name: translate(byId.get(id)?.name, lang),
     unitId: byId.get(id)?.unit ?? '',
     unit: unitLabel(byId.get(id)?.unit ?? '', lang),
+    zone: byId.get(id)?.zone ?? '',
     points: aggregates.indicators[id] ?? null,
   }));
 
@@ -173,22 +172,20 @@ export async function TrendsPanel({
         className="divide-border-subtle divide-y overflow-hidden rounded-xl border"
         aria-label={t.chooseIndicators}
       >
-        {series.slice(0, VISIBLE_ROWS).map(row)}
-        {series.length > VISIBLE_ROWS ? (
-          <li>
-            <Collapsible defaultOpen={series.slice(VISIBLE_ROWS).some((s) => s.id === selected.id)}>
-              <CollapsibleContent>
-                <ul className="divide-border-subtle divide-y border-b">
-                  {series.slice(VISIBLE_ROWS).map(row)}
-                </ul>
-              </CollapsibleContent>
-              <CollapsibleTrigger className="text-muted-foreground hover:text-foreground flex min-h-9 w-full items-center gap-1 px-4 text-sm">
-                {format(t.seeAll, { n: series.length })}
-                <ChevronRight aria-hidden="true" className="size-4" />
-              </CollapsibleTrigger>
-            </Collapsible>
-          </li>
-        ) : null}
+        {config.zones
+          .map((z) => ({ zone: z, items: series.filter((s) => s.zone === z.id) }))
+          .filter((g) => g.items.length > 0)
+          .map((g) => (
+            <li key={g.zone.id} data-zone={g.zone.id}>
+              <h3 className="bg-muted/40 text-foreground flex min-h-8 items-center px-4 text-xs font-semibold">
+                {translate(g.zone.name, lang)}
+                <span className="text-tertiary ml-2 font-normal tabular-nums">
+                  {g.items.length}
+                </span>
+              </h3>
+              <ul className="divide-border-subtle divide-y border-t">{g.items.map(row)}</ul>
+            </li>
+          ))}
       </ul>
     </Section>
   );
