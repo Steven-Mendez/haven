@@ -18,10 +18,17 @@ import {
   listRules,
   mergeMission,
   saveRules,
+  saveSampleResult,
   startMission,
   updateMission,
 } from './server';
-import type { JoinFormState, MissionField, MissionFormState, RulesFormState } from './types';
+import type {
+  JoinFormState,
+  MissionField,
+  MissionFormState,
+  RulesFormState,
+  SampleResultFormState,
+} from './types';
 
 const text = (v: FormDataEntryValue | null, max = 280) =>
   typeof v === 'string' ? v.trim().slice(0, max) : '';
@@ -209,4 +216,22 @@ export async function exportRulesConfig(versionId: string): Promise<string | nul
   const { versions } = await listRules(mission);
   const version = versions.find((v) => v.id === versionId);
   return version ? `${JSON.stringify(version.config, null, 2)}\n` : null;
+}
+
+export async function sendSampleResult(
+  _previous: SampleResultFormState,
+  form: FormData,
+): Promise<SampleResultFormState> {
+  const mission = await getMissionCode();
+  const id = text(form.get('id'), 200);
+  if (!mission || !id) return { status: 'error', id };
+  const result = await saveSampleResult(mission, {
+    id,
+    result: text(form.get('result'), 10),
+    detail: text(form.get('detail'), 280),
+    author: havenTexts.es.operatorName,
+  });
+  if (!result.ok) return { status: 'error', id };
+  refresh();
+  return { status: 'ok', id, at: Date.now() };
 }

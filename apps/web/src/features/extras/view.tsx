@@ -7,6 +7,7 @@ import { getMissionCode } from '@/lib/mission';
 import type { StoredMission } from '@/server/types';
 import { EvaPanel } from './components/eva-panel';
 import { RulesPanel } from './components/rules-panel';
+import { SamplesPanel } from './components/samples-panel';
 import { TrendsPanel } from './components/trends-panel';
 import { texts } from './i18n';
 import { getMission } from './server';
@@ -30,6 +31,7 @@ const TITLES = {
   rules: { title: 'tabRules', subtitle: 'rulesSubtitle' },
   trends: { title: 'tabTrends', subtitle: 'trendsSubtitle' },
   eva: { title: 'tabEva', subtitle: 'evaSubtitle' },
+  samples: { title: 'tabSamples', subtitle: 'samplesSubtitle' },
 } as const;
 
 async function ExtrasContent({
@@ -90,6 +92,7 @@ async function ExtrasContent({
         />
       ) : null}
       {section === 'eva' ? <EvaPanel mission={code} lang={lang} t={t} /> : null}
+      {section === 'samples' ? <SamplesPanel mission={code} lang={lang} t={t} /> : null}
     </>
   );
 }
@@ -114,6 +117,10 @@ export const TrendsView = ({ searchParams }: PageProps) => (
 );
 export const EvaView = ({ searchParams }: PageProps) => (
   <ExtrasPage section="eva" searchParams={searchParams} />
+);
+
+export const SamplesView = ({ searchParams }: PageProps) => (
+  <ExtrasPage section="samples" searchParams={searchParams} />
 );
 
 export function extrasRedirect(tab: unknown): `/${ExtrasTab}` {

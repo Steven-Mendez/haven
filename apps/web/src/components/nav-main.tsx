@@ -1,6 +1,6 @@
 'use client';
 
-import { Activity, Footprints, Rocket, SlidersHorizontal, Users } from 'lucide-react';
+import { Activity, Footprints, Rocket, SlidersHorizontal, TestTube, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
@@ -66,6 +66,7 @@ export function NavMain({ lang, crew }: Props) {
     },
     { href: '/trends', label: t.navTrendsShort, icon: Activity, active: pathname === '/trends' },
     { href: '/eva', label: t.navEvaShort, icon: Footprints, active: pathname === '/eva' },
+    { href: '/samples', label: t.navSamplesShort, icon: TestTube, active: pathname === '/samples' },
     {
       href: '/missions',
       label: t.navMissions,

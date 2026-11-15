@@ -12,6 +12,7 @@ import {
   Search,
   Settings,
   SlidersHorizontal,
+  TestTube,
   Users,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -147,6 +148,7 @@ export function CommandMenu({ lang, crew }: Props) {
     { href: '/rules', label: t.navRules, icon: SlidersHorizontal },
     { href: '/trends', label: t.navTrends, icon: Activity },
     { href: '/eva', label: t.navEva, icon: Footprints },
+    { href: '/samples', label: t.navSamples, icon: TestTube },
     { href: '/missions', label: t.navMissions, icon: Rocket },
     { href: '/settings', label: t.navSettings, icon: Settings },
   ];
