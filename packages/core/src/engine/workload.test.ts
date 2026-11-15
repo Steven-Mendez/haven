@@ -9,6 +9,7 @@ import {
   type WorkDay,
   workDays,
   workHoursReading,
+  workloadReminder,
   workloadStatus,
 } from './workload';
 
@@ -123,5 +124,19 @@ describe('parseWorkHours', () => {
     expect(parseWorkHours('9.3')).toBeUndefined();
     expect(parseWorkHours('25')).toBeUndefined();
     expect(parseWorkHours('')).toBeUndefined();
+  });
+});
+
+describe('workload reminder', () => {
+  it('asks for the log after the workday and rest when the status is red', () => {
+    const morning = new Date('2026-03-10T09:00:00Z');
+    expect(workloadReminder([], workload, morning)).toBeUndefined();
+    expect(workloadReminder([], workload, NOW)).toBe('log');
+    expect(
+      workloadReminder([workHoursReading(8, opts('2026-03-10T19:00:00Z'))], workload, NOW),
+    ).toBeUndefined();
+    expect(
+      workloadReminder([fatigueReading(7, opts('2026-03-10T08:00:00Z'))], workload, morning),
+    ).toBe('rest');
   });
 });

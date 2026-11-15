@@ -131,6 +131,25 @@ export function workloadStatus(days: WorkDay[], cfg: WorkloadConfig): WorkloadSt
   };
 }
 
+/** Hour (UTC) from which the day's hours can be logged. */
+export const WORKDAY_END_HOUR = 15;
+
+/**
+ * What Routine reminds about workload: rest when the status is red; otherwise,
+ * at the end of the workday, logging today's hours and fatigue.
+ */
+export function workloadReminder(
+  readings: Reading[],
+  cfg: WorkloadConfig,
+  now: Date,
+): 'rest' | 'log' | undefined {
+  const days = workDays(readings, now);
+  if (workloadStatus(days, cfg).level === 'red') return 'rest';
+  const today = days.at(-1);
+  if (now.getUTCHours() >= WORKDAY_END_HOUR && today?.hours === null) return 'log';
+  return undefined;
+}
+
 /** Hours of a log: 0–24 in half hours. */
 export function parseWorkHours(text: string): number | undefined {
   const trimmed = text.trim().replace(',', '.');
