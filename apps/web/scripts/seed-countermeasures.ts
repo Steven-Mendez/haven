@@ -2,7 +2,8 @@
 // prebreathe with the post-EVA decompression check (DEMOEV), and the medication
 // plan with biological and habitat samples (DEMOMS).
 //
-//   pnpm --filter web seed:countermeasures
+//   pnpm --filter web seed:countermeasures            # the three missions
+//   pnpm --filter web seed:countermeasures DEMOMS     # only the ones named
 //
 // Each mission has crew members in every state plus an empty "Revisor" seat to
 // join from the app on the simulator and go through the flows by hand.
@@ -10,6 +11,7 @@ import { fileURLToPath } from 'node:url';
 import {
   type Assessment,
   type CrewPlan,
+  classifySample,
   computeBaseline,
   dailyProgress,
   doseReading,
@@ -28,6 +30,7 @@ import {
   type Reading,
   reentryCheckReading,
   type SampleResult,
+  sampleConfig,
   sampleReading,
 } from '@haven/core';
 import { demoHistory } from '@haven/core/testdata';
@@ -136,18 +139,28 @@ function doseHistory(
   return out;
 }
 
-/** A sample collection and, when given, the lab result Earth already entered. */
+/** A sample collection and, when values are given, the lab result Earth already entered. */
 function sample(
   member: string,
   at: number,
   id: string,
-  extra?: { module?: string; result?: SampleResult['result']; detail?: string },
+  extra?: {
+    module?: string;
+    answers?: Record<string, string>;
+    comment?: string;
+    values?: Record<string, number>;
+    detail?: string;
+  },
 ): Reading {
   const r = sampleReading(id, {
     ...opts(member, at),
     ...(extra?.module ? { module: extra.module } : {}),
+    ...(extra?.answers ? { answers: extra.answers } : {}),
+    ...(extra?.comment ? { comment: extra.comment } : {}),
   });
-  if (extra?.result) {
+  const type = sampleConfig.samples.find((s) => s.id === id);
+  const level = type && extra?.values ? classifySample(type, extra.values).level : undefined;
+  if (level && extra?.values) {
     results.push({
       id: r.id,
       mission: 'DEMOMS',
@@ -155,7 +168,9 @@ function sample(
       sample: id,
       collectedAt: r.takenAt,
       ...(extra.module ? { module: extra.module } : {}),
-      result: extra.result,
+      result: level,
+      values: extra.values,
+      computed: level,
       ...(extra.detail ? { detail: extra.detail } : {}),
       enteredAt: iso(at + 6 * HOUR),
       author: 'Control de misión',
@@ -163,6 +178,17 @@ function sample(
   }
   return r;
 }
+
+const symptom = (member: string, at: number, value: string): Reading => ({
+  id: newId(),
+  indicator: 'symptom',
+  value,
+  unit: '',
+  takenAt: iso(at),
+  source: 'manual',
+  simulated: false,
+  crewMember: member,
+});
 
 const BONE_PLAN: MedicationAssignment[] = [
   { medication: 'vitamin-d' },
@@ -294,10 +320,26 @@ const DEMOS: Demo[] = [
         plan: BONE_PLAN,
         extra: (m, at) => [
           ...doseHistory(m, BONE_PLAN, at),
-          sample(m, at - 2 * DAY, 'saliva', { result: 'normal' }),
-          sample(m, at - 5 * DAY + HOUR, 'blood', { result: 'normal' }),
-          sample(m, at - 5 * DAY + 2 * HOUR, 'urine'),
-          sample(m, at - 4 * DAY, 'surface-swab', { module: 'lab', result: 'normal' }),
+          sample(m, at - 9 * DAY, 'saliva', {
+            answers: { ate: 'no' },
+            values: { ebv: 250, vzv: 0, hsv1: 0 },
+          }),
+          sample(m, at - 2 * DAY, 'saliva', {
+            answers: { ate: 'no' },
+            values: { ebv: 310, vzv: 0, hsv1: 0 },
+          }),
+          sample(m, at - 5 * DAY + HOUR, 'blood', {
+            answers: { fasting: 'yes', storage: 'frozen' },
+            values: { wbc: 6.2, lymphocytes: 1.9, glucose: 88 },
+          }),
+          sample(m, at - 5 * DAY + 2 * HOUR, 'urine', {
+            answers: { 'first-morning': 'yes', storage: 'frozen' },
+          }),
+          sample(m, at - 4 * DAY, 'surface-swab', {
+            module: 'lab',
+            answers: { surface: 'panels' },
+            values: { bacteria: 1200, fungi: 10 },
+          }),
         ],
       },
       {
@@ -317,9 +359,19 @@ const DEMOS: Demo[] = [
           ...doseHistory(m, [...BONE_PLAN, { medication: 'antibiotic' }], at, (n) =>
             n % 3 === 0 ? 'taken' : n % 3 === 1 ? 'missed' : 'skipped',
           ),
+          sample(m, at - 16 * DAY, 'saliva', {
+            answers: { ate: 'no' },
+            values: { ebv: 400, vzv: 0, hsv1: 5 },
+          }),
+          sample(m, at - 9 * DAY, 'saliva', {
+            answers: { ate: 'yes' },
+            values: { ebv: 1800, vzv: 0, hsv1: 900 },
+            detail: 'Herpes simple detectable; repetir en la próxima toma.',
+          }),
+          symptom(m, at - 2 * DAY - 3 * HOUR, 'fever-chills'),
           sample(m, at - 2 * DAY, 'saliva', {
-            result: 'abnormal',
-            detail: 'Virus del herpes simple detectable en saliva.',
+            answers: { ate: 'no' },
+            comment: 'Tengo una calentura en el labio desde ayer.',
           }),
         ],
       },
@@ -332,8 +384,12 @@ const DEMOS: Demo[] = [
         extra: (m, at) => [
           doseReading('motion-sickness', { status: 'taken' }, opts(m, at - 5 * HOUR)),
           doseReading('motion-sickness', { status: 'taken' }, opts(m, at - HOUR)),
-          sample(m, at - 2 * DAY, 'saliva'),
-          sample(m, at - 3 * HOUR, 'surface-swab', { module: 'galley' }),
+          sample(m, at - 2 * DAY, 'saliva', { answers: { ate: 'yes' } }),
+          sample(m, at - 3 * HOUR, 'surface-swab', {
+            module: 'galley',
+            answers: { surface: 'handles' },
+            comment: 'Mancha oscura detrás del panel del horno.',
+          }),
         ],
       },
       {
@@ -404,7 +460,8 @@ try {
     for (const i of indexes)
       await db.collection(name).createIndex(i.key, i.unique ? { unique: true } : {});
   }
-  for (const demo of DEMOS) {
+  const only = process.argv.slice(2).map((c) => c.toUpperCase());
+  for (const demo of DEMOS.filter((d) => only.length === 0 || only.includes(d.code))) {
     const phases = phasesOf(demo.template);
     const day =
       demo.today === 'station'
