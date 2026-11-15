@@ -1,27 +1,29 @@
 'use client';
 
-import { useActionState, useEffect } from 'react';
+import { useTransition } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import type { Language } from '@/lib/i18n';
 import { sendSampleResult } from '../actions';
 import { texts } from '../i18n';
-import type { SampleResultFormState } from '../types';
-
-const INITIAL: SampleResultFormState = { status: 'idle' };
 
 export function SampleResultForm({ id, lang }: { id: string; lang: Language }) {
   const t = texts[lang];
-  const [state, action, pending] = useActionState(sendSampleResult, INITIAL);
-  useEffect(() => {
-    if (state.status === 'ok') toast.success(t.resultSaved);
-    if (state.status === 'error') toast.error(t.resultError);
-  }, [state, t]);
+  const [pending, startTransition] = useTransition();
+
+  // The saved sample leaves the pending list and this form unmounts, so the
+  // toast is shown from the action's result rather than from component state.
+  const submit = (form: FormData) =>
+    startTransition(async () => {
+      const result = await sendSampleResult({ status: 'idle' }, form);
+      if (result.status === 'ok') toast.success(t.resultSaved);
+      else toast.error(t.resultError);
+    });
 
   return (
     <form
-      action={action}
+      action={submit}
       className="flex flex-wrap items-center gap-2"
       data-testid={`result-${id}`}
     >
