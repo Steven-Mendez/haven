@@ -24,6 +24,22 @@ import { nextPhase, parsePulse, recentWatchPulse, type TestPhase } from '../logi
 
 const O = reentry.orthostatic;
 
+/** The countdown lives apart so its ticks do not re-render the pulse field while typing. */
+function PulseTimer({ seconds }: { seconds: number }) {
+  const t = useTexts(texts);
+  const { remaining, done } = useCountdown(seconds, true);
+  return (
+    <View className="items-center gap-2">
+      <StepTimer total={seconds} remaining={remaining} size={180} />
+      {!done ? (
+        <Text className="text-tertiary text-caption">
+          {`${t.waitHint} ${formatClock(remaining)}`}
+        </Text>
+      ) : null}
+    </View>
+  );
+}
+
 function PulseStep({
   title,
   body,
@@ -36,10 +52,12 @@ function PulseStep({
   onNext: (pulse: number, fromWatch: boolean) => void;
 }) {
   const t = useTexts(texts);
-  const { remaining, done } = useCountdown(seconds, true);
   const heartRates = useReadings('heart-rate');
   const watchPulse = recentWatchPulse(heartRates, new Date());
   const [text, setText] = useState('');
+  // The field is uncontrolled: React never writes over what is being typed.
+  // Filling it from the watch remounts it with the new value.
+  const [filled, setFilled] = useState<{ value: string; key: number }>({ value: '', key: 0 });
   const [fromWatch, setFromWatch] = useState(false);
   const pulse = parsePulse(text);
   return (
@@ -50,13 +68,15 @@ function PulseStep({
         </Text>
         <Text className="text-muted-foreground text-body">{body}</Text>
       </View>
-      <StepTimer total={seconds} remaining={remaining} size={180} className="self-center" />
+      <PulseTimer seconds={seconds} />
       <View className="gap-2">
         <Label nativeID="pulse-label">{t.pulse}</Label>
         <Input
+          key={filled.key}
           aria-labelledby="pulse-label"
           keyboardType="number-pad"
-          value={text}
+          maxLength={5}
+          defaultValue={filled.value}
           onChangeText={(v) => {
             setText(v);
             setFromWatch(false);
@@ -71,15 +91,12 @@ function PulseStep({
             variant="ghost"
             label={format(t.useWatch, { n: watchPulse })}
             onPress={() => {
-              setText(String(watchPulse));
+              const value = String(watchPulse);
+              setFilled((f) => ({ value, key: f.key + 1 }));
+              setText(value);
               setFromWatch(true);
             }}
           />
-        ) : null}
-        {!done ? (
-          <Text className="text-tertiary text-caption">
-            {`${t.waitHint} ${formatClock(remaining)}`}
-          </Text>
         ) : null}
       </View>
       <BigButton
