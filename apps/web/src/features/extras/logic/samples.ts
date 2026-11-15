@@ -1,7 +1,9 @@
 import {
-  type awaitingResults,
+  type Collection,
+  type ContextReading,
   type Level,
   type Reading,
+  type SampleLevel,
   type SampleResult,
   type SampleState,
   type SampleStatus,
@@ -19,7 +21,25 @@ export type SampleRow = {
   results: Record<string, SampleResult | undefined>;
 };
 
-export type PendingSample = ReturnType<typeof awaitingResults>[number] & { name: string };
+/** A collection waiting for its lab result, with what Earth needs to judge it. */
+export type PendingSample = Collection & {
+  name: string;
+  /** Mission day the sample was collected on. */
+  day: number;
+  age: { days: number; stale: boolean };
+  context: { readings: ContextReading[]; symptoms: string[] };
+  history: SampleResult[];
+};
+
+export const RESULT_LEVEL: Record<SampleLevel, Level> = {
+  normal: 'green',
+  abnormal: 'amber',
+  critical: 'red',
+};
+
+export function missionDayOf(start: string, at: string): number {
+  return Math.max(1, Math.floor((Date.parse(at) - Date.parse(start)) / 86_400_000) + 1);
+}
 
 export const STATUS_LEVEL: Record<SampleStatus, Level> = {
   collected: 'green',

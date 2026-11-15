@@ -189,6 +189,30 @@ export type SampleType = {
   modules?: { id: string; name: I18n }[];
   /** What an abnormal lab result means. */
   abnormal: I18n;
+  /** Questions the app asks when the sample is collected. */
+  questions: SampleQuestion[];
+  /** Indicators worth seeing next to the result, read around the collection time. */
+  context: string[];
+  /** Days after collection beyond which the sample may no longer be reliable. */
+  maxAgeDays: number;
+  /** Lab values Earth enters; each one is classified against its ranges. */
+  analytes: SampleAnalyte[];
+};
+
+export type SampleQuestion = {
+  id: string;
+  label: I18n;
+  options: { id: string; label: I18n }[];
+};
+
+export type SampleAnalyte = {
+  id: string;
+  name: I18n;
+  unit: string;
+  /** Reference range: outside it the value is abnormal. */
+  green: [number, number];
+  /** Outside this wider range the value is critical. */
+  red: [number, number];
 };
 
 export type SampleConfig = {

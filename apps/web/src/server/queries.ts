@@ -1,6 +1,7 @@
 import 'server-only';
 import {
   type CrewPlan,
+  classifySample,
   cleanAssignments,
   crewAggregates,
   emptyPlan,
@@ -8,7 +9,9 @@ import {
   type MissionPhase,
   medications as medicationConfig,
   missionDays,
+  parseCollection,
   type Reading,
+  type SampleLevel,
   type SampleResult,
   collections as sampleCollections,
   sampleConfig,
@@ -641,14 +644,24 @@ export async function listSampleResults(mission: string): Promise<SampleResult[]
   return (await sampleResults()).find({ mission }, NO_ID).sort({ collectedAt: 1 }).toArray();
 }
 
+export type SampleResultInput = {
+  id: string;
+  /** Lab values by analyte id; unknown analytes are dropped. */
+  values?: Record<string, number>;
+  /** Earth's level when it overrides the one computed from the values. */
+  override?: string;
+  detail?: string;
+  author?: string;
+};
+
+const LEVELS: SampleLevel[] = ['normal', 'abnormal', 'critical'];
+
 /** Stores Earth's lab result for one collection reading that already arrived. */
 export async function saveSampleResult(
   mission: string,
-  input: { id: string; result: string; detail?: string; author?: string },
+  input: SampleResultInput,
   now = new Date(),
 ): Promise<Result<SampleResult>> {
-  if (input.result !== 'normal' && input.result !== 'abnormal')
-    return fail(400, "result: 'normal' | 'abnormal'");
   const doc = await (await packets()).findOne(
     { mission, 'readings.id': input.id },
     { projection: { _id: 0, readings: 1 } },
@@ -657,19 +670,33 @@ export async function saveSampleResult(
   if (!reading) return fail(404, `Sample ${input.id} has not arrived`);
   const sample = sampleConfig.samples.find((s) => s.id === reading.value);
   if (!sample) return fail(400, `Unknown sample ${String(reading.value)}`);
-  const module = /(?:^|;)module=([^;]+)/.exec(reading.note ?? '')?.[1];
-  const result: SampleResult = {
+  const values = Object.fromEntries(
+    sample.analytes
+      .map((a) => [a.id, input.values?.[a.id]] as const)
+      .filter(
+        (e): e is readonly [string, number] => typeof e[1] === 'number' && Number.isFinite(e[1]),
+      ),
+  );
+  const { level: computed } = classifySample(sample, values);
+  const override = LEVELS.find((l) => l === input.override);
+  const result = override ?? computed;
+  if (!result) return fail(400, 'Enter at least one value or choose a result');
+  const { module } = parseCollection(reading);
+  const doc2: SampleResult = {
     id: reading.id,
     mission,
     crewMember: reading.crewMember,
     sample: sample.id,
     collectedAt: reading.takenAt,
     ...(module ? { module } : {}),
-    result: input.result,
+    result,
+    ...(Object.keys(values).length ? { values } : {}),
+    ...(computed ? { computed } : {}),
+    ...(override && override !== computed ? { overridden: true } : {}),
     ...(input.detail?.trim() ? { detail: input.detail.trim().slice(0, 280) } : {}),
     enteredAt: now.toISOString(),
     ...(input.author ? { author: input.author.slice(0, 80) } : {}),
   };
-  await (await sampleResults()).updateOne({ id: result.id }, { $set: result }, { upsert: true });
-  return { ok: true, status: 200, data: result };
+  await (await sampleResults()).replaceOne({ id: doc2.id }, doc2, { upsert: true });
+  return { ok: true, status: 200, data: doc2 };
 }

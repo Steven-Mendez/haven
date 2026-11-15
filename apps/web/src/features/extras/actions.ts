@@ -259,9 +259,16 @@ export async function sendSampleResult(
   const mission = await getMissionCode();
   const id = text(form.get('id'), 200);
   if (!mission || !id) return { status: 'error', id };
+  const values: Record<string, number> = {};
+  for (const [key, raw] of form.entries()) {
+    if (!key.startsWith('value-') || typeof raw !== 'string' || !raw.trim()) continue;
+    const value = Number(raw.trim().replace(',', '.'));
+    if (Number.isFinite(value)) values[key.slice(6)] = value;
+  }
   const result = await saveSampleResult(mission, {
     id,
-    result: text(form.get('result'), 10),
+    values,
+    override: text(form.get('override'), 10) || undefined,
     detail: text(form.get('detail'), 280),
     author: havenTexts.es.operatorName,
   });
