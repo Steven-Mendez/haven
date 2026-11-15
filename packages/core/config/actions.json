@@ -245,5 +245,14 @@
       "en": "Send a message to family or a friend"
     },
     "priority": 3
+  },
+  {
+    "id": "start-decompression-protocol",
+    "text": {
+      "es": "Empieza ya el protocolo de enfermedad por descompresión",
+      "en": "Start the decompression sickness protocol now"
+    },
+    "priority": 1,
+    "protocol": "decompression-sickness"
   }
 ]

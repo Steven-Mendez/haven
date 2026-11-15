@@ -121,10 +121,12 @@ export async function getEvaReadiness(
   const crew = await queryGetCrew(mission);
   if (!crew) return null;
   const config = baseConfig();
+  const now = new Date(crew.generatedAt);
   const rows = await Promise.all(
     crew.crew.map(async (member) => {
       const detail = await queryGetAstronaut(mission, member.id);
-      return evaRow(member, detail?.assessments ?? [], config);
+      const readings = detail?.packets.flatMap((p) => p.readings) ?? [];
+      return evaRow(member, detail?.assessments ?? [], config, readings, now);
     }),
   );
   return { generatedAt: crew.generatedAt, rows: rows.sort((a, b) => a.name.localeCompare(b.name)) };

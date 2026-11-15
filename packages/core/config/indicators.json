@@ -1450,6 +1450,42 @@
     "source": "Umbral de 3 mmHg: valor inicial de P01, a confirmar con NASA-STD-3001 Vol. 2 (https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/). El CO₂ figura como riesgo del peligro de entornos cerrados: Valinia et al., NESC 2022 (https://ntrs.nasa.gov/api/citations/20220009899/downloads/F5.2_04_Valinia.pdf); NASA HRP, Hostile/Closed Environments (https://www.nasa.gov/hrp/hazard-hostile-closed-environments/)."
   },
   {
+    "id": "cabin-o2",
+    "name": {
+      "es": "Oxígeno de la cabina",
+      "en": "Cabin oxygen"
+    },
+    "zone": "environment",
+    "unit": "kPa",
+    "inputs": ["manual"],
+    "suggestedByChallenge": false,
+    "ridge": ["environment"],
+    "everyHours": 12,
+    "kind": "number",
+    "green": [19, 23.5],
+    "rules": [
+      {
+        "level": "red",
+        "outside": [16, 30],
+        "explanation": {
+          "es": "Oxígeno de la cabina por debajo de 16 kPa: riesgo de hipoxia. Ponte la máscara de oxígeno y cambia de módulo.",
+          "en": "Cabin oxygen below 16 kPa: risk of hypoxia. Put on the oxygen mask and move to another module."
+        },
+        "actions": ["apply-oxygen", "change-module", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [19, 23.5],
+        "explanation": {
+          "es": "Oxígeno de la cabina fuera de la referencia (19–23,5 kPa). Revisa el aire del módulo y pospón la salida si sigue así.",
+          "en": "Cabin oxygen outside the reference (19–23.5 kPa). Check the module air and postpone the EVA if it persists."
+        },
+        "actions": ["check-ventilation", "postpone-eva", "notify-earth"]
+      }
+    ],
+    "source": "Presión parcial de oxígeno de 19–23,5 kPa, que incluye el aire a nivel del mar (21,3 kPa) y la atmósfera de exploración de 56,5 kPa con 34 % de O₂ (19,2 kPa): referencia provisional, a confirmar con NASA-STD-3001 Vol. 2 (https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/). Rojo por debajo de 16 kPa (hipoxia) o por encima de 30 kPa (riesgo de incendio): referencia provisional. Hipoxia y atmósfera como riesgos: NASA HRP, Hostile/Closed Environments (https://www.nasa.gov/hrp/hazard-hostile-closed-environments/)."
+  },
+  {
     "id": "cabin-noise",
     "name": {
       "es": "Ruido de la cabina",

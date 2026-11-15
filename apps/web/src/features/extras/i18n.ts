@@ -319,7 +319,7 @@ export const texts = defineTexts({
     evaTitle: 'Aptitud para EVA',
     evaDescription: 'Apoyo para decidir, no una evaluación de Tierra.',
     evaSource:
-      'Se deriva solo de los últimos estados que el móvil calculó a bordo y ya llegaron: signos vitales, cognición (batería), sueño y ambiente. La Tierra no recalcula nada: un estado en atención o pendiente pide revisar; uno en emergencia, no apto.',
+      'Se deriva de los últimos estados que el móvil calculó a bordo y ya llegaron: signos vitales, cognición (batería), sueño y ambiente, que incluye el oxígeno de la cabina. Un estado en atención o pendiente pide revisar; uno en emergencia, no apto. Además, una prerrespiración más corta que el mínimo del método pide revisar, y los síntomas tras la salida (dolor articular, falta de aire, mareo, confusión, visión borrosa o náuseas) en las últimas 24 h dejan al tripulante no apto.',
     astronaut: 'Astronauta',
     readiness: 'Aptitud',
     reasons: 'Motivo',
@@ -366,6 +366,15 @@ export const texts = defineTexts({
     reentryEmptyDetail: 'El estado aparece cuando la tripulación envía sus primeros paquetes.',
     reentrySource:
       'Se calcula con las lecturas que llegaron en los paquetes de las últimas 72 h. El pulso que sube 30 lpm o más al ponerse de pie pide revisar; 40 lpm o más, o con mareo, desmayo, visión borrosa o náuseas, pide ayuda para levantarse después del amerizaje. Hidratación y presión muestran el último estado que calculó el móvil.',
+    prebreatheCol: 'Prerrespiración',
+    checkCol: 'Tras la salida',
+    prebreatheNone: 'Sin registrar (24 h)',
+    prebreatheDone: '{method}: {minutes} de {required} min',
+    prebreatheShort: '{method}: solo {minutes} de {required} min',
+    checkNone: 'Sin chequeo',
+    checkClear: 'Sin síntomas',
+    dcsReason: 'Síntomas tras la salida: protocolo de descompresión',
+    prebreatheReason: 'Prerrespiración incompleta',
   },
   en: {
     title: 'Earth extras',
@@ -686,7 +695,7 @@ export const texts = defineTexts({
     evaTitle: 'EVA readiness',
     evaDescription: 'A decision aid, not an Earth assessment.',
     evaSource:
-      'Derived only from the latest assessments the phone computed on board that have already arrived: vital signs, cognition (battery), sleep and environment. Earth recomputes nothing: an attention or pending status asks for review; an emergency one means unfit.',
+      'Derived from the latest assessments the phone computed on board that have already arrived: vital signs, cognition (battery), sleep and environment, which includes cabin oxygen. An attention or pending status asks for review; an emergency one means unfit. A prebreathe shorter than the method minimum also asks for review, and symptoms after the EVA (joint pain, shortness of breath, dizziness, confusion, blurred vision or nausea) in the last 24 h mean unfit.',
     astronaut: 'Astronaut',
     readiness: 'Readiness',
     reasons: 'Reason',
@@ -733,6 +742,15 @@ export const texts = defineTexts({
     reentryEmptyDetail: 'The status shows up when the crew sends their first packets.',
     reentrySource:
       'Computed from the readings that arrived in packets over the last 72 h. A pulse that rises 30 bpm or more on standing asks for review; 40 bpm or more, or with dizziness, fainting, blurred vision or nausea, asks for help to stand up after splashdown. Hydration and pressure show the latest status the phone computed.',
+    prebreatheCol: 'Prebreathe',
+    checkCol: 'After the EVA',
+    prebreatheNone: 'Not logged (24 h)',
+    prebreatheDone: '{method}: {minutes} of {required} min',
+    prebreatheShort: '{method}: only {minutes} of {required} min',
+    checkNone: 'No check',
+    checkClear: 'No symptoms',
+    dcsReason: 'Symptoms after the EVA: decompression protocol',
+    prebreatheReason: 'Incomplete prebreathe',
   },
 });
 

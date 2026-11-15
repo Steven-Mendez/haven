@@ -1,5 +1,6 @@
 import actionsJson from '../../config/actions.json';
 import environments from '../../config/environments.json';
+import evaJson from '../../config/eva.json';
 import glossaryJson from '../../config/glossary.json';
 import guides from '../../config/guides.json';
 import indicators from '../../config/indicators.json';
@@ -14,6 +15,7 @@ import type {
   Action,
   Config,
   Environment,
+  EvaConfig,
   I18n,
   Indicator,
   MissionPhase,
@@ -36,6 +38,7 @@ export const SYMPTOMS = [
   'fever-chills',
   'sweating',
   'palpitations',
+  'joint-pain',
 ] as const;
 
 export type SymptomId = (typeof SYMPTOMS)[number];
@@ -93,6 +96,7 @@ export function actionById(id: string): Action | undefined {
 }
 
 export const reentry: ReentryConfig = reentryJson as ReentryConfig;
+export const eva: EvaConfig = evaJson as EvaConfig;
 
 export type LoadedConfig = Config & { actions: Action[] };
 

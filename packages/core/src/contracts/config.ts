@@ -136,3 +136,20 @@ export type ReentryConfig = {
   };
   source: string;
 };
+
+export type PrebreatheMethod = {
+  id: string;
+  name: I18n;
+  detail: I18n;
+  /** Minimum prebreathe time, in minutes, before the EVA can start. */
+  minutes: number;
+  environments: string[];
+};
+
+export type EvaConfig = {
+  /** How far back the EVA readings count, in hours. */
+  windowHours: number;
+  methods: PrebreatheMethod[];
+  postEva: { symptoms: string[]; protocol: string };
+  source: string;
+};

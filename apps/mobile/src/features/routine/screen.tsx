@@ -1,7 +1,10 @@
 import {
   actionsDone,
+  canPerformEva,
   dailyProgress,
   dayHistory,
+  eva,
+  evaPrepStatus,
   isReentry,
   reentry,
   reentryStatus,
@@ -164,6 +167,10 @@ export default function Screen() {
     () => (isReentry(mission.environment) ? reentryStatus(readings, reentry, now) : undefined),
     [readings, mission.environment, now],
   );
+  const evaPrep = useMemo(
+    () => (canPerformEva(mission.environment, eva) ? evaPrepStatus(readings, eva, now) : undefined),
+    [readings, mission.environment, now],
+  );
 
   const week = lastSevenDays(history, today).map((d) => ({
     label: new Date(`${d.date}T12:00:00Z`).toLocaleDateString(language, {
@@ -285,6 +292,15 @@ export default function Screen() {
           }
           action={t.reentryOpen}
           onAction={() => router.push('/reentry')}
+        />
+      ) : null}
+
+      {evaPrep ? (
+        <StepCard
+          title={t.evaTitle}
+          detail={evaPrep.readiness === 'symptoms' ? t.evaSymptoms : t.evaDetail}
+          action={t.evaOpen}
+          onAction={() => router.push('/eva')}
         />
       ) : null}
 
