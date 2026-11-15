@@ -1,4 +1,11 @@
-import { actionsDone, dailyProgress, dayHistory } from '@haven/core';
+import {
+  actionsDone,
+  dailyProgress,
+  dayHistory,
+  isReentry,
+  reentry,
+  reentryStatus,
+} from '@haven/core';
 import { randomUUID } from 'expo-crypto';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Check, ChevronRight } from 'lucide-react-native';
@@ -153,6 +160,10 @@ export default function Screen() {
     [readings, config, mission.environment, now],
   );
   const checkin = useMemo(() => todayCheckin(readings, today), [readings, today]);
+  const reentryPrep = useMemo(
+    () => (isReentry(mission.environment) ? reentryStatus(readings, reentry, now) : undefined),
+    [readings, mission.environment, now],
+  );
 
   const week = lastSevenDays(history, today).map((d) => ({
     label: new Date(`${d.date}T12:00:00Z`).toLocaleDateString(language, {
@@ -263,6 +274,19 @@ export default function Screen() {
           )}
         </Section>
       </TourAnchor>
+
+      {reentryPrep ? (
+        <StepCard
+          title={t.reentryTitle}
+          detail={
+            reentryPrep.readiness === 'ready'
+              ? t.reentryReady
+              : format(t.reentryDetail, { done: reentryPrep.done, total: reentryPrep.total })
+          }
+          action={t.reentryOpen}
+          onAction={() => router.push('/reentry')}
+        />
+      ) : null}
 
       <Collapsible open={guideOpen} onOpenChange={setGuideOpen} className="gap-8">
         <CollapsibleTrigger
