@@ -214,7 +214,12 @@ export async function getMedicationOverview(
         queryGetAstronaut(mission, member.id),
         queryGetPlan(mission, member.id),
       ]);
-      const readings = detail?.packets.flatMap((p) => p.readings) ?? [];
+      // Each routine packet repeats the last 24 h: keep every reading once.
+      const readings = [
+        ...new Map(
+          (detail?.packets ?? []).flatMap((p) => p.readings).map((r) => [r.id, r]),
+        ).values(),
+      ];
       return medicationRow(member, plan, readings, now);
     }),
   );
