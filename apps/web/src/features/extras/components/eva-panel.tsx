@@ -1,3 +1,4 @@
+import { eva, symptomById } from '@haven/core';
 import { Info } from 'lucide-react';
 import {
   AgeLabel,
@@ -51,15 +52,35 @@ function categoryLabel(c: EvaCategory, t: ExtrasTexts) {
   }[c];
 }
 
+function prebreatheText(row: EvaRow, lang: Language, t: ExtrasTexts) {
+  const pre = row.prep.prebreathe;
+  if (!pre) return t.prebreatheNone;
+  const method = eva.methods.find((m) => m.id === pre.method)?.name[lang] ?? pre.method;
+  return format(pre.complete ? t.prebreatheDone : t.prebreatheShort, {
+    method,
+    minutes: pre.minutes,
+    required: pre.required,
+  });
+}
+
+function checkText(row: EvaRow, lang: Language, t: ExtrasTexts) {
+  const check = row.prep.check;
+  if (!check) return t.checkNone;
+  if (check.clear) return t.checkClear;
+  return check.symptoms.map((s) => symptomById(s)?.name[lang] ?? s).join(', ');
+}
+
 function reasonText(row: EvaRow, t: ExtrasTexts) {
+  if (row.prep.readiness === 'symptoms') return t.dcsReason;
   if (row.readiness === 'no-data') return row.noRecentData ? t.staleReason : t.noPackets;
-  if (row.reasons.length === 0) return t.allGreen;
+  if (row.reasons.length === 0 && row.prep.readiness !== 'incomplete') return t.allGreen;
   const list = (level: (l: string) => boolean) =>
     row.reasons.filter((c) => level(row.categories[c])).map((c) => categoryLabel(c, t));
   const flagged = list((l) => l === 'amber' || l === 'red');
   const missing = list((l) => l === 'pending');
   return [
     flagged.join(', '),
+    row.prep.readiness === 'incomplete' ? t.prebreatheReason : '',
     missing.length ? format(t.missing, { list: missing.join(', ').toLowerCase() }) : '',
   ]
     .filter(Boolean)
@@ -127,6 +148,8 @@ export async function EvaPanel({
                       </Term>
                     </TableHead>
                   ))}
+                  <TableHead>{t.prebreatheCol}</TableHead>
+                  <TableHead>{t.checkCol}</TableHead>
                   <TableHead>{t.reasons}</TableHead>
                   <TableHead className="pr-4">{t.lastData}</TableHead>
                 </TableRow>
@@ -161,6 +184,32 @@ export async function EvaPanel({
                         </span>
                       </TableCell>
                     ))}
+                    <TableCell className="text-xs whitespace-normal">
+                      <span className="inline-flex items-center gap-1.5">
+                        <LevelGlyph
+                          level={
+                            row.prep.prebreathe
+                              ? row.prep.prebreathe.complete
+                                ? 'green'
+                                : 'amber'
+                              : 'pending'
+                          }
+                          size={10}
+                        />
+                        {prebreatheText(row, lang, t)}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-xs whitespace-normal">
+                      <span className="inline-flex items-center gap-1.5">
+                        <LevelGlyph
+                          level={
+                            row.prep.check ? (row.prep.check.clear ? 'green' : 'red') : 'pending'
+                          }
+                          size={10}
+                        />
+                        {checkText(row, lang, t)}
+                      </span>
+                    </TableCell>
                     <TableCell className="text-muted-foreground text-xs whitespace-normal">
                       {reasonText(row, t)}
                     </TableCell>
