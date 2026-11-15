@@ -197,7 +197,7 @@ export async function ExercisePanel({
                   <TableHead className="pl-4">{t.astronaut}</TableHead>
                   <TableHead>{t.exComplianceCol}</TableHead>
                   <TableHead>{t.exWeekCol}</TableHead>
-                  <TableHead>{t.exTodayCol}</TableHead>
+                  <TableHead className="hidden xl:table-cell">{t.exTodayCol}</TableHead>
                   <TableHead className="hidden xl:table-cell">{t.exPrescriptionCol}</TableHead>
                   <TableHead>{t.exAssessmentCol}</TableHead>
                   <TableHead className="w-12 pr-4">
@@ -240,7 +240,7 @@ export async function ExercisePanel({
                     <TableCell className="py-3">
                       <WeekStrip row={row} lang={lang} t={t} />
                     </TableCell>
-                    <TableCell className="py-3 text-xs">
+                    <TableCell className="hidden py-3 text-xs xl:table-cell">
                       <TodayCell row={row} t={t} />
                     </TableCell>
                     <TableCell className="hidden py-3 text-xs whitespace-normal xl:table-cell">
