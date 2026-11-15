@@ -16,12 +16,12 @@ import {
   LevelBadge,
   ScreenHeader,
   Section,
-  SegmentedControl,
 } from '@/shared/components/haven';
 import { Text } from '@/shared/components/ui/text';
 import { store, useMission, usePreferences, useReadings } from '@/shared/data';
 import { useTexts, useTranslate } from '@/shared/i18n';
 import { cn } from '@/shared/lib/utils';
+import { CollectionForm, type CollectionInput } from './components/collection-form';
 import { texts } from './i18n';
 
 const STATUS_LEVEL: Record<SampleStatus, Level> = {
@@ -38,7 +38,9 @@ export default function Screen() {
   const mission = useMission();
   const readings = useReadings();
   const { crewMember } = usePreferences();
-  const [modules, setModules] = useState<Record<string, string>>({});
+  const [open, setOpen] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [savedFor, setSavedFor] = useState<string | null>(null);
   const [failed, setFailed] = useState(false);
   const now = new Date();
   const day = Math.max(1, mission.day);
@@ -47,20 +49,25 @@ export default function Screen() {
     [day, readings],
   );
 
-  const collect = async (sample: string, module?: string) => {
+  const collect = async (sample: string, input: CollectionInput) => {
+    setSaving(true);
     try {
       await store.saveReading(
         sampleReading(sample, {
           crewMember,
           takenAt: new Date().toISOString(),
           newId: randomUUID,
-          ...(module ? { module } : {}),
+          ...input,
         }),
       );
       setFailed(false);
+      setOpen(null);
+      setSavedFor(sample);
     } catch (error) {
       console.warn('[samples] save failed', error);
       setFailed(true);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -76,7 +83,6 @@ export default function Screen() {
           {states.map((state, i) => {
             const sample = sampleConfig.samples.find((s) => s.id === state.sample);
             if (!sample) return null;
-            const module = modules[sample.id] ?? sample.modules?.[0]?.id;
             const lastModule = sample.modules?.find((m) => m.id === state.last?.module);
             const age = state.last
               ? ageText(h, (now.getTime() - Date.parse(state.last.takenAt)) / 60_000)
@@ -104,23 +110,28 @@ export default function Screen() {
                   </View>
                   <LevelBadge level={STATUS_LEVEL[state.status]} label={t[state.status]} />
                 </View>
-                {sample.modules?.length && module ? (
-                  <SegmentedControl
-                    accessibilityLabel={t.chooseModule}
-                    options={sample.modules.map((m) => ({ value: m.id, label: translate(m.name) }))}
-                    value={module}
-                    onChange={(v) => setModules((prev) => ({ ...prev, [sample.id]: v }))}
-                  />
+                {savedFor === sample.id ? (
+                  <Text className="text-body-sm text-muted-foreground">{t.saved}</Text>
                 ) : null}
-                <BigButton
-                  label={t.collect}
-                  variant={
-                    state.status === 'due' || state.status === 'overdue' ? 'primary' : 'secondary'
-                  }
-                  onPress={() =>
-                    void collect(sample.id, sample.modules?.length ? module : undefined)
-                  }
-                />
+                {open === sample.id ? (
+                  <CollectionForm
+                    sample={sample}
+                    saving={saving}
+                    onSave={(input) => void collect(sample.id, input)}
+                    onCancel={() => setOpen(null)}
+                  />
+                ) : (
+                  <BigButton
+                    label={t.collect}
+                    variant={
+                      state.status === 'due' || state.status === 'overdue' ? 'primary' : 'secondary'
+                    }
+                    onPress={() => {
+                      setSavedFor(null);
+                      setOpen(sample.id);
+                    }}
+                  />
+                )}
               </View>
             );
           })}
