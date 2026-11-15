@@ -33,7 +33,6 @@ export function IndicatorSelect({
       onValueChange={(value) => {
         if (typeof value !== 'string') return;
         const next = new URLSearchParams(params.toString());
-        next.set('tab', 'trends');
         next.set('indicator', value);
         startTransition(() => router.replace(`${pathname}?${next}`, { scroll: false }));
       }}

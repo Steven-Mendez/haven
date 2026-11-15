@@ -10,6 +10,7 @@ import {
   sampleHistory,
 } from '@haven/core';
 import { connection } from 'next/server';
+import type { KpiDashboard, KpiSeriesData } from '@/lib/kpi';
 import { baseConfig } from '@/server/model';
 import {
   type MissionEdit,
@@ -18,12 +19,15 @@ import {
   finishMission as queryFinishMission,
   getAstronaut as queryGetAstronaut,
   getCrew as queryGetCrew,
+  getDashboard as queryGetDashboard,
   getMission as queryGetMission,
   getPlan as queryGetPlan,
+  missionKpiSeries as queryKpiSeries,
   listMissions as queryListMissions,
   listRules as queryListRules,
   listSampleResults as queryListSampleResults,
   mergeMission as queryMergeMission,
+  saveDashboard as querySaveDashboard,
   savePlan as querySavePlan,
   saveRules as querySaveRules,
   saveSampleResult as querySaveSampleResult,
@@ -108,6 +112,24 @@ export async function getAggregates(
 ): Promise<AggregatesResponse> {
   await connection();
   return queryAggregates(mission, indicators);
+}
+
+export async function getKpiSeries(
+  indicators: string[],
+  mission = DEFAULT_MISSION,
+): Promise<KpiSeriesData> {
+  await connection();
+  return queryKpiSeries(mission, indicators);
+}
+
+export async function getKpiDashboard(mission = DEFAULT_MISSION): Promise<KpiDashboard | null> {
+  await connection();
+  return queryGetDashboard(mission);
+}
+
+export async function saveKpiDashboardFor(mission: string, body: unknown) {
+  await connection();
+  return querySaveDashboard(mission, body);
 }
 
 export function getBaseConfig(): Config {

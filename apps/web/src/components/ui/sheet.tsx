@@ -40,14 +40,17 @@ function SheetContent({
   children,
   side = 'right',
   showCloseButton = true,
+  dimmed = true,
   ...props
 }: SheetPrimitive.Popup.Props & {
   side?: 'top' | 'right' | 'bottom' | 'left';
   showCloseButton?: boolean;
+  /** `false` keeps the page behind fully visible (the backdrop still closes the sheet on click). */
+  dimmed?: boolean;
 }) {
   return (
     <SheetPortal>
-      <SheetOverlay />
+      <SheetOverlay className={dimmed ? undefined : 'bg-transparent!'} />
       <SheetPrimitive.Popup
         data-slot="sheet-content"
         data-side={side}

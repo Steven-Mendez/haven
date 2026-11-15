@@ -72,7 +72,7 @@ function shortcutRows(h: HavenTexts): { keys: string[][]; label: string }[] {
     { keys: [['↵']], label: h.shortcutOpen },
     { keys: [['g', 'c']], label: h.shortcutGoCrew },
     { keys: [['g', 'r']], label: h.shortcutGoRules },
-    { keys: [['g', 't']], label: h.shortcutGoTrends },
+    { keys: [['g', 'k']], label: h.shortcutGoKpi },
     { keys: [['g', 'e']], label: h.shortcutGoEva },
     { keys: [['g', 'm']], label: h.shortcutGoMissions },
     { keys: [['⌘', 'B']], label: h.shortcutSidebar },

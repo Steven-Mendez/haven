@@ -4,29 +4,13 @@ import Link from 'next/link';
 import { type ChartMarker, EmptyState, Section, SeriesChart, Sparkline } from '@/components/haven';
 import { explain } from '@/components/haven/term';
 import { format, formatNumber, type Language, translate } from '@/lib/i18n';
+import { KPI_INDICATORS } from '@/lib/kpi';
 import { cn } from '@/lib/utils';
 import type { ExtrasTexts } from '../i18n';
 import { getAggregates, listRules } from '../server';
 import { ExportCsvButton } from './export-buttons';
 import { IndicatorSelect } from './indicator-picker';
 
-export const TREND_OPTIONS = [
-  'heart-rate',
-  'systolic-bp',
-  'spo2',
-  'body-temperature',
-  'sleep',
-  'mood',
-  'stress',
-  'steps',
-  'resistance-exercise',
-  'reaction-time',
-  'glucose',
-  'food-intake',
-  'hydration',
-  'radiation-dose',
-  'cabin-pressure',
-];
 const DAY_MS = 86_400_000;
 
 type Point = { date: string; mean: number };
@@ -49,7 +33,7 @@ export async function TrendsPanel({
 }) {
   const config = loadConfig();
   const byId = new Map(config.indicators.map((i) => [i.id, i]));
-  const ids = TREND_OPTIONS.filter((id) => byId.has(id));
+  const ids = KPI_INDICATORS.filter((id) => byId.has(id));
   const [aggregates, { versions }] = await Promise.all([
     getAggregates(ids, mission),
     listRules(mission),
@@ -98,7 +82,7 @@ export async function TrendsPanel({
     return (
       <li key={s.id}>
         <Link
-          href={`/trends?indicator=${s.id}`}
+          href={`/kpi?view=individual&indicator=${s.id}`}
           scroll={false}
           aria-current={active ? 'true' : undefined}
           className={cn(

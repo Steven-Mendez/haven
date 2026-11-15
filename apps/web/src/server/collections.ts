@@ -2,6 +2,7 @@ import 'server-only';
 import type { Collection, Db, Document } from 'mongodb';
 import {
   COLLECTIONS,
+  type DashboardDoc,
   INDEXES,
   type MissionDoc,
   type PacketDoc,
@@ -36,3 +37,4 @@ export const missions = () => collection<MissionDoc>(COLLECTIONS.missions);
 export const rules = () => collection<RulesDoc>(COLLECTIONS.rules);
 export const plans = () => collection<PlanDoc>(COLLECTIONS.plans);
 export const sampleResults = () => collection<SampleResultDoc>(COLLECTIONS.sampleResults);
+export const dashboards = () => collection<DashboardDoc>(COLLECTIONS.dashboards);

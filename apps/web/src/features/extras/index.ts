@@ -5,9 +5,9 @@ export { RulesEditView } from './rules-edit-view';
 export {
   EvaView,
   extrasRedirect,
+  KpiView,
   MedicationView,
   ReentryView,
   RulesView,
   SamplesView,
-  TrendsView,
 } from './view';
