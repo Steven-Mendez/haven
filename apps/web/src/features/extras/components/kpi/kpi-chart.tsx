@@ -154,6 +154,49 @@ function EdgeTick({
   );
 }
 
+/** Longest window that still gets separate, rounded bars (the 30-day range fits). */
+const DENSE_BAR_DAYS = 45;
+
+/** Approximate half advance of an 11px axis label character. */
+const LABEL_HALF_CHAR_PX = 3.2;
+
+/**
+ * Bar-chart date tick: centred under its bar, nudged inward just enough that the first
+ * and last labels never cross the plot's edges.
+ */
+function BarTick({
+  x,
+  y,
+  width,
+  payload,
+  label,
+}: {
+  x?: number;
+  y?: number;
+  /** Plot width, handed down by the axis (the plot starts at x = 0: no left margin or axis). */
+  width?: number;
+  payload?: { value: string };
+  label: (date: string) => string;
+}) {
+  const text = label(payload?.value ?? '');
+  const half = text.length * LABEL_HALF_CHAR_PX;
+  const at = x ?? 0;
+  const centre =
+    typeof width === 'number' && width > half * 2 ? Math.min(Math.max(at, half), width - half) : at;
+  return (
+    <text
+      x={centre}
+      y={(y ?? 0) + 12}
+      fill="var(--chart-axis)"
+      fontSize={11}
+      className="tabular-nums"
+      textAnchor="middle"
+    >
+      {text}
+    </text>
+  );
+}
+
 export function KpiChart({ model, env }: { model: ResolvedPanel; env: KpiEnv }) {
   const id = useId().replace(/:/g, '');
   const [animate, done] = useAnimateOnce();
@@ -172,7 +215,9 @@ export function KpiChart({ model, env }: { model: ResolvedPanel; env: KpiEnv }) 
   const values = series.flatMap((s) => s.points.map((p) => p.mean));
   const [lo, hi] = valueExtent(values, reference);
   const pad = kind === 'line' ? (hi - lo || Math.abs(hi) || 1) * 0.08 : 0;
-  const scale = niceScale(lo - pad, hi + pad, { zero: kind === 'bar' });
+  // Padding never pushes the axis below zero for quantities that cannot be negative.
+  const low = lo >= 0 ? Math.max(0, lo - pad) : lo - pad;
+  const scale = niceScale(low, hi + pad, { zero: kind === 'bar' });
   const yDecimals = tickDecimals(scale.ticks);
   const yLabels = scale.ticks.map((v) => fmt(env, v, yDecimals));
   const yWidth = axisWidth(yLabels);
@@ -182,6 +227,13 @@ export function KpiChart({ model, env }: { model: ResolvedPanel; env: KpiEnv }) 
   const xDomain: [number, number] = from === to ? [from - 43_200_000, to + 43_200_000] : [from, to];
   const mid = days.length > 2 ? dayMs(addDays(span[0], Math.floor((days.length - 1) / 2))) : null;
   const xTicks = from === to ? [from] : mid ? [from, mid, to] : [from, to];
+  // Bars label the same three days as the lines (first, middle, last) so panels line up.
+  const barTicks = [
+    ...new Set([days[0], days[Math.floor((days.length - 1) / 2)], days.at(-1)]),
+  ].filter((d): d is string => d !== undefined);
+  // Past this many days a bar is only a few pixels wide: gaps and rounded ends turn into
+  // moiré, so the bars close up into one crisp silhouette.
+  const dense = days.length > DENSE_BAR_DAYS;
   const markers = panel.type === 'timeseries' && panel.markers === true ? env.markers : [];
   const visibleMarkers = markers
     .map((m) => ({ ...m, x: Date.parse(m.at) }))
@@ -282,7 +334,7 @@ export function KpiChart({ model, env }: { model: ResolvedPanel; env: KpiEnv }) 
           {kind === 'bar' ? (
             <BarChart
               data={rows}
-              barCategoryGap="20%"
+              barCategoryGap={dense ? 0 : '20%'}
               barGap={2}
               margin={{ top: 4, right: 0, bottom: 0, left: 0 }}
               onMouseMove={(s) => {
@@ -294,18 +346,16 @@ export function KpiChart({ model, env }: { model: ResolvedPanel; env: KpiEnv }) 
               {grid}
               <XAxis
                 dataKey="date"
+                ticks={barTicks}
+                interval={0}
                 tickLine={false}
                 axisLine={false}
-                tickMargin={8}
-                interval="preserveStartEnd"
-                minTickGap={40}
-                tick={{ fill: 'var(--chart-axis)', fontSize: 11 }}
-                tickFormatter={(d: string) => formatDate(dayMs(d), env.lang)}
+                tick={<BarTick label={(d) => formatDate(dayMs(d), env.lang)} />}
               />
               {yAxis}
               {band}
               <Tooltip
-                cursor={false}
+                cursor={{ fill: 'var(--chart-band)' }}
                 isAnimationActive={false}
                 wrapperStyle={{ outline: 'none' }}
                 content={(p) => (
@@ -324,7 +374,8 @@ export function KpiChart({ model, env }: { model: ResolvedPanel; env: KpiEnv }) 
                   name={s.label}
                   fill={single ? 'var(--chart-bar)' : s.color}
                   maxBarSize={24}
-                  radius={[4, 4, 0, 0]}
+                  radius={dense ? 0 : [4, 4, 0, 0]}
+                  shapeRendering={dense ? 'crispEdges' : undefined}
                   isAnimationActive={animate}
                   animationDuration={400}
                   animationEasing="ease-out"
@@ -334,11 +385,7 @@ export function KpiChart({ model, env }: { model: ResolvedPanel; env: KpiEnv }) 
                     ? rows.map((r, i) => (
                         <Cell
                           key={r.date}
-                          fill={
-                            i === (hover ?? rows.length - 1)
-                              ? 'var(--chart-line)'
-                              : 'var(--chart-bar)'
-                          }
+                          fill={i === hover ? 'var(--chart-line)' : 'var(--chart-bar)'}
                         />
                       ))
                     : null}

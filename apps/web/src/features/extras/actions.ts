@@ -19,7 +19,6 @@ import {
   getCurrentConfig,
   getMission,
   listRules,
-  mergeMission,
   saveExercisePrescription,
   saveKpiDashboardFor,
   saveMedicationPlan,
@@ -193,18 +192,6 @@ function parsePhases(value: FormDataEntryValue | null, known: Set<string>) {
 export async function openMission(code: string) {
   await setMission(code);
   redirect('/');
-}
-
-export async function mergeMissionAction(
-  from: string,
-  into: string,
-  _previous: { failed: boolean },
-): Promise<{ failed: boolean }> {
-  const result = await mergeMission(from, into);
-  if (!result.ok) return { failed: true };
-  await setMission(into);
-  refresh();
-  return { failed: false };
 }
 
 export async function joinMission(

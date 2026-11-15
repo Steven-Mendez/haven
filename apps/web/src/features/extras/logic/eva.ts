@@ -66,8 +66,8 @@ export function evaRow(
   return { ...member, categories, readiness, reasons, prep };
 }
 
-export function readinessLevel(row: Pick<EvaRow, 'readiness' | 'noRecentData'>) {
-  switch (row.readiness) {
+export function readinessLevel(readiness: EvaReadiness) {
+  switch (readiness) {
     case 'fit':
       return 'green' as const;
     case 'review':
@@ -75,6 +75,6 @@ export function readinessLevel(row: Pick<EvaRow, 'readiness' | 'noRecentData'>) 
     case 'unfit':
       return 'red' as const;
     default:
-      return row.noRecentData ? ('no-data' as const) : ('pending' as const);
+      return 'pending' as const;
   }
 }

@@ -26,7 +26,6 @@ import {
   listMissions as queryListMissions,
   listRules as queryListRules,
   listSampleResults as queryListSampleResults,
-  mergeMission as queryMergeMission,
   saveDashboard as querySaveDashboard,
   savePlan as querySavePlan,
   savePrescription as querySavePrescription,
@@ -85,11 +84,6 @@ export async function startMission(code: string) {
 export async function finishMission(code: string) {
   await connection();
   return queryFinishMission(code);
-}
-
-export async function mergeMission(from: string, into: string) {
-  await connection();
-  return queryMergeMission(from, into);
 }
 
 export async function listRules(mission = DEFAULT_MISSION): Promise<RulesResponse> {

@@ -103,6 +103,12 @@ async function testCors() {
 async function testInstantAndIdempotency() {
   const mission = code();
   missionCodes.push(mission);
+  await call('POST', '/api/missions', {
+    name: 'Packets test',
+    environment: 'transit',
+    durationDays: 30,
+    code: mission,
+  });
   const takenAt = new Date(Date.now() - 5 * 60_000).toISOString();
   const sentAt = new Date().toISOString();
   const a = packet(mission, 'tester-a', {
@@ -222,10 +228,29 @@ async function testInstantAndIdempotency() {
     stale,
   );
   check(
-    'mission auto-created from packets with both crew members',
+    'crew members who send packets join the mission crew',
     after.data.mission.code === mission && after.data.crew.length === 2,
     after.data.mission,
   );
+}
+
+async function testUnknownMission() {
+  const mission = code();
+  missionCodes.push(mission);
+  const rejected = await call<{ error: string }>(
+    'POST',
+    '/api/packets',
+    packet(mission, 'tester-a'),
+  );
+  check('POST /api/packets for a mission nobody created → 404', rejected.status === 404, rejected);
+  const list = await call<{ missions: StoredMission[] }>('GET', '/api/missions');
+  check(
+    'a packet never creates a mission',
+    !list.data.missions.some((m) => m.code === mission),
+    list.data.missions.map((m) => m.code),
+  );
+  const astro = await call('GET', `/api/astronaut/tester-a?mission=${mission}`);
+  check('the rejected packet is not stored', astro.status === 404, astro);
 }
 
 async function testValidation() {
@@ -398,6 +423,7 @@ try {
   await testCors();
   await testValidation();
   await testInstantAndIdempotency();
+  await testUnknownMission();
   await testMissionsAndRules();
   await testSeed();
 } catch (error) {

@@ -144,7 +144,12 @@ async function ExtrasContent({
         {individual ? (
           <TrendsPanel mission={code} indicator={indicator} lang={lang} t={t} />
         ) : (
-          <KpiDashboardPanel mission={code} lang={lang} t={t} />
+          <KpiDashboardPanel
+            mission={code}
+            crew={mission.crew.map(({ id, name }) => ({ id, name }))}
+            lang={lang}
+            t={t}
+          />
         )}
       </>
     );

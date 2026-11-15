@@ -1,4 +1,4 @@
-import { ChevronRight, Clock } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Kbd } from '@/components/ui/kbd';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -273,7 +273,7 @@ function CrewRow({
                   <>
                     {flagged.slice(0, 2).map((z) => (
                       <span key={z.zone} className="inline-flex min-w-0 items-center gap-1">
-                        <LevelGlyph level={z.level} size={10} muted={stale} />
+                        <LevelGlyph level={z.level} size={10} />
                         <span className={cn('truncate', stale && 'text-muted-foreground')}>
                           {zoneNames?.[z.zone] ?? z.zone}
                         </span>
@@ -340,7 +340,6 @@ function CrewRow({
             {member.lastDataAt ? (
               stale ? (
                 <span className="text-foreground inline-flex items-center gap-1">
-                  <Clock aria-hidden="true" className="size-3" />
                   <TimeAgo
                     at={member.lastDataAt}
                     lang={lang}

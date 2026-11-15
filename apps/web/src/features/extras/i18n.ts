@@ -400,13 +400,6 @@ export const texts = defineTexts({
     created: 'Creada',
     current: 'Actual',
     open: 'Abrir',
-    unknownCode: 'Código desconocido',
-    unknownCodeHint:
-      'Llegaron paquetes con este código, pero nadie creó la misión: suele ser una errata al unirse desde un teléfono. Fusiónala con la misión correcta; no se pierde ningún dato.',
-    merge: 'Fusionar…',
-    mergeInto: 'Mover sus paquetes y su tripulación a:',
-    mergeNone: 'No hay otra misión con la que fusionarla.',
-    mergeFailed: 'No se pudo fusionar. Inténtalo de nuevo.',
     noMissions: 'No hay misiones',
 
     evaTitle: 'Aptitud para EVA',
@@ -1088,13 +1081,6 @@ export const texts = defineTexts({
     created: 'Created',
     current: 'Current',
     open: 'Open',
-    unknownCode: 'Unknown code',
-    unknownCodeHint:
-      'Packets arrived with this code, but nobody created the mission: usually a typo when joining from a phone. Merge it into the right mission; no data is lost.',
-    merge: 'Merge…',
-    mergeInto: 'Move its packets and crew to:',
-    mergeNone: 'There is no other mission to merge it into.',
-    mergeFailed: 'Could not merge. Try again.',
     noMissions: 'No missions',
 
     evaTitle: 'EVA readiness',

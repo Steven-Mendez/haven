@@ -62,7 +62,7 @@ export function KpiGauge({ model, env }: { model: ResolvedPanel; env: KpiEnv }) 
             d={arc(0, 1, R)}
             fill="none"
             stroke="var(--chart-bar)"
-            strokeOpacity={0.55}
+            strokeOpacity={0.35}
             strokeWidth={TRACK}
             strokeLinecap="butt"
           />

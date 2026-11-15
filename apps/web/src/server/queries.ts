@@ -32,7 +32,6 @@ import {
   latestEmergencyVersions,
   type MissionDoc,
   missionForApi,
-  missionFromPacket,
   missionHeader,
   missionStatus,
   missionSummary,
@@ -79,6 +78,8 @@ export async function receivePacket(
   const col = await packets();
   const existing = await col.findOne({ id: packet.id }, NO_ID);
   if (existing) return duplicate(existing);
+  if (!(await (await missions()).countDocuments({ code: packet.mission }, { limit: 1 })))
+    return fail(404, `Mission ${packet.mission} does not exist`);
 
   const doc = packetDoc(packet, now);
   try {
@@ -90,7 +91,7 @@ export async function receivePacket(
     }
     throw error;
   }
-  await registerMission(doc, currentMission, now);
+  await registerMission(doc, currentMission);
   return {
     ok: true,
     status: 201,
@@ -106,32 +107,16 @@ function duplicate(doc: PacketDoc): Result<PacketReceipt> {
   };
 }
 
-async function registerMission(
-  packet: PacketDoc,
-  currentMission: Partial<Mission> | undefined,
-  now: Date,
-) {
+async function registerMission(packet: PacketDoc, currentMission: Partial<Mission> | undefined) {
   const col = await missions();
-  const created = missionFromPacket(packet, now);
-  const hasCurrent = typeof currentMission === 'object' && currentMission !== null;
-  if (hasCurrent) {
+  const set: Partial<Pick<MissionDoc, 'environment' | 'currentDelayMin'>> = {};
+  if (typeof currentMission === 'object' && currentMission !== null) {
     if (typeof currentMission.environment === 'string')
-      created.environment = currentMission.environment;
+      set.environment = currentMission.environment;
     if (typeof currentMission.currentDelayMin === 'number')
-      created.currentDelayMin = currentMission.currentDelayMin;
-    if (typeof currentMission.day === 'number' && currentMission.day > 0)
-      created.start = new Date(now.getTime() - (currentMission.day - 1) * 86_400_000).toISOString();
-    if (Array.isArray(currentMission.crew) && currentMission.crew.length)
-      created.crew = currentMission.crew;
+      set.currentDelayMin = currentMission.currentDelayMin;
   }
-  const { environment, currentDelayMin, ...onInsertOnly } = created;
-  await col.updateOne(
-    { code: packet.mission },
-    hasCurrent
-      ? { $setOnInsert: onInsertOnly, $set: { environment, currentDelayMin } }
-      : { $setOnInsert: created },
-    { upsert: true },
-  );
+  if (Object.keys(set).length) await col.updateOne({ code: packet.mission }, { $set: set });
   await col.updateOne(
     { code: packet.mission, 'crew.id': { $ne: packet.crewMember } },
     { $push: { crew: { id: packet.crewMember, name: packet.crewMember, hasWatch: false } } },
@@ -401,25 +386,6 @@ export async function removeCrewMember(
   return { ok: true, status: 200, data: { id, packets: removed.deletedCount } };
 }
 
-export async function mergeMission(from: string, into: string): Promise<Result<{ code: string }>> {
-  if (from === into) return fail(400, 'Cannot merge a mission into itself');
-  const col = await missions();
-  const [source, target] = await Promise.all([
-    col.findOne({ code: from }, NO_ID),
-    col.findOne({ code: into }, NO_ID),
-  ]);
-  if (!source || !target) return fail(404, 'Mission does not exist');
-  if (source.origin !== 'packet')
-    return fail(409, 'Only missions created by a packet can be merged');
-  await (await packets()).updateMany({ mission: from }, { $set: { mission: into } });
-  const known = new Set(target.crew.map((m) => m.id));
-  const newcomers = source.crew.filter((m) => !known.has(m.id));
-  if (newcomers.length)
-    await col.updateOne({ code: into }, { $push: { crew: { $each: newcomers } } });
-  await col.deleteOne({ code: from });
-  return { ok: true, status: 200, data: { code: into } };
-}
-
 const FALLBACK_ENVIRONMENTS = ['transit', 'station', 'moon', 'mars', 'rover'];
 
 const MAX_MISSION_DAYS = 3000;
@@ -595,14 +561,22 @@ export async function saveRules(
   return { ok: true, status: 201, data: rulesForApi(doc) };
 }
 
+const READING_VALUES = {
+  projection: {
+    _id: 0,
+    crewMember: 1,
+    'readings.indicator': 1,
+    'readings.value': 1,
+    'readings.takenAt': 1,
+  },
+} as const;
+
 async function readingsByCrewMember(code: string): Promise<Record<string, Reading[]>> {
-  const visible = await (await packets()).find({ mission: code }, NO_ID).toArray();
+  const visible = await (await packets()).find({ mission: code }, READING_VALUES).toArray();
   const byCrewMember: Record<string, Reading[]> = {};
   for (const p of visible) {
-    byCrewMember[p.crewMember] = [
-      ...(byCrewMember[p.crewMember] ?? []),
-      ...packetForApi(p).readings,
-    ];
+    byCrewMember[p.crewMember] ??= [];
+    byCrewMember[p.crewMember].push(...(p.readings ?? []));
   }
   return byCrewMember;
 }

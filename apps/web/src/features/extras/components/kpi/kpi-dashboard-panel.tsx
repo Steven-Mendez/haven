@@ -10,26 +10,27 @@ import {
   type KpiMarker,
   type KpiSource,
 } from '../../logic/kpi';
-import { getCrewOverview, getKpiDashboard, getKpiSeries, listRules } from '../../server';
+import { getKpiDashboard, getKpiSeries, listRules } from '../../server';
 import { KpiDashboard } from './kpi-dashboard';
 import { kpiTexts } from './texts';
 
 export async function KpiDashboardPanel({
   mission,
+  crew,
   lang,
   t,
 }: {
   mission: string;
+  crew: { id: string; name: string }[];
   lang: Language;
   t: ExtrasTexts;
 }) {
   const config = loadConfig();
   const byId = new Map(config.indicators.map((i) => [i.id, i]));
   const ids = KPI_INDICATORS.filter((id) => byId.has(id));
-  const [series, { versions }, crew, saved] = await Promise.all([
+  const [series, { versions }, saved] = await Promise.all([
     getKpiSeries(ids, mission),
     listRules(mission),
-    getCrewOverview(mission),
     getKpiDashboard(mission),
   ]);
 
@@ -74,7 +75,7 @@ export async function KpiDashboardPanel({
     });
 
   const sources: KpiSource[] = [{ id: KPI_CREW_SOURCE, name: t.meanOfCrew }];
-  for (const member of crew?.crew ?? []) sources.push({ id: member.id, name: member.name });
+  for (const member of crew) sources.push({ id: member.id, name: member.name });
   for (const id of Object.keys(series.members)) {
     if (!sources.some((s) => s.id === id)) sources.push({ id, name: id });
   }

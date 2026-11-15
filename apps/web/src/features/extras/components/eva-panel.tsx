@@ -104,7 +104,7 @@ function Categories({ row, lang, t }: { row: EvaRow; lang: Language; t: ExtrasTe
               <span
                 className={cn(
                   'flex size-7 items-center justify-center',
-                  row.noRecentData ? 'text-tertiary' : (LEVEL_TEXT[level] ?? 'text-tertiary'),
+                  LEVEL_TEXT[level] ?? 'text-tertiary',
                 )}
               >
                 <Icon aria-hidden="true" className="size-3.5" />
@@ -135,7 +135,7 @@ export async function EvaPanel({
       <PanelHeading
         id="eva"
         title={
-          <Term id="eva" lang={lang}>
+          <Term id="eva" lang={lang} plain>
             {t.evaTitle}
           </Term>
         }
@@ -148,7 +148,7 @@ export async function EvaPanel({
             return (
               <li key={c} className="flex items-center gap-1.5">
                 <Icon aria-hidden="true" className="size-3.5" />
-                <Term id={CATEGORY_TERM[c]} lang={lang}>
+                <Term id={CATEGORY_TERM[c]} lang={lang} plain>
                   {categoryLabel(c, t)}
                 </Term>
               </li>
@@ -164,7 +164,7 @@ export async function EvaPanel({
             label={t.readiness}
             items={READINESS.map((r) => ({
               key: r,
-              tone: toneOf(readinessLevel({ readiness: r, noRecentData: false })),
+              tone: toneOf(readinessLevel(r)),
               label: readinessLabel(r, t),
               count: rows.filter((x) => x.readiness === r).length,
             }))}
@@ -202,7 +202,7 @@ export async function EvaPanel({
                         />
                       </TableCell>
                       <TableCell className="py-3">
-                        <StatusPill tone={toneOf(readinessLevel(row))}>
+                        <StatusPill tone={toneOf(readinessLevel(row.readiness))}>
                           {readinessLabel(row.readiness, t)}
                         </StatusPill>
                       </TableCell>

@@ -220,7 +220,7 @@
   --chart-band: rgba(11, 13, 18, 0.05);
   --chart-area: rgba(11, 13, 18, 0.07);
   --chart-hatch: rgba(11, 13, 18, 0.06);
-  --chart-bar: rgba(11, 13, 18, 0.16);
+  --chart-bar: #bec0c4;
   --chart-baseline: #8a909a;
   --chart-median: #8a909a;
   --chart-reference: #a3a8b1;
@@ -319,7 +319,7 @@
   --chart-band: rgba(232, 237, 245, 0.05);
   --chart-area: rgba(232, 237, 245, 0.08);
   --chart-hatch: rgba(232, 237, 245, 0.04);
-  --chart-bar: rgba(232, 237, 245, 0.18);
+  --chart-bar: #4a4d54;
   --chart-baseline: #686c75;
   --chart-median: #686c75;
   --chart-reference: #51555d;

@@ -14,6 +14,7 @@ type Props = {
   symbolOnly?: boolean;
   muted?: boolean;
   prefix?: boolean;
+  round?: boolean;
   className?: string;
 };
 
@@ -33,6 +34,7 @@ export function LevelBadge({
   symbolOnly,
   muted,
   prefix = true,
+  round,
   className,
 }: Props) {
   const meta = LEVELS[level];
@@ -51,7 +53,7 @@ export function LevelBadge({
         title={text}
         className={cn('inline-flex shrink-0 items-center justify-center', SQUARE[size], className)}
       >
-        <LevelGlyph level={level} size={GLYPH[size] + 1} muted={muted} />
+        <LevelGlyph level={level} size={GLYPH[size] + 1} muted={muted} round={round} />
         {sr}
       </span>
     );
@@ -71,7 +73,7 @@ export function LevelBadge({
       )}
     >
       <span className="inline-flex">
-        <LevelGlyph level={level} size={GLYPH[size]} muted={muted} />
+        <LevelGlyph level={level} size={GLYPH[size]} muted={muted} round={round} />
       </span>
       {sr}
     </Badge>

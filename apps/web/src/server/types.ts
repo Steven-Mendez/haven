@@ -103,7 +103,7 @@ export type StoredMission = Omit<Mission, 'crew'> & {
   start: string;
   durationDays: number;
   createdAt: string;
-  origin: 'earth' | 'packet' | 'seed';
+  origin: 'earth' | 'seed';
   awaitingStart?: boolean;
   finishedAt?: string;
   status?: MissionStatus;

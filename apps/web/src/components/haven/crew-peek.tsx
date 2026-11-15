@@ -246,7 +246,7 @@ function PeekBody({
                     key={a.indicator}
                     className="border-border-subtle flex min-h-9 items-center gap-2.5 border-b px-3 text-sm last:border-b-0"
                   >
-                    <LevelGlyph level={a.level} size={10} lang={lang} muted={stale} />
+                    <LevelGlyph level={a.level} size={10} lang={lang} />
                     <span className="min-w-0 flex-1 truncate">{info?.name ?? a.indicator}</span>
                     {typeof a.value === 'number' ? (
                       <span
@@ -276,7 +276,7 @@ function PeekBody({
             <ul className="flex flex-col gap-1.5">
               {zones.map((z) => (
                 <li key={z.zone} className="flex min-w-0 items-center gap-2 text-sm">
-                  <LevelGlyph level={z.level} size={10} muted={stale} />
+                  <LevelGlyph level={z.level} size={10} />
                   <span className="min-w-0 flex-1 truncate">{zoneNames?.[z.zone] ?? z.zone}</span>
                   <span className="text-muted-foreground text-xs">{levelLabel(z.level, lang)}</span>
                 </li>
