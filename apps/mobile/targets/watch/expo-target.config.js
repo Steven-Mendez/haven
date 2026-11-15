@@ -1,6 +1,6 @@
 module.exports = (_config) => ({
   type: 'watch',
-  name: 'HAVEN Watch',
+  name: 'HAVENWatch',
   displayName: 'HAVEN',
   bundleIdentifier: '.watchkitapp',
   icon: '../../assets/images/icon.png',

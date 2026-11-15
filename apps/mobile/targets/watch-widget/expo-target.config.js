@@ -1,6 +1,6 @@
 module.exports = (_config) => ({
   type: 'watch-widget',
-  name: 'HAVEN Complication',
+  name: 'HAVENComplication',
   displayName: 'HAVEN',
   bundleIdentifier: '.watchkitapp.widget',
   deploymentTarget: '11.0',
