@@ -37,7 +37,7 @@ import {
   TestTube,
   Waves,
 } from 'lucide-react-native';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
 import type { ScrollViewInstance } from 'react-native';
 import { ScrollView, View } from 'react-native';
 import {
@@ -48,7 +48,6 @@ import {
   Section,
 } from '@/shared/components/haven';
 import { ProfileButton } from '@/shared/components/profile-button';
-import { Button } from '@/shared/components/ui/button';
 import { Icon } from '@/shared/components/ui/icon';
 import { Text } from '@/shared/components/ui/text';
 import { useConfig } from '@/shared/config';
@@ -66,6 +65,7 @@ import { TourAnchor, useTourScroll } from '@/shared/tour';
 import { CheckinCard } from './components/checkin-card';
 import { ProgressTile, StreakTile, Tile, TileGroup } from './components/dashboard';
 import { ActionsGuide } from './components/guide';
+import { LaterButton } from './components/later-button';
 import { MilestoneSheet } from './components/milestone-sheet';
 import { More } from './components/more';
 import { RestModuleCheck } from './components/rest-module-check';
@@ -101,11 +101,14 @@ function StepCard({
   detail,
   action,
   onAction,
+  later,
 }: {
   title: string;
   detail: string;
   action: string;
   onAction: () => void;
+  /** "Not now" button, inside the card under the main action. */
+  later?: ReactNode;
 }) {
   return (
     <View className="border-border gap-4 rounded-lg border p-4">
@@ -115,7 +118,10 @@ function StepCard({
         </Text>
         <Text className="text-muted-foreground text-body">{detail}</Text>
       </View>
-      <BigButton label={action} onPress={onAction} />
+      <View className="gap-3">
+        <BigButton label={action} onPress={onAction} />
+        {later}
+      </View>
     </View>
   );
 }
@@ -259,6 +265,13 @@ export default function Screen() {
     setPostponed((list) => (list.length + 1 >= steps.length ? [] : [...list, key]));
 
   const stepBody = (current: RoutineStep) => {
+    const later =
+      steps.length > 1 ? (
+        <LaterButton
+          label={format(t.stepLater, { n: steps.length - 1 })}
+          onPress={() => postpone(stepKey(current))}
+        />
+      ) : null;
     switch (current.kind) {
       case 'cognition':
         return (
@@ -267,10 +280,11 @@ export default function Screen() {
             detail={t.stepCognition}
             action={t.start}
             onAction={() => openTarget({ kind: 'screen', screen: 'cognition' })}
+            later={later}
           />
         );
       case 'wellbeing':
-        return <CheckinCard crewMember={crewMember} today={checkin} />;
+        return <CheckinCard crewMember={crewMember} today={checkin} later={later} />;
       case 'measure':
         return (
           <StepCard
@@ -286,12 +300,14 @@ export default function Screen() {
             }
             action={t.stepEnter}
             onAction={() => openTarget({ kind: 'indicator', indicator: current.indicator })}
+            later={later}
           />
         );
       case 'check':
         return (
           <RestModuleCheck atmosphere={environment}>
             <BigButton label={t.stepChecked} onPress={() => void markDone(current.zone)} />
+            {later}
           </RestModuleCheck>
         );
     }
@@ -322,20 +338,7 @@ export default function Screen() {
       <TourAnchor step="routine-today" fill>
         <Section title={t.now} count={steps.length > 1 ? steps.length : undefined}>
           {step ? (
-            <View className="gap-3">
-              {stepBody(step)}
-              {steps.length > 1 ? (
-                <Button
-                  variant="ghost"
-                  className="min-h-touch h-auto self-center sm:h-auto"
-                  onPress={() => postpone(stepKey(step))}
-                >
-                  <Text className="text-link text-body-sm font-medium">
-                    {format(t.stepLater, { n: steps.length - 1 })}
-                  </Text>
-                </Button>
-              ) : null}
-            </View>
+            stepBody(step)
           ) : (
             <View className="flex-row items-center gap-2">
               <Icon as={Check} size={16} strokeWidth={2} className="text-brand" />
