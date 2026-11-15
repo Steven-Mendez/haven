@@ -219,7 +219,7 @@ export async function MotionPanel({
                     <TableCell className="py-3 text-xs">
                       <BalanceCell row={row} t={t} />
                     </TableCell>
-                    <TableCell className="text-muted-foreground hidden max-w-xs py-3 pr-4 text-xs whitespace-normal xl:table-cell">
+                    <TableCell className="text-muted-foreground hidden min-w-60 py-3 pr-4 text-xs whitespace-normal xl:table-cell">
                       {adviceText(row, t)}
                     </TableCell>
                   </TableRow>
