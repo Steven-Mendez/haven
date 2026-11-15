@@ -114,28 +114,6 @@ function WeekStrip({ row, lang, t }: { row: ExerciseRow; lang: Language; t: Extr
   );
 }
 
-function TodayCell({ row, t }: { row: ExerciseRow; t: ExtrasTexts }) {
-  const parts = [
-    {
-      label: t.exResistance,
-      done: row.today.resistance,
-      target: row.prescription.resistanceMinutes,
-    },
-    { label: t.exAerobic, done: row.today.aerobic, target: row.prescription.aerobicMinutes },
-  ];
-  return (
-    <ul className="flex flex-col items-start gap-1">
-      {parts.map((p) => (
-        <li key={p.label}>
-          <StatusPill tone={p.done >= p.target ? 'green' : 'muted'}>
-            {p.label} {format(t.exMinutesOf, { done: p.done, target: p.target })}
-          </StatusPill>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
 function AssessmentCell({ row, t }: { row: ExerciseRow; t: ExtrasTexts }) {
   const suggestion = row.suggestion ? SUGGESTION[row.suggestion] : undefined;
   return (
@@ -197,7 +175,6 @@ export async function ExercisePanel({
                   <TableHead className="pl-4">{t.astronaut}</TableHead>
                   <TableHead>{t.exComplianceCol}</TableHead>
                   <TableHead className="hidden xl:table-cell">{t.exWeekCol}</TableHead>
-                  <TableHead className="hidden min-[1800px]:table-cell">{t.exTodayCol}</TableHead>
                   <TableHead className="hidden xl:table-cell">{t.exPrescriptionCol}</TableHead>
                   <TableHead>{t.exAssessmentCol}</TableHead>
                   <TableHead className="w-12 pr-4">
@@ -239,9 +216,6 @@ export async function ExercisePanel({
                     </TableCell>
                     <TableCell className="hidden py-3 xl:table-cell">
                       <WeekStrip row={row} lang={lang} t={t} />
-                    </TableCell>
-                    <TableCell className="hidden py-3 text-xs min-[1800px]:table-cell">
-                      <TodayCell row={row} t={t} />
                     </TableCell>
                     <TableCell className="hidden py-3 text-xs whitespace-normal xl:table-cell">
                       <span className="flex flex-col items-start gap-1">
