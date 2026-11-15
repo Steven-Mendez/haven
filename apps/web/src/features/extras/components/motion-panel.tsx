@@ -2,27 +2,12 @@ import { type Level, loadConfig, motion, motionLevel } from '@haven/core';
 import { Info } from 'lucide-react';
 import { AgeLabel, EmptyState, Hint } from '@/components/haven';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { format, type Language } from '@/lib/i18n';
 import type { ExtrasTexts } from '../i18n';
 import type { MotionRow } from '../logic/motion';
 import { getMotionOverview } from '../server';
-import {
-  CrewCell,
-  PanelHeading,
-  panelTable,
-  StatusPill,
-  SummaryChips,
-  type Tone,
-  toneOf,
-} from './panel-parts';
+import { CrewTable } from './crew-table';
+import { CrewCell, crewHref, crewTableTexts, StatusPill, type Tone, toneOf } from './panel-parts';
 
 const { environments } = loadConfig();
 
@@ -146,90 +131,65 @@ export async function MotionPanel({
   const sick = rows.filter((r) => r.latest && r.latest.level !== 'green').length;
 
   return (
-    <section aria-labelledby="motion" className="flex min-w-0 flex-col gap-3">
-      <PanelHeading
-        id="motion"
-        title={t.motionTitle}
-        count={rows.length || undefined}
-        description={t.motionDescription}
-      />
+    <div className="flex min-w-0 flex-col gap-3">
       {rows.length === 0 || !data ? (
         <EmptyState title={t.motionEmpty} description={t.motionEmptyDetail} />
       ) : (
-        <>
-          <SummaryChips
-            label={t.moScoreCol}
-            items={LEVELS.map((l) => ({
-              key: l.level,
-              tone: toneOf(l.level),
-              label: l.label(t),
-              count: rows.filter((r) => levelOf(r) === l.level).length,
-            }))}
-          />
-          <div className={panelTable.card}>
-            <Table data-testid="motion-table">
-              <TableHeader className={panelTable.header}>
-                <TableRow className={panelTable.headRow}>
-                  <TableHead className="pl-4">{t.astronaut}</TableHead>
-                  <TableHead>{t.moScoreCol}</TableHead>
-                  <TableHead className="hidden xl:table-cell">{t.moDaysCol}</TableHead>
-                  <TableHead>{t.moWindowCol}</TableHead>
-                  <TableHead>{t.moBalanceCol}</TableHead>
-                  <TableHead className="hidden pr-4 2xl:table-cell">{t.moAdviceCol}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id} className={panelTable.row}>
-                    <TableCell className="py-3 pl-4">
-                      <CrewCell
-                        id={row.id}
-                        name={row.name}
-                        detail={
-                          <AgeLabel
-                            lastDataAt={row.lastDataAt}
-                            now={data.generatedAt}
-                            lang={lang}
-                            noRecentData={row.noRecentData}
-                          />
-                        }
-                      />
-                    </TableCell>
-                    <TableCell className="py-3 text-xs whitespace-normal">
-                      {row.latest ? (
-                        <span className="flex flex-col items-start gap-1">
-                          <StatusPill tone={toneOf(row.latest.level)}>
-                            {format(t.moScore, { score: row.latest.score })} ·{' '}
-                            {LEVELS.find((l) => l.level === row.latest?.level)?.label(t)}
-                          </StatusPill>
-                        </span>
-                      ) : (
-                        <span className="text-tertiary">{t.moNoRecent}</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="hidden py-3 xl:table-cell">
-                      <DayStrip row={row} lang={lang} t={t} />
-                    </TableCell>
-                    <TableCell className="py-3 text-xs">
-                      <WindowCell row={row} lang={lang} t={t} />
-                    </TableCell>
-                    <TableCell className="py-3 text-xs">
-                      <BalanceCell row={row} t={t} />
-                    </TableCell>
-                    <TableCell className="text-muted-foreground hidden min-w-52 py-3 pr-4 text-xs whitespace-normal 2xl:table-cell">
-                      {adviceText(row, t)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <div className={panelTable.footer}>
-              <span className="tabular-nums">
-                {format(t.motionFooter, { n: sick, total: rows.length })}
-              </span>
-            </div>
-          </div>
-        </>
+        <CrewTable
+          id="motion"
+          testId="motion-table"
+          title={t.motionTitle}
+          description={t.motionDescription}
+          groups={LEVELS.map((l) => ({ key: l.level, tone: toneOf(l.level), label: l.label(t) }))}
+          columns={[
+            { label: t.astronaut },
+            { label: t.moScoreCol, className: 'whitespace-normal' },
+            { label: t.moDaysCol, className: 'hidden xl:table-cell' },
+            { label: t.moWindowCol },
+            { label: t.moBalanceCol },
+            {
+              label: t.moAdviceCol,
+              className: 'text-muted-foreground hidden min-w-52 whitespace-normal 2xl:table-cell',
+            },
+          ]}
+          rows={rows.map((row) => ({
+            id: row.id,
+            name: row.name,
+            group: levelOf(row),
+            href: crewHref(row.id),
+            cells: [
+              <CrewCell
+                key="crew"
+                id={row.id}
+                name={row.name}
+                detail={
+                  <AgeLabel
+                    lastDataAt={row.lastDataAt}
+                    now={data.generatedAt}
+                    lang={lang}
+                    noRecentData={row.noRecentData}
+                  />
+                }
+              />,
+              row.latest ? (
+                <StatusPill key="score" tone={toneOf(row.latest.level)}>
+                  {format(t.moScore, { score: row.latest.score })} ·{' '}
+                  {LEVELS.find((l) => l.level === row.latest?.level)?.label(t)}
+                </StatusPill>
+              ) : (
+                <span key="score" className="text-tertiary">
+                  {t.moNoRecent}
+                </span>
+              ),
+              <DayStrip key="days" row={row} lang={lang} t={t} />,
+              <WindowCell key="window" row={row} lang={lang} t={t} />,
+              <BalanceCell key="balance" row={row} t={t} />,
+              adviceText(row, t),
+            ],
+          }))}
+          summary={format(t.motionFooter, { n: sick, total: rows.length })}
+          texts={crewTableTexts(t)}
+        />
       )}
       <Collapsible>
         <CollapsibleTrigger className="text-muted-foreground hover:text-foreground hit-area flex min-h-8 items-center gap-1.5 text-xs">
@@ -240,6 +200,6 @@ export async function MotionPanel({
           {t.motionHowTo} {motion.source}
         </CollapsibleContent>
       </Collapsible>
-    </section>
+    </div>
   );
 }
