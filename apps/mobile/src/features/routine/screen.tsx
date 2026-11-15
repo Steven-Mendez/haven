@@ -1,4 +1,11 @@
-import { actionsDone, dailyProgress, dayHistory } from '@haven/core';
+import {
+  actionsDone,
+  canPerformEva,
+  dailyProgress,
+  dayHistory,
+  eva,
+  evaPrepStatus,
+} from '@haven/core';
 import { randomUUID } from 'expo-crypto';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Check, ChevronRight } from 'lucide-react-native';
@@ -153,6 +160,10 @@ export default function Screen() {
     [readings, config, mission.environment, now],
   );
   const checkin = useMemo(() => todayCheckin(readings, today), [readings, today]);
+  const evaPrep = useMemo(
+    () => (canPerformEva(mission.environment, eva) ? evaPrepStatus(readings, eva, now) : undefined),
+    [readings, mission.environment, now],
+  );
 
   const week = lastSevenDays(history, today).map((d) => ({
     label: new Date(`${d.date}T12:00:00Z`).toLocaleDateString(language, {
@@ -263,6 +274,15 @@ export default function Screen() {
           )}
         </Section>
       </TourAnchor>
+
+      {evaPrep ? (
+        <StepCard
+          title={t.evaTitle}
+          detail={evaPrep.readiness === 'symptoms' ? t.evaSymptoms : t.evaDetail}
+          action={t.evaOpen}
+          onAction={() => router.push('/eva')}
+        />
+      ) : null}
 
       <Collapsible open={guideOpen} onOpenChange={setGuideOpen} className="gap-8">
         <CollapsibleTrigger
