@@ -1,7 +1,7 @@
 'use client';
 
 import {
-  Activity,
+  ChartNoAxesCombined,
   Compass,
   Footprints,
   Languages,
@@ -67,7 +67,7 @@ export function CommandTrigger({
         {...props}
         onClick={open}
         className={cn(
-          'text-muted-foreground hover:bg-hover hover:text-foreground border-border flex h-7 w-full justify-start gap-2 rounded-md px-2 text-sm font-normal group-data-[collapsible=icon]:hidden',
+          'text-muted-foreground hover:bg-hover hover:text-foreground border-border flex h-8 w-full justify-start gap-2.5 rounded-lg px-2.5 text-sm font-normal group-data-[collapsible=icon]:hidden',
           className,
         )}
       >
@@ -146,7 +146,7 @@ export function CommandMenu({ lang, crew }: Props) {
   const pages = [
     { href: '/', label: t.navCrew, icon: Users },
     { href: '/rules', label: t.navRules, icon: SlidersHorizontal },
-    { href: '/trends', label: t.navTrends, icon: Activity },
+    { href: '/kpi', label: t.navKpi, icon: ChartNoAxesCombined },
     { href: '/eva', label: t.navEva, icon: Footprints },
     { href: '/samples', label: t.navSamples, icon: TestTube },
     { href: '/missions', label: t.navMissions, icon: Rocket },
