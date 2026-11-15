@@ -10,10 +10,11 @@ type Props = {
   lang?: Language;
   muted?: boolean;
   pulse?: boolean;
+  round?: boolean;
   className?: string;
 };
 
-export function LevelGlyph({ level, size = 10, lang, muted, pulse, className }: Props) {
+export function LevelGlyph({ level, size = 10, lang, muted, pulse, round, className }: Props) {
   const label = lang ? `${havenTexts[lang].levelPrefix}: ${levelLabel(level, lang)}` : undefined;
   return (
     <svg
@@ -38,7 +39,13 @@ export function LevelGlyph({ level, size = 10, lang, muted, pulse, className }: 
           <path d="M6 1.5a4.5 4.5 0 0 1 0 9z" fill="currentColor" />
         </>
       ) : null}
-      {level === 'red' ? <path d="M6 1.2 11.2 10.5H0.8z" fill="currentColor" /> : null}
+      {level === 'red' ? (
+        round ? (
+          <circle cx="6" cy="6" r="5" fill="currentColor" />
+        ) : (
+          <path d="M6 1.2 11.2 10.5H0.8z" fill="currentColor" />
+        )
+      ) : null}
       {level === 'pending' ? (
         <circle
           cx="6"

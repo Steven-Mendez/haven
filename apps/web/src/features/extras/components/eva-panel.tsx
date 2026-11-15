@@ -84,7 +84,7 @@ export async function EvaPanel({
   return (
     <Section
       title={
-        <Term id="eva" lang={lang}>
+        <Term id="eva" lang={lang} plain>
           {t.evaTitle}
         </Term>
       }
@@ -101,10 +101,7 @@ export async function EvaPanel({
             {READINESS.map((r) => (
               <div key={r} className="bg-background md:bg-surface flex flex-col gap-1.5 px-4 py-3">
                 <dt className="text-muted-foreground flex items-center gap-1.5 text-xs">
-                  <LevelGlyph
-                    level={readinessLevel({ readiness: r, noRecentData: false })}
-                    size={10}
-                  />
+                  <LevelGlyph level={readinessLevel(r)} size={10} round />
                   {readinessLabel(r, t)}
                 </dt>
                 <dd className="text-[28px] leading-8 font-medium tracking-[-0.02em] tabular-nums">
@@ -122,7 +119,7 @@ export async function EvaPanel({
                   <TableHead>{t.readiness}</TableHead>
                   {EVA_CATEGORIES.map((c) => (
                     <TableHead key={c}>
-                      <Term id={CATEGORY_TERM[c]} lang={lang}>
+                      <Term id={CATEGORY_TERM[c]} lang={lang} plain>
                         {categoryLabel(c, t)}
                       </Term>
                     </TableHead>
@@ -137,9 +134,10 @@ export async function EvaPanel({
                     <TableCell className="pl-4 font-medium">{row.name}</TableCell>
                     <TableCell>
                       <LevelBadge
-                        level={readinessLevel(row)}
+                        level={readinessLevel(row.readiness)}
                         lang={lang}
                         label={readinessLabel(row.readiness, t)}
+                        round
                       />
                     </TableCell>
                     {EVA_CATEGORIES.map((c) => (
@@ -152,11 +150,7 @@ export async function EvaPanel({
                               : 'text-foreground',
                           )}
                         >
-                          <LevelGlyph
-                            level={row.categories[c]}
-                            size={10}
-                            muted={row.noRecentData}
-                          />
+                          <LevelGlyph level={row.categories[c]} size={10} round />
                           {levelLabel(row.categories[c], lang)}
                         </span>
                       </TableCell>
