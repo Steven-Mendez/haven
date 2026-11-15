@@ -55,6 +55,7 @@ import { type MotionRow, motionRow } from './logic/motion';
 import { type ReentryRow, reentryRow } from './logic/reentry';
 import { isFullConfig } from './logic/rules';
 import { missionDayOf, type PendingSample, type SampleRow, sampleRow } from './logic/samples';
+import { type WorkloadRow, workloadRow } from './logic/workload';
 
 export async function listMissions(): Promise<MissionsResponse> {
   await connection();
@@ -325,4 +326,21 @@ export async function getMotionOverview(
     environment: stored.environment,
     rows: rows.sort((a, b) => a.name.localeCompare(b.name)),
   };
+}
+
+export async function getWorkloadOverview(
+  mission = DEFAULT_MISSION,
+): Promise<{ generatedAt: string; rows: WorkloadRow[] } | null> {
+  await connection();
+  const crew = await queryGetCrew(mission);
+  if (!crew) return null;
+  const now = new Date(crew.generatedAt);
+  const rows = await Promise.all(
+    crew.crew.map(async (member) => {
+      const detail = await queryGetAstronaut(mission, member.id);
+      const readings = detail?.packets.flatMap((p) => p.readings) ?? [];
+      return workloadRow(member, readings, now);
+    }),
+  );
+  return { generatedAt: crew.generatedAt, rows: rows.sort((a, b) => a.name.localeCompare(b.name)) };
 }

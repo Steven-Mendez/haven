@@ -78,6 +78,7 @@ export default function RootLayout() {
         <Stack.Screen name="samples" options={{ title: t.samples }} />
         <Stack.Screen name="exercise" options={{ title: t.exercise }} />
         <Stack.Screen name="motion" options={{ title: t.motion }} />
+        <Stack.Screen name="workload" options={{ title: t.workload }} />
       </Stack>
       {phase === 'starting' ? (
         <View className="bg-background absolute inset-0 items-center justify-center gap-4">

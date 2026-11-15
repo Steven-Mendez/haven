@@ -20,6 +20,7 @@ export const BAR_INDICATORS = [
   'hydration',
   'resistance-exercise',
   'aerobic-exercise',
+  'work-hours',
 ] as const;
 
 export const DIARY_INDICATOR = 'diary';

@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  BriefcaseBusiness,
   ChartNoAxesCombined,
   Dumbbell,
   Footprints,
@@ -102,6 +103,12 @@ export function NavMain({ lang, crew }: Props) {
       label: t.navExerciseShort,
       icon: Dumbbell,
       active: pathname === '/exercise',
+    },
+    {
+      href: '/workload',
+      label: t.navWorkloadShort,
+      icon: BriefcaseBusiness,
+      active: pathname === '/workload',
     },
     {
       href: '/missions',

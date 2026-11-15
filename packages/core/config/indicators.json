@@ -606,6 +606,80 @@
     "source": "Tres registros seguidos con estrés ≥4: regla de M10 y P01, referencia provisional. Recursos CONNECT: NASA, Isolation (https://www.nasa.gov/humans-in-space/isolation-what-can-we-learn-from-the-experiences-of-nasa-astronauts/)."
   },
   {
+    "id": "work-hours",
+    "name": {
+      "es": "Horas de trabajo",
+      "en": "Work hours"
+    },
+    "zone": "mind",
+    "unit": "h",
+    "inputs": ["manual"],
+    "suggestedByChallenge": false,
+    "ridge": ["isolation", "distance"],
+    "everyHours": 24,
+    "kind": "number",
+    "green": [0, 10],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [0, 10],
+        "repetitions": 3,
+        "explanation": {
+          "es": "Tres jornadas seguidas de más de 10 horas: la fatiga se acumula y aumentan los errores.",
+          "en": "Three workdays in a row over 10 hours: fatigue builds up and errors increase."
+        },
+        "actions": ["review-workload", "prioritize-rest"]
+      },
+      {
+        "level": "amber",
+        "outside": [0, 12],
+        "explanation": {
+          "es": "Más de 12 horas de trabajo hoy. Descansa antes de la próxima tarea.",
+          "en": "Over 12 work hours today. Rest before the next task."
+        },
+        "actions": ["prioritize-rest", "review-workload"]
+      }
+    ],
+    "source": "Jornada larga de más de 10 h y máximo de 12 h: referencia provisional. La sobrecarga de trabajo es uno de los factores del riesgo de fatiga de NASA HRP (https://www.nasa.gov/hrp/)."
+  },
+  {
+    "id": "fatigue",
+    "name": {
+      "es": "Fatiga",
+      "en": "Fatigue"
+    },
+    "zone": "mind",
+    "unit": "points (1–7)",
+    "inputs": ["manual"],
+    "suggestedByChallenge": false,
+    "ridge": ["isolation", "distance"],
+    "everyHours": 24,
+    "kind": "number",
+    "green": [1, 4],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [1, 4],
+        "repetitions": 3,
+        "explanation": {
+          "es": "Tres registros seguidos con fatiga de 5 o más: revisa la carga de trabajo y el sueño.",
+          "en": "Three logs in a row with fatigue of 5 or more: review your workload and sleep."
+        },
+        "actions": ["review-workload", "sleep-hygiene"]
+      },
+      {
+        "level": "amber",
+        "outside": [1, 5],
+        "explanation": {
+          "es": "Fatiga muy alta (6 o más de 7). Evita tareas críticas hasta descansar.",
+          "en": "Very high fatigue (6 or more out of 7). Avoid critical tasks until you rest."
+        },
+        "actions": ["prioritize-rest", "review-workload", "notify-earth"]
+      }
+    ],
+    "source": "Escala Samn-Perelli de 7 puntos. Ámbar desde 5 repetido y desde 6 en un solo registro: referencia provisional. NASA HRP, riesgo de fatiga por falta de sueño, desajuste circadiano y sobrecarga de trabajo (https://www.nasa.gov/hrp/)."
+  },
+  {
     "id": "steps",
     "name": {
       "es": "Pasos",

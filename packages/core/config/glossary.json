@@ -328,6 +328,22 @@
       "en": "points (1–5): 1 is very bad and 5 is very good"
     }
   },
+  "work-hours": {
+    "term": { "es": "Horas de trabajo", "en": "Work hours" },
+    "short": {
+      "es": "Horas trabajadas en el día. Jornadas largas seguidas acumulan fatiga.",
+      "en": "Hours worked in the day. Long workdays in a row build up fatigue."
+    },
+    "unitHint": { "es": "h: horas trabajadas hoy", "en": "h: hours worked today" }
+  },
+  "fatigue": {
+    "term": { "es": "Fatiga", "en": "Fatigue" },
+    "short": {
+      "es": "Cansancio que sientes, de 1 (alerta) a 7 (agotado), en la escala Samn-Perelli.",
+      "en": "How tired you feel, from 1 (alert) to 7 (exhausted), on the Samn-Perelli scale."
+    },
+    "unitHint": { "es": "puntos: 1 alerta, 7 agotado", "en": "points: 1 alert, 7 exhausted" }
+  },
   "stress": {
     "term": { "es": "Estrés", "en": "Stress" },
     "short": {

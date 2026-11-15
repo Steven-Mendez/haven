@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  BriefcaseBusiness,
   ChartNoAxesCombined,
   Compass,
   Dumbbell,
@@ -157,6 +158,7 @@ export function CommandMenu({ lang, crew }: Props) {
     { href: '/samples', label: t.navSamples, icon: TestTube },
     { href: '/exercise', label: t.navExercise, icon: Dumbbell },
     { href: '/motion', label: t.navMotion, icon: Waves },
+    { href: '/workload', label: t.navWorkload, icon: BriefcaseBusiness },
     { href: '/missions', label: t.navMissions, icon: Rocket },
     { href: '/settings', label: t.navSettings, icon: Settings },
   ];

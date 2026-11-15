@@ -18,6 +18,8 @@ import {
   reentryStatus,
   sampleConfig,
   sampleStates,
+  workload,
+  workloadReminder,
 } from '@haven/core';
 import { randomUUID } from 'expo-crypto';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -207,6 +209,7 @@ export default function Screen() {
     () => motionCheckDue(readings, adaptationWindow(mission, motion, config.environments), now),
     [readings, mission, config.environments, now],
   );
+  const workloadDue = useMemo(() => workloadReminder(readings, workload, now), [readings, now]);
 
   const week = lastSevenDays(history, today).map((d) => ({
     label: new Date(`${d.date}T12:00:00Z`).toLocaleDateString(language, {
@@ -391,6 +394,15 @@ export default function Screen() {
           detail={t.motionDue}
           action={t.motionOpen}
           onAction={() => router.push('/motion')}
+        />
+      ) : null}
+
+      {workloadDue ? (
+        <StepCard
+          title={t.workloadTitle}
+          detail={workloadDue === 'rest' ? t.workloadRest : t.workloadLog}
+          action={t.workloadOpen}
+          onAction={() => router.push('/workload')}
         />
       ) : null}
 

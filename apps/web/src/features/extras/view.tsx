@@ -16,6 +16,7 @@ import { ReentryPanel } from './components/reentry-panel';
 import { RulesPanel } from './components/rules-panel';
 import { SamplesPanel } from './components/samples-panel';
 import { TrendsPanel } from './components/trends-panel';
+import { WorkloadPanel } from './components/workload-panel';
 import { type ExtrasTexts, texts } from './i18n';
 import { getMission } from './server';
 import { EXTRAS_TABS, type ExtrasTab } from './types';
@@ -80,6 +81,7 @@ const TITLES = {
   samples: { title: 'tabSamples', subtitle: 'samplesSubtitle' },
   exercise: { title: 'tabExercise', subtitle: 'exerciseSubtitle' },
   motion: { title: 'tabMotion', subtitle: 'motionSubtitle' },
+  workload: { title: 'tabWorkload', subtitle: 'workloadSubtitle' },
 } as const;
 
 async function ExtrasContent({
@@ -158,6 +160,7 @@ async function ExtrasContent({
       {section === 'samples' ? <SamplesPanel mission={code} lang={lang} t={t} /> : null}
       {section === 'exercise' ? <ExercisePanel mission={code} lang={lang} t={t} /> : null}
       {section === 'motion' ? <MotionPanel mission={code} lang={lang} t={t} /> : null}
+      {section === 'workload' ? <WorkloadPanel mission={code} lang={lang} t={t} /> : null}
     </>
   );
 }
@@ -202,6 +205,10 @@ export const ExerciseView = ({ searchParams }: PageProps) => (
 
 export const MotionView = ({ searchParams }: PageProps) => (
   <ExtrasPage section="motion" searchParams={searchParams} />
+);
+
+export const WorkloadView = ({ searchParams }: PageProps) => (
+  <ExtrasPage section="workload" searchParams={searchParams} />
 );
 
 export function extrasRedirect(tab: unknown): `/${ExtrasTab}` {

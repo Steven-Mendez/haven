@@ -14,6 +14,7 @@ import samplesJson from '../../config/samples.json';
 import symptomsJson from '../../config/symptoms.json';
 import unitsJson from '../../config/units.json';
 import version from '../../config/version.json';
+import workloadJson from '../../config/workload.json';
 import zones from '../../config/zones.json';
 import type {
   Action,
@@ -29,6 +30,7 @@ import type {
   MotionConfig,
   ReentryConfig,
   SampleConfig,
+  WorkloadConfig,
 } from '../contracts';
 
 type IndicatorWithoutGuide = Omit<Indicator, 'guide'>;
@@ -109,6 +111,7 @@ export const medications: MedicationConfig = medicationsJson as MedicationConfig
 export const sampleConfig: SampleConfig = samplesJson as SampleConfig;
 export const exercise: ExerciseConfig = exerciseJson as ExerciseConfig;
 export const motion: MotionConfig = motionJson as MotionConfig;
+export const workload: WorkloadConfig = workloadJson as WorkloadConfig;
 
 export type LoadedConfig = Config & { actions: Action[] };
 

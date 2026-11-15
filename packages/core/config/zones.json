@@ -38,7 +38,7 @@
       "es": "Sueño, actividad, ánimo y estrés: cómo descansas y cómo llevas el aislamiento.",
       "en": "Sleep, activity, mood and stress: how you rest and how you cope with isolation."
     },
-    "indicators": ["sleep", "mood", "stress", "steps"],
+    "indicators": ["sleep", "mood", "stress", "work-hours", "fatigue", "steps"],
     "dailyAction": {
       "text": {
         "es": "Registrar ánimo, estrés, contacto y diario",
