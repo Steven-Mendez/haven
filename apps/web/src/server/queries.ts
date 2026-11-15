@@ -583,14 +583,22 @@ export async function saveRules(
   return { ok: true, status: 201, data: rulesForApi(doc) };
 }
 
+const READING_VALUES = {
+  projection: {
+    _id: 0,
+    crewMember: 1,
+    'readings.indicator': 1,
+    'readings.value': 1,
+    'readings.takenAt': 1,
+  },
+} as const;
+
 async function readingsByCrewMember(code: string): Promise<Record<string, Reading[]>> {
-  const visible = await (await packets()).find({ mission: code }, NO_ID).toArray();
+  const visible = await (await packets()).find({ mission: code }, READING_VALUES).toArray();
   const byCrewMember: Record<string, Reading[]> = {};
   for (const p of visible) {
-    byCrewMember[p.crewMember] = [
-      ...(byCrewMember[p.crewMember] ?? []),
-      ...packetForApi(p).readings,
-    ];
+    byCrewMember[p.crewMember] ??= [];
+    byCrewMember[p.crewMember].push(...(p.readings ?? []));
   }
   return byCrewMember;
 }

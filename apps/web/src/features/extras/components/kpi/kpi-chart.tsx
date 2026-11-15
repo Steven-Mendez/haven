@@ -172,7 +172,9 @@ export function KpiChart({ model, env }: { model: ResolvedPanel; env: KpiEnv }) 
   const values = series.flatMap((s) => s.points.map((p) => p.mean));
   const [lo, hi] = valueExtent(values, reference);
   const pad = kind === 'line' ? (hi - lo || Math.abs(hi) || 1) * 0.08 : 0;
-  const scale = niceScale(lo - pad, hi + pad, { zero: kind === 'bar' });
+  // Padding never pushes the axis below zero for quantities that cannot be negative.
+  const low = lo >= 0 ? Math.max(0, lo - pad) : lo - pad;
+  const scale = niceScale(low, hi + pad, { zero: kind === 'bar' });
   const yDecimals = tickDecimals(scale.ticks);
   const yLabels = scale.ticks.map((v) => fmt(env, v, yDecimals));
   const yWidth = axisWidth(yLabels);
