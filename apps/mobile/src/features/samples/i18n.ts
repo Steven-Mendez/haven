@@ -1,0 +1,36 @@
+import { defineTexts } from '@/shared/i18n';
+
+export const texts = defineTexts({
+  es: {
+    title: 'Muestras',
+    subtitle: 'Saliva, sangre, orina y superficies del hábitat. Tierra analiza los resultados.',
+    day: 'Día {day} de la misión',
+    collected: 'Recogida',
+    due: 'Toca ahora',
+    overdue: 'Atrasada',
+    upcoming: 'Próxima',
+    next: 'Siguiente: día {day}',
+    last: 'Última: {age}',
+    lastModule: 'Última: {age} · {module}',
+    collect: 'Registrar la recogida',
+    chooseModule: 'Módulo',
+    saveFailed: 'No se pudo guardar. Inténtalo otra vez.',
+    source: 'De dónde salen los valores',
+  },
+  en: {
+    title: 'Samples',
+    subtitle: 'Saliva, blood, urine and habitat surfaces. Earth analyses the results.',
+    day: 'Mission day {day}',
+    collected: 'Collected',
+    due: 'Due now',
+    overdue: 'Overdue',
+    upcoming: 'Upcoming',
+    next: 'Next: day {day}',
+    last: 'Last: {age}',
+    lastModule: 'Last: {age} · {module}',
+    collect: 'Log the collection',
+    chooseModule: 'Module',
+    saveFailed: 'Could not save. Try again.',
+    source: 'Where the values come from',
+  },
+});
