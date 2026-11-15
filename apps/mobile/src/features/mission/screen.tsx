@@ -1,3 +1,4 @@
+import { type CommsMode, comms, commsMode, linkTimes } from '@haven/core';
 import { useLocalSearchParams } from 'expo-router';
 import { ChevronRight } from 'lucide-react-native';
 import { type ComponentRef, useEffect, useRef, useState } from 'react';
@@ -33,6 +34,25 @@ import { texts } from './i18n';
 
 type MissionView = 'list' | 'mission' | 'environment' | 'crew' | 'profile' | 'rules' | 'settings';
 
+const MODE_LABEL: Record<
+  CommsMode,
+  'modeRealtime' | 'modeDelayed' | 'modeAutonomous' | 'modeOffline'
+> = {
+  realtime: 'modeRealtime',
+  delayed: 'modeDelayed',
+  autonomous: 'modeAutonomous',
+  offline: 'modeOffline',
+};
+const MODE_HINT: Record<
+  CommsMode,
+  'modeRealtimeHint' | 'modeDelayedHint' | 'modeAutonomousHint' | 'modeOfflineHint'
+> = {
+  realtime: 'modeRealtimeHint',
+  delayed: 'modeDelayedHint',
+  autonomous: 'modeAutonomousHint',
+  offline: 'modeOfflineHint',
+};
+
 export default function Screen() {
   const t = useTexts(texts);
   const translate = useTranslate();
@@ -51,6 +71,14 @@ export default function Screen() {
   const [view, setView] = useState<MissionView>('list');
   const { baseline } = usePreflightBaseline(crewMember, view);
   const phaseText = useMissionPhaseText();
+  const mode = commsMode(mission, comms);
+  const times = linkTimes(new Date(), mission.currentDelayMin);
+  const clock = (iso: string) =>
+    new Date(iso).toLocaleTimeString(language, { hour: '2-digit', minute: '2-digit' });
+  const commsHint = format(t[MODE_HINT[mode]], {
+    arrives: clock(times.arrivesAt),
+    reply: clock(times.replyAt),
+  });
   const [destination, setDestination] = useState<string | undefined>(record?.destination);
   const chosenDestination = destination ?? record?.destination;
 
@@ -265,6 +293,9 @@ export default function Screen() {
                 </View>
               </Row>
             </TourAnchor>
+            <Row label={t.commsMode} hint={commsHint}>
+              <Text className="text-muted-foreground text-body-sm">{t[MODE_LABEL[mode]]}</Text>
+            </Row>
             <LinkRow
               key="rules"
               label={t.rulesShort}

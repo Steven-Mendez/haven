@@ -96,6 +96,17 @@ export const texts = defineTexts({
     preparingCaps: 'Preparación',
 
     linkDownHint: 'Las decisiones se toman a bordo; lo enviado sale al volver el enlace.',
+    commsMode: 'Comunicación',
+    modeRealtime: 'En directo',
+    modeDelayed: 'Con retraso',
+    modeAutonomous: 'Autónoma',
+    modeOffline: 'Sin enlace',
+    modeRealtimeHint: 'Lo que envíes llega a Tierra en segundos.',
+    modeDelayedHint:
+      'Si envías ahora, llega a Tierra hacia las {arrives} y la respuesta, como pronto, a las {reply}.',
+    modeAutonomousHint:
+      'Si envías ahora, la respuesta llega como pronto a las {reply}. En una emergencia, decide a bordo sin esperar.',
+    modeOfflineHint: 'Decide a bordo; lo que envíes sale al volver el enlace.',
 
     crewGroup: 'Tripulación vinculada',
     crewHint: 'Reciben el aviso de emergencia. Toca para usar este teléfono como esa persona.',
@@ -244,6 +255,17 @@ export const texts = defineTexts({
     linkOnHint:
       'Detected automatically. Without a link you decide on board and what you send leaves on its own when it is back.',
     linkStatusUp: 'Link up',
+    commsMode: 'Communication',
+    modeRealtime: 'Live',
+    modeDelayed: 'Delayed',
+    modeAutonomous: 'Autonomous',
+    modeOffline: 'No link',
+    modeRealtimeHint: 'What you send reaches Earth in seconds.',
+    modeDelayedHint:
+      'If you send now, it reaches Earth around {arrives} and the reply, at the earliest, around {reply}.',
+    modeAutonomousHint:
+      'If you send now, the earliest reply comes around {reply}. In an emergency, decide on board without waiting.',
+    modeOfflineHint: 'Decide on board; what you send leaves when the link is back.',
     linkStatusDown: 'No link',
     dayCaps: 'Day',
     preparingCaps: 'Preparing',
