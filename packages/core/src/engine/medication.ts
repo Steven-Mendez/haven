@@ -151,19 +151,26 @@ export function doseReading(
   };
 }
 
-/** Scheduled doses of the last `days` days, today included, that are already closed or recorded. */
+/**
+ * Scheduled doses of the last `days` days, today included, that are already
+ * closed or recorded. Doses before `since` (when the crew member started using
+ * the app) do not count.
+ */
 export function adherence(
   plan: CrewPlan,
   cfg: MedicationConfig,
   readings: Reading[],
   now: Date,
   days = 7,
+  since?: string,
 ): Adherence {
+  const from = since ? ms(since) : Number.NEGATIVE_INFINITY;
   const result = { expected: 0, taken: 0, skipped: 0, missed: 0 };
   for (let k = days - 1; k >= 0; k--) {
     const day = dayOf(now.getTime() - k * DAY_MS);
     for (const dose of dosesForDay(plan, cfg, readings, now, day)) {
       if (dose.status === 'upcoming' || dose.status === 'due') continue;
+      if (ms(dose.scheduledAt) < from) continue;
       result.expected++;
       result[dose.status]++;
     }

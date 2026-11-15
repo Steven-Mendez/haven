@@ -102,7 +102,18 @@ export async function MedicationPanel({
                   </TableCell>
                   <TableCell className="text-xs">
                     <span className="flex flex-col gap-1">
-                      <LevelBadge level={row.level} lang={lang} />
+                      <LevelBadge
+                        level={row.level}
+                        lang={lang}
+                        label={
+                          {
+                            green: t.adherenceGood,
+                            amber: t.adherenceIrregular,
+                            red: t.adherenceLow,
+                            pending: t.adherencePending,
+                          }[row.level]
+                        }
+                      />
                       <span className="text-muted-foreground tabular-nums">
                         {row.adherence.percent === null
                           ? t.adherenceNone
