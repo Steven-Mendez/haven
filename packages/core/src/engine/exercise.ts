@@ -249,3 +249,37 @@ export function assessmentReading(
     note: `pain=${a.pain};completion=${a.completion}`,
   };
 }
+
+/** When the crew member's own data starts: the week and the self-assessment count from here. */
+export function firstDataAt(readings: Reading[]): string | undefined {
+  let first: string | undefined;
+  for (const r of readings) {
+    if (r.simulated) continue;
+    if (!first || r.takenAt < first) first = r.takenAt;
+  }
+  return first;
+}
+
+export type ExerciseReminder =
+  | { kind: 'assessment' }
+  | { kind: 'today'; done: number; target: number };
+
+/**
+ * What Routine reminds about exercise: the weekly self-assessment when it is
+ * due; otherwise today's minutes while the prescription is not met.
+ */
+export function exerciseReminder(
+  readings: Reading[],
+  p: ExercisePrescription,
+  cfg: ExerciseConfig,
+  now: Date,
+): ExerciseReminder | undefined {
+  if (assessmentDue(latestAssessment(readings), cfg, now, firstDataAt(readings))) {
+    return { kind: 'assessment' };
+  }
+  const today = dayMinutes(readings, dayOf(now.getTime()));
+  if (isMet(today, p)) return undefined;
+  const done =
+    Math.min(today.resistance, p.resistanceMinutes) + Math.min(today.aerobic, p.aerobicMinutes);
+  return { kind: 'today', done, target: p.resistanceMinutes + p.aerobicMinutes };
+}

@@ -9,7 +9,9 @@ import {
   dayMinutes,
   EXERCISE_ASSESSMENT_INDICATOR,
   exerciseCompliance,
+  exerciseReminder,
   exerciseWeek,
+  firstDataAt,
   latestAssessment,
   prescriptionOf,
   sessionReading,
@@ -196,5 +198,58 @@ describe('exercise self-assessment', () => {
     expect(s(9)).toBe('lower');
     expect(s(5, 'strong')).toBe('lower');
     expect(s(5, 'none', 'none')).toBe('lower');
+  });
+});
+
+describe('first data and the Routine reminder', () => {
+  const hr = (takenAt: string, simulated = false): Reading => ({
+    id: takenAt,
+    indicator: 'heart-rate',
+    value: 70,
+    unit: 'bpm',
+    takenAt,
+    source: 'watch',
+    simulated,
+    crewMember: 'ines',
+  });
+  const assessed = (takenAt: string) =>
+    assessmentReading({ effort: 5, pain: 'none', completion: 'full' }, opts(takenAt));
+
+  it('first data is the oldest real reading', () => {
+    expect(
+      firstDataAt([
+        hr('2026-03-05T10:00:00Z'),
+        hr('2026-03-01T10:00:00Z', true),
+        hr('2026-03-03T10:00:00Z'),
+      ]),
+    ).toBe('2026-03-03T10:00:00Z');
+    expect(firstDataAt([])).toBeUndefined();
+  });
+
+  it('asks for the self-assessment a week after the first data', () => {
+    const old = [hr('2026-03-02T10:00:00Z'), ...fullDay('2026-03-10')];
+    expect(exerciseReminder(old, P, exercise, NOW)).toEqual({ kind: 'assessment' });
+    expect(
+      exerciseReminder([...old, assessed('2026-03-09T10:00:00Z')], P, exercise, NOW),
+    ).toBeUndefined();
+  });
+
+  it('shows today’s minutes until the prescription is met, without counting extra minutes', () => {
+    const recent = [hr('2026-03-08T10:00:00Z')];
+    expect(
+      exerciseReminder(
+        [
+          ...recent,
+          minutes('resistance-exercise', 60, '2026-03-10T09:00:00Z'),
+          minutes('aerobic-exercise', 10, '2026-03-10T10:00:00Z'),
+        ],
+        P,
+        exercise,
+        NOW,
+      ),
+    ).toEqual({ kind: 'today', done: 55, target: 90 });
+    expect(
+      exerciseReminder([...recent, ...fullDay('2026-03-10')], P, exercise, NOW),
+    ).toBeUndefined();
   });
 });
