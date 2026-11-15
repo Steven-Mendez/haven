@@ -14,6 +14,7 @@ export * from './cognition';
 export * from './evaluate';
 export * from './protocols';
 export * from './radiation';
+export * from './reentry';
 export * from './routine';
 export { LEVEL_ORDER, worstLevel } from './util';
 export * from './visible-at';
