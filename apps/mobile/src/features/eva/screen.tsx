@@ -37,6 +37,7 @@ import {
   type PrebreatheSession,
   SESSION_COLLECTION,
   sessionProgress,
+  sessionUsable,
 } from './logic/session';
 
 const sessions = db.collection<PrebreatheSession>(SESSION_COLLECTION);
@@ -117,9 +118,18 @@ export default function Screen() {
   const [failed, setFailed] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  // A session left open in another mission, by someone else or long ago is discarded.
   useEffect(() => {
-    void sessions.get(CURRENT_SESSION).then((s) => setSession(s ?? null));
-  }, []);
+    void sessions.get(CURRENT_SESSION).then((s) => {
+      const method = s ? eva.methods.find((m) => m.id === s.method) : undefined;
+      if (s && sessionUsable(s, { crewMember, mission: mission.code }, method, new Date())) {
+        setSession(s);
+        return;
+      }
+      setSession(null);
+      if (s) void sessions.remove(CURRENT_SESSION);
+    });
+  }, [crewMember, mission.code]);
 
   const minute = Math.floor(now.getTime() / 60_000);
   const status = useMemo(
@@ -133,10 +143,15 @@ export default function Screen() {
 
   const start = useCallback(async () => {
     if (!selected) return;
-    const next = { method: selected.id, startedAt: new Date().toISOString(), crewMember };
+    const next = {
+      method: selected.id,
+      startedAt: new Date().toISOString(),
+      crewMember,
+      mission: mission.code,
+    };
     await sessions.put(CURRENT_SESSION, next);
     setSession(next);
-  }, [selected, crewMember]);
+  }, [selected, crewMember, mission.code]);
 
   const finish = useCallback(async () => {
     if (!session || !active) return;
@@ -217,7 +232,11 @@ export default function Screen() {
 
       <Section title={t.status}>
         <View className="border-border gap-2 rounded-lg border p-4">
-          <LevelBadge level={status.level} size="lg" label={t[status.readiness]} />
+          {session && status.readiness === 'none' ? (
+            <LevelBadge level="pending" size="lg" label={t.running} />
+          ) : (
+            <LevelBadge level={status.level} size="lg" label={t[status.readiness]} />
+          )}
           {statusDetail ? <Text className="text-body">{statusDetail}</Text> : null}
           {pre ? (
             <Text className="text-muted-foreground text-body-sm tabular-nums">
