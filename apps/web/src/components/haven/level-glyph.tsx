@@ -46,7 +46,7 @@ export function LevelGlyph({ level, size = 10, lang, muted, pulse, round, classN
           <path d="M6 1.2 11.2 10.5H0.8z" fill="currentColor" />
         )
       ) : null}
-      {level === 'pending' ? (
+      {level === 'pending' || level === 'no-data' ? (
         <circle
           cx="6"
           cy="6"
@@ -56,20 +56,6 @@ export function LevelGlyph({ level, size = 10, lang, muted, pulse, round, classN
           strokeWidth="1.5"
           strokeDasharray="2.2 1.6"
         />
-      ) : null}
-      {level === 'no-data' ? (
-        <>
-          <circle
-            cx="6"
-            cy="6"
-            r="4.75"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.3"
-            strokeDasharray="2.2 1.6"
-          />
-          <path d="M6 3.4V6l1.7 1.1" fill="none" stroke="currentColor" strokeWidth="1.2" />
-        </>
       ) : null}
     </svg>
   );

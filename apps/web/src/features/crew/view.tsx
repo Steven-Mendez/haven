@@ -17,7 +17,6 @@ import {
   StatStrip,
 } from '@/components/haven';
 import { buttonVariants } from '@/components/ui/button';
-import { Kbd } from '@/components/ui/kbd';
 import { format, type Language, translate } from '@/lib/i18n';
 import { getLanguage } from '@/lib/language';
 import { getMissionCode } from '@/lib/mission';
@@ -242,12 +241,7 @@ async function CrewContent({ searchParams }: { searchParams: SearchParams }) {
               ) : null}
             </div>
             <div className="flex items-center gap-3">
-              <p className="text-tertiary hidden items-center gap-1.5 text-xs md:flex">
-                <Kbd>j</Kbd>
-                <Kbd>k</Kbd>
-                <Kbd>↵</Kbd>
-                <span className="sr-only">{h.keyboardHint}</span>
-              </p>
+              <p className="sr-only">{h.keyboardHint}</p>
               <Link href="/crew" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
                 <UserCog data-icon="inline-start" />
                 {t.rosterManage}
