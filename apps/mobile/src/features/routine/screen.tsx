@@ -1,4 +1,13 @@
-import { actionsDone, dailyProgress, dayHistory, dosesForDay, medications } from '@haven/core';
+import {
+  actionsDone,
+  dailyProgress,
+  dayHistory,
+  dosesForDay,
+  exercise,
+  exerciseReminder,
+  medications,
+  prescriptionOf,
+} from '@haven/core';
 import { randomUUID } from 'expo-crypto';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Check, ChevronRight } from 'lucide-react-native';
@@ -164,6 +173,10 @@ export default function Screen() {
         : [],
     [plan, readings, now],
   );
+  const exerciseDue = useMemo(
+    () => exerciseReminder(readings, prescriptionOf(plan, exercise), exercise, now),
+    [plan, readings, now],
+  );
 
   const week = lastSevenDays(history, today).map((d) => ({
     label: new Date(`${d.date}T12:00:00Z`).toLocaleDateString(language, {
@@ -288,6 +301,19 @@ export default function Screen() {
           )}
           action={t.medicationOpen}
           onAction={() => router.push('/medication')}
+        />
+      ) : null}
+
+      {exerciseDue ? (
+        <StepCard
+          title={t.exerciseTitle}
+          detail={
+            exerciseDue.kind === 'assessment'
+              ? t.exerciseAssessment
+              : format(t.exerciseToday, { done: exerciseDue.done, target: exerciseDue.target })
+          }
+          action={t.exerciseOpen}
+          onAction={() => router.push('/exercise')}
         />
       ) : null}
 
