@@ -3,6 +3,7 @@ import {
   evaluate,
   type I18n,
   type Indicator,
+  type IndicatorInput,
   type Level,
   type Reading,
 } from '@haven/core';
@@ -22,6 +23,7 @@ export type EditableIndicator = {
   name: I18n;
   zone: string;
   unit: string;
+  inputs: IndicatorInput[];
   green: Range;
   rules: EditableRule[];
   overrides: string[];
@@ -59,6 +61,7 @@ export function editableIndicators(config: Config): EditableIndicator[] {
       name: i.name,
       zone: i.zone,
       unit: i.unit,
+      inputs: [...(i.inputs ?? [])],
       green: [i.green[0], i.green[1]],
       rules: i.rules.flatMap((r, index) =>
         isRange(r.outside)

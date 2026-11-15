@@ -111,34 +111,23 @@ describe('indicators', () => {
     expect(flagged.sort()).toEqual([...CHALLENGE_INDICATORS].sort());
   });
 
-  it('loads only the essential set; the extras stay in the file, unused', () => {
-    const EXTRAS = [
-      'hrv',
-      'heart-rhythm',
-      'wrist-temperature',
-      'visual-acuity',
-      'bone-loss',
-      'distance',
-      'floors',
-      'weight',
-      'cabin-co2',
-      'cabin-noise',
-      'solar-event',
-    ];
-    expect([...EXTRA_INDICATORS].sort()).toEqual([...EXTRAS].sort());
-    expect(config.indicators).toHaveLength(19);
-    for (const id of EXTRAS) {
-      expect(indicatorIds.has(id), id).toBe(false);
-      expect(isTracked(id), id).toBe(false);
+  it('tracks every indicator in the file: none is hidden and each one says how it is obtained', () => {
+    expect([...EXTRA_INDICATORS]).toEqual([]);
+    expect(config.indicators).toHaveLength(30);
+    expect(loadConfig({ includeExtras: true }).indicators).toHaveLength(30);
+    const INPUTS = ['watch', 'health', 'phone', 'test', 'check-in', 'manual'];
+    for (const i of config.indicators) {
+      expect(isTracked(i.id), i.id).toBe(true);
+      expect(i.extra, i.id).toBeUndefined();
+      expect(i.inputs.length, i.id).toBeGreaterThan(0);
+      expect(new Set(i.inputs).size, i.id).toBe(i.inputs.length);
+      for (const input of i.inputs) expect(INPUTS, i.id).toContain(input);
       expect(
-        config.zones.some((z) => z.indicators.includes(id)),
-        id,
-      ).toBe(false);
+        config.zones.filter((z) => z.indicators.includes(i.id)),
+        i.id,
+      ).toHaveLength(1);
     }
-    expect(isTracked('heart-rate')).toBe(true);
-    const full = loadConfig({ includeExtras: true });
-    expect(full.indicators).toHaveLength(30);
-    expect(full.indicators.find((i) => i.id === 'heart-rhythm')?.categoryLabels?.sinus).toEqual({
+    expect(config.indicators.find((i) => i.id === 'heart-rhythm')?.categoryLabels?.sinus).toEqual({
       es: 'Sinusal',
       en: 'Sinus',
     });

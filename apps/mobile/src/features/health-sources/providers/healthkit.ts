@@ -93,6 +93,13 @@ const ALL_MAPPINGS: Mapping[] = [
     decimals: 0,
   },
   {
+    indicator: 'cabin-noise',
+    type: 'HKQuantityTypeIdentifierEnvironmentalAudioExposure',
+    hkUnit: 'dBASPL',
+    unit: 'dB',
+    decimals: 0,
+  },
+  {
     indicator: 'hrv',
     type: 'HKQuantityTypeIdentifierHeartRateVariabilitySDNN',
     hkUnit: 'ms',

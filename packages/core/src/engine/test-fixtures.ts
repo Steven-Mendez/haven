@@ -11,6 +11,7 @@ const guide: Indicator['guide'] = {
 function indicator(p: Partial<Indicator> & Pick<Indicator, 'id' | 'zone' | 'unit'>): Indicator {
   return {
     name: t(p.id),
+    inputs: ['manual'],
     suggestedByChallenge: true,
     kind: 'number',
     green: [0, 0],

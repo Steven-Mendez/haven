@@ -68,21 +68,27 @@ describe('zoneDetail', () => {
       'diastolic-bp',
       'spo2',
       'body-temperature',
+      'hrv',
+      'heart-rhythm',
+      'wrist-temperature',
     ]);
     expect(detail?.indicators[0]?.level).toBe('amber');
     expect(detail?.indicators[1]?.level).toBe('pending');
     expect(detail?.indicators[1]?.assessment).toBeUndefined();
   });
 
-  it('never lists the untracked extras, even if an assessment for one arrives', () => {
+  it('lists every indicator of the zone; a red one drives the zone and raises an alert', () => {
     const list = [assessment('solar-event', 'red')];
     const detail = zoneDetail('environment', evaluateZones(list, config), list, config);
     expect(detail?.indicators.map((i) => i.indicator.id)).toEqual([
       'radiation-dose',
       'cabin-pressure',
+      'cabin-co2',
+      'cabin-noise',
+      'solar-event',
     ]);
-    expect(detail?.level).toBe('pending');
-    expect(activeAlerts(list, config)).toEqual([]);
+    expect(detail?.level).toBe('red');
+    expect(activeAlerts(list, config).map((a) => a.indicator.id)).toEqual(['solar-event']);
   });
 
   it('a zone without data is pending, never green', () => {
@@ -140,10 +146,22 @@ describe('zoneOrigins', () => {
     const origins = zoneOrigins(config, (id) => latest.get(id));
     const vitals = origins.find((o) => o.zone === 'vitals');
     expect(vitals?.sources).toEqual(['watch', 'manual']);
-    expect(vitals?.missing).toEqual(['spo2', 'body-temperature']);
+    expect(vitals?.missing).toEqual([
+      'spo2',
+      'body-temperature',
+      'hrv',
+      'heart-rhythm',
+      'wrist-temperature',
+    ]);
     const environment = origins.find((o) => o.zone === 'environment');
     expect(environment?.sources).toEqual([]);
-    expect(environment?.missing).toEqual(['radiation-dose', 'cabin-pressure']);
+    expect(environment?.missing).toEqual([
+      'radiation-dose',
+      'cabin-pressure',
+      'cabin-co2',
+      'cabin-noise',
+      'solar-event',
+    ]);
   });
 });
 

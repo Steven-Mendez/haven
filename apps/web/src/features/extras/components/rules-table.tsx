@@ -4,12 +4,18 @@ import {
   Activity,
   Brain,
   Dumbbell,
+  Heart,
   HeartPulse,
+  Keyboard,
   type LucideIcon,
   Pencil,
   Search,
+  Smartphone,
+  SmilePlus,
   Thermometer,
+  Timer,
   Utensils,
+  Watch,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -49,6 +55,16 @@ const zoneIcons: Record<string, LucideIcon> = {
   metabolism: Utensils,
   environment: Thermometer,
 };
+
+const inputIcons = {
+  watch: { Icon: Watch, text: 'inputWatch' },
+  health: { Icon: Heart, text: 'inputHealth' },
+  phone: { Icon: Smartphone, text: 'inputPhone' },
+  test: { Icon: Timer, text: 'inputTest' },
+  'check-in': { Icon: SmilePlus, text: 'inputCheckIn' },
+  manual: { Icon: Keyboard, text: 'inputManual' },
+} as const;
+const inputOrder = Object.keys(inputIcons) as (keyof typeof inputIcons)[];
 
 const range = (r: [number, number], unit: string) => `${r[0]}–${r[1]}${unit ? ` ${unit}` : ''}`;
 
@@ -95,6 +111,23 @@ export function RulesTable({
       >
         <TableCell className="pl-4 font-medium whitespace-normal">
           <TermTip explanation={explanations?.[i.id]}>{name}</TermTip>
+        </TableCell>
+        <TableCell>
+          <ul className="flex items-center gap-1.5" data-inputs={i.inputs.join(' ')}>
+            {i.inputs.map((input) => {
+              const { Icon, text } = inputIcons[input];
+              return (
+                <li key={input}>
+                  <Hint label={t[text]} side="top">
+                    <span className="text-muted-foreground flex size-6 items-center justify-center rounded-md border">
+                      <Icon aria-hidden="true" className="size-3.5" />
+                      <span className="sr-only">{t[text]}</span>
+                    </span>
+                  </Hint>
+                </li>
+              );
+            })}
+          </ul>
         </TableCell>
         <TableCell className="text-muted-foreground tabular-nums">
           {range(i.green, i.unit)}
@@ -161,6 +194,22 @@ export function RulesTable({
               </li>
             ))}
           </ul>
+          <ul
+            aria-label={t.inputsLegend}
+            className="text-muted-foreground mt-1 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs"
+          >
+            {inputOrder
+              .filter((input) => indicators.some((i) => i.inputs.includes(input)))
+              .map((input) => {
+                const { Icon, text } = inputIcons[input];
+                return (
+                  <li key={input} className="flex items-center gap-1.5">
+                    <Icon aria-hidden="true" className="size-3.5" />
+                    {t[text]}
+                  </li>
+                );
+              })}
+          </ul>
         </div>
         <div className="relative w-full sm:w-64">
           <Search
@@ -205,6 +254,7 @@ export function RulesTable({
           <TableHeader>
             <TableRow>
               <TableHead className="pl-4">{t.indicator}</TableHead>
+              <TableHead>{t.colInput}</TableHead>
               <TableHead>
                 <TermTip explanation={rangeExplain}>{t.greenRange}</TermTip>
               </TableHead>
@@ -219,7 +269,7 @@ export function RulesTable({
             {active?.items.map(row)}
             {shown.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-muted-foreground h-16 text-center">
+                <TableCell colSpan={6} className="text-muted-foreground h-16 text-center">
                   {t.noMatches}
                 </TableCell>
               </TableRow>

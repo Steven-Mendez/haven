@@ -16,11 +16,14 @@ export type Zone = {
   dailyAction: { text: I18n; minutes: number; opens: string };
 };
 
+export type IndicatorInput = 'watch' | 'health' | 'phone' | 'test' | 'check-in' | 'manual';
+
 export type Indicator = {
   id: string;
   name: I18n;
   zone: string;
   unit: string;
+  inputs: IndicatorInput[];
   suggestedByChallenge: boolean;
   extra?: boolean;
   everyHours?: number;
