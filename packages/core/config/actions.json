@@ -136,8 +136,8 @@
   {
     "id": "complete-exercise",
     "text": {
-      "es": "Haz hoy tus 45 min de ejercicio resistivo",
-      "en": "Do your 45 min of resistance exercise today"
+      "es": "Completa hoy tu ejercicio de fuerza y aeróbico",
+      "en": "Complete today’s strength and aerobic exercise"
     },
     "priority": 2
   },
@@ -245,5 +245,14 @@
       "en": "Send a message to family or a friend"
     },
     "priority": 3
+  },
+  {
+    "id": "start-decompression-protocol",
+    "text": {
+      "es": "Empieza ya el protocolo de enfermedad por descompresión",
+      "en": "Start the decompression sickness protocol now"
+    },
+    "priority": 1,
+    "protocol": "decompression-sickness"
   }
 ]

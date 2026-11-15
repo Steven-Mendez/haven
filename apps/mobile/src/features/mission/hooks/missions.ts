@@ -75,6 +75,7 @@ const synced = (m: Mission) =>
     m.day,
     m.currentDelayMin,
     m.crew,
+    m.phases,
   ]);
 
 let announcedSession: string | undefined;

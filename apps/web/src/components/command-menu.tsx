@@ -1,18 +1,24 @@
 'use client';
 
 import {
+  BriefcaseBusiness,
   ChartNoAxesCombined,
   Compass,
+  Dumbbell,
   Footprints,
   Languages,
   LogIn,
   Moon,
+  Pill,
+  PlaneLanding,
   Plus,
   Rocket,
   Search,
   Settings,
   SlidersHorizontal,
+  TestTube,
   Users,
+  Waves,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
@@ -147,6 +153,12 @@ export function CommandMenu({ lang, crew }: Props) {
     { href: '/rules', label: t.navRules, icon: SlidersHorizontal },
     { href: '/kpi', label: t.navKpi, icon: ChartNoAxesCombined },
     { href: '/eva', label: t.navEva, icon: Footprints },
+    { href: '/reentry', label: t.navReentry, icon: PlaneLanding },
+    { href: '/medication', label: t.navMedication, icon: Pill },
+    { href: '/samples', label: t.navSamples, icon: TestTube },
+    { href: '/exercise', label: t.navExercise, icon: Dumbbell },
+    { href: '/motion', label: t.navMotion, icon: Waves },
+    { href: '/workload', label: t.navWorkload, icon: BriefcaseBusiness },
     { href: '/missions', label: t.navMissions, icon: Rocket },
     { href: '/settings', label: t.navSettings, icon: Settings },
   ];

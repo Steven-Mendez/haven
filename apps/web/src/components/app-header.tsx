@@ -1,6 +1,7 @@
 'use client';
 
-import { WifiOff } from 'lucide-react';
+import { comms, commsMode } from '@haven/core';
+import { SatelliteDish, WifiOff } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Fragment } from 'react';
@@ -18,12 +19,14 @@ import {
 } from '@/components/ui/breadcrumb';
 import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { format, type Language } from '@/lib/i18n';
+import { format, formatDelay, type Language } from '@/lib/i18n';
 
 type Props = {
   lang: Language;
   day?: number;
   linkDown?: boolean;
+  /** One-way light delay of the mission, in minutes. */
+  delayMin?: number;
   crewNames?: Record<string, string>;
   crew?: CommandCrewMember[];
 };
@@ -33,6 +36,37 @@ type Crumb = { label: string; href?: string };
 const HEADER =
   'bg-surface/80 sticky top-0 z-30 flex h-[calc(3.25rem_+_env(safe-area-inset-top))] shrink-0 items-center gap-2 border-b pt-[env(safe-area-inset-top)] pr-[max(0.75rem,env(safe-area-inset-right))] pl-[max(0.75rem,env(safe-area-inset-left))] backdrop-blur-md md:rounded-tl-3xl md:pr-5 md:pl-5';
 
+/** The link with the crew: live, delayed or autonomous, with what that means for a reply. */
+function LinkChip({ delayMin, t }: { delayMin: number; t: (typeof havenTexts)['es'] }) {
+  const mode = commsMode({ currentDelayMin: delayMin, linkDown: false }, comms);
+  const oneWay = formatDelay(delayMin);
+  const vars = { t: oneWay, rt: formatDelay(delayMin * 2) };
+  const label =
+    mode === 'realtime'
+      ? t.linkRealtime
+      : format(mode === 'autonomous' ? t.linkAutonomous : t.linkDelayed, vars);
+  const hint = format(
+    mode === 'realtime'
+      ? t.linkRealtimeHint
+      : mode === 'autonomous'
+        ? t.linkAutonomousHint
+        : t.linkDelayedHint,
+    vars,
+  );
+  return (
+    <Hint label={hint}>
+      <span
+        className="hidden h-6 items-center gap-1.5 rounded-md border px-2 tabular-nums md:inline-flex"
+        data-testid="link-chip"
+      >
+        <SatelliteDish aria-hidden="true" className="size-3.5" />
+        {label}
+        <span className="sr-only">. {hint}</span>
+      </span>
+    </Hint>
+  );
+}
+
 export function AppHeaderSkeleton() {
   return (
     <header className={HEADER}>
@@ -41,7 +75,7 @@ export function AppHeaderSkeleton() {
   );
 }
 
-export function AppHeader({ lang, day, linkDown, crewNames, crew = [] }: Props) {
+export function AppHeader({ lang, day, linkDown, delayMin, crewNames, crew = [] }: Props) {
   const t = havenTexts[lang];
   const pathname = usePathname();
 
@@ -51,6 +85,12 @@ export function AppHeader({ lang, day, linkDown, crewNames, crew = [] }: Props) 
     crumbs.push({ label: t.navRulesShort, href: '/rules' }, { label: t.editThresholdsCrumb });
   else if (pathname === '/kpi') crumbs.push({ label: t.navKpiShort });
   else if (pathname === '/eva') crumbs.push({ label: t.navEvaShort });
+  else if (pathname === '/reentry') crumbs.push({ label: t.navReentryShort });
+  else if (pathname === '/medication') crumbs.push({ label: t.navMedicationShort });
+  else if (pathname === '/samples') crumbs.push({ label: t.navSamplesShort });
+  else if (pathname === '/exercise') crumbs.push({ label: t.navExerciseShort });
+  else if (pathname === '/motion') crumbs.push({ label: t.navMotionShort });
+  else if (pathname === '/workload') crumbs.push({ label: t.navWorkloadShort });
   else if (pathname === '/missions/new')
     crumbs.push({ label: t.navMissions, href: '/missions' }, { label: t.newMissionCrumb });
   else if (/^\/missions\/[^/]+\/plan$/.test(pathname))
@@ -115,6 +155,8 @@ export function AppHeader({ lang, day, linkDown, crewNames, crew = [] }: Props) 
             <WifiOff aria-hidden="true" className="size-3.5" />
             {t.linkDownShort}
           </span>
+        ) : delayMin !== undefined ? (
+          <LinkChip delayMin={delayMin} t={t} />
         ) : null}
         <Hint label={t.search} kbd="⌘K">
           <CommandTrigger lang={lang} data-tour="search" />

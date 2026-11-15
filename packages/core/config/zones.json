@@ -38,7 +38,7 @@
       "es": "Sueño, actividad, ánimo y estrés: cómo descansas y cómo llevas el aislamiento.",
       "en": "Sleep, activity, mood and stress: how you rest and how you cope with isolation."
     },
-    "indicators": ["sleep", "mood", "stress", "steps"],
+    "indicators": ["sleep", "mood", "stress", "work-hours", "fatigue", "steps"],
     "dailyAction": {
       "text": {
         "es": "Registrar ánimo, estrés, contacto y diario",
@@ -60,6 +60,7 @@
     },
     "indicators": [
       "resistance-exercise",
+      "aerobic-exercise",
       "reaction-time",
       "pvt-lapses",
       "working-memory",
@@ -108,7 +109,14 @@
       "es": "Radiación y presión de la cabina: lo que te rodea y explica cambios en el cuerpo.",
       "en": "Radiation and cabin pressure: what surrounds you and explains changes in the body."
     },
-    "indicators": ["radiation-dose", "cabin-pressure", "cabin-co2", "cabin-noise", "solar-event"],
+    "indicators": [
+      "radiation-dose",
+      "cabin-pressure",
+      "cabin-co2",
+      "cabin-o2",
+      "cabin-noise",
+      "solar-event"
+    ],
     "dailyAction": {
       "text": {
         "es": "Revisar el ambiente de la cabina; al refugio si hay evento solar",

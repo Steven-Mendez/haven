@@ -1,0 +1,30 @@
+{
+  "prescription": { "resistanceMinutes": 45, "aerobicMinutes": 45, "daysPerWeek": 6 },
+  "limits": { "minutes": [0, 180], "daysPerWeek": [3, 7], "sessionMinutes": [1, 180] },
+  "devices": [
+    {
+      "id": "resistance-device",
+      "kind": "resistance",
+      "name": {
+        "es": "Equipo de fuerza (pesas de vacío)",
+        "en": "Resistance device (vacuum weights)"
+      }
+    },
+    {
+      "id": "cycle",
+      "kind": "aerobic",
+      "name": { "es": "Cicloergómetro", "en": "Cycle ergometer" }
+    },
+    {
+      "id": "treadmill",
+      "kind": "aerobic",
+      "name": { "es": "Cinta con arnés", "en": "Treadmill with harness" }
+    }
+  ],
+  "assessment": {
+    "everyDays": 7,
+    "easyEffort": 3,
+    "hardEffort": 8
+  },
+  "source": "Entre 1,5 y 2 h diarias de ejercicio de fuerza y aeróbico, 6–7 días por semana, con autoevaluaciones periódicas para ajustar la carga: NASA HRP, Gravity Fields (https://www.nasa.gov/hrp/hazard-gravity-fields/). Reparto de 45 + 45 min, 6 días por semana, umbrales de esfuerzo percibido (escala 0–10) y autoevaluación semanal: referencia provisional."
+}

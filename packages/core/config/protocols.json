@@ -989,5 +989,114 @@
         }
       }
     ]
+  },
+  {
+    "id": "decompression-sickness",
+    "name": {
+      "es": "Enfermedad por descompresión",
+      "en": "Decompression sickness"
+    },
+    "start": "stop",
+    "steps": [
+      {
+        "id": "stop",
+        "text": {
+          "es": "Para lo que estés haciendo y quédate quieto. Avisa a tu compañero de salida y a la tripulación.",
+          "en": "Stop what you are doing and stay still. Tell your EVA partner and the crew."
+        },
+        "audio": {
+          "es": "Para lo que estés haciendo y quédate quieto. Avisa a tu compañero de salida y a la tripulación.",
+          "en": "Stop what you are doing and stay still. Tell your EVA partner and the crew."
+        },
+        "next": "pure-oxygen"
+      },
+      {
+        "id": "pure-oxygen",
+        "text": {
+          "es": "Respira oxígeno puro: sube la presión del traje si puedes o ponte la máscara de oxígeno al volver a la esclusa.",
+          "en": "Breathe pure oxygen: raise the suit pressure if you can, or put on the oxygen mask once back in the airlock."
+        },
+        "audio": {
+          "es": "Respira oxígeno puro: sube la presión del traje si puedes o ponte la máscara de oxígeno al volver a la esclusa.",
+          "en": "Breathe pure oxygen: raise the suit pressure if you can, or put on the oxygen mask once back in the airlock."
+        },
+        "seconds": 600,
+        "next": "return"
+      },
+      {
+        "id": "return",
+        "text": {
+          "es": "Vuelve a la esclusa con ayuda y represuriza. No hagas esfuerzo: deja que tu compañero lleve el material.",
+          "en": "Return to the airlock with help and repressurize. Avoid effort: let your partner carry the gear."
+        },
+        "audio": {
+          "es": "Vuelve a la esclusa con ayuda y represuriza. No hagas esfuerzo: deja que tu compañero lleve el material.",
+          "en": "Return to the airlock with help and repressurize. Avoid effort: let your partner carry the gear."
+        },
+        "next": "check"
+      },
+      {
+        "id": "check",
+        "text": {
+          "es": "¿Cómo siguen los síntomas después de 10 minutos con oxígeno?",
+          "en": "How are the symptoms after 10 minutes on oxygen?"
+        },
+        "audio": {
+          "es": "¿Cómo siguen los síntomas después de 10 minutos con oxígeno?",
+          "en": "How are the symptoms after 10 minutes on oxygen?"
+        },
+        "options": [
+          {
+            "text": {
+              "es": "Mejoran o desaparecen",
+              "en": "Better or gone"
+            },
+            "next": "observe"
+          },
+          {
+            "text": {
+              "es": "Siguen igual o empeoran, o hay confusión o falta de aire",
+              "en": "Same or worse, or confusion or shortness of breath"
+            },
+            "next": "severe"
+          }
+        ]
+      },
+      {
+        "id": "observe",
+        "text": {
+          "es": "Sigue con oxígeno 2 horas más, bebe agua y no vuelvas a salir hoy. Mide tu oxígeno y tu pulso cada 30 minutos.",
+          "en": "Keep breathing oxygen for 2 more hours, drink water and do not go out again today. Measure your oxygen and pulse every 30 minutes."
+        },
+        "audio": {
+          "es": "Sigue con oxígeno 2 horas más, bebe agua y no vuelvas a salir hoy. Mide tu oxígeno y tu pulso cada 30 minutos.",
+          "en": "Keep breathing oxygen for 2 more hours, drink water and do not go out again today. Measure your oxygen and pulse every 30 minutes."
+        },
+        "next": "earth-packet"
+      },
+      {
+        "id": "severe",
+        "text": {
+          "es": "Síntomas graves: sigue con oxígeno puro, acuéstate y que el médico de a bordo prepare la recompresión en el traje o en la esclusa.",
+          "en": "Severe symptoms: stay on pure oxygen, lie down and have the crew medical officer prepare recompression in the suit or the airlock."
+        },
+        "audio": {
+          "es": "Síntomas graves: sigue con oxígeno puro, acuéstate y que el médico de a bordo prepare la recompresión en el traje o en la esclusa.",
+          "en": "Severe symptoms: stay on pure oxygen, lie down and have the crew medical officer prepare recompression in the suit or the airlock."
+        },
+        "next": "earth-packet"
+      },
+      {
+        "id": "earth-packet",
+        "text": {
+          "es": "Envía un paquete a Tierra con la hora de la salida, los síntomas, el oxígeno y el pulso.",
+          "en": "Send a packet to Earth with the EVA time, the symptoms, oxygen and pulse."
+        },
+        "audio": {
+          "es": "Envía un paquete a Tierra con la hora de la salida, los síntomas, el oxígeno y el pulso.",
+          "en": "Send a packet to Earth with the EVA time, the symptoms, oxygen and pulse."
+        }
+      }
+    ]
   }
 ]

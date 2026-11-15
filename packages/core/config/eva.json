@@ -1,0 +1,60 @@
+{
+  "windowHours": 24,
+  "methods": [
+    {
+      "id": "exercise",
+      "name": { "es": "Ejercicio con oxígeno", "en": "Exercise prebreathe" },
+      "detail": {
+        "es": "Oxígeno puro con mascarilla y 10 minutos de bicicleta y brazos al principio para sacar el nitrógeno más rápido.",
+        "en": "Pure oxygen on a mask with 10 minutes of cycling and arm work at the start to wash out nitrogen faster."
+      },
+      "minutes": 120,
+      "environments": ["station"]
+    },
+    {
+      "id": "isle",
+      "name": {
+        "es": "Ejercicio ligero en el traje (ISLE)",
+        "en": "In-suit light exercise (ISLE)"
+      },
+      "detail": {
+        "es": "Oxígeno puro dentro del traje mientras mueves brazos y piernas sin esfuerzo, con pausas de descanso.",
+        "en": "Pure oxygen inside the suit while moving arms and legs gently, with rest breaks."
+      },
+      "minutes": 100,
+      "environments": ["station"]
+    },
+    {
+      "id": "campout",
+      "name": { "es": "Noche en la esclusa", "en": "Airlock campout" },
+      "detail": {
+        "es": "Duermes en la esclusa a presión reducida y por la mañana respiras oxígeno puro antes de salir.",
+        "en": "You sleep in the airlock at reduced pressure and breathe pure oxygen in the morning before going out."
+      },
+      "minutes": 70,
+      "environments": ["station"]
+    },
+    {
+      "id": "exploration",
+      "name": { "es": "Atmósfera de exploración", "en": "Exploration atmosphere" },
+      "detail": {
+        "es": "El hábitat ya está a baja presión con más oxígeno, así que basta con una prerrespiración corta en el traje.",
+        "en": "The habitat already runs at low pressure with more oxygen, so a short prebreathe in the suit is enough."
+      },
+      "minutes": 15,
+      "environments": ["moon", "mars", "rover", "lunar-orbit", "mars-orbit", "transit"]
+    }
+  ],
+  "postEva": {
+    "symptoms": [
+      "joint-pain",
+      "shortness-of-breath",
+      "dizziness",
+      "confusion",
+      "blurred-vision",
+      "nausea"
+    ],
+    "protocol": "decompression-sickness"
+  },
+  "source": "Prerrespiración de oxígeno puro para eliminar el nitrógeno antes de una salida y su relación con la enfermedad por descompresión: NASA HRP, Risks of Human Spaceflight (https://www.nasa.gov/hrp/risks/). Atmósfera de exploración de 56,5 kPa con 34 % de oxígeno que acorta la prerrespiración: NASA-STD-3001 Vol. 2 (https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/). Duración de cada método en minutos: referencia provisional."
+}

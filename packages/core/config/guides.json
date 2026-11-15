@@ -130,6 +130,24 @@
       "NASA HRP, Hostile/Closed Environments: https://www.nasa.gov/hrp/hazard-hostile-closed-environments/"
     ]
   },
+  "cabin-o2": {
+    "howToMeasure": {
+      "es": "Lo miden los analizadores de aire de cada módulo como presión parcial de oxígeno, en kilopascales (kPa). Anota el valor que muestra el panel del módulo.",
+      "en": "The air analyzers in each module measure it as oxygen partial pressure, in kilopascals (kPa). Log the value shown on the module panel."
+    },
+    "whyItMatters": {
+      "es": "Lo que importa al cuerpo es cuánto oxígeno llega al pulmón, no el porcentaje. Si baja, aparecen mareo, confusión y falta de aire sin que lo notes; si sube mucho, aumenta el riesgo de incendio.",
+      "en": "What matters to the body is how much oxygen reaches the lungs, not the percentage. If it drops, dizziness, confusion and breathlessness appear without you noticing; if it rises a lot, fire risk goes up."
+    },
+    "whatToDo": {
+      "es": "Fuera de 19–23,5 kPa: revisa el aire del módulo y pospón la salida. Por debajo de 16 kPa: máscara de oxígeno y cambia de módulo.",
+      "en": "Outside 19–23.5 kPa: check the module air and postpone the EVA. Below 16 kPa: oxygen mask and move to another module."
+    },
+    "sources": [
+      "NASA-STD-3001 (OCHMO): https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/",
+      "NASA HRP, Hostile/Closed Environments: https://www.nasa.gov/hrp/hazard-hostile-closed-environments/"
+    ]
+  },
   "cabin-noise": {
     "howToMeasure": {
       "es": "Lo miden dosímetros acústicos (medidores de ruido) de la nave, en decibelios (dB); la app lo recibe por la telemetría de la nave.",
@@ -328,6 +346,21 @@
       "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/"
     ]
   },
+  "aerobic-exercise": {
+    "howToMeasure": {
+      "es": "Al terminar la sesión en el cicloergómetro o en la cinta con arnés, registra los minutos en Ejercicio.",
+      "en": "When you finish your session on the cycle ergometer or the harnessed treadmill, log the minutes in Exercise."
+    },
+    "whyItMatters": {
+      "es": "Sin gravedad el corazón trabaja menos y pierde forma. El ejercicio aeróbico lo mantiene entrenado para el regreso.",
+      "en": "Without gravity the heart works less and gets out of shape. Aerobic exercise keeps it trained for the return."
+    },
+    "whatToDo": {
+      "es": "Completa los minutos que te marca Tierra, 45 por defecto. Si un día no llegas, avísalo en la autoevaluación.",
+      "en": "Complete the minutes Earth sets, 45 by default. If you fall short one day, say so in the self-assessment."
+    },
+    "sources": ["NASA HRP, Gravity Fields: https://www.nasa.gov/hrp/hazard-gravity-fields/"]
+  },
   "resistance-exercise": {
     "howToMeasure": {
       "es": "Al terminar la sesión en el equipo de ejercicio de fuerza de la nave (pesas de vacío), marca los minutos en la Rutina.",
@@ -459,6 +492,39 @@
       "NASA, Isolation (CONNECT): https://www.nasa.gov/humans-in-space/isolation-what-can-we-learn-from-the-experiences-of-nasa-astronauts/",
       "NASA HRP, Isolation and Confinement: https://www.nasa.gov/hrp/hazard-isolation-and-confinement/",
       "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/"
+    ]
+  },
+  "work-hours": {
+    "howToMeasure": {
+      "es": "Al terminar la jornada, anota en Carga de trabajo las horas que trabajaste hoy, contando tareas, reuniones y mantenimiento.",
+      "en": "At the end of the workday, log in Workload the hours you worked today, counting tasks, meetings and maintenance."
+    },
+    "whyItMatters": {
+      "es": "Jornadas largas seguidas acumulan fatiga y aumentan los errores, sobre todo con poco sueño y lejos de casa.",
+      "en": "Long workdays in a row build up fatigue and increase errors, above all with little sleep and far from home."
+    },
+    "whatToDo": {
+      "es": "Por encima de 10 h varios días seguidos, habla con la comandante o con Tierra para repartir tareas y guarda un día de descanso por semana.",
+      "en": "Over 10 h several days in a row, talk to the commander or Earth to share tasks out, and keep one rest day a week."
+    },
+    "sources": ["NASA Human Research Program: https://www.nasa.gov/hrp/"]
+  },
+  "fatigue": {
+    "howToMeasure": {
+      "es": "Elige en la escala de 1 a 7 cómo de cansado te sientes ahora; mejor siempre a la misma hora, al acabar la jornada.",
+      "en": "Pick on the 1 to 7 scale how tired you feel right now; best always at the same time, at the end of the workday."
+    },
+    "whyItMatters": {
+      "es": "La fatiga baja la atención y la memoria antes de que lo notes. Con 6 o 7 aumentan mucho los errores en tareas críticas.",
+      "en": "Fatigue lowers attention and memory before you notice. At 6 or 7 errors in critical tasks rise sharply."
+    },
+    "whatToDo": {
+      "es": "Con 5 varios días, revisa la carga y el sueño. Con 6 o 7, evita tareas críticas y descansa antes.",
+      "en": "At 5 several days, review your workload and sleep. At 6 or 7, avoid critical tasks and rest first."
+    },
+    "sources": [
+      "Samn & Perelli, Estimating aircrew fatigue, USAF SAM-TR-82-21 (1982)",
+      "NASA Human Research Program: https://www.nasa.gov/hrp/"
     ]
   },
   "stress": {

@@ -2,7 +2,11 @@ import {
   type Assessment,
   BATTERY_INDICATORS,
   type Config,
+  type EvaPrepStatus,
+  eva,
+  evaPrepStatus,
   type Level,
+  type Reading,
   worstLevel,
 } from '@haven/core';
 
@@ -19,6 +23,7 @@ export type EvaRow = {
   categories: Record<EvaCategory, Level>;
   readiness: EvaReadiness;
   reasons: EvaCategory[];
+  prep: EvaPrepStatus;
 };
 
 export function categoryIndicators(config: Config): Record<EvaCategory, string[]> {
@@ -35,6 +40,8 @@ export function evaRow(
   member: { id: string; name: string; lastDataAt: string | null; noRecentData: boolean },
   assessments: Assessment[],
   config: Config,
+  readings: Reading[] = [],
+  now: Date = new Date(),
 ): EvaRow {
   const ids = categoryIndicators(config);
   const categories = Object.fromEntries(
@@ -46,14 +53,17 @@ export function evaRow(
   const levels = EVA_CATEGORIES.map((c) => categories[c]);
   const reasons = EVA_CATEGORIES.filter((c) => categories[c] !== 'green');
 
+  const prep = evaPrepStatus(readings, eva, now);
+
   let readiness: EvaReadiness;
-  if (assessments.length === 0 || member.noRecentData || levels.every((l) => l === 'pending'))
+  if (prep.readiness === 'symptoms') readiness = 'unfit';
+  else if (assessments.length === 0 || member.noRecentData || levels.every((l) => l === 'pending'))
     readiness = 'no-data';
   else if (levels.includes('red')) readiness = 'unfit';
-  else if (reasons.length > 0) readiness = 'review';
+  else if (reasons.length > 0 || prep.readiness === 'incomplete') readiness = 'review';
   else readiness = 'fit';
 
-  return { ...member, categories, readiness, reasons };
+  return { ...member, categories, readiness, reasons, prep };
 }
 
 export function readinessLevel(readiness: EvaReadiness) {

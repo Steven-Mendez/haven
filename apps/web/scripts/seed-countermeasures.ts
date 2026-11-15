@@ -1,0 +1,659 @@
+// Demo of the countermeasure features: reentry preparation (DEMORE), EVA
+// prebreathe with the post-EVA decompression check (DEMOEV), and the medication
+// plan with biological and habitat samples, and the exercise prescription with
+// its weekly self-assessment and the workload of a station crew (DEMOMS), and motion sickness with the balance test
+// on the second day after landing on the Moon (DEMOCN), and a Mars surface stay
+// with 12 minutes of light delay to see the autonomous communication mode (DEMOMA).
+//
+//   pnpm --filter web seed:countermeasures            # every demo mission
+//   pnpm --filter web seed:countermeasures DEMOMS     # only the ones named
+//
+// Each mission has crew members in every state plus an empty "Revisor" seat to
+// join from the app on the simulator and go through the flows by hand.
+import { fileURLToPath } from 'node:url';
+import {
+  type Assessment,
+  assessmentReading,
+  balanceReading,
+  type CrewPlan,
+  classifySample,
+  computeBaseline,
+  dailyProgress,
+  doseReading,
+  dosesForDay,
+  type ExercisePrescription,
+  eva,
+  evaluate,
+  type MedicationAssignment,
+  type MissionPhase,
+  medications,
+  missionDays,
+  missionTemplates,
+  motionReading,
+  orthostaticReadings,
+  type Packet,
+  postEvaReadings,
+  prebreatheReading,
+  type Reading,
+  reentryCheckReading,
+  type SampleResult,
+  sampleConfig,
+  sampleReading,
+} from '@haven/core';
+import { demoHistory } from '@haven/core/testdata';
+import { MongoClient } from 'mongodb';
+import {
+  baseConfig,
+  COLLECTIONS,
+  INDEXES,
+  type MissionDoc,
+  type PacketDoc,
+  packetDoc,
+} from '../src/server/model';
+import { mongoDbName, mongoUri } from '../src/server/mongo-env';
+
+const MINUTE = 60_000;
+const HOUR = 60 * MINUTE;
+const DAY = 24 * HOUR;
+const HISTORY_DAYS = 7;
+
+process.loadEnvFile(fileURLToPath(new URL('../.env.local', import.meta.url)));
+
+const config = baseConfig();
+const now = Date.now();
+const iso = (ms: number) => new Date(ms).toISOString();
+let seq = 0;
+const newId = () => `cm-${(++seq).toString(36)}`;
+
+type Member = {
+  id: string;
+  name: string;
+  role: [es: string, en: string];
+  /** Readings added to the last packet, built with the same helpers the app uses. */
+  extra?: (member: string, at: number) => Reading[];
+  /** Changes the history of the last day. */
+  tweak?: (readings: Reading[], at: number) => void;
+  note?: string;
+  /** No packets: the seat for the app on the simulator. */
+  empty?: boolean;
+  /** Medication plan Earth assigned. */
+  plan?: MedicationAssignment[];
+  /** Exercise prescription Earth changed; the default applies without it. */
+  exercise?: ExercisePrescription;
+};
+
+type Demo = {
+  code: string;
+  name: string;
+  template: string;
+  /** Phase environment the mission is in today. */
+  today: string;
+  /** Day within today's phase (1 is the first); 3 without it, 1 in reentry. */
+  phaseDay?: number;
+  /** One-way light delay today, in minutes; 0 without it. */
+  delayMin?: number;
+  crew: Member[];
+};
+
+const phasesOf = (template: string): MissionPhase[] =>
+  missionTemplates.find((t) => t.id === template)?.phases ?? [];
+
+/** Mission day on which the first phase in `environment` starts. */
+function firstDayOf(phases: MissionPhase[], environment: string): number {
+  let day = 1;
+  for (const p of phases) {
+    if (p.environment === environment) return day;
+    day += p.days;
+  }
+  return 1;
+}
+
+const opts = (member: string, at: number) => ({ crewMember: member, takenAt: iso(at), newId });
+const method = (id: string) => {
+  const m = eva.methods.find((x) => x.id === id);
+  if (!m) throw new Error(`unknown prebreathe method ${id}`);
+  return m;
+};
+const lastDay = (readings: Reading[], at: number, indicator: string, value: number) => {
+  for (const r of readings) {
+    const t = Date.parse(r.takenAt);
+    if (r.indicator === indicator && t > at - DAY && t <= at) r.value = value;
+  }
+};
+
+/**
+ * Sets the value of an indicator on the days `daysAgo` before `at` (0 is
+ * today); 0 removes that day's reading.
+ */
+function setDays(
+  readings: Reading[],
+  at: number,
+  indicator: string,
+  minutesByDaysAgo: Record<number, number>,
+) {
+  for (let i = readings.length - 1; i >= 0; i--) {
+    const r = readings[i];
+    if (!r || r.indicator !== indicator) continue;
+    const minutes = minutesByDaysAgo[Math.floor((at - Date.parse(r.takenAt)) / DAY)];
+    if (minutes === undefined) continue;
+    if (minutes === 0) readings.splice(i, 1);
+    else r.value = minutes;
+  }
+}
+
+const selfAssessment = (
+  member: string,
+  at: number,
+  effort: number,
+  pain: 'none' | 'mild' | 'strong',
+  completion: 'full' | 'partial' | 'none',
+) => assessmentReading({ effort, pain, completion }, opts(member, at));
+
+const results: SampleResult[] = [];
+
+/** Every scheduled dose of the last 7 days, taken unless `skip(n)` says otherwise. */
+function doseHistory(
+  member: string,
+  plan: MedicationAssignment[],
+  at: number,
+  skip: (n: number) => 'taken' | 'skipped' | 'missed' = () => 'taken',
+): Reading[] {
+  const crewPlan: CrewPlan = { mission: '', crewMember: member, medications: plan, updatedAt: '' };
+  const out: Reading[] = [];
+  let n = 0;
+  for (let k = 6; k >= 0; k--) {
+    const day = iso(at - k * DAY).slice(0, 10);
+    for (const dose of dosesForDay(crewPlan, medications, [], new Date(at), day)) {
+      const scheduled = Date.parse(dose.scheduledAt);
+      if (scheduled > at - 15 * MINUTE) continue;
+      const status = skip(n++);
+      if (status === 'missed') continue;
+      out.push(
+        doseReading(
+          dose.medication,
+          { status, scheduledAt: dose.scheduledAt },
+          opts(member, scheduled + 10 * MINUTE),
+        ),
+      );
+    }
+  }
+  return out;
+}
+
+/** A sample collection and, when values are given, the lab result Earth already entered. */
+function sample(
+  member: string,
+  at: number,
+  id: string,
+  extra?: {
+    module?: string;
+    answers?: Record<string, string>;
+    comment?: string;
+    values?: Record<string, number>;
+    detail?: string;
+  },
+): Reading {
+  const r = sampleReading(id, {
+    ...opts(member, at),
+    ...(extra?.module ? { module: extra.module } : {}),
+    ...(extra?.answers ? { answers: extra.answers } : {}),
+    ...(extra?.comment ? { comment: extra.comment } : {}),
+  });
+  const type = sampleConfig.samples.find((s) => s.id === id);
+  const level = type && extra?.values ? classifySample(type, extra.values).level : undefined;
+  if (level && extra?.values) {
+    results.push({
+      id: r.id,
+      mission: 'DEMOMS',
+      crewMember: member,
+      sample: id,
+      collectedAt: r.takenAt,
+      ...(extra.module ? { module: extra.module } : {}),
+      result: level,
+      values: extra.values,
+      computed: level,
+      ...(extra.detail ? { detail: extra.detail } : {}),
+      enteredAt: iso(at + 6 * HOUR),
+      author: 'Control de misión',
+    });
+  }
+  return r;
+}
+
+const symptom = (member: string, at: number, value: string): Reading => ({
+  id: newId(),
+  indicator: 'symptom',
+  value,
+  unit: '',
+  takenAt: iso(at),
+  source: 'manual',
+  simulated: false,
+  crewMember: member,
+});
+
+const BONE_PLAN: MedicationAssignment[] = [
+  { medication: 'vitamin-d' },
+  { medication: 'vitamin-b-complex' },
+  { medication: 'alendronate' },
+];
+
+const REVIEWER: Member = {
+  id: 'revisor',
+  name: 'Revisor (tu app)',
+  role: ['Revisión', 'Review'],
+  empty: true,
+};
+
+const DEMOS: Demo[] = [
+  {
+    code: 'DEMORE',
+    name: 'Demo reentrada',
+    template: 'lunar-flyby',
+    today: 'reentry',
+    crew: [
+      {
+        id: 'lucia-ortiz',
+        name: 'Lucía Ortiz',
+        role: ['Comandante', 'Commander'],
+        note: 'Lista completa: líquidos, prenda de compresión y prueba ortostática sin síntomas.',
+        extra: (m, at) => [
+          reentryCheckReading('fluid-loading', opts(m, at - 90 * MINUTE)),
+          reentryCheckReading('compression-garment', opts(m, at - 60 * MINUTE)),
+          ...orthostaticReadings(
+            { supine: 64, standing: 78, symptoms: [] },
+            { ...opts(m, at - 30 * MINUTE), supineAt: iso(at - 35 * MINUTE) },
+          ),
+        ],
+      },
+      {
+        id: 'omar-haddad',
+        name: 'Omar Haddad',
+        role: ['Piloto', 'Pilot'],
+        note: 'El pulso me sube bastante al ponerme de pie. Aún no me he puesto la prenda.',
+        extra: (m, at) => [
+          reentryCheckReading('fluid-loading', opts(m, at - 80 * MINUTE)),
+          ...orthostaticReadings(
+            { supine: 66, standing: 100, symptoms: [] },
+            { ...opts(m, at - 20 * MINUTE), supineAt: iso(at - 25 * MINUTE) },
+          ),
+        ],
+      },
+      {
+        id: 'nina-petrova',
+        name: 'Nina Petrova',
+        role: ['Especialista de misión', 'Mission specialist'],
+        note: 'Mareo fuerte al levantarme en la prueba; he bebido poco hoy.',
+        tweak: (rs, at) => lastDay(rs, at, 'hydration', 1200),
+        extra: (m, at) =>
+          orthostaticReadings(
+            { supine: 70, standing: 96, symptoms: ['dizziness'] },
+            { ...opts(m, at - 15 * MINUTE), supineAt: iso(at - 20 * MINUTE) },
+          ),
+      },
+      {
+        id: 'tomas-reyes',
+        name: 'Tomás Reyes',
+        role: ['Ingeniero de vuelo', 'Flight engineer'],
+        note: 'Todavía no he empezado la preparación.',
+      },
+      REVIEWER,
+    ],
+  },
+  {
+    code: 'DEMOEV',
+    name: 'Demo EVA lunar',
+    template: 'lunar-landing',
+    today: 'moon',
+    crew: [
+      {
+        id: 'kai-nakamura',
+        name: 'Kai Nakamura',
+        role: ['Comandante', 'Commander'],
+        note: 'Salida de 6 h sin incidencias.',
+        extra: (m, at) => [
+          prebreatheReading(
+            { method: method('exploration'), startedAt: iso(at - 8 * HOUR - 20 * MINUTE) },
+            opts(m, at - 8 * HOUR),
+          ),
+          ...postEvaReadings([], opts(m, at - HOUR)),
+        ],
+      },
+      {
+        id: 'sofia-mendes',
+        name: 'Sofía Mendes',
+        role: ['Geóloga', 'Geologist'],
+        note: 'Tuve que quitarme la mascarilla a los 8 minutos; el O₂ del módulo marca bajo.',
+        tweak: (rs, at) => lastDay(rs, at, 'cabin-o2', 17.8),
+        extra: (m, at) => [
+          prebreatheReading(
+            { method: method('exploration'), startedAt: iso(at - 38 * MINUTE) },
+            opts(m, at - 30 * MINUTE),
+          ),
+        ],
+      },
+      {
+        id: 'diego-alvarez',
+        name: 'Diego Álvarez',
+        role: ['Médico de vuelo', 'Flight surgeon'],
+        note: 'Dolor en el codo derecho y el hombro al volver de la salida. Protocolo de descompresión iniciado.',
+        extra: (m, at) => [
+          prebreatheReading(
+            { method: method('exploration'), startedAt: iso(at - 7 * HOUR - 15 * MINUTE) },
+            opts(m, at - 7 * HOUR),
+          ),
+          ...postEvaReadings(['joint-pain'], opts(m, at - 40 * MINUTE)),
+        ],
+      },
+      REVIEWER,
+    ],
+  },
+  {
+    code: 'DEMOMS',
+    name: 'Demo medicación y muestras',
+    template: 'station-stay',
+    today: 'station',
+    crew: [
+      {
+        id: 'ines-garcia',
+        name: 'Inés García',
+        role: ['Comandante', 'Commander'],
+        note: 'Todo al día: suplementos tomados y muestras de esta semana entregadas.',
+        plan: BONE_PLAN,
+        tweak: (rs, at) => setDays(rs, at, 'work-hours', { 2: 3 }),
+        extra: (m, at) => [
+          selfAssessment(m, at - 2 * DAY, 2, 'none', 'full'),
+          ...doseHistory(m, BONE_PLAN, at),
+          sample(m, at - 9 * DAY, 'saliva', {
+            answers: { ate: 'no' },
+            values: { ebv: 250, vzv: 0, hsv1: 0 },
+          }),
+          sample(m, at - 2 * DAY, 'saliva', {
+            answers: { ate: 'no' },
+            values: { ebv: 310, vzv: 0, hsv1: 0 },
+          }),
+          sample(m, at - 5 * DAY + HOUR, 'blood', {
+            answers: { fasting: 'yes', storage: 'frozen' },
+            values: { wbc: 6.2, lymphocytes: 1.9, glucose: 88 },
+          }),
+          sample(m, at - 5 * DAY + 2 * HOUR, 'urine', {
+            answers: { 'first-morning': 'yes', storage: 'frozen' },
+          }),
+          sample(m, at - 4 * DAY, 'surface-swab', {
+            module: 'lab',
+            answers: { surface: 'panels' },
+            values: { bacteria: 1200, fungi: 10 },
+          }),
+        ],
+      },
+      {
+        id: 'jonas-weber',
+        name: 'Jonas Weber',
+        role: ['Ingeniero de vuelo', 'Flight engineer'],
+        note: 'Llevo días olvidando las pastillas de la mañana; tengo un herpes en el labio.',
+        plan: [
+          ...BONE_PLAN,
+          {
+            medication: 'antibiotic',
+            until: iso(Date.now() + 3 * DAY).slice(0, 10),
+            note: 'Infección de piel: 7 días.',
+          },
+        ],
+        tweak: (rs, at) => {
+          setDays(rs, at, 'aerobic-exercise', { 1: 0, 2: 15, 4: 0, 5: 20 });
+          setDays(rs, at, 'resistance-exercise', { 1: 30, 4: 0 });
+          setDays(rs, at, 'work-hours', { 0: 12, 1: 11.5, 2: 11, 3: 11, 4: 10.5 });
+          setDays(rs, at, 'fatigue', { 0: 6, 1: 5 });
+          setDays(rs, at, 'sleep', { 0: 5.2, 1: 5.8 });
+        },
+        extra: (m, at) => [
+          selfAssessment(m, at - DAY, 8, 'mild', 'partial'),
+          ...doseHistory(m, [...BONE_PLAN, { medication: 'antibiotic' }], at, (n) =>
+            n % 3 === 0 ? 'taken' : n % 3 === 1 ? 'missed' : 'skipped',
+          ),
+          sample(m, at - 16 * DAY, 'saliva', {
+            answers: { ate: 'no' },
+            values: { ebv: 400, vzv: 0, hsv1: 5 },
+          }),
+          sample(m, at - 9 * DAY, 'saliva', {
+            answers: { ate: 'yes' },
+            values: { ebv: 1800, vzv: 0, hsv1: 900 },
+            detail: 'Herpes simple detectable; repetir en la próxima toma.',
+          }),
+          symptom(m, at - 2 * DAY - 3 * HOUR, 'fever-chills'),
+          sample(m, at - 2 * DAY, 'saliva', {
+            answers: { ate: 'no' },
+            comment: 'Tengo una calentura en el labio desde ayer.',
+          }),
+        ],
+      },
+      {
+        id: 'aiko-tanaka',
+        name: 'Aiko Tanaka',
+        role: ['Médica de vuelo', 'Flight surgeon'],
+        note: 'Mareo fuerte hoy tras el cambio de órbita: dos antimareos.',
+        plan: [{ medication: 'motion-sickness' }, { medication: 'melatonin' }],
+        exercise: {
+          resistanceMinutes: 30,
+          aerobicMinutes: 30,
+          daysPerWeek: 5,
+          note: 'Mientras dure el mareo, intensidad suave y sin carrera.',
+        },
+        tweak: (rs, at) => {
+          setDays(rs, at, 'aerobic-exercise', { 0: 0, 1: 0, 3: 10 });
+          setDays(rs, at, 'resistance-exercise', { 0: 20 });
+          setDays(rs, at, 'work-hours', { 0: 10.5, 1: 11, 2: 10.5, 5: 4 });
+          setDays(rs, at, 'fatigue', { 0: 4 });
+        },
+        extra: (m, at) => [
+          // Last self-assessment over a week ago: the next one is due.
+          selfAssessment(m, at - 8 * DAY, 4, 'none', 'full'),
+          doseReading('motion-sickness', { status: 'taken' }, opts(m, at - 5 * HOUR)),
+          doseReading('motion-sickness', { status: 'taken' }, opts(m, at - HOUR)),
+          sample(m, at - 2 * DAY, 'saliva', { answers: { ate: 'yes' } }),
+          sample(m, at - 3 * HOUR, 'surface-swab', {
+            module: 'galley',
+            answers: { surface: 'handles' },
+            comment: 'Mancha oscura detrás del panel del horno.',
+          }),
+        ],
+      },
+      {
+        ...REVIEWER,
+        plan: [
+          {
+            medication: 'vitamin-d',
+            schedule: { kind: 'daily', times: [iso(Date.now() - 30 * MINUTE).slice(11, 16)] },
+          },
+          { medication: 'antibiotic', note: 'Cada 12 h hasta terminar.' },
+          { medication: 'motion-sickness' },
+        ],
+      },
+    ],
+  },
+  {
+    code: 'DEMOCN',
+    name: 'Demo cinetosis',
+    template: 'lunar-landing',
+    today: 'moon',
+    phaseDay: 2,
+    crew: [
+      {
+        id: 'lucia-ferrer',
+        name: 'Lucía Ferrer',
+        role: ['Comandante', 'Commander'],
+        note: 'Ayer me mareé al bajar del módulo; hoy ya casi nada.',
+        extra: (m, at) => [
+          motionReading(4, opts(m, at - DAY - 2 * HOUR)),
+          motionReading(1, opts(m, at - 3 * HOUR)),
+          balanceReading({ open: 9, closed: 18 }, opts(m, at - 2 * HOUR)),
+        ],
+      },
+      {
+        id: 'omar-haddad',
+        name: 'Omar Haddad',
+        role: ['Piloto', 'Pilot'],
+        note: 'Náuseas desde la llegada; he vomitado una vez esta mañana.',
+        extra: (m, at) => [
+          motionReading(6, opts(m, at - DAY - HOUR)),
+          motionReading(7, opts(m, at - 4 * HOUR)),
+          balanceReading({ open: 14, closed: 48 }, opts(m, at - 3 * HOUR)),
+        ],
+      },
+      {
+        id: 'mei-lin',
+        name: 'Mei Lin',
+        role: ['Especialista de misión', 'Mission specialist'],
+        note: 'Algo de dolor de cabeza ayer. Hoy aún no he anotado nada.',
+        extra: (m, at) => [
+          motionReading(2, opts(m, at - DAY - 3 * HOUR)),
+          balanceReading({ open: 8, closed: 22 }, opts(m, at - DAY - 2 * HOUR)),
+        ],
+      },
+      REVIEWER,
+    ],
+  },
+  {
+    code: 'DEMOMA',
+    name: 'Demo Marte (retardo)',
+    template: 'mars-conjunction',
+    today: 'mars',
+    phaseDay: 120,
+    delayMin: 12,
+    crew: [
+      {
+        id: 'nadia-okafor',
+        name: 'Nadia Okafor',
+        role: ['Comandante', 'Commander'],
+        note: 'Todo en orden. Recibimos vuestro mensaje de ayer con 12 minutos de retraso.',
+      },
+      {
+        id: 'pavel-ivanov',
+        name: 'Pavel Ivanov',
+        role: ['Ingeniero de vuelo', 'Flight engineer'],
+        note: 'Revisamos el soporte vital por nuestra cuenta; os enviamos el informe.',
+      },
+      REVIEWER,
+    ],
+  },
+];
+
+function assess(readings: Reading[], environment: string, at: number): Assessment[] {
+  const known = readings.filter((r) => Date.parse(r.takenAt) <= at);
+  const baselines: Record<string, Assessment['baseline']> = {};
+  for (const indicator of config.indicators) {
+    baselines[indicator.id] = computeBaseline(known, indicator.id);
+  }
+  const symptoms = known.filter((r) => r.indicator === 'symptom');
+  return evaluate(known, config, environment, baselines, symptoms, new Date(at)).map((a) => ({
+    ...a,
+    simulated: false,
+  }));
+}
+
+function packetsFor(demo: Demo, member: Member, last: number): PacketDoc[] {
+  const history = demoHistory(member.id, new Date(last), { days: HISTORY_DAYS }).map((r) => ({
+    ...r,
+    crewMember: member.id,
+    simulated: false,
+  }));
+  member.tweak?.(history, last);
+  const extra = member.extra?.(member.id, last) ?? [];
+  const all = [...history, ...extra];
+  const docs: PacketDoc[] = [];
+  let previousAt = 0;
+  for (let k = HISTORY_DAYS - 1; k >= 0; k--) {
+    const at = last - k * DAY;
+    const known = all.filter((r) => Date.parse(r.takenAt) <= at);
+    const packet: Packet = {
+      id: `demo-${demo.code}-${member.id}-${String(HISTORY_DAYS - k).padStart(3, '0')}`,
+      type: 'routine',
+      crewMember: member.id,
+      assessments: assess(all, demo.today, at),
+      readings: known.filter((r) => Date.parse(r.takenAt) > previousAt),
+      notes: k === 0 ? (member.note ?? '') : '',
+      dailyProgress: dailyProgress(known, config, new Date(at)),
+      mission: demo.code,
+      createdAt: iso(at),
+      sentAt: iso(at),
+      visibleAt: iso(at),
+    };
+    docs.push(packetDoc(packet, new Date(at)));
+    previousAt = at;
+  }
+  return docs;
+}
+
+const client = await new MongoClient(mongoUri(), { serverSelectionTimeoutMS: 5000 }).connect();
+try {
+  const db = client.db(mongoDbName());
+  for (const [name, indexes] of Object.entries(INDEXES)) {
+    for (const i of indexes)
+      await db.collection(name).createIndex(i.key, i.unique ? { unique: true } : {});
+  }
+  const only = process.argv.slice(2).map((c) => c.toUpperCase());
+  for (const demo of DEMOS.filter((d) => only.length === 0 || only.includes(d.code))) {
+    const phases = phasesOf(demo.template).map((p) =>
+      demo.delayMin !== undefined && p.environment === demo.today
+        ? { ...p, delayMin: demo.delayMin }
+        : p,
+    );
+    const day =
+      demo.today === 'station'
+        ? 40
+        : firstDayOf(phases, demo.today) +
+          (demo.phaseDay ?? (demo.today === 'reentry' ? 1 : 3)) -
+          1;
+    const docs = demo.crew
+      .filter((m) => !m.empty)
+      .flatMap((m, i) => packetsFor(demo, m, now - (10 + i * 7) * MINUTE));
+    const hasWatch = new Set(
+      docs.filter((d) => d.readings.some((r) => r.source === 'watch')).map((d) => d.crewMember),
+    );
+    const mission: MissionDoc = {
+      code: demo.code,
+      name: demo.name,
+      environment: demo.today,
+      day,
+      currentDelayMin: demo.delayMin ?? 0,
+      linkDown: false,
+      crew: demo.crew.map((m) => ({
+        id: m.id,
+        name: m.name,
+        hasWatch: hasWatch.has(m.id),
+        role: { es: m.role[0], en: m.role[1] },
+      })),
+      start: iso(now - (day - 1) * DAY - HOUR),
+      durationDays: missionDays(phases),
+      phases,
+      createdAt: iso(now),
+      origin: 'seed',
+    };
+    await Promise.all([
+      db.collection(COLLECTIONS.packets).deleteMany({ mission: demo.code }),
+      db.collection(COLLECTIONS.missions).deleteMany({ code: demo.code }),
+      db.collection(COLLECTIONS.rules).deleteMany({ mission: demo.code }),
+      db.collection(COLLECTIONS.plans).deleteMany({ mission: demo.code }),
+      db.collection(COLLECTIONS.sampleResults).deleteMany({ mission: demo.code }),
+    ]);
+    const plans = demo.crew
+      .filter((m) => m.plan || m.exercise)
+      .map((m) => ({
+        mission: demo.code,
+        crewMember: m.id,
+        medications: m.plan ?? [],
+        ...(m.exercise ? { exercise: m.exercise } : {}),
+        updatedAt: iso(now - 7 * DAY),
+        author: 'Control de misión',
+      }));
+    if (plans.length) await db.collection(COLLECTIONS.plans).insertMany(plans);
+    const own = results.filter((r) => r.mission === demo.code);
+    if (own.length)
+      await db.collection(COLLECTIONS.sampleResults).insertMany(own.map((r) => ({ ...r })));
+    await db.collection<MissionDoc>(COLLECTIONS.missions).insertOne({ ...mission });
+    if (docs.length) await db.collection<PacketDoc>(COLLECTIONS.packets).insertMany(docs);
+    console.log(`${demo.code} (${demo.name}), day ${day} in ${demo.today}: ${docs.length} packets`);
+    for (const m of demo.crew) console.log(`  ${m.id}${m.empty ? ' (seat for the app)' : ''}`);
+  }
+} finally {
+  await client.close();
+}

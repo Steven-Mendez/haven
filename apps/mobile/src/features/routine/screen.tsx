@@ -1,4 +1,26 @@
-import { actionsDone, dailyProgress, dayHistory } from '@haven/core';
+import {
+  actionsDone,
+  adaptationWindow,
+  canPerformEva,
+  dailyProgress,
+  dayHistory,
+  dosesForDay,
+  eva,
+  evaPrepStatus,
+  exercise,
+  exerciseReminder,
+  isReentry,
+  medications,
+  motion,
+  motionCheckDue,
+  prescriptionOf,
+  reentry,
+  reentryStatus,
+  sampleConfig,
+  sampleStates,
+  workload,
+  workloadReminder,
+} from '@haven/core';
 import { randomUUID } from 'expo-crypto';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Check, ChevronRight } from 'lucide-react-native';
@@ -36,6 +58,7 @@ import {
 import { useLanguage, useTexts, useTranslate } from '@/shared/i18n';
 import { useLayout } from '@/shared/lib/layout';
 import { cn } from '@/shared/lib/utils';
+import { usePlan } from '@/shared/plan';
 import { TourAnchor, useTourScroll } from '@/shared/tour';
 import { CheckinCard } from './components/checkin-card';
 import { ActionsGuide } from './components/guide';
@@ -153,6 +176,40 @@ export default function Screen() {
     [readings, config, mission.environment, now],
   );
   const checkin = useMemo(() => todayCheckin(readings, today), [readings, today]);
+  const reentryPrep = useMemo(
+    () => (isReentry(mission.environment) ? reentryStatus(readings, reentry, now) : undefined),
+    [readings, mission.environment, now],
+  );
+  const evaPrep = useMemo(
+    () => (canPerformEva(mission.environment, eva) ? evaPrepStatus(readings, eva, now) : undefined),
+    [readings, mission.environment, now],
+  );
+  const plan = usePlan();
+  const pendingDoses = useMemo(
+    () =>
+      plan
+        ? dosesForDay(plan, medications, readings, now).filter(
+            (d) => d.status === 'due' || d.status === 'missed',
+          )
+        : [],
+    [plan, readings, now],
+  );
+  const pendingSamples = useMemo(
+    () =>
+      sampleStates(sampleConfig, Math.max(1, mission.day), readings, now).filter(
+        (s) => s.status === 'due' || s.status === 'overdue',
+      ),
+    [mission.day, readings, now],
+  );
+  const exerciseDue = useMemo(
+    () => exerciseReminder(readings, prescriptionOf(plan, exercise), exercise, now),
+    [plan, readings, now],
+  );
+  const motionDue = useMemo(
+    () => motionCheckDue(readings, adaptationWindow(mission, motion, config.environments), now),
+    [readings, mission, config.environments, now],
+  );
+  const workloadDue = useMemo(() => workloadReminder(readings, workload, now), [readings, now]);
 
   const week = lastSevenDays(history, today).map((d) => ({
     label: new Date(`${d.date}T12:00:00Z`).toLocaleDateString(language, {
@@ -263,6 +320,91 @@ export default function Screen() {
           )}
         </Section>
       </TourAnchor>
+
+      {reentryPrep ? (
+        <StepCard
+          title={t.reentryTitle}
+          detail={
+            reentryPrep.readiness === 'ready'
+              ? t.reentryReady
+              : format(t.reentryDetail, { done: reentryPrep.done, total: reentryPrep.total })
+          }
+          action={t.reentryOpen}
+          onAction={() => router.push('/reentry')}
+        />
+      ) : null}
+
+      {evaPrep ? (
+        <StepCard
+          title={t.evaTitle}
+          detail={evaPrep.readiness === 'symptoms' ? t.evaSymptoms : t.evaDetail}
+          action={t.evaOpen}
+          onAction={() => router.push('/eva')}
+        />
+      ) : null}
+
+      {pendingDoses.length ? (
+        <StepCard
+          title={t.medicationTitle}
+          detail={format(
+            pendingDoses.some((d) => d.status === 'due') ? t.medicationDue : t.medicationMissed,
+            {
+              names: [...new Set(pendingDoses.map((d) => d.medication))]
+                .map((id) => translate(medications.catalog.find((m) => m.id === id)?.name) || id)
+                .join(', '),
+            },
+          )}
+          action={t.medicationOpen}
+          onAction={() => router.push('/medication')}
+        />
+      ) : null}
+
+      {pendingSamples.length ? (
+        <StepCard
+          title={t.samplesTitle}
+          detail={format(
+            pendingSamples.some((s) => s.status === 'overdue') ? t.samplesOverdue : t.samplesDue,
+            {
+              names: pendingSamples
+                .map((s) => translate(sampleConfig.samples.find((x) => x.id === s.sample)?.name))
+                .join(', '),
+            },
+          )}
+          action={t.samplesOpen}
+          onAction={() => router.push('/samples')}
+        />
+      ) : null}
+
+      {exerciseDue ? (
+        <StepCard
+          title={t.exerciseTitle}
+          detail={
+            exerciseDue.kind === 'assessment'
+              ? t.exerciseAssessment
+              : format(t.exerciseToday, { done: exerciseDue.done, target: exerciseDue.target })
+          }
+          action={t.exerciseOpen}
+          onAction={() => router.push('/exercise')}
+        />
+      ) : null}
+
+      {motionDue ? (
+        <StepCard
+          title={t.motionTitle}
+          detail={t.motionDue}
+          action={t.motionOpen}
+          onAction={() => router.push('/motion')}
+        />
+      ) : null}
+
+      {workloadDue ? (
+        <StepCard
+          title={t.workloadTitle}
+          detail={workloadDue === 'rest' ? t.workloadRest : t.workloadLog}
+          action={t.workloadOpen}
+          onAction={() => router.push('/workload')}
+        />
+      ) : null}
 
       <Collapsible open={guideOpen} onOpenChange={setGuideOpen} className="gap-8">
         <CollapsibleTrigger

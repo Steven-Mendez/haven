@@ -1,22 +1,38 @@
 import actionsJson from '../../config/actions.json';
+import commsJson from '../../config/comms.json';
 import environments from '../../config/environments.json';
+import evaJson from '../../config/eva.json';
+import exerciseJson from '../../config/exercise.json';
 import glossaryJson from '../../config/glossary.json';
 import guides from '../../config/guides.json';
 import indicators from '../../config/indicators.json';
+import medicationsJson from '../../config/medications.json';
 import templatesJson from '../../config/mission-templates.json';
+import motionJson from '../../config/motion.json';
 import protocols from '../../config/protocols.json';
+import reentryJson from '../../config/reentry.json';
+import samplesJson from '../../config/samples.json';
 import symptomsJson from '../../config/symptoms.json';
 import unitsJson from '../../config/units.json';
 import version from '../../config/version.json';
+import workloadJson from '../../config/workload.json';
 import zones from '../../config/zones.json';
 import type {
   Action,
+  CommsConfig,
   Config,
   Environment,
+  EvaConfig,
+  ExerciseConfig,
   I18n,
   Indicator,
+  MedicationConfig,
   MissionPhase,
   MissionTemplate,
+  MotionConfig,
+  ReentryConfig,
+  SampleConfig,
+  WorkloadConfig,
 } from '../contracts';
 
 type IndicatorWithoutGuide = Omit<Indicator, 'guide'>;
@@ -34,6 +50,7 @@ export const SYMPTOMS = [
   'fever-chills',
   'sweating',
   'palpitations',
+  'joint-pain',
 ] as const;
 
 export type SymptomId = (typeof SYMPTOMS)[number];
@@ -89,6 +106,15 @@ export const actions: Action[] = actionsJson as Action[];
 export function actionById(id: string): Action | undefined {
   return actions.find((a) => a.id === id);
 }
+
+export const reentry: ReentryConfig = reentryJson as ReentryConfig;
+export const eva: EvaConfig = evaJson as EvaConfig;
+export const medications: MedicationConfig = medicationsJson as MedicationConfig;
+export const sampleConfig: SampleConfig = samplesJson as SampleConfig;
+export const exercise: ExerciseConfig = exerciseJson as ExerciseConfig;
+export const motion: MotionConfig = motionJson as MotionConfig;
+export const workload: WorkloadConfig = workloadJson as WorkloadConfig;
+export const comms: CommsConfig = commsJson as CommsConfig;
 
 export type LoadedConfig = Config & { actions: Action[] };
 

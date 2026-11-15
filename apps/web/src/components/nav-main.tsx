@@ -1,12 +1,18 @@
 'use client';
 
 import {
+  BriefcaseBusiness,
   ChartNoAxesCombined,
+  Dumbbell,
   Footprints,
+  Pill,
+  PlaneLanding,
   Rocket,
   SlidersHorizontal,
+  TestTube,
   UserRound,
   Users,
+  Waves,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -78,6 +84,32 @@ export function NavMain({ lang, crew }: Props) {
       active: pathname === '/kpi',
     },
     { href: '/eva', label: t.navEvaShort, icon: Footprints, active: pathname === '/eva' },
+    { href: '/motion', label: t.navMotionShort, icon: Waves, active: pathname === '/motion' },
+    {
+      href: '/reentry',
+      label: t.navReentryShort,
+      icon: PlaneLanding,
+      active: pathname === '/reentry',
+    },
+    {
+      href: '/medication',
+      label: t.navMedicationShort,
+      icon: Pill,
+      active: pathname === '/medication',
+    },
+    { href: '/samples', label: t.navSamplesShort, icon: TestTube, active: pathname === '/samples' },
+    {
+      href: '/exercise',
+      label: t.navExerciseShort,
+      icon: Dumbbell,
+      active: pathname === '/exercise',
+    },
+    {
+      href: '/workload',
+      label: t.navWorkloadShort,
+      icon: BriefcaseBusiness,
+      active: pathname === '/workload',
+    },
     {
       href: '/missions',
       label: t.navMissions,

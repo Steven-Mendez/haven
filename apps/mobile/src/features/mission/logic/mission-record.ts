@@ -1,4 +1,4 @@
-import type { Environment, Mission, MissionStatus } from '@haven/core';
+import type { Environment, Mission, MissionPhase, MissionStatus } from '@haven/core';
 import { isValidMissionCode, normalizeMissionCode } from './code';
 import { type CrewOption, crewFromApi, mergeCrew, missionCrew } from './crew';
 import { clampDelay, defaultDelay } from './environment';
@@ -20,6 +20,8 @@ export type MissionRecord = {
   awaitingStart?: true;
   finishedAt?: string;
   startAt?: string;
+  /** Phase plan from Earth: environments and their days. */
+  phases?: MissionPhase[];
 };
 
 export type MissionDraft = {
@@ -120,6 +122,7 @@ export function missionFromRecord(record: MissionRecord, current: Mission, now: 
     day: recordDay(record, now),
     currentDelayMin: record.currentDelayMin,
     crew: record.crew ? missionCrew(record.crew) : current.crew,
+    phases: record.phases,
   };
 }
 
@@ -138,6 +141,16 @@ export function toApiBody(record: MissionRecord, crew: Mission['crew']) {
 const STATUSES: MissionStatus[] = ['planned', 'scheduled', 'active', 'finished'];
 const isStatus = (value: unknown): value is MissionStatus =>
   STATUSES.includes(value as MissionStatus);
+
+function phasesFromApi(value: unknown): MissionPhase[] | undefined {
+  if (!Array.isArray(value) || value.length === 0) return undefined;
+  const phases = value.flatMap((p) =>
+    p && typeof p === 'object' && typeof p.environment === 'string' && Number.isInteger(p.days)
+      ? [{ environment: p.environment as string, days: Math.max(1, p.days as number) }]
+      : [],
+  );
+  return phases.length === value.length ? phases : undefined;
+}
 
 export function recordFromApi(value: unknown): MissionRecord | undefined {
   if (!value || typeof value !== 'object') return undefined;
@@ -167,6 +180,7 @@ export function recordFromApi(value: unknown): MissionRecord | undefined {
     ...(isStatus(m.status) ? { status: m.status } : {}),
     ...(m.awaitingStart === true ? { awaitingStart: true as const } : {}),
     ...(typeof m.finishedAt === 'string' ? { finishedAt: m.finishedAt } : {}),
+    ...(phasesFromApi(m.phases) ? { phases: phasesFromApi(m.phases) } : {}),
     ...(typeof m.start === 'string' && m.start.length > 10 && Date.parse(m.start)
       ? { startAt: m.start }
       : {}),

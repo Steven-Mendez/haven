@@ -75,6 +75,17 @@
       "en": "mmHg: millimetres of mercury; here, how much CO₂ is in the air"
     }
   },
+  "cabin-o2": {
+    "term": { "es": "Oxígeno de la cabina", "en": "Cabin oxygen" },
+    "short": {
+      "es": "Cuánto oxígeno hay en el aire del módulo. Si baja, mareo y confusión; si sube, riesgo de fuego.",
+      "en": "How much oxygen the module air holds. Too low causes dizziness; too high raises fire risk."
+    },
+    "unitHint": {
+      "es": "kPa: kilopascales; aquí, la presión del oxígeno dentro del aire",
+      "en": "kPa: kilopascals; here, the pressure of the oxygen within the air"
+    }
+  },
   "cabin-noise": {
     "term": { "es": "Ruido de la cabina", "en": "Cabin noise" },
     "short": {
@@ -207,6 +218,17 @@
       "en": "mL: milliliters; 1000 mL make one liter"
     }
   },
+  "aerobic-exercise": {
+    "term": { "es": "Ejercicio aeróbico", "en": "Aerobic exercise" },
+    "short": {
+      "es": "Bicicleta o cinta a ritmo sostenido. Mantiene en forma el corazón y la resistencia.",
+      "en": "Cycling or treadmill at a steady pace. Keeps the heart and endurance in shape."
+    },
+    "unitHint": {
+      "es": "min: minutos de ejercicio en el día",
+      "en": "min: minutes of exercise in the day"
+    }
+  },
   "resistance-exercise": {
     "term": { "es": "Ejercicio de fuerza", "en": "Strength exercise" },
     "short": {
@@ -305,6 +327,22 @@
       "es": "puntos (1–5): 1 es muy mal y 5 es muy bien",
       "en": "points (1–5): 1 is very bad and 5 is very good"
     }
+  },
+  "work-hours": {
+    "term": { "es": "Horas de trabajo", "en": "Work hours" },
+    "short": {
+      "es": "Horas trabajadas en el día. Jornadas largas seguidas acumulan fatiga.",
+      "en": "Hours worked in the day. Long workdays in a row build up fatigue."
+    },
+    "unitHint": { "es": "h: horas trabajadas hoy", "en": "h: hours worked today" }
+  },
+  "fatigue": {
+    "term": { "es": "Fatiga", "en": "Fatigue" },
+    "short": {
+      "es": "Cansancio que sientes, de 1 (alerta) a 7 (agotado), en la escala Samn-Perelli.",
+      "en": "How tired you feel, from 1 (alert) to 7 (exhausted), on the Samn-Perelli scale."
+    },
+    "unitHint": { "es": "puntos: 1 alerta, 7 agotado", "en": "points: 1 alert, 7 exhausted" }
   },
   "stress": {
     "term": { "es": "Estrés", "en": "Stress" },

@@ -1,4 +1,12 @@
-import type { Packet, Protocol, Reading } from '@haven/core';
+import {
+  actsAlone,
+  comms,
+  commsMode,
+  linkTimes,
+  type Packet,
+  type Protocol,
+  type Reading,
+} from '@haven/core';
 import { randomUUID } from 'expo-crypto';
 import { useKeepAwake } from 'expo-keep-awake';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
@@ -159,6 +167,8 @@ function Emergency({
   const t = useTexts(texts);
   const language = useLanguage();
   const mission = useMission();
+  // With a long delay or no link, Earth cannot guide the emergency in time.
+  const alone = actsAlone(commsMode(mission, comms));
   const preferences = usePreferences();
   const [startedAt] = useState(() => new Date());
   const crewName =
@@ -397,6 +407,26 @@ function Emergency({
           }
         />
       </View>
+
+      {alone ? (
+        <View
+          className="border-border mx-4 mb-2 gap-1 rounded-lg border px-4 py-3"
+          accessible
+          accessibilityLiveRegion="polite"
+        >
+          <Text className="text-body font-semibold">{t.aloneTitle}</Text>
+          <Text className="text-muted-foreground text-caption">
+            {mission.linkDown
+              ? t.aloneOffline
+              : format(t.aloneDelay, {
+                  reply: new Date(
+                    linkTimes(new Date(), mission.currentDelayMin).replyAt,
+                  ).toLocaleTimeString(language, { hour: '2-digit', minute: '2-digit' }),
+                  n: Math.round(mission.currentDelayMin * 2),
+                })}
+          </Text>
+        </View>
+      ) : null}
 
       {watching && (response !== 'responding' || status === 'unresponsive') ? (
         <View

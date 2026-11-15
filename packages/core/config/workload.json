@@ -1,0 +1,43 @@
+{
+  "fatigueScale": [
+    {
+      "score": 1,
+      "label": { "es": "Totalmente alerta, despierto del todo", "en": "Fully alert, wide awake" }
+    },
+    {
+      "score": 2,
+      "label": {
+        "es": "Muy activo, con energía, pero no al máximo",
+        "en": "Very lively, responsive, but not at peak"
+      }
+    },
+    { "score": 3, "label": { "es": "Bien, algo fresco", "en": "Okay, somewhat fresh" } },
+    {
+      "score": 4,
+      "label": { "es": "Algo cansado, menos fresco", "en": "A little tired, less than fresh" }
+    },
+    {
+      "score": 5,
+      "label": { "es": "Bastante cansado, sin energía", "en": "Moderately tired, let down" }
+    },
+    {
+      "score": 6,
+      "label": {
+        "es": "Muy cansado, cuesta concentrarse",
+        "en": "Extremely tired, very difficult to concentrate"
+      }
+    },
+    {
+      "score": 7,
+      "label": {
+        "es": "Agotado, incapaz de rendir bien",
+        "en": "Completely exhausted, unable to function effectively"
+      }
+    }
+  ],
+  "fatigue": { "amber": 5, "red": 6 },
+  "day": { "long": 10, "max": 12, "rest": 4 },
+  "week": { "amber": 60, "red": 70, "minRestDays": 1, "longStreak": 3 },
+  "shortSleep": 6,
+  "source": "Escala de fatiga Samn-Perelli de 7 puntos (Samn y Perelli, 1982), usada en aviación y en vuelos espaciales. La carga de trabajo, el horario y el sueño son factores del riesgo de fatiga y de errores: NASA HRP, Risk of Performance Decrements and Adverse Health Outcomes Resulting from Sleep Loss, Circadian Desynchronization, and Work Overload (https://www.nasa.gov/hrp/). Jornada larga de más de 10 h, máximo de 12 h, día de descanso de 4 h o menos, 60–70 h semanales y un día de descanso a la semana: referencia provisional."
+}

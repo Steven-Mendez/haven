@@ -1,14 +1,26 @@
 import 'server-only';
 import {
+  type CrewPlan,
+  classifySample,
+  cleanAssignments,
+  cleanPrescription,
   crewAggregates,
+  emptyPlan,
+  exercise as exerciseConfig,
   type Mission,
   type MissionPhase,
+  medications as medicationConfig,
   missionDays,
+  parseCollection,
   type Reading,
+  type SampleLevel,
+  type SampleResult,
+  collections as sampleCollections,
+  sampleConfig,
 } from '@haven/core';
 import { type KpiDashboard, type KpiSeriesData, validateDashboard } from '@/lib/kpi';
 import { CREW_NOT_READY } from '@/server/types';
-import { dashboards, missions, packets, rules } from './collections';
+import { dashboards, missions, packets, plans, rules, sampleResults } from './collections';
 import {
   baseConfig,
   type CrewEntry,
@@ -582,6 +594,95 @@ export async function missionAggregates(
   };
 }
 
+export async function getPlan(mission: string, crewMember: string): Promise<CrewPlan> {
+  const doc = await (await plans()).findOne({ mission, crewMember }, NO_ID);
+  return doc ?? emptyPlan(mission, crewMember);
+}
+
+export async function listPlans(mission: string): Promise<CrewPlan[]> {
+  return (await plans()).find({ mission }, NO_ID).toArray();
+}
+
+export async function savePlan(
+  mission: string,
+  crewMember: string,
+  medications: unknown,
+  author?: string,
+  now = new Date(),
+): Promise<Result<CrewPlan>> {
+  if (!(await findMission(mission, now))) return fail(404, `Mission ${mission} does not exist`);
+  const plan: CrewPlan = {
+    mission,
+    crewMember,
+    medications: cleanAssignments(medications, medicationConfig),
+    updatedAt: now.toISOString(),
+    ...(author ? { author: author.slice(0, 80) } : {}),
+  };
+  await (await plans()).updateOne({ mission, crewMember }, { $set: plan }, { upsert: true });
+  return { ok: true, status: 200, data: plan };
+}
+
+export async function listSampleResults(mission: string): Promise<SampleResult[]> {
+  return (await sampleResults()).find({ mission }, NO_ID).sort({ collectedAt: 1 }).toArray();
+}
+
+export type SampleResultInput = {
+  id: string;
+  /** Lab values by analyte id; unknown analytes are dropped. */
+  values?: Record<string, number>;
+  /** Earth's level when it overrides the one computed from the values. */
+  override?: string;
+  detail?: string;
+  author?: string;
+};
+
+const LEVELS: SampleLevel[] = ['normal', 'abnormal', 'critical'];
+
+/** Stores Earth's lab result for one collection reading that already arrived. */
+export async function saveSampleResult(
+  mission: string,
+  input: SampleResultInput,
+  now = new Date(),
+): Promise<Result<SampleResult>> {
+  const doc = await (await packets()).findOne(
+    { mission, 'readings.id': input.id },
+    { projection: { _id: 0, readings: 1 } },
+  );
+  const reading = doc ? sampleCollections(doc.readings).find((r) => r.id === input.id) : undefined;
+  if (!reading) return fail(404, `Sample ${input.id} has not arrived`);
+  const sample = sampleConfig.samples.find((s) => s.id === reading.value);
+  if (!sample) return fail(400, `Unknown sample ${String(reading.value)}`);
+  const values = Object.fromEntries(
+    sample.analytes
+      .map((a) => [a.id, input.values?.[a.id]] as const)
+      .filter(
+        (e): e is readonly [string, number] => typeof e[1] === 'number' && Number.isFinite(e[1]),
+      ),
+  );
+  const { level: computed } = classifySample(sample, values);
+  const override = LEVELS.find((l) => l === input.override);
+  const result = override ?? computed;
+  if (!result) return fail(400, 'Enter at least one value or choose a result');
+  const { module } = parseCollection(reading);
+  const doc2: SampleResult = {
+    id: reading.id,
+    mission,
+    crewMember: reading.crewMember,
+    sample: sample.id,
+    collectedAt: reading.takenAt,
+    ...(module ? { module } : {}),
+    result,
+    ...(Object.keys(values).length ? { values } : {}),
+    ...(computed ? { computed } : {}),
+    ...(override && override !== computed ? { overridden: true } : {}),
+    ...(input.detail?.trim() ? { detail: input.detail.trim().slice(0, 280) } : {}),
+    enteredAt: now.toISOString(),
+    ...(input.author ? { author: input.author.slice(0, 80) } : {}),
+  };
+  await (await sampleResults()).replaceOne({ id: doc2.id }, doc2, { upsert: true });
+  return { ok: true, status: 200, data: doc2 };
+}
+
 export async function missionKpiSeries(code: string, indicators: string[]): Promise<KpiSeriesData> {
   const byCrewMember = await readingsByCrewMember(code);
   return {
@@ -626,4 +727,31 @@ export async function saveDashboard(
     { upsert: true },
   );
   return { ok: true, status: 200, data: checked.dashboard };
+}
+
+/**
+ * Sets or clears (with null) the exercise prescription of one crew member.
+ * Only the exercise field changes: the medication plan stays as it is.
+ */
+export async function savePrescription(
+  mission: string,
+  crewMember: string,
+  input: unknown,
+  author?: string,
+  now = new Date(),
+): Promise<Result<CrewPlan>> {
+  if (!(await findMission(mission, now))) return fail(404, `Mission ${mission} does not exist`);
+  const prescription = input === null ? undefined : cleanPrescription(input, exerciseConfig);
+  if (input !== null && !prescription) return fail(400, 'Invalid exercise prescription');
+  const meta = { updatedAt: now.toISOString(), ...(author ? { author: author.slice(0, 80) } : {}) };
+  await (await plans()).updateOne(
+    { mission, crewMember },
+    {
+      $set: prescription ? { ...meta, exercise: prescription } : meta,
+      ...(prescription ? {} : { $unset: { exercise: '' } }),
+      $setOnInsert: { mission, crewMember, medications: [] },
+    },
+    { upsert: true },
+  );
+  return { ok: true, status: 200, data: await getPlan(mission, crewMember) };
 }

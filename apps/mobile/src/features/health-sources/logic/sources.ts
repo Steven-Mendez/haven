@@ -142,14 +142,26 @@ export function rhythmFromEcg(classification: string): 'sinus' | 'irregular' | u
   return undefined;
 }
 
+/** HKWorkoutActivityType: functional and traditional strength training, core training. */
 export const RESISTANCE_WORKOUT_TYPES: readonly number[] = [20, 50, 59];
+/** HKWorkoutActivityType: cycling, elliptical, rowing, running, HIIT and mixed cardio. */
+export const AEROBIC_WORKOUT_TYPES: readonly number[] = [13, 16, 35, 37, 63, 73];
 
-export function resistanceMinutes(
-  workouts: { type: number; end: Date; seconds: number }[],
+type Workout = { type: number; end: Date; seconds: number };
+
+export const resistanceMinutes = (workouts: Workout[]) =>
+  workoutMinutes(workouts, RESISTANCE_WORKOUT_TYPES);
+export const aerobicMinutes = (workouts: Workout[]) =>
+  workoutMinutes(workouts, AEROBIC_WORKOUT_TYPES);
+
+/** Minutes of the given workout types on each local day. */
+export function workoutMinutes(
+  workouts: Workout[],
+  types: readonly number[],
 ): { day: Date; minutes: number; end: Date }[] {
   const days = new Map<string, { day: Date; seconds: number; end: Date }>();
   for (const w of workouts) {
-    if (!RESISTANCE_WORKOUT_TYPES.includes(w.type) || !(w.seconds > 0)) continue;
+    if (!types.includes(w.type) || !(w.seconds > 0)) continue;
     const key = localDay(w.end);
     const day = days.get(key) ?? {
       day: new Date(w.end.getFullYear(), w.end.getMonth(), w.end.getDate()),

@@ -606,6 +606,80 @@
     "source": "Tres registros seguidos con estrés ≥4: regla de M10 y P01, referencia provisional. Recursos CONNECT: NASA, Isolation (https://www.nasa.gov/humans-in-space/isolation-what-can-we-learn-from-the-experiences-of-nasa-astronauts/)."
   },
   {
+    "id": "work-hours",
+    "name": {
+      "es": "Horas de trabajo",
+      "en": "Work hours"
+    },
+    "zone": "mind",
+    "unit": "h",
+    "inputs": ["manual"],
+    "suggestedByChallenge": false,
+    "ridge": ["isolation", "distance"],
+    "everyHours": 24,
+    "kind": "number",
+    "green": [0, 10],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [0, 10],
+        "repetitions": 3,
+        "explanation": {
+          "es": "Tres jornadas seguidas de más de 10 horas: la fatiga se acumula y aumentan los errores.",
+          "en": "Three workdays in a row over 10 hours: fatigue builds up and errors increase."
+        },
+        "actions": ["review-workload", "prioritize-rest"]
+      },
+      {
+        "level": "amber",
+        "outside": [0, 12],
+        "explanation": {
+          "es": "Más de 12 horas de trabajo hoy. Descansa antes de la próxima tarea.",
+          "en": "Over 12 work hours today. Rest before the next task."
+        },
+        "actions": ["prioritize-rest", "review-workload"]
+      }
+    ],
+    "source": "Jornada larga de más de 10 h y máximo de 12 h: referencia provisional. La sobrecarga de trabajo es uno de los factores del riesgo de fatiga de NASA HRP (https://www.nasa.gov/hrp/)."
+  },
+  {
+    "id": "fatigue",
+    "name": {
+      "es": "Fatiga",
+      "en": "Fatigue"
+    },
+    "zone": "mind",
+    "unit": "points (1–7)",
+    "inputs": ["manual"],
+    "suggestedByChallenge": false,
+    "ridge": ["isolation", "distance"],
+    "everyHours": 24,
+    "kind": "number",
+    "green": [1, 4],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [1, 4],
+        "repetitions": 3,
+        "explanation": {
+          "es": "Tres registros seguidos con fatiga de 5 o más: revisa la carga de trabajo y el sueño.",
+          "en": "Three logs in a row with fatigue of 5 or more: review your workload and sleep."
+        },
+        "actions": ["review-workload", "sleep-hygiene"]
+      },
+      {
+        "level": "amber",
+        "outside": [1, 5],
+        "explanation": {
+          "es": "Fatiga muy alta (6 o más de 7). Evita tareas críticas hasta descansar.",
+          "en": "Very high fatigue (6 or more out of 7). Avoid critical tasks until you rest."
+        },
+        "actions": ["prioritize-rest", "review-workload", "notify-earth"]
+      }
+    ],
+    "source": "Escala Samn-Perelli de 7 puntos. Ámbar desde 5 repetido y desde 6 en un solo registro: referencia provisional. NASA HRP, riesgo de fatiga por falta de sueño, desajuste circadiano y sobrecarga de trabajo (https://www.nasa.gov/hrp/)."
+  },
+  {
     "id": "steps",
     "name": {
       "es": "Pasos",
@@ -692,6 +766,33 @@
       }
     ],
     "source": "45 min al día: valor inicial de P01, referencia provisional. El ejercicio es la contramedida principal contra la pérdida ósea y muscular: NASA HRP, Gravity Fields (https://www.nasa.gov/hrp/hazard-gravity-fields/)."
+  },
+  {
+    "id": "aerobic-exercise",
+    "name": {
+      "es": "Ejercicio aeróbico",
+      "en": "Aerobic exercise"
+    },
+    "zone": "performance",
+    "unit": "min",
+    "inputs": ["watch", "health", "manual"],
+    "suggestedByChallenge": false,
+    "ridge": ["gravity"],
+    "everyHours": 24,
+    "kind": "number",
+    "green": [45, 240],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [45, 240],
+        "explanation": {
+          "es": "No llegaste a los 45 minutos de ejercicio aeróbico de hoy: el corazón y la resistencia lo necesitan.",
+          "en": "You did not reach today’s 45 minutes of aerobic exercise: your heart and endurance need it."
+        },
+        "actions": ["complete-exercise"]
+      }
+    ],
+    "source": "45 min al día en cicloergómetro o cinta: reparto provisional de los 90 min diarios. El ejercicio aeróbico mantiene la capacidad cardiovascular en microgravedad: NASA HRP, Gravity Fields (https://www.nasa.gov/hrp/hazard-gravity-fields/)."
   },
   {
     "id": "reaction-time",
@@ -1448,6 +1549,42 @@
       }
     ],
     "source": "Umbral de 3 mmHg: valor inicial de P01, a confirmar con NASA-STD-3001 Vol. 2 (https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/). El CO₂ figura como riesgo del peligro de entornos cerrados: Valinia et al., NESC 2022 (https://ntrs.nasa.gov/api/citations/20220009899/downloads/F5.2_04_Valinia.pdf); NASA HRP, Hostile/Closed Environments (https://www.nasa.gov/hrp/hazard-hostile-closed-environments/)."
+  },
+  {
+    "id": "cabin-o2",
+    "name": {
+      "es": "Oxígeno de la cabina",
+      "en": "Cabin oxygen"
+    },
+    "zone": "environment",
+    "unit": "kPa",
+    "inputs": ["manual"],
+    "suggestedByChallenge": false,
+    "ridge": ["environment"],
+    "everyHours": 12,
+    "kind": "number",
+    "green": [19, 23.5],
+    "rules": [
+      {
+        "level": "red",
+        "outside": [16, 30],
+        "explanation": {
+          "es": "Oxígeno de la cabina por debajo de 16 kPa: riesgo de hipoxia. Ponte la máscara de oxígeno y cambia de módulo.",
+          "en": "Cabin oxygen below 16 kPa: risk of hypoxia. Put on the oxygen mask and move to another module."
+        },
+        "actions": ["apply-oxygen", "change-module", "notify-earth"]
+      },
+      {
+        "level": "amber",
+        "outside": [19, 23.5],
+        "explanation": {
+          "es": "Oxígeno de la cabina fuera de la referencia (19–23,5 kPa). Revisa el aire del módulo y pospón la salida si sigue así.",
+          "en": "Cabin oxygen outside the reference (19–23.5 kPa). Check the module air and postpone the EVA if it persists."
+        },
+        "actions": ["check-ventilation", "postpone-eva", "notify-earth"]
+      }
+    ],
+    "source": "Presión parcial de oxígeno de 19–23,5 kPa, que incluye el aire a nivel del mar (21,3 kPa) y la atmósfera de exploración de 56,5 kPa con 34 % de O₂ (19,2 kPa): referencia provisional, a confirmar con NASA-STD-3001 Vol. 2 (https://www.nasa.gov/ochmo/human-spaceflight-and-aviation-standards/). Rojo por debajo de 16 kPa (hipoxia) o por encima de 30 kPa (riesgo de incendio): referencia provisional. Hipoxia y atmósfera como riesgos: NASA HRP, Hostile/Closed Environments (https://www.nasa.gov/hrp/hazard-hostile-closed-environments/)."
   },
   {
     "id": "cabin-noise",

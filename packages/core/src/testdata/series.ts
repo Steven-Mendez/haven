@@ -143,6 +143,14 @@ export const SERIES: SeriesDef[] = [
     note: (c) => (inRestModule(c.hour) ? 'module:rest' : 'module:lab'),
   },
   {
+    indicator: 'cabin-o2',
+    unit: 'kPa',
+    everyHours: 1,
+    source: 'ship',
+    decimals: 1,
+    value: (c) => 21.2 + gaussian(c.rng, 0.25),
+  },
+  {
     indicator: 'cabin-noise',
     unit: 'dB',
     everyHours: 1,
@@ -251,6 +259,14 @@ export const SERIES: SeriesDef[] = [
     value: (c) => 45 + Math.floor(c.rng() * 16),
   },
   {
+    indicator: 'aerobic-exercise',
+    unit: 'min',
+    everyHours: 24,
+    source: 'manual',
+    decimals: 0,
+    value: (c) => 45 + Math.floor(c.rng() * 11),
+  },
+  {
     indicator: 'bone-loss',
     unit: '%',
     everyHours: 168,
@@ -321,6 +337,22 @@ export const SERIES: SeriesDef[] = [
     source: 'screen',
     decimals: 0,
     value: (c) => (c.rng() < 0.1 ? 1 : 2),
+  },
+  {
+    indicator: 'work-hours',
+    unit: 'h',
+    everyHours: 24,
+    source: 'manual',
+    decimals: 1,
+    value: (c) => Math.round((7.5 + c.rng() * 2) * 2) / 2,
+  },
+  {
+    indicator: 'fatigue',
+    unit: '1-7',
+    everyHours: 24,
+    source: 'manual',
+    decimals: 0,
+    value: (c) => (c.rng() < 0.3 ? 3 : 2),
   },
   {
     indicator: 'sleep',

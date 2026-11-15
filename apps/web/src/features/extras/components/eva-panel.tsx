@@ -1,12 +1,6 @@
-import { Info } from 'lucide-react';
-import {
-  AgeLabel,
-  EmptyState,
-  LevelBadge,
-  LevelGlyph,
-  levelLabel,
-  Section,
-} from '@/components/haven';
+import { eva, symptomById } from '@haven/core';
+import { Brain, HeartPulse, Info, type LucideIcon, Moon, Thermometer } from 'lucide-react';
+import { AgeLabel, EmptyState, Hint, levelLabel } from '@/components/haven';
 import { Term } from '@/components/haven/term';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
@@ -28,8 +22,29 @@ import {
   readinessLevel,
 } from '../logic/eva';
 import { getEvaReadiness } from '../server';
+import {
+  CrewCell,
+  PanelHeading,
+  panelTable,
+  StatusPill,
+  SummaryChips,
+  toneOf,
+} from './panel-parts';
 
 const READINESS: EvaReadiness[] = ['fit', 'review', 'unfit', 'no-data'];
+
+const CATEGORY_ICON: Record<EvaCategory, LucideIcon> = {
+  vitals: HeartPulse,
+  cognition: Brain,
+  sleep: Moon,
+  environment: Thermometer,
+};
+
+const LEVEL_TEXT: Record<string, string> = {
+  green: 'text-level-green',
+  amber: 'text-level-amber',
+  red: 'text-level-red',
+};
 
 const CATEGORY_TERM: Record<EvaCategory, string> = {
   vitals: 'vitals',
@@ -51,19 +66,56 @@ function categoryLabel(c: EvaCategory, t: ExtrasTexts) {
   }[c];
 }
 
+function checkText(row: EvaRow, lang: Language, t: ExtrasTexts) {
+  const check = row.prep.check;
+  if (!check) return t.checkNone;
+  if (check.clear) return t.checkClear;
+  return check.symptoms.map((s) => symptomById(s)?.name[lang] ?? s).join(', ');
+}
+
 function reasonText(row: EvaRow, t: ExtrasTexts) {
+  if (row.prep.readiness === 'symptoms') return t.dcsReason;
   if (row.readiness === 'no-data') return row.noRecentData ? t.staleReason : t.noPackets;
-  if (row.reasons.length === 0) return t.allGreen;
+  if (row.reasons.length === 0 && row.prep.readiness !== 'incomplete') return t.allGreen;
   const list = (level: (l: string) => boolean) =>
     row.reasons.filter((c) => level(row.categories[c])).map((c) => categoryLabel(c, t));
   const flagged = list((l) => l === 'amber' || l === 'red');
   const missing = list((l) => l === 'pending');
   return [
     flagged.join(', '),
+    row.prep.readiness === 'incomplete' ? t.prebreatheReason : '',
     missing.length ? format(t.missing, { list: missing.join(', ').toLowerCase() }) : '',
   ]
     .filter(Boolean)
     .join(' · ');
+}
+
+/** The four categories as one segmented icon strip, each colored by its level. */
+function Categories({ row, lang, t }: { row: EvaRow; lang: Language; t: ExtrasTexts }) {
+  return (
+    <ul className="bg-surface-elevated/60 inline-flex items-center divide-x rounded-md border">
+      {EVA_CATEGORIES.map((c) => {
+        const Icon = CATEGORY_ICON[c];
+        const level = row.categories[c];
+        const label = `${categoryLabel(c, t)}: ${levelLabel(level, lang)}`;
+        return (
+          <li key={c}>
+            <Hint label={label} side="top">
+              <span
+                className={cn(
+                  'flex size-7 items-center justify-center',
+                  LEVEL_TEXT[level] ?? 'text-tertiary',
+                )}
+              >
+                <Icon aria-hidden="true" className="size-3.5" />
+                <span className="sr-only">{label}</span>
+              </span>
+            </Hint>
+          </li>
+        );
+      })}
+    </ul>
+  );
 }
 
 export async function EvaPanel({
@@ -77,99 +129,122 @@ export async function EvaPanel({
 }) {
   const data = await getEvaReadiness(mission);
   const rows = data?.rows ?? [];
-  const counts = Object.fromEntries(
-    READINESS.map((r) => [r, rows.filter((x) => x.readiness === r).length]),
-  ) as Record<EvaReadiness, number>;
 
   return (
-    <Section
-      title={
-        <Term id="eva" lang={lang} plain>
-          {t.evaTitle}
-        </Term>
-      }
-      description={t.evaDescription}
-    >
+    <section aria-labelledby="eva" className="flex min-w-0 flex-col gap-3">
+      <PanelHeading
+        id="eva"
+        title={
+          <Term id="eva" lang={lang} plain>
+            {t.evaTitle}
+          </Term>
+        }
+        count={rows.length || undefined}
+        description={t.evaDescription}
+      >
+        <ul className="text-muted-foreground flex flex-wrap items-center gap-x-4 gap-y-1 text-xs">
+          {EVA_CATEGORIES.map((c) => {
+            const Icon = CATEGORY_ICON[c];
+            return (
+              <li key={c} className="flex items-center gap-1.5">
+                <Icon aria-hidden="true" className="size-3.5" />
+                <Term id={CATEGORY_TERM[c]} lang={lang} plain>
+                  {categoryLabel(c, t)}
+                </Term>
+              </li>
+            );
+          })}
+        </ul>
+      </PanelHeading>
       {rows.length === 0 || !data ? (
         <EmptyState title={t.evaEmpty} description={t.evaEmptyDetail} />
       ) : (
         <>
-          <dl
-            className="bg-border grid grid-cols-2 gap-px overflow-hidden rounded-xl border sm:grid-cols-4"
-            aria-label={t.readiness}
-          >
-            {READINESS.map((r) => (
-              <div key={r} className="bg-background md:bg-surface flex flex-col gap-1.5 px-4 py-3">
-                <dt className="text-muted-foreground flex items-center gap-1.5 text-xs">
-                  <LevelGlyph level={readinessLevel(r)} size={10} round />
-                  {readinessLabel(r, t)}
-                </dt>
-                <dd className="text-[28px] leading-8 font-medium tracking-[-0.02em] tabular-nums">
-                  {counts[r]}
-                  <span className="text-tertiary ml-1 text-sm font-normal">/ {rows.length}</span>
-                </dd>
-              </div>
-            ))}
-          </dl>
-          <div className="overflow-hidden rounded-xl border">
+          <SummaryChips
+            label={t.readiness}
+            items={READINESS.map((r) => ({
+              key: r,
+              tone: toneOf(readinessLevel(r)),
+              label: readinessLabel(r, t),
+              count: rows.filter((x) => x.readiness === r).length,
+            }))}
+          />
+          <div className={panelTable.card}>
             <Table data-testid="eva-table">
-              <TableHeader>
-                <TableRow>
+              <TableHeader className={panelTable.header}>
+                <TableRow className={panelTable.headRow}>
                   <TableHead className="pl-4">{t.astronaut}</TableHead>
                   <TableHead>{t.readiness}</TableHead>
-                  {EVA_CATEGORIES.map((c) => (
-                    <TableHead key={c}>
-                      <Term id={CATEGORY_TERM[c]} lang={lang} plain>
-                        {categoryLabel(c, t)}
-                      </Term>
-                    </TableHead>
-                  ))}
-                  <TableHead>{t.reasons}</TableHead>
-                  <TableHead className="pr-4">{t.lastData}</TableHead>
+                  <TableHead>{t.evaCategories}</TableHead>
+                  <TableHead>{t.prebreatheCol}</TableHead>
+                  <TableHead>{t.checkCol}</TableHead>
+                  <TableHead className="hidden pr-4 xl:table-cell">{t.reasons}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id}>
-                    <TableCell className="pl-4 font-medium">{row.name}</TableCell>
-                    <TableCell>
-                      <LevelBadge
-                        level={readinessLevel(row.readiness)}
-                        lang={lang}
-                        label={readinessLabel(row.readiness, t)}
-                        round
-                      />
-                    </TableCell>
-                    {EVA_CATEGORIES.map((c) => (
-                      <TableCell key={c}>
-                        <span
-                          className={cn(
-                            'inline-flex items-center gap-1.5 text-xs',
-                            row.noRecentData || row.categories[c] === 'pending'
-                              ? 'text-muted-foreground'
-                              : 'text-foreground',
-                          )}
-                        >
-                          <LevelGlyph level={row.categories[c]} size={10} round />
-                          {levelLabel(row.categories[c], lang)}
-                        </span>
+                {rows.map((row) => {
+                  const pre = row.prep.prebreathe;
+                  const check = row.prep.check;
+                  return (
+                    <TableRow key={row.id} className={panelTable.row}>
+                      <TableCell className="py-3 pl-4">
+                        <CrewCell
+                          id={row.id}
+                          name={row.name}
+                          detail={
+                            <AgeLabel
+                              lastDataAt={row.lastDataAt}
+                              now={data.generatedAt}
+                              lang={lang}
+                              noRecentData={row.noRecentData}
+                            />
+                          }
+                        />
                       </TableCell>
-                    ))}
-                    <TableCell className="text-muted-foreground text-xs whitespace-normal">
-                      {reasonText(row, t)}
-                    </TableCell>
-                    <TableCell className="pr-4">
-                      <AgeLabel
-                        lastDataAt={row.lastDataAt}
-                        now={data.generatedAt}
-                        lang={lang}
-                        noRecentData={row.noRecentData}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      <TableCell className="py-3">
+                        <StatusPill tone={toneOf(readinessLevel(row.readiness))}>
+                          {readinessLabel(row.readiness, t)}
+                        </StatusPill>
+                      </TableCell>
+                      <TableCell className="py-3">
+                        <Categories row={row} lang={lang} t={t} />
+                      </TableCell>
+                      <TableCell className="py-3 text-xs whitespace-normal">
+                        <StatusPill tone={pre ? (pre.complete ? 'green' : 'amber') : 'muted'}>
+                          {pre ? `${pre.minutes}/${pre.required} min` : t.prebreatheNone}
+                        </StatusPill>
+                        {pre ? (
+                          <span className="text-muted-foreground mt-1 block">
+                            {eva.methods.find((m) => m.id === pre.method)?.name[lang] ?? pre.method}
+                          </span>
+                        ) : null}
+                      </TableCell>
+                      <TableCell className="py-3 text-xs whitespace-normal">
+                        <StatusPill tone={check ? (check.clear ? 'green' : 'red') : 'muted'}>
+                          {check ? (check.clear ? t.checkClear : t.checkSymptoms) : t.checkNone}
+                        </StatusPill>
+                        {check && !check.clear ? (
+                          <span className="text-muted-foreground mt-1 block">
+                            {checkText(row, lang, t)}
+                          </span>
+                        ) : null}
+                      </TableCell>
+                      <TableCell className="text-muted-foreground hidden py-3 pr-4 text-xs whitespace-normal xl:table-cell">
+                        {reasonText(row, t)}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               </TableBody>
             </Table>
+            <div className={panelTable.footer}>
+              <span className="tabular-nums">
+                {format(t.evaFooter, {
+                  fit: rows.filter((r) => r.readiness === 'fit').length,
+                  total: rows.length,
+                })}
+              </span>
+            </div>
           </div>
         </>
       )}
@@ -182,6 +257,6 @@ export async function EvaPanel({
           {t.evaSource}
         </CollapsibleContent>
       </Collapsible>
-    </Section>
+    </section>
   );
 }

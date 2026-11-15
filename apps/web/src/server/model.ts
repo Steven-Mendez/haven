@@ -1,6 +1,7 @@
 import {
   type Assessment,
   type Config,
+  type CrewPlan,
   evaluateZones,
   isTracked,
   type Level,
@@ -9,6 +10,7 @@ import {
   type Packet,
   phaseAt,
   phaseDelay,
+  type SampleResult,
 } from '@haven/core';
 import type { KpiDashboard } from '@/lib/kpi';
 import type {
@@ -29,6 +31,8 @@ export const COLLECTIONS = {
   packets: 'packets',
   missions: 'missions',
   rules: 'rules',
+  plans: 'plans',
+  sampleResults: 'sampleResults',
   dashboards: 'dashboards',
 } as const;
 
@@ -38,6 +42,8 @@ export type PacketDoc = Packet & {
 };
 export type MissionDoc = StoredMission;
 export type RulesDoc = Omit<RulesVersion, 'status'>;
+export type PlanDoc = CrewPlan;
+export type SampleResultDoc = SampleResult;
 export type DashboardDoc = {
   mission: string;
   key: string;
@@ -52,6 +58,8 @@ export const INDEXES: Record<
   packets: [{ key: { id: 1 }, unique: true }, { key: { mission: 1, crewMember: 1, dataAt: -1 } }],
   missions: [{ key: { code: 1 }, unique: true }],
   rules: [{ key: { id: 1 }, unique: true }, { key: { mission: 1, sentAt: -1 } }],
+  plans: [{ key: { mission: 1, crewMember: 1 }, unique: true }],
+  sampleResults: [{ key: { id: 1 }, unique: true }, { key: { mission: 1, crewMember: 1 } }],
   dashboards: [{ key: { mission: 1, key: 1 }, unique: true }],
 };
 

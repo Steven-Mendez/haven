@@ -1,0 +1,37 @@
+{
+  "windowHours": 72,
+  "checklist": [
+    {
+      "id": "fluid-loading",
+      "name": { "es": "Carga de líquidos con sal", "en": "Fluid loading with salt" },
+      "detail": {
+        "es": "En las 2 horas previas al frenado, toma alrededor de 1 L de agua con 8 tabletas de sal (o caldo). Sube el volumen de sangre y reduce el mareo al ponerte de pie.",
+        "en": "In the 2 hours before deorbit, drink about 1 L of water with 8 salt tablets (or broth). It raises blood volume and reduces dizziness on standing."
+      }
+    },
+    {
+      "id": "compression-garment",
+      "name": { "es": "Prenda de compresión", "en": "Compression garment" },
+      "detail": {
+        "es": "Ponte la prenda de compresión de la parte inferior del cuerpo antes de sentarte para la reentrada. Evita que la sangre se acumule en las piernas al volver la gravedad.",
+        "en": "Put on the lower-body compression garment before strapping in for reentry. It keeps blood from pooling in the legs when gravity returns."
+      }
+    },
+    {
+      "id": "orthostatic-test",
+      "name": { "es": "Prueba ortostática", "en": "Orthostatic test" },
+      "detail": {
+        "es": "Mide tu pulso acostado y otra vez de pie. Si sube mucho o te mareas, la tripulación te ayuda a levantarte después del amerizaje.",
+        "en": "Measure your pulse lying down and again standing. If it rises a lot or you get dizzy, the crew helps you up after splashdown."
+      }
+    }
+  ],
+  "orthostatic": {
+    "supineSeconds": 300,
+    "standingSeconds": 180,
+    "amberRise": 30,
+    "redRise": 40,
+    "symptoms": ["dizziness", "fainting", "blurred-vision", "nausea"]
+  },
+  "source": "Carga de líquidos de 1 L de agua con 8 g de sal antes del aterrizaje y prendas de compresión contra la intolerancia ortostática: NASA HRP, Gravity Fields (https://www.nasa.gov/hrp/hazard-gravity-fields/), referencia provisional para las cantidades. Aumento de 30 lpm al ponerse de pie como criterio de intolerancia: Sheldon et al. 2015, Heart Rhythm (https://doi.org/10.1016/j.hrthm.2015.03.029). Rojo desde 40 lpm o con síntomas, tiempos de 5 min acostado y 3 min de pie: referencia provisional."
+}

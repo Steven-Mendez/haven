@@ -1,0 +1,5 @@
+{
+  "realtimeMaxMin": 0.1,
+  "autonomousFromMin": 5,
+  "source": "Retardo de la luz por trayecto: unos 1,3 s con la Luna y de 3 a 22 min con Marte según la posición de los planetas: NASA, Communications delay (https://www.nasa.gov/hrp/hazard-distance-from-earth/). Con más de 5 min por trayecto (más de 10 min de ida y vuelta) la tripulación debe resolver sola las emergencias y Tierra apoya después: referencia provisional."
+}

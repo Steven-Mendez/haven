@@ -8,21 +8,34 @@ import { havenTexts } from '@/components/haven/texts';
 import type { KpiDashboard } from '@/lib/kpi';
 import { getMissionCode } from '@/lib/mission';
 import { CREW_NOT_READY } from '@/server/types';
+import { formInt } from './logic/exercise';
 import { templatePhases } from './logic/plan-options';
 import { applyEdit, engineCheck, parseNumber, type RulesEdit, validateEdit } from './logic/rules';
 import {
   createMission,
   finishMission,
   getBaseConfig,
+  getCrewPlan,
   getCurrentConfig,
   getMission,
   listRules,
+  saveExercisePrescription,
   saveKpiDashboardFor,
+  saveMedicationPlan,
   saveRules,
+  saveSampleResult,
   startMission,
   updateMission,
 } from './server';
-import type { JoinFormState, MissionField, MissionFormState, RulesFormState } from './types';
+import type {
+  ExerciseFormState,
+  JoinFormState,
+  MedicationFormState,
+  MissionField,
+  MissionFormState,
+  RulesFormState,
+  SampleResultFormState,
+} from './types';
 
 const text = (v: FormDataEntryValue | null, max = 280) =>
   typeof v === 'string' ? v.trim().slice(0, max) : '';
@@ -200,6 +213,62 @@ export async function exportRulesConfig(versionId: string): Promise<string | nul
   return version ? `${JSON.stringify(version.config, null, 2)}\n` : null;
 }
 
+export async function sendMedicationPlan(
+  _previous: MedicationFormState,
+  form: FormData,
+): Promise<MedicationFormState> {
+  const mission = await getMissionCode();
+  const crewMember = text(form.get('crewMember'), 60);
+  if (!mission || !crewMember) return { status: 'error', crewMember };
+  const chosen = form.getAll('medication').map((v) => String(v));
+  // The form edits which medications, the end date and the note; a schedule
+  // Earth already changed for a medication that stays in the plan is kept.
+  const current = await getCrewPlan(mission, crewMember);
+  const assignments = chosen.map((id) => {
+    const schedule = current.medications.find((a) => a.medication === id)?.schedule;
+    return {
+      medication: id,
+      ...(schedule ? { schedule } : {}),
+      until: text(form.get(`until-${id}`), 10) || undefined,
+      note: text(form.get(`note-${id}`), 200) || undefined,
+    };
+  });
+  const result = await saveMedicationPlan(
+    mission,
+    crewMember,
+    assignments,
+    havenTexts.es.operatorName,
+  );
+  if (!result.ok) return { status: 'error', crewMember };
+  refresh();
+  return { status: 'ok', crewMember, at: Date.now() };
+}
+
+export async function sendSampleResult(
+  _previous: SampleResultFormState,
+  form: FormData,
+): Promise<SampleResultFormState> {
+  const mission = await getMissionCode();
+  const id = text(form.get('id'), 200);
+  if (!mission || !id) return { status: 'error', id };
+  const values: Record<string, number> = {};
+  for (const [key, raw] of form.entries()) {
+    if (!key.startsWith('value-') || typeof raw !== 'string' || !raw.trim()) continue;
+    const value = Number(raw.trim().replace(',', '.'));
+    if (Number.isFinite(value)) values[key.slice(6)] = value;
+  }
+  const result = await saveSampleResult(mission, {
+    id,
+    values,
+    override: text(form.get('override'), 10) || undefined,
+    detail: text(form.get('detail'), 280),
+    author: havenTexts.es.operatorName,
+  });
+  if (!result.ok) return { status: 'error', id };
+  refresh();
+  return { status: 'ok', id, at: Date.now() };
+}
+
 export async function saveKpiDashboard(dashboard: KpiDashboard): Promise<{ ok: boolean }> {
   const mission = await getMissionCode();
   if (!mission) return { ok: false };
@@ -208,4 +277,32 @@ export async function saveKpiDashboard(dashboard: KpiDashboard): Promise<{ ok: b
   } catch {
     return { ok: false };
   }
+}
+
+export async function sendExercisePrescription(
+  _previous: ExerciseFormState,
+  form: FormData,
+): Promise<ExerciseFormState> {
+  const mission = await getMissionCode();
+  const crewMember = text(form.get('crewMember'), 60);
+  if (!mission || !crewMember) return { status: 'error', crewMember };
+  // "Reset" clears Earth's change so the starting prescription applies again.
+  const prescription =
+    form.get('intent') === 'reset'
+      ? null
+      : {
+          resistanceMinutes: formInt(form.get('resistanceMinutes')),
+          aerobicMinutes: formInt(form.get('aerobicMinutes')),
+          daysPerWeek: formInt(form.get('daysPerWeek')),
+          note: text(form.get('note'), 200) || undefined,
+        };
+  const result = await saveExercisePrescription(
+    mission,
+    crewMember,
+    prescription,
+    havenTexts.es.operatorName,
+  );
+  if (!result.ok) return { status: 'error', crewMember };
+  refresh();
+  return { status: 'ok', crewMember, at: Date.now() };
 }
