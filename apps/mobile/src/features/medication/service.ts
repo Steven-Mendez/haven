@@ -48,4 +48,14 @@ export function startPlanSync() {
   AppState.addEventListener('change', (state) => {
     if (state === 'active') sync();
   });
+  // A new mission or crew member needs its own plan right away, not on the next poll.
+  let who = `${store.mission().code}/${store.preferences().crewMember}`;
+  const onChange = () => {
+    const next = `${store.mission().code}/${store.preferences().crewMember}`;
+    if (next === who) return;
+    who = next;
+    sync();
+  };
+  store.subscribe('preferences', onChange);
+  store.subscribe('mission', onChange);
 }
