@@ -78,6 +78,23 @@ export type Environment = {
   destinations?: Destination[];
 };
 
+/** One step of the 0–10 motion sickness scale (MISC). */
+export type MotionScaleStep = { score: number; label: I18n };
+
+export type HeadMovementStep = { id: string; seconds: number; title: I18n; body: I18n };
+
+export type MotionConfig = {
+  /** Days after launch or a gravity change in which the scale is asked every day. */
+  windowDays: number;
+  scale: MotionScaleStep[];
+  /** Lowest score of each level: amber from `amber`, red from `red`. */
+  levels: { amber: number; red: number };
+  headMovements: HeadMovementStep[];
+  /** Balance test: seconds per stance and sway thresholds (mg, eyes closed). */
+  balance: { seconds: number; amberSway: number; redSway: number; amberRatio: number };
+  source: string;
+};
+
 export type MissionPhase = {
   environment: EnvironmentId | (string & {});
   days: number;

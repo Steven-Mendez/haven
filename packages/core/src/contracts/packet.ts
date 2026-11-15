@@ -1,4 +1,5 @@
 import type { Assessment } from './assessment';
+import type { MissionPhase } from './config';
 import type { Reading } from './reading';
 
 export type EmergencyStatus = 'open' | 'unresponsive' | 'closed';
@@ -41,4 +42,6 @@ export type Mission = {
   linkDown: boolean;
   scenario?: string;
   crew: { id: string; name: string; hasWatch: boolean }[];
+  /** Phase plan from Earth; lets the app know when gravity changed. */
+  phases?: MissionPhase[];
 };
