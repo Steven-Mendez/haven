@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { sessionProgress } from './session';
+import { sessionProgress, sessionUsable } from './session';
 
 const NOW = new Date('2026-11-14T12:00:00.000Z');
 const startedAt = (minutesAgo: number) =>
@@ -22,5 +22,36 @@ describe('sessionProgress', () => {
 
   it('treats a start in the future as just started', () => {
     expect(sessionProgress({ startedAt: startedAt(-5) }, { minutes: 15 }, NOW).elapsedSec).toBe(0);
+  });
+});
+
+describe('sessionUsable', () => {
+  const who = { crewMember: 'ana', mission: 'DEMOEV' };
+  const session = (minutesAgo: number, extra: object = {}) => ({
+    method: 'exploration',
+    startedAt: startedAt(minutesAgo),
+    crewMember: 'ana',
+    mission: 'DEMOEV',
+    ...extra,
+  });
+
+  it('continues a recent session of the same crew member and mission', () => {
+    expect(sessionUsable(session(30), who, { minutes: 15 }, NOW)).toBe(true);
+    expect(sessionUsable(session(230), who, { minutes: 120 }, NOW)).toBe(true);
+  });
+
+  it('drops an abandoned session, another person or mission, or an unknown method', () => {
+    expect(sessionUsable(session(300), who, { minutes: 15 }, NOW)).toBe(false);
+    expect(sessionUsable(session(250), who, { minutes: 150 }, NOW)).toBe(true);
+    expect(sessionUsable(session(30, { crewMember: 'luis' }), who, { minutes: 15 }, NOW)).toBe(
+      false,
+    );
+    expect(sessionUsable(session(30, { mission: 'DEMOMS' }), who, { minutes: 15 }, NOW)).toBe(
+      false,
+    );
+    expect(sessionUsable(session(30, { mission: undefined }), who, { minutes: 15 }, NOW)).toBe(
+      false,
+    );
+    expect(sessionUsable(session(30), who, undefined, NOW)).toBe(false);
   });
 });
