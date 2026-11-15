@@ -1,4 +1,4 @@
-import { actionsDone, dailyProgress, dayHistory } from '@haven/core';
+import { actionsDone, dailyProgress, dayHistory, dosesForDay, medications } from '@haven/core';
 import { randomUUID } from 'expo-crypto';
 import { router, useLocalSearchParams } from 'expo-router';
 import { Check, ChevronRight } from 'lucide-react-native';
@@ -36,6 +36,7 @@ import {
 import { useLanguage, useTexts, useTranslate } from '@/shared/i18n';
 import { useLayout } from '@/shared/lib/layout';
 import { cn } from '@/shared/lib/utils';
+import { usePlan } from '@/shared/plan';
 import { TourAnchor, useTourScroll } from '@/shared/tour';
 import { CheckinCard } from './components/checkin-card';
 import { ActionsGuide } from './components/guide';
@@ -153,6 +154,16 @@ export default function Screen() {
     [readings, config, mission.environment, now],
   );
   const checkin = useMemo(() => todayCheckin(readings, today), [readings, today]);
+  const plan = usePlan();
+  const pendingDoses = useMemo(
+    () =>
+      plan
+        ? dosesForDay(plan, medications, readings, now).filter(
+            (d) => d.status === 'due' || d.status === 'missed',
+          )
+        : [],
+    [plan, readings, now],
+  );
 
   const week = lastSevenDays(history, today).map((d) => ({
     label: new Date(`${d.date}T12:00:00Z`).toLocaleDateString(language, {
@@ -263,6 +274,22 @@ export default function Screen() {
           )}
         </Section>
       </TourAnchor>
+
+      {pendingDoses.length ? (
+        <StepCard
+          title={t.medicationTitle}
+          detail={format(
+            pendingDoses.some((d) => d.status === 'due') ? t.medicationDue : t.medicationMissed,
+            {
+              names: [...new Set(pendingDoses.map((d) => d.medication))]
+                .map((id) => translate(medications.catalog.find((m) => m.id === id)?.name) || id)
+                .join(', '),
+            },
+          )}
+          action={t.medicationOpen}
+          onAction={() => router.push('/medication')}
+        />
+      ) : null}
 
       <Collapsible open={guideOpen} onOpenChange={setGuideOpen} className="gap-8">
         <CollapsibleTrigger
