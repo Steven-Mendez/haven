@@ -31,7 +31,7 @@ export function crewRole(id: string): I18n | undefined {
 }
 
 export const DEMO_COMMANDER = 'elena-vega';
-export const DEMO_MISSION_CONTROL = { id: 'lucia-morales', name: 'Lucía Morales' };
+export const DEMO_MISSION_CONTROL = { id: 'lucia-morales', name: 'John Doe' };
 
 export const DEMO_MISSION: Mission = {
   code: 'ARES01',

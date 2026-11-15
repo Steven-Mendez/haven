@@ -10,8 +10,9 @@ import {
   missionDays,
   type Reading,
 } from '@haven/core';
+import { type KpiDashboard, type KpiSeriesData, validateDashboard } from '@/lib/kpi';
 import { CREW_NOT_READY } from '@/server/types';
-import { missions, packets, plans, rules } from './collections';
+import { dashboards, missions, packets, plans, rules } from './collections';
 import {
   baseConfig,
   type CrewEntry,
@@ -586,10 +587,7 @@ export async function saveRules(
   return { ok: true, status: 201, data: rulesForApi(doc) };
 }
 
-export async function missionAggregates(
-  code: string,
-  indicators: string[],
-): Promise<AggregatesResponse> {
+async function readingsByCrewMember(code: string): Promise<Record<string, Reading[]>> {
   const visible = await (await packets()).find({ mission: code }, NO_ID).toArray();
   const byCrewMember: Record<string, Reading[]> = {};
   for (const p of visible) {
@@ -598,12 +596,66 @@ export async function missionAggregates(
       ...packetForApi(p).readings,
     ];
   }
+  return byCrewMember;
+}
+
+export async function missionAggregates(
+  code: string,
+  indicators: string[],
+): Promise<AggregatesResponse> {
+  const byCrewMember = await readingsByCrewMember(code);
   return {
     mission: code,
     indicators: Object.fromEntries(
       indicators.map((i) => [i, crewAggregates(byCrewMember, i, { minimum: 1 })]),
     ),
   };
+}
+
+export async function missionKpiSeries(code: string, indicators: string[]): Promise<KpiSeriesData> {
+  const byCrewMember = await readingsByCrewMember(code);
+  return {
+    mission: code,
+    crew: Object.fromEntries(
+      indicators.map((i) => [i, crewAggregates(byCrewMember, i, { minimum: 1 })]),
+    ),
+    members: Object.fromEntries(
+      Object.entries(byCrewMember).map(([member, readings]) => [
+        member,
+        Object.fromEntries(
+          indicators.flatMap((i) => {
+            const points = crewAggregates({ [member]: readings }, i, { minimum: 1 }) ?? [];
+            return points.length ? [[i, points]] : [];
+          }),
+        ),
+      ]),
+    ),
+  };
+}
+
+const DASHBOARD_KEY = 'kpi';
+
+export async function getDashboard(mission: string): Promise<KpiDashboard | null> {
+  const doc = await (await dashboards()).findOne({ mission, key: DASHBOARD_KEY }, NO_ID);
+  if (!doc) return null;
+  const checked = validateDashboard(doc.dashboard);
+  return checked.ok ? checked.dashboard : null;
+}
+
+export async function saveDashboard(
+  mission: string,
+  body: unknown,
+  now = new Date(),
+): Promise<Result<KpiDashboard>> {
+  if (!(await findMission(mission, now))) return fail(404, `Mission ${mission} does not exist`);
+  const checked = validateDashboard(body);
+  if (!checked.ok) return fail(400, 'Invalid dashboard', checked.errors);
+  await (await dashboards()).updateOne(
+    { mission, key: DASHBOARD_KEY },
+    { $set: { dashboard: checked.dashboard, updatedAt: now.toISOString() } },
+    { upsert: true },
+  );
+  return { ok: true, status: 200, data: checked.dashboard };
 }
 
 export async function getPlan(mission: string, crewMember: string): Promise<CrewPlan> {
