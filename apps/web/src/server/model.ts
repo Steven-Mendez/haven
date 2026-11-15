@@ -121,22 +121,6 @@ export function packetDoc(packet: Packet, receivedAt: Date): PacketDoc {
   };
 }
 
-export function missionFromPacket(packet: Packet, receivedAt: Date): MissionDoc {
-  return {
-    code: packet.mission,
-    name: packet.mission,
-    environment: 'transit',
-    day: 1,
-    currentDelayMin: 0,
-    linkDown: false,
-    crew: [{ id: packet.crewMember, name: packet.crewMember, hasWatch: false }],
-    start: receivedAt.toISOString(),
-    durationDays: 0,
-    createdAt: receivedAt.toISOString(),
-    origin: 'packet',
-  };
-}
-
 export function packetForApi(doc: PacketDoc): ReceivedPacket {
   const { _id: _i, ...p } = doc as PacketDoc & { _id?: unknown; phoneVisibleAt?: string };
   delete (p as { phoneVisibleAt?: string }).phoneVisibleAt;

@@ -20,7 +20,6 @@ import {
   latestEmergencyVersions,
   type MissionDoc,
   missionForApi,
-  missionFromPacket,
   missionHeader,
   missionStatus,
   missionSummary,
@@ -67,6 +66,8 @@ export async function receivePacket(
   const col = await packets();
   const existing = await col.findOne({ id: packet.id }, NO_ID);
   if (existing) return duplicate(existing);
+  if (!(await (await missions()).countDocuments({ code: packet.mission }, { limit: 1 })))
+    return fail(404, `Mission ${packet.mission} does not exist`);
 
   const doc = packetDoc(packet, now);
   try {
@@ -78,7 +79,7 @@ export async function receivePacket(
     }
     throw error;
   }
-  await registerMission(doc, currentMission, now);
+  await registerMission(doc, currentMission);
   return {
     ok: true,
     status: 201,
@@ -94,32 +95,16 @@ function duplicate(doc: PacketDoc): Result<PacketReceipt> {
   };
 }
 
-async function registerMission(
-  packet: PacketDoc,
-  currentMission: Partial<Mission> | undefined,
-  now: Date,
-) {
+async function registerMission(packet: PacketDoc, currentMission: Partial<Mission> | undefined) {
   const col = await missions();
-  const created = missionFromPacket(packet, now);
-  const hasCurrent = typeof currentMission === 'object' && currentMission !== null;
-  if (hasCurrent) {
+  const set: Partial<Pick<MissionDoc, 'environment' | 'currentDelayMin'>> = {};
+  if (typeof currentMission === 'object' && currentMission !== null) {
     if (typeof currentMission.environment === 'string')
-      created.environment = currentMission.environment;
+      set.environment = currentMission.environment;
     if (typeof currentMission.currentDelayMin === 'number')
-      created.currentDelayMin = currentMission.currentDelayMin;
-    if (typeof currentMission.day === 'number' && currentMission.day > 0)
-      created.start = new Date(now.getTime() - (currentMission.day - 1) * 86_400_000).toISOString();
-    if (Array.isArray(currentMission.crew) && currentMission.crew.length)
-      created.crew = currentMission.crew;
+      set.currentDelayMin = currentMission.currentDelayMin;
   }
-  const { environment, currentDelayMin, ...onInsertOnly } = created;
-  await col.updateOne(
-    { code: packet.mission },
-    hasCurrent
-      ? { $setOnInsert: onInsertOnly, $set: { environment, currentDelayMin } }
-      : { $setOnInsert: created },
-    { upsert: true },
-  );
+  if (Object.keys(set).length) await col.updateOne({ code: packet.mission }, { $set: set });
   await col.updateOne(
     { code: packet.mission, 'crew.id': { $ne: packet.crewMember } },
     { $push: { crew: { id: packet.crewMember, name: packet.crewMember, hasWatch: false } } },
