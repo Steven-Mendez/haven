@@ -245,7 +245,7 @@ export async function ExercisePanel({
                     </TableCell>
                     <TableCell className="hidden py-3 text-xs whitespace-normal xl:table-cell">
                       <span className="flex flex-col items-start gap-1">
-                        <span className="tabular-nums">
+                        <span className="whitespace-nowrap tabular-nums">
                           {format(t.exPrescriptionText, {
                             resistance: row.prescription.resistanceMinutes,
                             aerobic: row.prescription.aerobicMinutes,
