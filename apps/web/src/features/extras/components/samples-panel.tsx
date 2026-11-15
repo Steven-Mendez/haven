@@ -12,9 +12,9 @@ import {
 } from '@/components/ui/table';
 import { format, type Language } from '@/lib/i18n';
 import type { ExtrasTexts } from '../i18n';
-import { STATUS_LEVEL } from '../logic/samples';
+import { RESULT_LEVEL, STATUS_LEVEL } from '../logic/samples';
 import { getSampleOverview } from '../server';
-import { SampleResultForm } from './sample-result-form';
+import { dateText, resultLabel, SampleFile, valuesText } from './sample-file';
 
 const sampleOf = (id: string) => sampleConfig.samples.find((s) => s.id === id);
 
@@ -23,23 +23,14 @@ function moduleName(sample: string, module: string | undefined, lang: Language) 
   return sampleOf(sample)?.modules?.find((m) => m.id === module)?.name[lang] ?? module;
 }
 
-function dateText(iso: string, lang: Language) {
-  return new Date(iso).toLocaleString(lang, {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'UTC',
-  });
-}
-
 function ResultLine({ result, lang, t }: { result: SampleResult; lang: Language; t: ExtrasTexts }) {
-  const abnormal = result.result === 'abnormal';
+  const flagged = result.result !== 'normal';
   return (
-    <span className="inline-flex items-center gap-1.5">
-      <LevelGlyph level={abnormal ? 'red' : 'green'} size={8} />
-      {abnormal ? t.resultAbnormal : t.resultNormal}
-      {abnormal ? (
+    <span className="inline-flex flex-wrap items-center gap-x-1.5">
+      <LevelGlyph level={RESULT_LEVEL[result.result]} size={8} />
+      {resultLabel(result.result, t)}
+      {result.overridden ? <span className="text-muted-foreground">({t.overridden})</span> : null}
+      {flagged ? (
         <span className="text-muted-foreground">· {sampleOf(result.sample)?.abnormal[lang]}</span>
       ) : null}
     </span>
@@ -137,23 +128,9 @@ export async function SamplesPanel({
             <p className="text-muted-foreground text-sm">{t.pendingEmpty}</p>
           ) : (
             <ul className="flex flex-col divide-y rounded-xl border">
-              {data.pending.map((p) => {
-                const module = moduleName(p.sample, p.module, lang);
-                return (
-                  <li key={p.id} className="flex flex-col gap-2 px-4 py-3">
-                    <span className="text-sm">
-                      <span className="font-medium">{p.name}</span> ·{' '}
-                      {sampleOf(p.sample)?.name[lang] ?? p.sample}
-                      {module ? ` · ${format(t.moduleLabel, { module })}` : ''}
-                      <span className="text-muted-foreground">
-                        {' '}
-                        · {format(t.collectedOn, { date: dateText(p.collectedAt, lang) })}
-                      </span>
-                    </span>
-                    <SampleResultForm id={p.id} lang={lang} />
-                  </li>
-                );
-              })}
+              {data.pending.map((p) => (
+                <SampleFile key={p.id} item={p} lang={lang} t={t} />
+              ))}
             </ul>
           )}
         </Section>
@@ -173,6 +150,11 @@ export async function SamplesPanel({
                   <span>{sampleOf(r.sample)?.name[lang] ?? r.sample}</span>
                   <span className="text-muted-foreground">{dateText(r.collectedAt, lang)}</span>
                   <ResultLine result={r} lang={lang} t={t} />
+                  {r.values ? (
+                    <span className="text-muted-foreground tabular-nums">
+                      {valuesText(r, lang)}
+                    </span>
+                  ) : null}
                   {r.detail ? <span className="text-muted-foreground">“{r.detail}”</span> : null}
                 </li>
               ))}

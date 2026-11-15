@@ -1,5 +1,14 @@
 import 'server-only';
-import { awaitingResults, type Config, rebaseConfig, type SampleResult } from '@haven/core';
+import {
+  awaitingResults,
+  type Config,
+  rebaseConfig,
+  type SampleResult,
+  sampleAge,
+  sampleConfig,
+  sampleContext,
+  sampleHistory,
+} from '@haven/core';
 import { connection } from 'next/server';
 import { baseConfig } from '@/server/model';
 import {
@@ -18,6 +27,7 @@ import {
   saveSampleResult as querySaveSampleResult,
   startMission as queryStartMission,
   updateMission as queryUpdateMission,
+  type SampleResultInput,
 } from '@/server/queries';
 import type {
   AggregatesResponse,
@@ -33,7 +43,7 @@ import type {
 import { DEFAULT_MISSION } from '@/server/types';
 import { type EvaRow, evaRow } from './logic/eva';
 import { isFullConfig } from './logic/rules';
-import { type PendingSample, type SampleRow, sampleRow } from './logic/samples';
+import { missionDayOf, type PendingSample, type SampleRow, sampleRow } from './logic/samples';
 
 export async function listMissions(): Promise<MissionsResponse> {
   await connection();
@@ -153,12 +163,18 @@ export async function getSampleOverview(mission = DEFAULT_MISSION): Promise<{
     crew.crew.map(async (member) => {
       const detail = await queryGetAstronaut(mission, member.id);
       const readings = detail?.packets.flatMap((p) => p.readings) ?? [];
-      pending.push(
-        ...awaitingResults(readings, results).map((p) => ({
-          ...p,
-          name: names.get(p.crewMember) ?? p.crewMember,
-        })),
-      );
+      for (const c of awaitingResults(readings, results)) {
+        const sample = sampleConfig.samples.find((s) => s.id === c.sample);
+        if (!sample) continue;
+        pending.push({
+          ...c,
+          name: names.get(c.crewMember) ?? c.crewMember,
+          day: missionDayOf(stored.start, c.collectedAt),
+          age: sampleAge(sample, c.collectedAt, now),
+          context: sampleContext(sample, readings, c.collectedAt),
+          history: sampleHistory(results, c.crewMember, c.sample, c.collectedAt),
+        });
+      }
       return sampleRow(member, Math.max(1, stored.day), readings, results, now);
     }),
   );
@@ -171,10 +187,7 @@ export async function getSampleOverview(mission = DEFAULT_MISSION): Promise<{
   };
 }
 
-export async function saveSampleResult(
-  mission: string,
-  input: { id: string; result: string; detail?: string; author?: string },
-) {
+export async function saveSampleResult(mission: string, input: SampleResultInput) {
   await connection();
   return querySaveSampleResult(mission, input);
 }
