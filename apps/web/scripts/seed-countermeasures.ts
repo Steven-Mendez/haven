@@ -2,9 +2,10 @@
 // prebreathe with the post-EVA decompression check (DEMOEV), and the medication
 // plan with biological and habitat samples, and the exercise prescription with
 // its weekly self-assessment and the workload of a station crew (DEMOMS), and motion sickness with the balance test
-// on the second day after landing on the Moon (DEMOCN).
+// on the second day after landing on the Moon (DEMOCN), and a Mars surface stay
+// with 12 minutes of light delay to see the autonomous communication mode (DEMOMA).
 //
-//   pnpm --filter web seed:countermeasures            # the four missions
+//   pnpm --filter web seed:countermeasures            # every demo mission
 //   pnpm --filter web seed:countermeasures DEMOMS     # only the ones named
 //
 // Each mission has crew members in every state plus an empty "Revisor" seat to
@@ -89,6 +90,8 @@ type Demo = {
   today: string;
   /** Day within today's phase (1 is the first); 3 without it, 1 in reentry. */
   phaseDay?: number;
+  /** One-way light delay today, in minutes; 0 without it. */
+  delayMin?: number;
   crew: Member[];
 };
 
@@ -509,6 +512,29 @@ const DEMOS: Demo[] = [
       REVIEWER,
     ],
   },
+  {
+    code: 'DEMOMA',
+    name: 'Demo Marte (retardo)',
+    template: 'mars-conjunction',
+    today: 'mars',
+    phaseDay: 120,
+    delayMin: 12,
+    crew: [
+      {
+        id: 'nadia-okafor',
+        name: 'Nadia Okafor',
+        role: ['Comandante', 'Commander'],
+        note: 'Todo en orden. Recibimos vuestro mensaje de ayer con 12 minutos de retraso.',
+      },
+      {
+        id: 'pavel-ivanov',
+        name: 'Pavel Ivanov',
+        role: ['Ingeniero de vuelo', 'Flight engineer'],
+        note: 'Revisamos el soporte vital por nuestra cuenta; os enviamos el informe.',
+      },
+      REVIEWER,
+    ],
+  },
 ];
 
 function assess(readings: Reading[], environment: string, at: number): Assessment[] {
@@ -566,7 +592,11 @@ try {
   }
   const only = process.argv.slice(2).map((c) => c.toUpperCase());
   for (const demo of DEMOS.filter((d) => only.length === 0 || only.includes(d.code))) {
-    const phases = phasesOf(demo.template);
+    const phases = phasesOf(demo.template).map((p) =>
+      demo.delayMin !== undefined && p.environment === demo.today
+        ? { ...p, delayMin: demo.delayMin }
+        : p,
+    );
     const day =
       demo.today === 'station'
         ? 40
@@ -584,7 +614,7 @@ try {
       name: demo.name,
       environment: demo.today,
       day,
-      currentDelayMin: 0,
+      currentDelayMin: demo.delayMin ?? 0,
       linkDown: false,
       crew: demo.crew.map((m) => ({
         id: m.id,
