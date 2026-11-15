@@ -161,3 +161,8 @@ export async function saveMedicationPlan(
   await connection();
   return querySavePlan(mission, crewMember, medications, author);
 }
+
+export async function getCrewPlan(mission: string, crewMember: string) {
+  await connection();
+  return queryGetPlan(mission, crewMember);
+}

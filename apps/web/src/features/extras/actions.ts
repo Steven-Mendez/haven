@@ -13,6 +13,7 @@ import {
   createMission,
   finishMission,
   getBaseConfig,
+  getCrewPlan,
   getCurrentConfig,
   getMission,
   listRules,
@@ -226,11 +227,18 @@ export async function sendMedicationPlan(
   const crewMember = text(form.get('crewMember'), 60);
   if (!mission || !crewMember) return { status: 'error', crewMember };
   const chosen = form.getAll('medication').map((v) => String(v));
-  const assignments = chosen.map((id) => ({
-    medication: id,
-    until: text(form.get(`until-${id}`), 10) || undefined,
-    note: text(form.get(`note-${id}`), 200) || undefined,
-  }));
+  // The form edits which medications, the end date and the note; a schedule
+  // Earth already changed for a medication that stays in the plan is kept.
+  const current = await getCrewPlan(mission, crewMember);
+  const assignments = chosen.map((id) => {
+    const schedule = current.medications.find((a) => a.medication === id)?.schedule;
+    return {
+      medication: id,
+      ...(schedule ? { schedule } : {}),
+      until: text(form.get(`until-${id}`), 10) || undefined,
+      note: text(form.get(`note-${id}`), 200) || undefined,
+    };
+  });
   const result = await saveMedicationPlan(
     mission,
     crewMember,

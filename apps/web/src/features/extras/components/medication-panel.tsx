@@ -57,9 +57,18 @@ export async function MedicationPanel({
 }) {
   const data = await getMedicationOverview(mission);
   const rows = data?.rows ?? [];
-  const schedules = Object.fromEntries(
-    medications.catalog.map((m) => [m.id, scheduleText(m.schedule, lang, t)]),
-  );
+  /** Readable schedule of each medication for one crew member: Earth's change or the catalog's. */
+  const schedulesFor = (row: MedicationRow) =>
+    Object.fromEntries(
+      medications.catalog.map((m) => [
+        m.id,
+        scheduleText(
+          row.plan.medications.find((a) => a.medication === m.id)?.schedule ?? m.schedule,
+          lang,
+          t,
+        ),
+      ]),
+    );
 
   return (
     <Section title={t.medicationTitle} description={t.medicationDescription}>
@@ -93,7 +102,7 @@ export async function MedicationPanel({
                             crewMember={row.id}
                             plan={row.plan}
                             catalog={medications.catalog}
-                            schedules={schedules}
+                            schedules={schedulesFor(row)}
                             lang={lang}
                           />
                         </CollapsibleContent>
