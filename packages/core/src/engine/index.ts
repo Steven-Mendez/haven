@@ -18,4 +18,5 @@ export * from './routine';
 export { LEVEL_ORDER, worstLevel } from './util';
 export * from './visible-at';
 export * from './watch-readings';
+export * from './workload';
 export * from './zones';

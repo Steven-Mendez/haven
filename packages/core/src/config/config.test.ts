@@ -122,8 +122,8 @@ describe('indicators', () => {
 
   it('tracks every indicator in the file: none is hidden and each one says how it is obtained', () => {
     expect([...EXTRA_INDICATORS]).toEqual([]);
-    expect(config.indicators).toHaveLength(30);
-    expect(loadConfig({ includeExtras: true }).indicators).toHaveLength(30);
+    expect(config.indicators).toHaveLength(32);
+    expect(loadConfig({ includeExtras: true }).indicators).toHaveLength(32);
     const INPUTS = ['watch', 'health', 'phone', 'test', 'check-in', 'manual'];
     for (const i of config.indicators) {
       expect(isTracked(i.id), i.id).toBe(true);

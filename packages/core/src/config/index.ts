@@ -8,6 +8,7 @@ import protocols from '../../config/protocols.json';
 import symptomsJson from '../../config/symptoms.json';
 import unitsJson from '../../config/units.json';
 import version from '../../config/version.json';
+import workloadJson from '../../config/workload.json';
 import zones from '../../config/zones.json';
 import type {
   Action,
@@ -17,6 +18,7 @@ import type {
   Indicator,
   MissionPhase,
   MissionTemplate,
+  WorkloadConfig,
 } from '../contracts';
 
 type IndicatorWithoutGuide = Omit<Indicator, 'guide'>;
@@ -89,6 +91,8 @@ export const actions: Action[] = actionsJson as Action[];
 export function actionById(id: string): Action | undefined {
   return actions.find((a) => a.id === id);
 }
+
+export const workload: WorkloadConfig = workloadJson as WorkloadConfig;
 
 export type LoadedConfig = Config & { actions: Action[] };
 

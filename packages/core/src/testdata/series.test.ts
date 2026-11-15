@@ -59,6 +59,8 @@ describe('demoHistory', () => {
       'go-nogo-accuracy': 'screen',
       mood: 'screen',
       stress: 'screen',
+      'work-hours': 'manual',
+      fatigue: 'manual',
       'radiation-dose': 'manual',
       'cabin-pressure': 'phone',
       hydration: 'manual',

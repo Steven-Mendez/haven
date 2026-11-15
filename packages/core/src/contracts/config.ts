@@ -78,6 +78,20 @@ export type Environment = {
   destinations?: Destination[];
 };
 
+export type WorkloadConfig = {
+  /** Samn-Perelli fatigue scale, 1 (fully alert) to 7 (completely exhausted). */
+  fatigueScale: { score: number; label: I18n }[];
+  /** Lowest fatigue of each level. */
+  fatigue: { amber: number; red: number };
+  /** Hours of a long day, the daily maximum and the most a rest day can have. */
+  day: { long: number; max: number; rest: number };
+  /** Weekly hours of each level, rest days needed in 7 and long days in a row that warn. */
+  week: { amber: number; red: number; minRestDays: number; longStreak: number };
+  /** Hours of sleep under which high fatigue turns red. */
+  shortSleep: number;
+  source: string;
+};
+
 export type MissionPhase = {
   environment: EnvironmentId | (string & {});
   days: number;

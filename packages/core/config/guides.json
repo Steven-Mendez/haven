@@ -461,6 +461,39 @@
       "NASA HRP, Risks of Human Spaceflight: https://www.nasa.gov/hrp/risks/"
     ]
   },
+  "work-hours": {
+    "howToMeasure": {
+      "es": "Al terminar la jornada, anota en Carga de trabajo las horas que trabajaste hoy, contando tareas, reuniones y mantenimiento.",
+      "en": "At the end of the workday, log in Workload the hours you worked today, counting tasks, meetings and maintenance."
+    },
+    "whyItMatters": {
+      "es": "Jornadas largas seguidas acumulan fatiga y aumentan los errores, sobre todo con poco sueño y lejos de casa.",
+      "en": "Long workdays in a row build up fatigue and increase errors, above all with little sleep and far from home."
+    },
+    "whatToDo": {
+      "es": "Por encima de 10 h varios días seguidos, habla con la comandante o con Tierra para repartir tareas y guarda un día de descanso por semana.",
+      "en": "Over 10 h several days in a row, talk to the commander or Earth to share tasks out, and keep one rest day a week."
+    },
+    "sources": ["NASA Human Research Program: https://www.nasa.gov/hrp/"]
+  },
+  "fatigue": {
+    "howToMeasure": {
+      "es": "Elige en la escala de 1 a 7 cómo de cansado te sientes ahora; mejor siempre a la misma hora, al acabar la jornada.",
+      "en": "Pick on the 1 to 7 scale how tired you feel right now; best always at the same time, at the end of the workday."
+    },
+    "whyItMatters": {
+      "es": "La fatiga baja la atención y la memoria antes de que lo notes. Con 6 o 7 aumentan mucho los errores en tareas críticas.",
+      "en": "Fatigue lowers attention and memory before you notice. At 6 or 7 errors in critical tasks rise sharply."
+    },
+    "whatToDo": {
+      "es": "Con 5 varios días, revisa la carga y el sueño. Con 6 o 7, evita tareas críticas y descansa antes.",
+      "en": "At 5 several days, review your workload and sleep. At 6 or 7, avoid critical tasks and rest first."
+    },
+    "sources": [
+      "Samn & Perelli, Estimating aircrew fatigue, USAF SAM-TR-82-21 (1982)",
+      "NASA Human Research Program: https://www.nasa.gov/hrp/"
+    ]
+  },
   "stress": {
     "howToMeasure": {
       "es": "En el mismo registro de bienestar, elige del 1 (nada) al 5 (muchísimo) tu nivel de estrés. Lo introduces tú.",

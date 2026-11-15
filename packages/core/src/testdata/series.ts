@@ -323,6 +323,22 @@ export const SERIES: SeriesDef[] = [
     value: (c) => (c.rng() < 0.1 ? 1 : 2),
   },
   {
+    indicator: 'work-hours',
+    unit: 'h',
+    everyHours: 24,
+    source: 'manual',
+    decimals: 1,
+    value: (c) => Math.round((7.5 + c.rng() * 2) * 2) / 2,
+  },
+  {
+    indicator: 'fatigue',
+    unit: '1-7',
+    everyHours: 24,
+    source: 'manual',
+    decimals: 0,
+    value: (c) => (c.rng() < 0.3 ? 3 : 2),
+  },
+  {
     indicator: 'sleep',
     unit: 'h',
     everyHours: 24,
