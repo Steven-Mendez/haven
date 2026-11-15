@@ -38,7 +38,7 @@ export function NavMainSkeleton() {
       <SidebarMenu className="gap-0.5">
         {Array.from({ length: 6 }, (_, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: static placeholders
-          <SidebarMenuItem key={i} className="flex h-7 items-center gap-2 px-2">
+          <SidebarMenuItem key={i} className="flex h-8 items-center gap-2.5 px-2.5">
             <Skeleton className="size-3.5 animate-none rounded-sm" />
             <Skeleton className="h-2.5 w-24 animate-none group-data-[collapsible=icon]:hidden" />
           </SidebarMenuItem>

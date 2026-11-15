@@ -39,6 +39,8 @@ export function MissionSwitcher({ lang, missions, active }: Props) {
     name: active ?? t.noMission,
   };
 
+  const label = current.name || current.code || 'HAVEN';
+
   const choose = (code: string) =>
     startTransition(async () => {
       await setMission(code);
@@ -47,7 +49,16 @@ export function MissionSwitcher({ lang, missions, active }: Props) {
     });
 
   return (
-    <SidebarMenu>
+    <SidebarMenu className="gap-2">
+      <li className="flex h-8 items-center justify-center px-1.5 group-data-[collapsible=icon]:hidden">
+        <Image
+          src="/brand/haven-mark.svg"
+          alt="HAVEN"
+          width={115}
+          height={12}
+          className="h-3 w-auto shrink-0 invert dark:invert-0"
+        />
+      </li>
       <SidebarMenuItem>
         <DropdownMenu>
           <DropdownMenuTrigger
@@ -55,23 +66,27 @@ export function MissionSwitcher({ lang, missions, active }: Props) {
               <SidebarMenuButton
                 size="lg"
                 aria-busy={pending}
-                className="hit-area text-foreground data-open:bg-sidebar-accent h-9 gap-2 px-1.5"
+                className="hit-area text-foreground bg-sidebar-hover border-sidebar-border hover:bg-sidebar-accent data-open:bg-sidebar-accent h-10 gap-2.5 rounded-xl border px-2.5 group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:border-transparent group-data-[collapsible=icon]:bg-transparent"
               />
             }
           >
-            <span className="grid size-5 shrink-0 place-items-center">
-              <Image src="/brand/haven-mark.svg" alt="" width={20} height={20} />
+            <span
+              aria-hidden="true"
+              className="bg-sidebar-primary text-sidebar-primary-foreground text-2xs grid size-5 shrink-0 place-items-center rounded-full font-semibold uppercase"
+            >
+              {label.charAt(0)}
             </span>
-            <span className="flex min-w-0 flex-1 items-baseline gap-1.5 text-left">
-              <span className="truncate text-sm font-semibold">
-                {current.name && current.name !== current.code ? current.name : 'HAVEN'}
-              </span>
+            <span className="flex min-w-0 flex-1 items-baseline gap-1.5 text-left group-data-[collapsible=icon]:hidden">
+              <span className="truncate text-sm font-medium">{label}</span>
               <span className="sr-only">
                 {' '}
                 · HAVEN {t.app} · {t.sidebarMission}
               </span>
             </span>
-            <ChevronsUpDown aria-hidden="true" className="text-tertiary ml-auto size-3.5!" />
+            <ChevronsUpDown
+              aria-hidden="true"
+              className="text-tertiary ml-auto size-3.5! group-data-[collapsible=icon]:hidden"
+            />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="min-w-60" align="start" side="bottom" sideOffset={4}>
             {missions.length ? (
