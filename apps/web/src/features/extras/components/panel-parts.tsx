@@ -144,3 +144,26 @@ export function SummaryChips({
     </ul>
   );
 }
+
+/** Texts of the crew tables (filter, tabs, empty state and footer). */
+export function crewTableTexts(
+  t: {
+    crewFilter: string;
+    crewAll: string;
+    crewNoMatches: string;
+    crewFooter: string;
+    crewFooterHint: string;
+    crewFooterEditHint: string;
+  },
+  editable = false,
+) {
+  return {
+    filter: t.crewFilter,
+    all: t.crewAll,
+    noMatches: t.crewNoMatches,
+    footer: t.crewFooter,
+    footerHint: editable ? t.crewFooterEditHint : t.crewFooterHint,
+  };
+}
+
+export const crewHref = (id: string) => `/astronaut/${encodeURIComponent(id)}`;

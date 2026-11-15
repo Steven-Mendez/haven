@@ -2,28 +2,13 @@ import { type ExerciseDay, type ExerciseSuggestion, exercise, type Level } from 
 import { ArrowDown, ArrowUp, Equal, Info, type LucideIcon } from 'lucide-react';
 import { AgeLabel, EmptyState, Hint } from '@/components/haven';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { format, type Language } from '@/lib/i18n';
 import type { ExtrasTexts } from '../i18n';
 import type { ExerciseRow } from '../logic/exercise';
 import { getExerciseOverview } from '../server';
+import { CrewTable } from './crew-table';
 import { ExercisePlanSheet } from './exercise-plan-sheet';
-import {
-  CrewCell,
-  PanelHeading,
-  panelTable,
-  StatusPill,
-  SummaryChips,
-  type Tone,
-  toneOf,
-} from './panel-parts';
+import { CrewCell, crewHref, crewTableTexts, StatusPill, type Tone, toneOf } from './panel-parts';
 
 const COMPLIANCE: { level: Level; label: (t: ExtrasTexts) => string }[] = [
   { level: 'green', label: (t) => t.exComplianceGood },
@@ -148,116 +133,90 @@ export async function ExercisePanel({
   const meeting = rows.filter((r) => r.compliance.level === 'green').length;
 
   return (
-    <section aria-labelledby="exercise" className="flex min-w-0 flex-col gap-3">
-      <PanelHeading
-        id="exercise"
-        title={t.exerciseTitle}
-        count={rows.length || undefined}
-        description={t.exerciseDescription}
-      />
+    <div className="flex min-w-0 flex-col gap-3">
       {rows.length === 0 || !data ? (
         <EmptyState title={t.exerciseEmpty} description={t.exerciseEmptyDetail} />
       ) : (
-        <>
-          <SummaryChips
-            label={t.exComplianceCol}
-            items={COMPLIANCE.map((c) => ({
-              key: c.level,
-              tone: toneOf(c.level),
-              label: c.label(t),
-              count: rows.filter((r) => r.compliance.level === c.level).length,
-            }))}
-          />
-          <div className={panelTable.card}>
-            <Table data-testid="exercise-table">
-              <TableHeader className={panelTable.header}>
-                <TableRow className={panelTable.headRow}>
-                  <TableHead className="pl-4">{t.astronaut}</TableHead>
-                  <TableHead>{t.exComplianceCol}</TableHead>
-                  <TableHead className="hidden xl:table-cell">{t.exWeekCol}</TableHead>
-                  <TableHead className="hidden xl:table-cell">{t.exPrescriptionCol}</TableHead>
-                  <TableHead>{t.exAssessmentCol}</TableHead>
-                  <TableHead className="w-12 pr-4">
-                    <span className="sr-only">{t.exEditPrescription}</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id} className={panelTable.row}>
-                    <TableCell className="py-3 pl-4">
-                      <CrewCell
-                        id={row.id}
-                        name={row.name}
-                        detail={
-                          <AgeLabel
-                            lastDataAt={row.lastDataAt}
-                            now={data.generatedAt}
-                            lang={lang}
-                            noRecentData={row.noRecentData}
-                          />
-                        }
-                      />
-                    </TableCell>
-                    <TableCell className="py-3 text-xs">
-                      <span className="flex flex-col items-start gap-1">
-                        <StatusPill tone={toneOf(row.compliance.level)}>
-                          {complianceLabel(row.compliance.level, t)}
-                        </StatusPill>
-                        <span className="text-muted-foreground tabular-nums">
-                          {row.compliance.counted === 0
-                            ? t.exNoClosedDays
-                            : format(t.exDaysMet, {
-                                met: row.compliance.met,
-                                target: row.compliance.target,
-                              })}
-                        </span>
-                      </span>
-                    </TableCell>
-                    <TableCell className="hidden py-3 xl:table-cell">
-                      <WeekStrip row={row} lang={lang} t={t} />
-                    </TableCell>
-                    <TableCell className="hidden py-3 text-xs whitespace-normal xl:table-cell">
-                      <span className="flex flex-col items-start gap-1">
-                        <span className="whitespace-nowrap tabular-nums">
-                          {format(t.exPrescriptionText, {
-                            resistance: row.prescription.resistanceMinutes,
-                            aerobic: row.prescription.aerobicMinutes,
-                            days: row.prescription.daysPerWeek,
-                          })}
-                        </span>
-                        <span className="text-tertiary">
-                          {row.custom ? t.exCustom : t.exDefault}
-                        </span>
-                      </span>
-                    </TableCell>
-                    <TableCell className="py-3 text-xs whitespace-normal">
-                      <AssessmentCell row={row} t={t} />
-                    </TableCell>
-                    <TableCell className="py-3 pr-3 text-right">
-                      <ExercisePlanSheet
-                        crewMember={row.id}
-                        name={row.name}
-                        prescription={row.prescription}
-                        custom={row.custom}
-                        suggestion={
-                          row.suggestion ? SUGGESTION[row.suggestion].label(t) : undefined
-                        }
-                        assessment={assessmentText(row, t) || undefined}
-                        lang={lang}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <div className={panelTable.footer}>
-              <span className="tabular-nums">
-                {format(t.exFooter, { n: meeting, total: rows.length })}
-              </span>
-            </div>
-          </div>
-        </>
+        <CrewTable
+          id="exercise"
+          testId="exercise-table"
+          title={t.exerciseTitle}
+          description={t.exerciseDescription}
+          groups={COMPLIANCE.map((c) => ({
+            key: c.level,
+            tone: toneOf(c.level),
+            label: c.label(t),
+          }))}
+          columns={[
+            { label: t.astronaut },
+            { label: t.exComplianceCol },
+            { label: t.exWeekCol, className: 'hidden xl:table-cell' },
+            { label: t.exPrescriptionCol, className: 'hidden whitespace-normal xl:table-cell' },
+            { label: t.exAssessmentCol, className: 'whitespace-normal' },
+            {
+              label: <span className="sr-only">{t.exEditPrescription}</span>,
+              className: 'w-12 text-right',
+            },
+          ]}
+          rows={rows.map((row) => ({
+            id: row.id,
+            name: row.name,
+            group: row.compliance.level,
+            href: crewHref(row.id),
+            cells: [
+              <CrewCell
+                key="crew"
+                id={row.id}
+                name={row.name}
+                detail={
+                  <AgeLabel
+                    lastDataAt={row.lastDataAt}
+                    now={data.generatedAt}
+                    lang={lang}
+                    noRecentData={row.noRecentData}
+                  />
+                }
+              />,
+              <span key="compliance" className="flex flex-col items-start gap-1">
+                <StatusPill tone={toneOf(row.compliance.level)}>
+                  {complianceLabel(row.compliance.level, t)}
+                </StatusPill>
+                <span className="text-muted-foreground tabular-nums">
+                  {row.compliance.counted === 0
+                    ? t.exNoClosedDays
+                    : format(t.exDaysMet, {
+                        met: row.compliance.met,
+                        target: row.compliance.target,
+                      })}
+                </span>
+              </span>,
+              <WeekStrip key="week" row={row} lang={lang} t={t} />,
+              <span key="prescription" className="flex flex-col items-start gap-1">
+                <span className="whitespace-nowrap tabular-nums">
+                  {format(t.exPrescriptionText, {
+                    resistance: row.prescription.resistanceMinutes,
+                    aerobic: row.prescription.aerobicMinutes,
+                    days: row.prescription.daysPerWeek,
+                  })}
+                </span>
+                <span className="text-tertiary">{row.custom ? t.exCustom : t.exDefault}</span>
+              </span>,
+              <AssessmentCell key="assessment" row={row} t={t} />,
+              <ExercisePlanSheet
+                key="edit"
+                crewMember={row.id}
+                name={row.name}
+                prescription={row.prescription}
+                custom={row.custom}
+                suggestion={row.suggestion ? SUGGESTION[row.suggestion].label(t) : undefined}
+                assessment={assessmentText(row, t) || undefined}
+                lang={lang}
+              />,
+            ],
+          }))}
+          summary={format(t.exFooter, { n: meeting, total: rows.length })}
+          texts={crewTableTexts(t, true)}
+        />
       )}
       <Collapsible>
         <CollapsibleTrigger className="text-muted-foreground hover:text-foreground hit-area flex min-h-8 items-center gap-1.5 text-xs">
@@ -268,6 +227,6 @@ export async function ExercisePanel({
           {t.exerciseSource} {exercise.source}
         </CollapsibleContent>
       </Collapsible>
-    </section>
+    </div>
   );
 }

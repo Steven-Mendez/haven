@@ -2,28 +2,13 @@ import { type MedicationSchedule, medications } from '@haven/core';
 import { Info, Pill } from 'lucide-react';
 import { AgeLabel, EmptyState } from '@/components/haven';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { format, type Language } from '@/lib/i18n';
 import type { ExtrasTexts } from '../i18n';
 import { type MedicationRow, weekdayName } from '../logic/medication';
 import { getMedicationOverview } from '../server';
+import { CrewTable } from './crew-table';
 import { MedicationPlanSheet } from './medication-plan-sheet';
-import {
-  CrewCell,
-  PanelHeading,
-  panelTable,
-  StatusPill,
-  SummaryChips,
-  type Tone,
-  toneOf,
-} from './panel-parts';
+import { CrewCell, crewHref, crewTableTexts, StatusPill, type Tone, toneOf } from './panel-parts';
 
 function scheduleText(s: MedicationSchedule | undefined, lang: Language, t: ExtrasTexts) {
   if (!s) return '';
@@ -99,131 +84,110 @@ export async function MedicationPanel({
   const withPlan = rows.filter((r) => r.plan.medications.length > 0).length;
 
   return (
-    <section aria-labelledby="medication" className="flex min-w-0 flex-col gap-3">
-      <PanelHeading
-        id="medication"
-        title={t.medicationTitle}
-        count={rows.length || undefined}
-        description={t.medicationDescription}
-      />
+    <div className="flex min-w-0 flex-col gap-3">
       {rows.length === 0 || !data ? (
         <EmptyState title={t.medicationEmpty} description={t.medicationEmptyDetail} />
       ) : (
-        <>
-          <SummaryChips
-            label={t.adherenceCol}
-            items={ADHERENCE.map((a) => ({
-              key: a.level,
-              tone: toneOf(a.level),
-              label: a.label(t),
-              count: rows.filter((r) => r.level === a.level).length,
-            }))}
-          />
-          <div className={panelTable.card}>
-            <Table data-testid="medication-table">
-              <TableHeader className={panelTable.header}>
-                <TableRow className={panelTable.headRow}>
-                  <TableHead className="pl-4">{t.astronaut}</TableHead>
-                  <TableHead>{t.adherenceCol}</TableHead>
-                  <TableHead>{t.todayCol}</TableHead>
-                  <TableHead>{t.planCol}</TableHead>
-                  <TableHead className="hidden xl:table-cell">{t.asNeededCol}</TableHead>
-                  <TableHead className="w-12 pr-4">
-                    <span className="sr-only">{t.editPlan}</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.map((row) => (
-                  <TableRow key={row.id} className={panelTable.row}>
-                    <TableCell className="py-3 pl-4">
-                      <CrewCell
-                        id={row.id}
-                        name={row.name}
-                        detail={
-                          <AgeLabel
-                            lastDataAt={row.lastDataAt}
-                            now={data.generatedAt}
-                            lang={lang}
-                            noRecentData={row.noRecentData}
-                          />
-                        }
-                      />
-                    </TableCell>
-                    <TableCell className="py-3 text-xs">
-                      <span className="flex flex-col items-start gap-1">
-                        <StatusPill tone={toneOf(row.level)}>
-                          {row.adherence.percent === null
-                            ? adherenceLabel(row.level, t)
-                            : `${row.adherence.percent} % · ${adherenceLabel(row.level, t)}`}
-                        </StatusPill>
-                        <span className="text-muted-foreground tabular-nums">
-                          {row.adherence.percent === null
-                            ? t.adherenceNone
-                            : format(t.adherenceDoses, {
-                                taken: row.adherence.taken,
-                                expected: row.adherence.expected,
-                              })}
-                        </span>
-                      </span>
-                    </TableCell>
-                    <TableCell className="py-3 text-xs whitespace-normal">
-                      <TodayCell row={row} t={t} />
-                    </TableCell>
-                    <TableCell className="py-3 text-xs whitespace-normal">
-                      {row.plan.medications.length === 0 ? (
-                        <span className="text-tertiary">{t.noPlan}</span>
-                      ) : (
-                        <ul className="flex max-w-xs flex-wrap gap-1">
-                          {row.plan.medications.map((a) => (
-                            <li
-                              key={a.medication}
-                              className="bg-surface-elevated/60 text-muted-foreground inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 whitespace-nowrap"
-                            >
-                              <Pill aria-hidden="true" className="text-tertiary size-3" />
-                              {nameOf(a.medication, lang)}
-                              {a.until ? <span className="text-tertiary">→ {a.until}</span> : null}
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </TableCell>
-                    <TableCell className="hidden py-3 text-xs whitespace-normal xl:table-cell">
-                      {row.asNeeded.length === 0 ? (
-                        <span className="text-tertiary">—</span>
-                      ) : (
-                        <ul className="flex flex-col items-start gap-1">
-                          {row.asNeeded.map((a) => (
-                            <li key={a.medication}>
-                              <StatusPill tone={a.canTake ? 'muted' : 'amber'}>
-                                {nameOf(a.medication, lang)} {a.taken}/{a.maxPerDay}
-                              </StatusPill>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </TableCell>
-                    <TableCell className="py-3 pr-3 text-right">
-                      <MedicationPlanSheet
-                        crewMember={row.id}
-                        name={row.name}
-                        plan={row.plan}
-                        catalog={medications.catalog}
-                        schedules={schedulesFor(row)}
-                        lang={lang}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <div className={panelTable.footer}>
-              <span className="tabular-nums">
-                {format(t.medicationFooter, { n: withPlan, total: rows.length })}
-              </span>
-            </div>
-          </div>
-        </>
+        <CrewTable
+          id="medication"
+          testId="medication-table"
+          title={t.medicationTitle}
+          description={t.medicationDescription}
+          groups={ADHERENCE.map((a) => ({
+            key: a.level,
+            tone: toneOf(a.level),
+            label: a.label(t),
+          }))}
+          columns={[
+            { label: t.astronaut },
+            { label: t.adherenceCol },
+            { label: t.todayCol, className: 'whitespace-normal' },
+            { label: t.planCol, className: 'whitespace-normal' },
+            { label: t.asNeededCol, className: 'hidden whitespace-normal xl:table-cell' },
+            { label: <span className="sr-only">{t.editPlan}</span>, className: 'w-12 text-right' },
+          ]}
+          rows={rows.map((row) => ({
+            id: row.id,
+            name: row.name,
+            group: row.level,
+            href: crewHref(row.id),
+            cells: [
+              <CrewCell
+                key="crew"
+                id={row.id}
+                name={row.name}
+                detail={
+                  <AgeLabel
+                    lastDataAt={row.lastDataAt}
+                    now={data.generatedAt}
+                    lang={lang}
+                    noRecentData={row.noRecentData}
+                  />
+                }
+              />,
+              <span key="adherence" className="flex flex-col items-start gap-1">
+                <StatusPill tone={toneOf(row.level)}>
+                  {row.adherence.percent === null
+                    ? adherenceLabel(row.level, t)
+                    : `${row.adherence.percent} % · ${adherenceLabel(row.level, t)}`}
+                </StatusPill>
+                <span className="text-muted-foreground tabular-nums">
+                  {row.adherence.percent === null
+                    ? t.adherenceNone
+                    : format(t.adherenceDoses, {
+                        taken: row.adherence.taken,
+                        expected: row.adherence.expected,
+                      })}
+                </span>
+              </span>,
+              <TodayCell key="today" row={row} t={t} />,
+              row.plan.medications.length === 0 ? (
+                <span key="plan" className="text-tertiary">
+                  {t.noPlan}
+                </span>
+              ) : (
+                <ul key="plan" className="flex max-w-xs flex-wrap gap-1">
+                  {row.plan.medications.map((a) => (
+                    <li
+                      key={a.medication}
+                      className="bg-surface-elevated/60 text-muted-foreground inline-flex items-center gap-1 rounded-md border px-1.5 py-0.5 whitespace-nowrap"
+                    >
+                      <Pill aria-hidden="true" className="text-tertiary size-3" />
+                      {nameOf(a.medication, lang)}
+                      {a.until ? <span className="text-tertiary">→ {a.until}</span> : null}
+                    </li>
+                  ))}
+                </ul>
+              ),
+              row.asNeeded.length === 0 ? (
+                <span key="as-needed" className="text-tertiary">
+                  —
+                </span>
+              ) : (
+                <ul key="as-needed" className="flex flex-col items-start gap-1">
+                  {row.asNeeded.map((a) => (
+                    <li key={a.medication}>
+                      <StatusPill tone={a.canTake ? 'muted' : 'amber'}>
+                        {nameOf(a.medication, lang)} {a.taken}/{a.maxPerDay}
+                      </StatusPill>
+                    </li>
+                  ))}
+                </ul>
+              ),
+              <MedicationPlanSheet
+                key="edit"
+                crewMember={row.id}
+                name={row.name}
+                plan={row.plan}
+                catalog={medications.catalog}
+                schedules={schedulesFor(row)}
+                lang={lang}
+              />,
+            ],
+          }))}
+          summary={format(t.medicationFooter, { n: withPlan, total: rows.length })}
+          texts={crewTableTexts(t, true)}
+        />
       )}
       <Collapsible>
         <CollapsibleTrigger className="text-muted-foreground hover:text-foreground hit-area flex min-h-8 items-center gap-1.5 text-xs">
@@ -234,6 +198,6 @@ export async function MedicationPanel({
           {t.medicationSource} {medications.source}
         </CollapsibleContent>
       </Collapsible>
-    </section>
+    </div>
   );
 }

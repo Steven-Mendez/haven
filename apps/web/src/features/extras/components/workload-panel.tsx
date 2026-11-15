@@ -8,26 +8,12 @@ import {
 import { Info } from 'lucide-react';
 import { AgeLabel, EmptyState, Hint } from '@/components/haven';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { format, type Language } from '@/lib/i18n';
 import type { ExtrasTexts } from '../i18n';
 import type { WorkloadRow } from '../logic/workload';
 import { getWorkloadOverview } from '../server';
-import {
-  CrewCell,
-  PanelHeading,
-  panelTable,
-  StatusPill,
-  SummaryChips,
-  toneOf,
-} from './panel-parts';
+import { CrewTable } from './crew-table';
+import { CrewCell, crewHref, crewTableTexts, StatusPill, toneOf } from './panel-parts';
 
 const LEVELS: { level: Level; label: (t: ExtrasTexts) => string }[] = [
   { level: 'green', label: (t) => t.wlGreen },
@@ -117,122 +103,99 @@ export async function WorkloadPanel({
   const loaded = rows.filter((r) => r.status.level === 'amber' || r.status.level === 'red').length;
 
   return (
-    <section aria-labelledby="workload" className="flex min-w-0 flex-col gap-3">
-      <PanelHeading
-        id="workload"
-        title={t.workloadTitle}
-        count={rows.length || undefined}
-        description={t.workloadDescription}
-      />
+    <div className="flex min-w-0 flex-col gap-3">
       {rows.length === 0 || !data ? (
         <EmptyState title={t.workloadEmpty} description={t.workloadEmptyDetail} />
       ) : (
-        <>
-          <SummaryChips
-            label={t.wlStatusCol}
-            items={LEVELS.map((l) => ({
-              key: l.level,
-              tone: toneOf(l.level),
-              label: l.label(t),
-              count: rows.filter((r) => r.status.level === l.level).length,
-            }))}
-          />
-          <div className={panelTable.card}>
-            <Table data-testid="workload-table">
-              <TableHeader className={panelTable.header}>
-                <TableRow className={panelTable.headRow}>
-                  <TableHead className="pl-4">{t.astronaut}</TableHead>
-                  <TableHead>{t.wlStatusCol}</TableHead>
-                  <TableHead>{t.wlHoursCol}</TableHead>
-                  <TableHead>{t.wlFatigueCol}</TableHead>
-                  <TableHead className="hidden xl:table-cell">{t.wlSleepCol}</TableHead>
-                  <TableHead className="hidden pr-4 2xl:table-cell">{t.wlReasonsCol}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.map((row) => {
-                  const s = row.status;
-                  return (
-                    <TableRow key={row.id} className={panelTable.row}>
-                      <TableCell className="py-3 pl-4">
-                        <CrewCell
-                          id={row.id}
-                          name={row.name}
-                          detail={
-                            <AgeLabel
-                              lastDataAt={row.lastDataAt}
-                              now={data.generatedAt}
-                              lang={lang}
-                              noRecentData={row.noRecentData}
-                            />
-                          }
-                        />
-                      </TableCell>
-                      <TableCell className="py-3 text-xs">
-                        <span className="flex flex-col items-start gap-1">
-                          <StatusPill tone={toneOf(s.level)}>{levelLabel(s.level, t)}</StatusPill>
-                          {s.loggedDays > 0 ? (
-                            <span className="text-muted-foreground tabular-nums">
-                              {format(t.wlWeek, { hours: s.weekHours, rest: s.restDays })}
-                            </span>
-                          ) : null}
-                        </span>
-                      </TableCell>
-                      <TableCell className="py-3 text-xs">
-                        <span className="flex flex-col items-start gap-1">
-                          <HoursStrip row={row} lang={lang} t={t} />
-                          {s.longStreak >= 2 ? (
-                            <span className="text-muted-foreground">
-                              {format(t.wlStreak, { n: s.longStreak })}
-                            </span>
-                          ) : null}
-                        </span>
-                      </TableCell>
-                      <TableCell className="py-3 text-xs whitespace-normal">
-                        {s.latestFatigue === null ? (
-                          <span className="text-tertiary">{t.wlNoFatigue}</span>
-                        ) : (
-                          <span className="flex flex-col items-start gap-1">
-                            <StatusPill tone={toneOf(fatigueLevel(s.latestFatigue, workload))}>
-                              {format(t.wlFatigue, { score: s.latestFatigue })}
-                            </StatusPill>
-                            <span className="text-muted-foreground max-w-44">
-                              {
-                                workload.fatigueScale.find((f) => f.score === s.latestFatigue)
-                                  ?.label[lang]
-                              }
-                            </span>
-                          </span>
-                        )}
-                      </TableCell>
-                      <TableCell className="hidden py-3 text-xs tabular-nums xl:table-cell">
-                        {s.averageSleep === null ? (
-                          <span className="text-tertiary">{t.wlNoSleep}</span>
-                        ) : (
-                          <StatusPill
-                            tone={s.averageSleep < workload.shortSleep ? 'amber' : 'muted'}
-                          >
-                            {format(t.wlSleep, { hours: s.averageSleep })}
-                          </StatusPill>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-muted-foreground hidden min-w-52 py-3 pr-4 text-xs whitespace-normal 2xl:table-cell">
-                        {s.reasons.length
-                          ? s.reasons.map((r) => reasonText(r, row, t)).join(' · ')
-                          : t.wlReasonNone}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-            <div className={panelTable.footer}>
-              <span className="tabular-nums">
-                {format(t.workloadFooter, { n: loaded, total: rows.length })}
-              </span>
-            </div>
-          </div>
-        </>
+        <CrewTable
+          id="workload"
+          testId="workload-table"
+          title={t.workloadTitle}
+          description={t.workloadDescription}
+          groups={LEVELS.map((l) => ({ key: l.level, tone: toneOf(l.level), label: l.label(t) }))}
+          columns={[
+            { label: t.astronaut },
+            { label: t.wlStatusCol },
+            { label: t.wlHoursCol },
+            { label: t.wlFatigueCol, className: 'whitespace-normal' },
+            { label: t.wlSleepCol, className: 'hidden tabular-nums xl:table-cell' },
+            {
+              label: t.wlReasonsCol,
+              className: 'text-muted-foreground hidden min-w-52 whitespace-normal 2xl:table-cell',
+            },
+          ]}
+          rows={rows.map((row) => {
+            const s = row.status;
+            return {
+              id: row.id,
+              name: row.name,
+              group: s.level,
+              href: crewHref(row.id),
+              cells: [
+                <CrewCell
+                  key="crew"
+                  id={row.id}
+                  name={row.name}
+                  detail={
+                    <AgeLabel
+                      lastDataAt={row.lastDataAt}
+                      now={data.generatedAt}
+                      lang={lang}
+                      noRecentData={row.noRecentData}
+                    />
+                  }
+                />,
+                <span key="status" className="flex flex-col items-start gap-1">
+                  <StatusPill tone={toneOf(s.level)}>{levelLabel(s.level, t)}</StatusPill>
+                  {s.loggedDays > 0 ? (
+                    <span className="text-muted-foreground tabular-nums">
+                      {format(t.wlWeek, { hours: s.weekHours, rest: s.restDays })}
+                    </span>
+                  ) : null}
+                </span>,
+                <span key="hours" className="flex flex-col items-start gap-1">
+                  <HoursStrip row={row} lang={lang} t={t} />
+                  {s.longStreak >= 2 ? (
+                    <span className="text-muted-foreground">
+                      {format(t.wlStreak, { n: s.longStreak })}
+                    </span>
+                  ) : null}
+                </span>,
+                s.latestFatigue === null ? (
+                  <span key="fatigue" className="text-tertiary">
+                    {t.wlNoFatigue}
+                  </span>
+                ) : (
+                  <span key="fatigue" className="flex flex-col items-start gap-1">
+                    <StatusPill tone={toneOf(fatigueLevel(s.latestFatigue, workload))}>
+                      {format(t.wlFatigue, { score: s.latestFatigue })}
+                    </StatusPill>
+                    <span className="text-muted-foreground max-w-44">
+                      {workload.fatigueScale.find((f) => f.score === s.latestFatigue)?.label[lang]}
+                    </span>
+                  </span>
+                ),
+                s.averageSleep === null ? (
+                  <span key="sleep" className="text-tertiary">
+                    {t.wlNoSleep}
+                  </span>
+                ) : (
+                  <StatusPill
+                    key="sleep"
+                    tone={s.averageSleep < workload.shortSleep ? 'amber' : 'muted'}
+                  >
+                    {format(t.wlSleep, { hours: s.averageSleep })}
+                  </StatusPill>
+                ),
+                s.reasons.length
+                  ? s.reasons.map((r) => reasonText(r, row, t)).join(' · ')
+                  : t.wlReasonNone,
+              ],
+            };
+          })}
+          summary={format(t.workloadFooter, { n: loaded, total: rows.length })}
+          texts={crewTableTexts(t)}
+        />
       )}
       <Collapsible>
         <CollapsibleTrigger className="text-muted-foreground hover:text-foreground hit-area flex min-h-8 items-center gap-1.5 text-xs">
@@ -243,6 +206,6 @@ export async function WorkloadPanel({
           {t.workloadHowTo} {workload.source}
         </CollapsibleContent>
       </Collapsible>
-    </section>
+    </div>
   );
 }
