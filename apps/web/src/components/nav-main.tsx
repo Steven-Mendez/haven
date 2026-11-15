@@ -1,11 +1,10 @@
 'use client';
 
-import { Activity, Footprints, Rocket, SlidersHorizontal, Users } from 'lucide-react';
+import { Activity, Footprints, Rocket, SlidersHorizontal, UserRound, Users } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 import { CommandTrigger } from '@/components/command-menu';
-import { LevelGlyph } from '@/components/haven/level-glyph';
 import { levelLabel } from '@/components/haven/levels';
 import { havenTexts } from '@/components/haven/texts';
 import type { VisualLevel } from '@/components/haven/types';
@@ -19,6 +18,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { Language } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 
 export type NavCrewMember = {
   id: string;
@@ -109,6 +109,12 @@ export function NavMain({ lang, crew }: Props) {
           {crew.map((m) => {
             const href = `/astronaut/${m.id}`;
             const label = levelLabel(m.level, lang);
+            const alertDot =
+              m.emergency || m.level === 'red'
+                ? 'bg-level-red'
+                : m.level === 'amber'
+                  ? 'bg-level-amber'
+                  : null;
             return (
               <SidebarMenuItem key={m.id}>
                 <SidebarMenuButton
@@ -117,19 +123,21 @@ export function NavMain({ lang, crew }: Props) {
                   render={<Link href={href} />}
                   className="hit-area pr-8"
                 >
-                  <span className="grid size-4 place-items-center">
-                    <LevelGlyph level={m.level} size={10} className="opacity-100!" />
-                  </span>
+                  <UserRound aria-hidden="true" />
                   <span className="truncate">{m.name}</span>
                 </SidebarMenuButton>
                 <SidebarMenuBadge
                   title={label}
                   className="text-tertiary text-2xs pointer-events-none top-1/2! -translate-y-1/2 font-normal"
                 >
-                  {m.emergency ? (
+                  {alertDot ? (
                     <span
                       aria-hidden="true"
-                      className="bg-level-red motion-safe:animate-live size-1.5 rounded-full"
+                      className={cn(
+                        'size-1.5 rounded-full',
+                        alertDot,
+                        m.emergency && 'motion-safe:animate-live',
+                      )}
                     />
                   ) : null}
                   <span className="sr-only">

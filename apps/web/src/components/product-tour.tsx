@@ -17,7 +17,7 @@ const texts = defineTexts({
     missionBody: 'Cambia de misión aquí. Todo lo que ves es de la misión elegida.',
     navTitle: 'Secciones',
     navBody:
-      'Tripulación, reglas de umbral, tendencias, aptitud para EVA y misiones. Atajo: g y la inicial.',
+      'Tripulación, indicadores, tendencias, aptitud para EVA y misiones. Atajo: g y la inicial.',
     headerTitle: 'La misión',
     headerBody:
       'Día, entorno y estado del enlace. Los datos llegan con el retardo real de la misión.',
@@ -38,8 +38,7 @@ const texts = defineTexts({
     missionTitle: 'Active mission',
     missionBody: 'Switch missions here. Everything you see belongs to the chosen mission.',
     navTitle: 'Sections',
-    navBody:
-      'Crew, threshold rules, trends, EVA readiness and missions. Shortcut: g and the initial.',
+    navBody: 'Crew, indicators, trends, EVA readiness and missions. Shortcut: g and the initial.',
     headerTitle: 'The mission',
     headerBody: 'Day, environment and link status. Data arrives with the real mission delay.',
     statsTitle: 'Summary',
