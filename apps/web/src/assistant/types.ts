@@ -92,3 +92,13 @@ export function checkPreferences(value: unknown): Preferences {
     effort: EFFORTS.find((e) => e === v.effort) ?? DEFAULT_PREFERENCES.effort,
   };
 }
+
+export type CountermeasureTone = 'green' | 'amber' | 'red' | 'muted';
+
+/** What the chat draws for a countermeasure area: one state per crew member and the tab. */
+export type CountermeasureCardView = {
+  area: string;
+  title: string;
+  page: string;
+  rows: { id: string; name: string; tone: CountermeasureTone; label: string; detail?: string }[];
+};

@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import type { AssistantTexts } from '../i18n';
 import { type AssistantTools, WRITE_TOOLS, type WriteResult } from '../types';
 import { ChartCard } from './chart-card';
+import { CountermeasureCard } from './countermeasure-card';
 import { PanelCard } from './panel-card';
 
 type Part = ToolUIPart<AssistantTools>;
@@ -391,6 +392,13 @@ export function ToolPart({
     }
     return <Activity label={label} state="failed" note={t.toolFailed} />;
   }
+
+  if (
+    part.type === 'tool-getCountermeasures' &&
+    part.state === 'output-available' &&
+    'card' in part.output
+  )
+    return <CountermeasureCard card={part.output.card} t={t} />;
 
   if (part.type === 'tool-getInvitation' && part.state === 'output-available')
     return 'link' in part.output ? (
