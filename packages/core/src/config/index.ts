@@ -3,6 +3,7 @@ import environments from '../../config/environments.json';
 import glossaryJson from '../../config/glossary.json';
 import guides from '../../config/guides.json';
 import indicators from '../../config/indicators.json';
+import medicationsJson from '../../config/medications.json';
 import templatesJson from '../../config/mission-templates.json';
 import protocols from '../../config/protocols.json';
 import symptomsJson from '../../config/symptoms.json';
@@ -15,6 +16,7 @@ import type {
   Environment,
   I18n,
   Indicator,
+  MedicationConfig,
   MissionPhase,
   MissionTemplate,
 } from '../contracts';
@@ -89,6 +91,8 @@ export const actions: Action[] = actionsJson as Action[];
 export function actionById(id: string): Action | undefined {
   return actions.find((a) => a.id === id);
 }
+
+export const medications: MedicationConfig = medicationsJson as MedicationConfig;
 
 export type LoadedConfig = Config & { actions: Action[] };
 
