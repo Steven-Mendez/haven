@@ -202,9 +202,6 @@ export async function MotionPanel({
                             {format(t.moScore, { score: row.latest.score })} ·{' '}
                             {LEVELS.find((l) => l.level === row.latest?.level)?.label(t)}
                           </StatusPill>
-                          <span className="text-muted-foreground max-w-48">
-                            {motion.scale.find((s) => s.score === row.latest?.score)?.label[lang]}
-                          </span>
                         </span>
                       ) : (
                         <span className="text-tertiary">{t.moNoRecent}</span>
@@ -219,7 +216,7 @@ export async function MotionPanel({
                     <TableCell className="py-3 text-xs">
                       <BalanceCell row={row} t={t} />
                     </TableCell>
-                    <TableCell className="text-muted-foreground hidden min-w-60 py-3 pr-4 text-xs whitespace-normal xl:table-cell">
+                    <TableCell className="text-muted-foreground hidden min-w-52 py-3 pr-4 text-xs whitespace-normal xl:table-cell">
                       {adviceText(row, t)}
                     </TableCell>
                   </TableRow>
