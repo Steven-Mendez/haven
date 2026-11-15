@@ -1,5 +1,6 @@
 import actionsJson from '../../config/actions.json';
 import environments from '../../config/environments.json';
+import exerciseJson from '../../config/exercise.json';
 import glossaryJson from '../../config/glossary.json';
 import guides from '../../config/guides.json';
 import indicators from '../../config/indicators.json';
@@ -14,6 +15,7 @@ import type {
   Action,
   Config,
   Environment,
+  ExerciseConfig,
   I18n,
   Indicator,
   MedicationConfig,
@@ -93,6 +95,7 @@ export function actionById(id: string): Action | undefined {
 }
 
 export const medications: MedicationConfig = medicationsJson as MedicationConfig;
+export const exercise: ExerciseConfig = exerciseJson as ExerciseConfig;
 
 export type LoadedConfig = Config & { actions: Action[] };
 

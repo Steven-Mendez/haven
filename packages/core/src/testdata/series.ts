@@ -251,6 +251,14 @@ export const SERIES: SeriesDef[] = [
     value: (c) => 45 + Math.floor(c.rng() * 16),
   },
   {
+    indicator: 'aerobic-exercise',
+    unit: 'min',
+    everyHours: 24,
+    source: 'manual',
+    decimals: 0,
+    value: (c) => 45 + Math.floor(c.rng() * 11),
+  },
+  {
     indicator: 'bone-loss',
     unit: '%',
     everyHours: 168,

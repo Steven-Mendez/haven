@@ -12,6 +12,7 @@ export * from './baseline';
 export * from './categories';
 export * from './cognition';
 export * from './evaluate';
+export * from './exercise';
 export * from './medication';
 export * from './protocols';
 export * from './radiation';

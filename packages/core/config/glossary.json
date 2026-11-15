@@ -207,6 +207,17 @@
       "en": "mL: milliliters; 1000 mL make one liter"
     }
   },
+  "aerobic-exercise": {
+    "term": { "es": "Ejercicio aeróbico", "en": "Aerobic exercise" },
+    "short": {
+      "es": "Bicicleta o cinta a ritmo sostenido. Mantiene en forma el corazón y la resistencia.",
+      "en": "Cycling or treadmill at a steady pace. Keeps the heart and endurance in shape."
+    },
+    "unitHint": {
+      "es": "min: minutos de ejercicio en el día",
+      "en": "min: minutes of exercise in the day"
+    }
+  },
   "resistance-exercise": {
     "term": { "es": "Ejercicio de fuerza", "en": "Strength exercise" },
     "short": {

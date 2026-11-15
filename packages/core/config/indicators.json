@@ -694,6 +694,33 @@
     "source": "45 min al día: valor inicial de P01, referencia provisional. El ejercicio es la contramedida principal contra la pérdida ósea y muscular: NASA HRP, Gravity Fields (https://www.nasa.gov/hrp/hazard-gravity-fields/)."
   },
   {
+    "id": "aerobic-exercise",
+    "name": {
+      "es": "Ejercicio aeróbico",
+      "en": "Aerobic exercise"
+    },
+    "zone": "performance",
+    "unit": "min",
+    "inputs": ["watch", "health", "manual"],
+    "suggestedByChallenge": false,
+    "ridge": ["gravity"],
+    "everyHours": 24,
+    "kind": "number",
+    "green": [45, 240],
+    "rules": [
+      {
+        "level": "amber",
+        "outside": [45, 240],
+        "explanation": {
+          "es": "No llegaste a los 45 minutos de ejercicio aeróbico de hoy: el corazón y la resistencia lo necesitan.",
+          "en": "You did not reach today’s 45 minutes of aerobic exercise: your heart and endurance need it."
+        },
+        "actions": ["complete-exercise"]
+      }
+    ],
+    "source": "45 min al día en cicloergómetro o cinta: reparto provisional de los 90 min diarios. El ejercicio aeróbico mantiene la capacidad cardiovascular en microgravedad: NASA HRP, Gravity Fields (https://www.nasa.gov/hrp/hazard-gravity-fields/)."
+  },
+  {
     "id": "reaction-time",
     "name": {
       "es": "Tiempo de reacción",
