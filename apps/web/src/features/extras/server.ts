@@ -30,6 +30,7 @@ import type {
 } from '@/server/types';
 import { DEFAULT_MISSION } from '@/server/types';
 import { type EvaRow, evaRow } from './logic/eva';
+import { type ReentryRow, reentryRow } from './logic/reentry';
 import { isFullConfig } from './logic/rules';
 
 export async function listMissions(): Promise<MissionsResponse> {
@@ -124,6 +125,23 @@ export async function getEvaReadiness(
     crew.crew.map(async (member) => {
       const detail = await queryGetAstronaut(mission, member.id);
       return evaRow(member, detail?.assessments ?? [], config);
+    }),
+  );
+  return { generatedAt: crew.generatedAt, rows: rows.sort((a, b) => a.name.localeCompare(b.name)) };
+}
+
+export async function getReentryReadiness(
+  mission = DEFAULT_MISSION,
+): Promise<{ generatedAt: string; rows: ReentryRow[] } | null> {
+  await connection();
+  const crew = await queryGetCrew(mission);
+  if (!crew) return null;
+  const now = new Date(crew.generatedAt);
+  const rows = await Promise.all(
+    crew.crew.map(async (member) => {
+      const detail = await queryGetAstronaut(mission, member.id);
+      const readings = detail?.packets.flatMap((p) => p.readings) ?? [];
+      return reentryRow(member, readings, detail?.assessments ?? [], now);
     }),
   );
   return { generatedAt: crew.generatedAt, rows: rows.sort((a, b) => a.name.localeCompare(b.name)) };
