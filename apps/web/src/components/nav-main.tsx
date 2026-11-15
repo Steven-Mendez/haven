@@ -2,6 +2,7 @@
 
 import {
   ChartNoAxesCombined,
+  Dumbbell,
   Footprints,
   Pill,
   Rocket,
@@ -84,6 +85,12 @@ export function NavMain({ lang, crew }: Props) {
       label: t.navMedicationShort,
       icon: Pill,
       active: pathname === '/medication',
+    },
+    {
+      href: '/exercise',
+      label: t.navExerciseShort,
+      icon: Dumbbell,
+      active: pathname === '/exercise',
     },
     {
       href: '/missions',

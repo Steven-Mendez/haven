@@ -52,6 +52,7 @@ export const KPI_INDICATORS = [
   'stress',
   'steps',
   'resistance-exercise',
+  'aerobic-exercise',
   'reaction-time',
   'glucose',
   'food-intake',

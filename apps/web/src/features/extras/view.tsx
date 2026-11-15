@@ -8,6 +8,7 @@ import { getMissionCode } from '@/lib/mission';
 import { cn } from '@/lib/utils';
 import type { StoredMission } from '@/server/types';
 import { EvaPanel } from './components/eva-panel';
+import { ExercisePanel } from './components/exercise-panel';
 import { KpiDashboardPanel } from './components/kpi/kpi-dashboard-panel';
 import { MedicationPanel } from './components/medication-panel';
 import { RulesPanel } from './components/rules-panel';
@@ -72,6 +73,7 @@ const TITLES = {
   kpi: { title: 'kpiTitle', subtitle: 'kpiSubtitle' },
   eva: { title: 'tabEva', subtitle: 'evaSubtitle' },
   medication: { title: 'tabMedication', subtitle: 'medicationSubtitle' },
+  exercise: { title: 'tabExercise', subtitle: 'exerciseSubtitle' },
 } as const;
 
 async function ExtrasContent({
@@ -146,6 +148,7 @@ async function ExtrasContent({
       {section === 'rules' ? <RulesPanel mission={mission} lang={lang} t={t} /> : null}
       {section === 'eva' ? <EvaPanel mission={code} lang={lang} t={t} /> : null}
       {section === 'medication' ? <MedicationPanel mission={code} lang={lang} t={t} /> : null}
+      {section === 'exercise' ? <ExercisePanel mission={code} lang={lang} t={t} /> : null}
     </>
   );
 }
@@ -174,6 +177,10 @@ export const EvaView = ({ searchParams }: PageProps) => (
 
 export const MedicationView = ({ searchParams }: PageProps) => (
   <ExtrasPage section="medication" searchParams={searchParams} />
+);
+
+export const ExerciseView = ({ searchParams }: PageProps) => (
+  <ExtrasPage section="exercise" searchParams={searchParams} />
 );
 
 export function extrasRedirect(tab: unknown): `/${ExtrasTab}` {

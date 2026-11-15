@@ -3,6 +3,7 @@
 import {
   ChartNoAxesCombined,
   Compass,
+  Dumbbell,
   Footprints,
   Languages,
   LogIn,
@@ -149,6 +150,7 @@ export function CommandMenu({ lang, crew }: Props) {
     { href: '/kpi', label: t.navKpi, icon: ChartNoAxesCombined },
     { href: '/eva', label: t.navEva, icon: Footprints },
     { href: '/medication', label: t.navMedication, icon: Pill },
+    { href: '/exercise', label: t.navExercise, icon: Dumbbell },
     { href: '/missions', label: t.navMissions, icon: Rocket },
     { href: '/settings', label: t.navSettings, icon: Settings },
   ];

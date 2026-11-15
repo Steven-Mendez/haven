@@ -19,6 +19,7 @@ export const BAR_INDICATORS = [
   'food-intake',
   'hydration',
   'resistance-exercise',
+  'aerobic-exercise',
 ] as const;
 
 export const DIARY_INDICATOR = 'diary';

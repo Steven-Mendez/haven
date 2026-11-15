@@ -19,6 +19,7 @@ import {
   mergeMission as queryMergeMission,
   saveDashboard as querySaveDashboard,
   savePlan as querySavePlan,
+  savePrescription as querySavePrescription,
   saveRules as querySaveRules,
   startMission as queryStartMission,
   updateMission as queryUpdateMission,
@@ -36,6 +37,7 @@ import type {
 } from '@/server/types';
 import { DEFAULT_MISSION } from '@/server/types';
 import { type EvaRow, evaRow } from './logic/eva';
+import { type ExerciseRow, exerciseRow } from './logic/exercise';
 import { type MedicationRow, medicationRow } from './logic/medication';
 import { isFullConfig } from './logic/rules';
 
@@ -187,4 +189,34 @@ export async function saveMedicationPlan(
 export async function getCrewPlan(mission: string, crewMember: string) {
   await connection();
   return queryGetPlan(mission, crewMember);
+}
+
+export async function getExerciseOverview(
+  mission = DEFAULT_MISSION,
+): Promise<{ generatedAt: string; rows: ExerciseRow[] } | null> {
+  await connection();
+  const crew = await queryGetCrew(mission);
+  if (!crew) return null;
+  const now = new Date(crew.generatedAt);
+  const rows = await Promise.all(
+    crew.crew.map(async (member) => {
+      const [detail, plan] = await Promise.all([
+        queryGetAstronaut(mission, member.id),
+        queryGetPlan(mission, member.id),
+      ]);
+      const readings = detail?.packets.flatMap((p) => p.readings) ?? [];
+      return exerciseRow(member, plan, readings, now);
+    }),
+  );
+  return { generatedAt: crew.generatedAt, rows: rows.sort((a, b) => a.name.localeCompare(b.name)) };
+}
+
+export async function saveExercisePrescription(
+  mission: string,
+  crewMember: string,
+  prescription: unknown,
+  author?: string,
+) {
+  await connection();
+  return querySavePrescription(mission, crewMember, prescription, author);
 }
