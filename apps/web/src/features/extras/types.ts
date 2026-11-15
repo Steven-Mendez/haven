@@ -1,6 +1,6 @@
 import type { ThresholdError } from './logic/rules';
 
-export const EXTRAS_TABS = ['rules', 'kpi', 'eva'] as const;
+export const EXTRAS_TABS = ['rules', 'kpi', 'eva', 'motion'] as const;
 export type ExtrasTab = (typeof EXTRAS_TABS)[number];
 
 export type RulesFormState =

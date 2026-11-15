@@ -7,6 +7,7 @@ import {
   SlidersHorizontal,
   UserRound,
   Users,
+  Waves,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -78,6 +79,7 @@ export function NavMain({ lang, crew }: Props) {
       active: pathname === '/kpi',
     },
     { href: '/eva', label: t.navEvaShort, icon: Footprints, active: pathname === '/eva' },
+    { href: '/motion', label: t.navMotionShort, icon: Waves, active: pathname === '/motion' },
     {
       href: '/missions',
       label: t.navMissions,

@@ -13,6 +13,7 @@ import {
   Settings,
   SlidersHorizontal,
   Users,
+  Waves,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
@@ -147,6 +148,7 @@ export function CommandMenu({ lang, crew }: Props) {
     { href: '/rules', label: t.navRules, icon: SlidersHorizontal },
     { href: '/kpi', label: t.navKpi, icon: ChartNoAxesCombined },
     { href: '/eva', label: t.navEva, icon: Footprints },
+    { href: '/motion', label: t.navMotion, icon: Waves },
     { href: '/missions', label: t.navMissions, icon: Rocket },
     { href: '/settings', label: t.navSettings, icon: Settings },
   ];

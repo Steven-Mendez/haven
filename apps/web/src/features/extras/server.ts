@@ -34,6 +34,7 @@ import type {
 } from '@/server/types';
 import { DEFAULT_MISSION } from '@/server/types';
 import { type EvaRow, evaRow } from './logic/eva';
+import { type MotionRow, motionRow } from './logic/motion';
 import { isFullConfig } from './logic/rules';
 
 export async function listMissions(): Promise<MissionsResponse> {
@@ -149,4 +150,26 @@ export async function getEvaReadiness(
     }),
   );
   return { generatedAt: crew.generatedAt, rows: rows.sort((a, b) => a.name.localeCompare(b.name)) };
+}
+
+export async function getMotionOverview(
+  mission = DEFAULT_MISSION,
+): Promise<{ generatedAt: string; rows: MotionRow[]; environment: string } | null> {
+  await connection();
+  const [crew, stored] = await Promise.all([queryGetCrew(mission), queryGetMission(mission)]);
+  if (!crew || !stored) return null;
+  const now = new Date(crew.generatedAt);
+  const { environments } = baseConfig();
+  const rows = await Promise.all(
+    crew.crew.map(async (member) => {
+      const detail = await queryGetAstronaut(mission, member.id);
+      const readings = detail?.packets.flatMap((p) => p.readings) ?? [];
+      return motionRow(member, readings, stored, environments, now);
+    }),
+  );
+  return {
+    generatedAt: crew.generatedAt,
+    environment: stored.environment,
+    rows: rows.sort((a, b) => a.name.localeCompare(b.name)),
+  };
 }
