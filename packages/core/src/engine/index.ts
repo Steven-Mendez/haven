@@ -15,6 +15,7 @@ export * from './eva';
 export * from './evaluate';
 export * from './exercise';
 export * from './medication';
+export * from './motion';
 export * from './protocols';
 export * from './radiation';
 export * from './reentry';

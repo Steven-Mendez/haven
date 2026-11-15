@@ -17,6 +17,7 @@ import {
   SlidersHorizontal,
   TestTube,
   Users,
+  Waves,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
@@ -155,6 +156,7 @@ export function CommandMenu({ lang, crew }: Props) {
     { href: '/medication', label: t.navMedication, icon: Pill },
     { href: '/samples', label: t.navSamples, icon: TestTube },
     { href: '/exercise', label: t.navExercise, icon: Dumbbell },
+    { href: '/motion', label: t.navMotion, icon: Waves },
     { href: '/missions', label: t.navMissions, icon: Rocket },
     { href: '/settings', label: t.navSettings, icon: Settings },
   ];

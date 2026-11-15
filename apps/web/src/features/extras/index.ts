@@ -8,6 +8,7 @@ export {
   extrasRedirect,
   KpiView,
   MedicationView,
+  MotionView,
   ReentryView,
   RulesView,
   SamplesView,

@@ -51,6 +51,7 @@ import { DEFAULT_MISSION } from '@/server/types';
 import { type EvaRow, evaRow } from './logic/eva';
 import { type ExerciseRow, exerciseRow } from './logic/exercise';
 import { type MedicationRow, medicationRow } from './logic/medication';
+import { type MotionRow, motionRow } from './logic/motion';
 import { type ReentryRow, reentryRow } from './logic/reentry';
 import { isFullConfig } from './logic/rules';
 import { missionDayOf, type PendingSample, type SampleRow, sampleRow } from './logic/samples';
@@ -302,4 +303,26 @@ export async function saveExercisePrescription(
 ) {
   await connection();
   return querySavePrescription(mission, crewMember, prescription, author);
+}
+
+export async function getMotionOverview(
+  mission = DEFAULT_MISSION,
+): Promise<{ generatedAt: string; rows: MotionRow[]; environment: string } | null> {
+  await connection();
+  const [crew, stored] = await Promise.all([queryGetCrew(mission), queryGetMission(mission)]);
+  if (!crew || !stored) return null;
+  const now = new Date(crew.generatedAt);
+  const { environments } = baseConfig();
+  const rows = await Promise.all(
+    crew.crew.map(async (member) => {
+      const detail = await queryGetAstronaut(mission, member.id);
+      const readings = detail?.packets.flatMap((p) => p.readings) ?? [];
+      return motionRow(member, readings, stored, environments, now);
+    }),
+  );
+  return {
+    generatedAt: crew.generatedAt,
+    environment: stored.environment,
+    rows: rows.sort((a, b) => a.name.localeCompare(b.name)),
+  };
 }

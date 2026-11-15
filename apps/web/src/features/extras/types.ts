@@ -8,6 +8,7 @@ export const EXTRAS_TABS = [
   'medication',
   'samples',
   'exercise',
+  'motion',
 ] as const;
 export type ExtrasTab = (typeof EXTRAS_TABS)[number];
 

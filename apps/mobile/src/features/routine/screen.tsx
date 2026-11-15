@@ -1,5 +1,6 @@
 import {
   actionsDone,
+  adaptationWindow,
   canPerformEva,
   dailyProgress,
   dayHistory,
@@ -10,6 +11,8 @@ import {
   exerciseReminder,
   isReentry,
   medications,
+  motion,
+  motionCheckDue,
   prescriptionOf,
   reentry,
   reentryStatus,
@@ -200,6 +203,10 @@ export default function Screen() {
     () => exerciseReminder(readings, prescriptionOf(plan, exercise), exercise, now),
     [plan, readings, now],
   );
+  const motionDue = useMemo(
+    () => motionCheckDue(readings, adaptationWindow(mission, motion, config.environments), now),
+    [readings, mission, config.environments, now],
+  );
 
   const week = lastSevenDays(history, today).map((d) => ({
     label: new Date(`${d.date}T12:00:00Z`).toLocaleDateString(language, {
@@ -375,6 +382,15 @@ export default function Screen() {
           }
           action={t.exerciseOpen}
           onAction={() => router.push('/exercise')}
+        />
+      ) : null}
+
+      {motionDue ? (
+        <StepCard
+          title={t.motionTitle}
+          detail={t.motionDue}
+          action={t.motionOpen}
+          onAction={() => router.push('/motion')}
         />
       ) : null}
 

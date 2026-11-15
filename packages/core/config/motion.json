@@ -1,0 +1,74 @@
+{
+  "windowDays": 3,
+  "scale": [
+    { "score": 0, "label": { "es": "Sin síntomas", "en": "No symptoms" } },
+    {
+      "score": 1,
+      "label": {
+        "es": "Algo de malestar, sin síntomas concretos",
+        "en": "Some discomfort, no specific symptoms"
+      }
+    },
+    {
+      "score": 2,
+      "label": {
+        "es": "Mareo, calor, dolor de cabeza o notar el estómago: apenas",
+        "en": "Dizziness, warmth, headache or stomach awareness: vague"
+      }
+    },
+    { "score": 3, "label": { "es": "Esos síntomas: algo", "en": "Those symptoms: some" } },
+    { "score": 4, "label": { "es": "Esos síntomas: bastante", "en": "Those symptoms: medium" } },
+    { "score": 5, "label": { "es": "Esos síntomas: muy fuertes", "en": "Those symptoms: severe" } },
+    { "score": 6, "label": { "es": "Náusea: algo", "en": "Nausea: some" } },
+    { "score": 7, "label": { "es": "Náusea: bastante", "en": "Nausea: medium" } },
+    { "score": 8, "label": { "es": "Náusea: muy fuerte", "en": "Nausea: severe" } },
+    { "score": 9, "label": { "es": "Arcadas", "en": "Retching" } },
+    { "score": 10, "label": { "es": "Vómito", "en": "Vomiting" } }
+  ],
+  "levels": { "amber": 2, "red": 6 },
+  "headMovements": [
+    {
+      "id": "still",
+      "seconds": 30,
+      "title": { "es": "Quieto y con un punto fijo", "en": "Still, on a fixed point" },
+      "body": {
+        "es": "Apoya la espalda o sujétate. Mira un punto fijo de la nave y respira despacio.",
+        "en": "Rest your back or hold on. Look at a fixed point in the ship and breathe slowly."
+      }
+    },
+    {
+      "id": "yaw",
+      "seconds": 45,
+      "title": { "es": "Girar la cabeza a los lados", "en": "Turn your head side to side" },
+      "body": {
+        "es": "Gira la cabeza despacio a izquierda y derecha sin perder el punto fijo. Para si el mareo sube.",
+        "en": "Turn your head slowly left and right while keeping the fixed point. Stop if the dizziness grows."
+      }
+    },
+    {
+      "id": "pitch",
+      "seconds": 45,
+      "title": { "es": "Asentir despacio", "en": "Nod slowly" },
+      "body": {
+        "es": "Mueve la cabeza arriba y abajo, despacio y en poco recorrido. Para si el mareo sube.",
+        "en": "Move your head up and down, slowly and with a small range. Stop if the dizziness grows."
+      }
+    },
+    {
+      "id": "rest",
+      "seconds": 30,
+      "title": { "es": "Descansa", "en": "Rest" },
+      "body": {
+        "es": "Cierra los ojos y mantén la cabeza quieta. Repite la serie dos o tres veces al día.",
+        "en": "Close your eyes and keep your head still. Repeat the set two or three times a day."
+      }
+    }
+  ],
+  "balance": {
+    "seconds": 30,
+    "amberSway": 25,
+    "redSway": 45,
+    "amberRatio": 2.5
+  },
+  "source": "Escala de malestar MISC de 0 a 10 (Bos y otros, 2005). La mayoría de los astronautas tiene mareo en los primeros días de cada cambio de gravedad, y los movimientos de cabeza graduales y la medicación ayudan a adaptarse: NASA HRP, Gravity Fields (https://www.nasa.gov/hrp/hazard-gravity-fields/). Ventana de 3 días, umbrales de la escala (ámbar desde 2, rojo desde la náusea, 6) y del balanceo medido con el acelerómetro del teléfono: referencia provisional."
+}

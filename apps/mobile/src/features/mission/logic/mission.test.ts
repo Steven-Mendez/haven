@@ -202,3 +202,29 @@ describe('pre-flight baseline', () => {
     expect(next.values).toEqual({ 'heart-rate': 66 });
   });
 });
+
+describe('mission phases from Earth', () => {
+  const base = { code: 'ABCDEF', environment: 'moon', day: 8, start: '2026-03-01' };
+
+  it('keeps a valid phase plan and carries it into the mission', () => {
+    const phases = [
+      { environment: 'launch', days: 1 },
+      { environment: 'moon', days: 10 },
+    ];
+    const record = findInApiResponse([{ ...base, phases }], 'ABCDEF');
+    expect(record?.phases).toEqual(phases);
+    if (!record) throw new Error('no record');
+    expect(
+      missionFromRecord(record, DEMO_MISSION, new Date('2026-03-08T12:00:00Z')).phases,
+    ).toEqual(phases);
+  });
+
+  it('drops a malformed plan', () => {
+    const record = findInApiResponse(
+      [{ ...base, phases: [{ environment: 'moon', days: 'ten' }] }],
+      'ABCDEF',
+    );
+    expect(record).toBeDefined();
+    expect(record?.phases).toBeUndefined();
+  });
+});

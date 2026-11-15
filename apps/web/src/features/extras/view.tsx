@@ -11,6 +11,7 @@ import { EvaPanel } from './components/eva-panel';
 import { ExercisePanel } from './components/exercise-panel';
 import { KpiDashboardPanel } from './components/kpi/kpi-dashboard-panel';
 import { MedicationPanel } from './components/medication-panel';
+import { MotionPanel } from './components/motion-panel';
 import { ReentryPanel } from './components/reentry-panel';
 import { RulesPanel } from './components/rules-panel';
 import { SamplesPanel } from './components/samples-panel';
@@ -78,6 +79,7 @@ const TITLES = {
   medication: { title: 'tabMedication', subtitle: 'medicationSubtitle' },
   samples: { title: 'tabSamples', subtitle: 'samplesSubtitle' },
   exercise: { title: 'tabExercise', subtitle: 'exerciseSubtitle' },
+  motion: { title: 'tabMotion', subtitle: 'motionSubtitle' },
 } as const;
 
 async function ExtrasContent({
@@ -155,6 +157,7 @@ async function ExtrasContent({
       {section === 'medication' ? <MedicationPanel mission={code} lang={lang} t={t} /> : null}
       {section === 'samples' ? <SamplesPanel mission={code} lang={lang} t={t} /> : null}
       {section === 'exercise' ? <ExercisePanel mission={code} lang={lang} t={t} /> : null}
+      {section === 'motion' ? <MotionPanel mission={code} lang={lang} t={t} /> : null}
     </>
   );
 }
@@ -195,6 +198,10 @@ export const SamplesView = ({ searchParams }: PageProps) => (
 
 export const ExerciseView = ({ searchParams }: PageProps) => (
   <ExtrasPage section="exercise" searchParams={searchParams} />
+);
+
+export const MotionView = ({ searchParams }: PageProps) => (
+  <ExtrasPage section="motion" searchParams={searchParams} />
 );
 
 export function extrasRedirect(tab: unknown): `/${ExtrasTab}` {

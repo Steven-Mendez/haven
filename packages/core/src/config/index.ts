@@ -7,6 +7,7 @@ import guides from '../../config/guides.json';
 import indicators from '../../config/indicators.json';
 import medicationsJson from '../../config/medications.json';
 import templatesJson from '../../config/mission-templates.json';
+import motionJson from '../../config/motion.json';
 import protocols from '../../config/protocols.json';
 import reentryJson from '../../config/reentry.json';
 import samplesJson from '../../config/samples.json';
@@ -25,6 +26,7 @@ import type {
   MedicationConfig,
   MissionPhase,
   MissionTemplate,
+  MotionConfig,
   ReentryConfig,
   SampleConfig,
 } from '../contracts';
@@ -106,6 +108,7 @@ export const eva: EvaConfig = evaJson as EvaConfig;
 export const medications: MedicationConfig = medicationsJson as MedicationConfig;
 export const sampleConfig: SampleConfig = samplesJson as SampleConfig;
 export const exercise: ExerciseConfig = exerciseJson as ExerciseConfig;
+export const motion: MotionConfig = motionJson as MotionConfig;
 
 export type LoadedConfig = Config & { actions: Action[] };
 
