@@ -208,6 +208,14 @@
           }
         }
       }
+    },
+    {
+      "includes": ["apps/mobile/**"],
+      "linter": {
+        "rules": {
+          "a11y": "off"
+        }
+      }
     }
   ]
 }

@@ -46,8 +46,8 @@ scripts/
 | Despliegue | Vercel, con `apps/web` como directorio raíz |
 | Móvil | Expo SDK 58, Expo Router, NativeWind 4, React Native Reusables, SQLite local |
 | Reloj | SwiftUI; el target lo genera `@bacons/apple-targets` en cada prebuild |
-| Lint y formato | Biome 2 para TS, JSX, JSON y CSS; `swift-format` para Swift |
-| Hooks de git | Lefthook: Biome y swift-format en `pre-commit`; typecheck y tests en `pre-push` |
+| Lint y formato | Biome 2 para TS, JSX, JSON y CSS; ESLint solo en `apps/mobile` para la accesibilidad de React Native; `swift-format` para Swift |
+| Hooks de git | Lefthook: Biome, ESLint de accesibilidad móvil y swift-format en `pre-commit`; typecheck y tests en `pre-push` |
 | Tests | Vitest en `packages/core` y en la lógica pura del móvil |
 | CI | GitHub Actions: lint, typecheck y tests en cada push y pull request |
 
@@ -181,7 +181,7 @@ Recorrido de punta a punta: SOS en el reloj → el iPhone abre el triaje con la 
 | `pnpm dev:web` | Arranca la web en `localhost:3000` |
 | `pnpm dev:mobile` | Arranca Metro para la app móvil |
 | `pnpm build` | Compila la web |
-| `pnpm lint` / `pnpm lint:fix` | Biome en todo el repo |
+| `pnpm lint` / `pnpm lint:fix` | Biome en todo el repo; `pnpm lint` añade la accesibilidad de `apps/mobile` con ESLint |
 | `pnpm format` | Formatea con Biome |
 | `pnpm lint:swift` / `pnpm format:swift` | swift-format sobre `apps/mobile/targets` |
 | `pnpm typecheck` | TypeScript en todos los paquetes |

@@ -104,6 +104,7 @@ export function PacketView({ packet, linkDown, delayMin, primary, onSaveNote }: 
                 key={photo.takenAt + photo.uri.slice(-16)}
                 source={{ uri: photo.uri }}
                 accessibilityLabel={t.photos}
+                accessibilityIgnoresInvertColors
                 className="bg-muted h-16 w-16 rounded-md"
               />
             ))}
