@@ -1,206 +1,74 @@
-# HAVEN
+# HAVEN by CODA
 
-Monitoreo de salud para tripulaciones en misiones espaciales (NASA Space Apps 2026). El astronauta lleva la app en el teléfono y en el Apple Watch; el equipo en Tierra sigue a la tripulación desde la web.
+**Health monitoring for space mission crews. Built for NASA Space Apps Challenge 2026.**
 
-HAVEN es una herramienta de apoyo a la decisión. No es un dispositivo médico y no tiene afiliación con la NASA.
+Astronauts use HAVEN on their phone and Apple Watch, and the ground team follows the whole crew from a web dashboard. HAVEN keeps working without a connection: it stores health packets locally and sends them to Earth when the link comes back.
 
-Vista de Tierra desplegada: <https://haven-eta-gray.vercel.app>
+- **Live demo (Ground View):** <https://haven-eta-gray.vercel.app>
+- **Full technical documentation:** `HAVEN_by_CODA_System_Technical_Documentation_EN.pdf` (included with our project submission)
+- **Spanish README (full developer guide):** [README.es.md](README.es.md)
 
-| Pieza | Qué es | Dónde |
+> HAVEN is a decision-support tool. It is not a medical device and is not affiliated with NASA.
+
+## What it does
+
+| Component | What it is | Location |
 |---|---|---|
-| Vista de Tierra | Web y API: misiones, tripulación, reglas, KPI y paquetes recibidos | `apps/web` |
-| App del astronauta | Rutina, indicadores, cognición, emergencias y cola de envío a Tierra | `apps/mobile` |
-| Reloj | Monitor de frecuencia cardíaca y alarma de emergencia (SOS) | `apps/mobile/targets/watch` |
-| Core | Contratos, motor de reglas y configuración versionada que comparten todos | `packages/core` |
+| Ground View | Web app and API: missions, crew, rules, KPIs and received packets | `apps/web` |
+| Astronaut app | Daily routine, health indicators, cognitive checks, emergencies and an offline send queue | `apps/mobile` |
+| Apple Watch | Heart-rate monitor and SOS emergency alarm | `apps/mobile/targets/watch` |
+| Core | Shared contracts, rules engine and versioned configuration | `packages/core` |
+| Orion AI | In-app assistant that can operate every feature through tools | `apps/web/src/assistant` |
 
-## Estructura
+**End-to-end flow:** an astronaut presses SOS on the watch → the iPhone opens triage with the watch's heart rate → "Finish" → the packet appears in the Ground View under `/astronaut/<id>?tab=packets`.
 
-```
-apps/
-  web/                    Next.js 16: API y Vista de Tierra
-    src/app/              rutas y API (/api/*)
-    src/features/<x>/     astronaut, crew, extras, settings
-    src/assistant/        Orion AI: el chat que maneja todos los features con sus herramientas
-    src/server/           MongoDB, modelo y utilidades HTTP
-    scripts/              seed y pruebas de la API
-  mobile/                 Expo SDK 58 (iOS y Android)
-    src/app/              rutas de Expo Router; cada una reexporta su feature
-    src/features/<x>/     una carpeta por feature
-    src/shared/           UI, datos locales, i18n y servicios comunes
-    targets/watch/        app de Apple Watch en SwiftUI
-    targets/watch-widget/ complicación del reloj
-    modules/haven-watch/  módulo nativo que conecta el iPhone con el reloj
-packages/
-  core/                   src/contracts, src/engine, src/config y config/*.json
-scripts/
-  new-feature.mjs         generador de features
-  sim/                    utilidades para los simuladores de iOS y watchOS
-```
+**Design principles**
+- Works offline, and missing data is never shown as "normal".
+- Thresholds, texts and protocols come from versioned config (`packages/core/config`), not from hard-coded values.
+- Fully bilingual (English and Spanish).
 
-## Stack
+## Tech stack
 
-| Pieza | Herramientas |
+| Area | Tools |
 |---|---|
-| Monorepo | pnpm 12 workspaces (`nodeLinker: hoisted`, lo pide React Native) y Turborepo |
-| Web | Next.js 16 (Turbopack, Cache Components), Tailwind 4, shadcn/ui sobre Base UI, driver oficial `mongodb`, AI SDK 7 con OpenAI para Orion AI |
-| Base de datos | MongoDB Atlas; MongoDB 8 en Docker como alternativa sin internet |
-| Despliegue | Vercel, con `apps/web` como directorio raíz |
-| Móvil | Expo SDK 58, Expo Router, NativeWind 4, React Native Reusables, SQLite local |
-| Reloj | SwiftUI; el target lo genera `@bacons/apple-targets` en cada prebuild |
-| Lint y formato | Biome 2 para TS, JSX, JSON y CSS; ESLint solo en `apps/mobile` para la accesibilidad de React Native; `swift-format` para Swift |
-| Hooks de git | Lefthook: Biome, ESLint de accesibilidad móvil y swift-format en `pre-commit`; typecheck y tests en `pre-push` |
-| Tests | Vitest en `packages/core` y en la lógica pura del móvil |
-| CI | GitHub Actions: lint, typecheck y tests en cada push y pull request |
+| Monorepo | pnpm workspaces and Turborepo |
+| Web | Next.js 16, Tailwind 4, shadcn/ui, MongoDB, AI SDK with OpenAI (Orion AI) |
+| Mobile | Expo SDK 58, Expo Router, NativeWind, SQLite (offline storage) |
+| Watch | SwiftUI |
+| Database and hosting | MongoDB Atlas on Vercel |
+| Quality | Biome, ESLint (mobile accessibility), swift-format, Vitest, GitHub Actions CI |
 
-## Requisitos
+## Quick start
 
-- Node 24 (`.nvmrc`) y pnpm 12 (`corepack enable`).
-- Acceso al clúster de MongoDB Atlas, o Docker para usar MongoDB local.
-- iOS y reloj: macOS con Xcode y CocoaPods.
-- Android: Android Studio, con `JAVA_HOME` y `ANDROID_HOME` exportados.
-
-## Primeros pasos
+Requirements: Node 24 and pnpm 12 (`corepack enable`), plus MongoDB Atlas or Docker. Building for iOS and Apple Watch needs macOS with Xcode.
 
 ```bash
-pnpm install                                    # instala dependencias y los hooks de git
-cp apps/web/.env.example apps/web/.env.local    # pon el MONGODB_URI de Atlas
-cp apps/mobile/.env.example apps/mobile/.env    # pon la dirección de Tierra
+pnpm install
+cp apps/web/.env.example apps/web/.env.local    # set MONGODB_URI
+cp apps/mobile/.env.example apps/mobile/.env    # set the Ground View URL
 pnpm dev:web                                    # http://localhost:3000
-curl localhost:3000/api/health                  # {"ok":true,"mongo":"connected"}
+pnpm --filter web seed                          # sample mission Ares-1 (code ARES01)
+cd apps/mobile && pnpm ios                      # development build on the iOS simulator
 ```
 
-## Variables de entorno
+To link an astronaut, create a mission and its crew in the web app, open the crew page, and scan the invitation QR code (or type the code) in the mobile app.
 
-Los archivos `.env*` no se versionan; solo los `.env.example`, que documentan cada variable.
+Without internet, set `MONGODB_USE_LOCAL=true` and run `pnpm db:up` to use a local MongoDB in Docker. Orion AI needs `OPENAI_API_KEY`; without it, the chat tells you the key is missing.
 
-### Web: `apps/web/.env.local`
+## AI disclosure (Use of Super Intelligence)
 
-| Variable | Obligatoria | Para qué |
-|---|---|---|
-| `MONGODB_URI` | Sí | Cadena de conexión de Atlas |
-| `MONGODB_DB` | No | Nombre de la base de datos; por defecto `haven` |
-| `MONGODB_USE_LOCAL` | No | Con `true` usa `MONGODB_LOCAL_URI` en vez de Atlas |
-| `MONGODB_LOCAL_URI` | No | MongoDB local; por defecto `mongodb://localhost:27017` |
-| `HAVEN_PUBLIC_URL` | No | Dirección de Tierra que va en el QR de invitación; por defecto, el host de la página |
-| `OPENAI_API_KEY` | No | Clave de OpenAI para Orion AI (`/orion`); sin ella el chat avisa de que falta |
-| `HAVEN_ASSISTANT_SECRET` | No | Secreto que firma las confirmaciones de cambios de Orion AI; por defecto se deriva de `OPENAI_API_KEY` |
+The idea, the problem framing and the design decisions behind HAVEN came from the CODA team. We used AI tools to speed up the build:
 
-Para trabajar sin internet: `MONGODB_USE_LOCAL=true` y `pnpm db:up`.
+- **Code: Claude Code (Anthropic).** We used Claude Code as an AI coding assistant to help write, refactor, debug, test and document parts of this repository: the web app, the mobile app, the Apple Watch app and the shared rules engine. The team reviewed, tested and integrated all AI-assisted code. Commits made with AI assistance carry a `Co-Authored-By: Claude` trailer.
+- **Video:** voiceovers were generated with ElevenLabs TTS, music with ElevenLabs Music, sound effects with ElevenLabs, and CGI clips with Higgsfield (Google Veo 3.1). The AI-generated visuals carry a visible watermark, and the video files include this disclosure in their metadata.
+- **In-product AI:** Orion AI uses the OpenAI API at runtime. It is a feature of the product, not a tool we used to build it.
 
-### Móvil: `apps/mobile/.env`
+No NASA logos, flags or mission identifiers were generated or modified with AI.
 
-| Variable | Obligatoria | Para qué |
-|---|---|---|
-| `EXPO_PUBLIC_API_URL` | No | Dirección de Tierra inicial, normalmente `https://haven-eta-gray.vercel.app`; por defecto `http://localhost:3000` |
+## Team
 
-Es solo el valor inicial: al unirse a una misión por QR o código, la app guarda la dirección de la invitación, y también se puede cambiar en Ajustes. Expo incrusta las variables `EXPO_PUBLIC_*` al compilar el bundle, así que no deben contener secretos y hay que reiniciar Metro (`pnpm start -c`) al cambiarlas.
+Built by **CODA** for NASA Space Apps Challenge 2026.
 
-### Vercel
+## License
 
-El proyecto de Vercel usa `apps/web` como directorio raíz y las mismas variables que `apps/web/.env.local`: `MONGODB_URI` y, si no es `haven`, `MONGODB_DB`. `MONGODB_USE_LOCAL` no debe activarse ahí. En Atlas, el acceso de red tiene que permitir las conexiones desde Vercel.
-
-## Web (Vista de Tierra)
-
-```bash
-pnpm dev:web                 # escucha en 0.0.0.0, también para teléfonos en la red local
-pnpm --filter web build      # compilación de producción
-pnpm --filter web seed       # siembra la misión de ejemplo Ares-1 (código ARES01)
-pnpm --filter web test:api   # prueba la API contra un servidor en marcha
-```
-
-`seed` y `test:api` leen `apps/web/.env.local`, así que escriben en la misma base de datos que la web: en Atlas, salvo que `MONGODB_USE_LOCAL=true`. `test:api` usa `http://localhost:3000` y se puede apuntar a otro servidor con `API_URL`.
-
-Añadir componentes de shadcn: `cd apps/web && pnpm dlx shadcn@latest add <componente>`.
-
-### API
-
-| Ruta | Uso |
-|---|---|
-| `GET /api/health` | Comprueba que la API responde y que MongoDB está accesible |
-| `/api/missions` | Misiones y sus fases |
-| `/api/crew` | Tripulación de una misión |
-| `/api/astronaut/[id]` | Detalle de un astronauta y sus paquetes |
-| `/api/packets` | Paquetes que envía la app del astronauta |
-| `/api/rules` | Reglas vigentes para una misión |
-| `/api/aggregates` | Agregados diarios de la tripulación que alimentan las vistas de KPI |
-
-## Móvil
-
-La app usa librerías nativas, así que se trabaja con una compilación de desarrollo, no con Expo Go.
-
-```bash
-cd apps/mobile
-pnpm ios        # prebuild, compila y abre el simulador
-pnpm android
-pnpm start      # solo Metro, para una compilación ya instalada
-```
-
-`ios/` y `android/` no se versionan: se regeneran con `pnpm prebuild`. La configuración nativa va en `app.json` o en config plugins.
-
-Instalar paquetes con `npx expo install <paquete>`, que elige la versión compatible con el SDK. Añadir componentes de React Native Reusables: `npx @react-native-reusables/cli@latest add <componente>`.
-
-### Enlace con Tierra
-
-1. En la web, crear la misión y su tripulación.
-2. En la página de tripulación, mostrar el QR o el código de invitación del astronauta.
-3. En la app, unirse escaneando el QR o escribiendo el código.
-
-A partir de ahí la app envía sus paquetes a `/api/packets`. Sin conexión los guarda en una cola local y los envía cuando vuelve el enlace.
-
-### Apple Watch
-
-El código vive en `apps/mobile/targets/watch/` y el prebuild lo añade como target dentro del proyecto de iOS. Para trabajarlo: `pnpm prebuild` y abrir `apps/mobile/ios/HAVEN.xcworkspace` en Xcode; el esquema `HAVEN` compila e incrusta el reloj. Lo que se edite en Xcode fuera de `targets/` se pierde en el siguiente prebuild.
-
-Para instalar en dispositivos reales hay que poner el Team ID de Apple en `ios.appleTeamId` de `apps/mobile/app.json`.
-
-### EAS
-
-```bash
-cd apps/mobile
-npx eas-cli@latest login
-npx eas-cli@latest init
-npx eas-cli@latest build --profile development --platform ios
-npx eas-cli@latest build --profile development --platform android
-```
-
-## Probar en simuladores
-
-`scripts/sim/sim.sh` automatiza los simuladores de iOS y watchOS: reservar un par iPhone + Apple Watch, abrir rutas, tocar, escribir, capturar pantalla y grabar video.
-
-```bash
-pnpm dev:web
-pnpm --filter web seed
-cd apps/mobile && npx expo start --port 8081 --dev-client
-scripts/sim/sim.sh acquire watch
-scripts/sim/sim.sh status
-```
-
-Recorrido de punta a punta: SOS en el reloj → el iPhone abre el triaje con la frecuencia cardíaca del reloj → «Terminar» → el paquete aparece en Tierra en `/astronaut/<id>?tab=packets`.
-
-## Comandos de la raíz
-
-| Comando | Qué hace |
-|---|---|
-| `pnpm dev:web` | Arranca la web en `localhost:3000` |
-| `pnpm dev:mobile` | Arranca Metro para la app móvil |
-| `pnpm build` | Compila la web |
-| `pnpm lint` / `pnpm lint:fix` | Biome en todo el repo; `pnpm lint` añade la accesibilidad de `apps/mobile` con ESLint |
-| `pnpm format` | Formatea con Biome |
-| `pnpm lint:swift` / `pnpm format:swift` | swift-format sobre `apps/mobile/targets` |
-| `pnpm typecheck` | TypeScript en todos los paquetes |
-| `pnpm test` | Tests de core y del móvil |
-| `pnpm db:up` / `pnpm db:down` | Levanta o para MongoDB local en Docker |
-| `pnpm feature <mobile\|web> <carpeta> <ID> "<título es>" "<título en>"` | Crea una feature con su estructura |
-
-## Cómo trabajamos
-
-- Una feature por carpeta, de punta a punta, con un responsable.
-- Las features no comparten archivos; lo común vive en `packages/core` o en `shared/`.
-- Umbrales, textos y protocolos salen de la configuración de `packages/core/config`, no del código.
-- Textos en español e inglés.
-- La app funciona sin conexión; «sin datos» nunca se muestra como «normal».
-- Ramas cortas hacia `main`, con lint, typecheck y tests en verde.
-
-## Licencia
-
-Apache 2.0, ver [LICENSE](LICENSE).
+Apache 2.0. See [LICENSE](LICENSE).
