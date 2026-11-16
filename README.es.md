@@ -201,6 +201,16 @@ Recorrido de punta a punta: SOS en el reloj → el iPhone abre el triaje con la 
 - La app funciona sin conexión; «sin datos» nunca se muestra como «normal».
 - Ramas cortas hacia `main`, con lint, typecheck y tests en verde.
 
+## Uso de IA (Super Intelligence)
+
+La idea, el planteamiento del problema y las decisiones de diseño de HAVEN son del equipo CODA. Usamos herramientas de IA para acelerar el desarrollo:
+
+- **Código: Claude Code (Anthropic).** Lo usamos como asistente de programación para escribir, refactorizar, depurar, probar y documentar partes de este repositorio: la web, la app móvil, la app del Apple Watch y el motor de reglas. El equipo revisó, probó e integró todo el código asistido por IA. Los commits hechos con ayuda de IA llevan la línea `Co-Authored-By: Claude`.
+- **Video:** las locuciones se generaron con ElevenLabs TTS, la música con ElevenLabs Music, los efectos de sonido con ElevenLabs y los clips CGI con Higgsfield (Google Veo 3.1). Las imágenes generadas con IA llevan una marca de agua visible y los archivos de video incluyen este aviso en sus metadatos.
+- **IA dentro del producto:** Orion AI usa la API de OpenAI en tiempo de ejecución. Es una función del producto, no una herramienta que usamos para construirlo.
+
+No se generaron ni modificaron con IA logos, banderas ni identificadores de misión de la NASA.
+
 ## Licencia
 
 Apache 2.0, ver [LICENSE](LICENSE).
