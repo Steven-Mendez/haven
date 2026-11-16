@@ -3,7 +3,7 @@ import type { I18n } from '@haven/core';
 export type Language = 'es' | 'en';
 
 export const LANGUAGES: readonly Language[] = ['es', 'en'];
-export const DEFAULT_LANGUAGE: Language = 'es';
+export const DEFAULT_LANGUAGE: Language = 'en';
 export const LANGUAGE_COOKIE = 'haven-lang';
 
 export function isLanguage(value: unknown): value is Language {
