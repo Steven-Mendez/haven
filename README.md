@@ -1,73 +1,55 @@
 # HAVEN by CODA
 
-**Health monitoring for space mission crews. Built for NASA Space Apps Challenge 2026.**
+**Health monitoring for astronauts on long-duration space missions.** NASA Space Apps Challenge 2026, challenge "Create Health Monitoring Software for Astronauts on Space Missions".
 
-Astronauts use HAVEN on their phone and Apple Watch, and the ground team follows the whole crew from a web dashboard. HAVEN keeps working without a connection: it stores health packets locally and sends them to Earth when the link comes back.
+Astronauts use HAVEN on their iPhone and Apple Watch, and the ground team follows the crew from the web. When the link with Earth is down, HAVEN keeps assessing health on board, guides the crew through emergencies, and sends everything once the link returns.
 
-- **Live demo (Ground View):** <https://haven-eta-gray.vercel.app>
-- **Full technical documentation:** `HAVEN_by_CODA_System_Technical_Documentation_EN.pdf` (included with our project submission)
-- **Spanish README (full developer guide):** [README.es.md](README.es.md)
+**[Live demo](https://haven-eta-gray.vercel.app)** · **[Pitch video](docs/video/HAVEN_by_CODA_SpaceApps2026_Video_EN.mp4)** · [Versión en español](README.es.md)
+
+[![HAVEN pitch video](docs/video/thumbnail.jpg)](docs/video/HAVEN_by_CODA_SpaceApps2026_Video_EN.mp4)
 
 > HAVEN is a decision-support tool. It is not a medical device and is not affiliated with NASA.
 
-## What it does
+## Screenshots
 
-| Component | What it is | Location |
+| Astronaut app | SOS triage | Apple Watch SOS | Watch emergency |
+|:---:|:---:|:---:|:---:|
+| <img src="docs/screenshots/mobile-home.png" width="200"> | <img src="docs/screenshots/mobile-sos-triage.png" width="200"> | <img src="docs/screenshots/watch-sos.png" width="160"> | <img src="docs/screenshots/watch-emergency.png" width="160"> |
+
+**Ground View (web)**
+
+<img src="docs/screenshots/web-ground-view.png" width="800">
+
+## How it works
+
+| Component | What it does | Code |
 |---|---|---|
-| Ground View | Web app and API: missions, crew, rules, KPIs and received packets | `apps/web` |
-| Astronaut app | Daily routine, health indicators, cognitive checks, emergencies and an offline send queue | `apps/mobile` |
-| Apple Watch | Heart-rate monitor and SOS emergency alarm | `apps/mobile/targets/watch` |
-| Core | Shared contracts, rules engine and versioned configuration | `packages/core` |
-| Orion AI | In-app assistant that can operate every feature through tools | `apps/web/src/assistant` |
+| Astronaut app | Health indicators, daily routine, cognitive tests, SOS and an offline send queue | `apps/mobile` (Expo) |
+| Apple Watch | Live heart rate and SOS alarm | `apps/mobile/targets/watch` (SwiftUI) |
+| Ground View | Missions, crew status, KPIs and the Orion AI assistant | `apps/web` (Next.js, MongoDB) |
+| Core | Shared rules engine and versioned health thresholds | `packages/core` |
 
-**End-to-end flow:** an astronaut presses SOS on the watch → the iPhone opens triage with the watch's heart rate → "Finish" → the packet appears in the Ground View under `/astronaut/<id>?tab=packets`.
-
-**Design principles**
-- Works offline, and missing data is never shown as "normal".
-- Thresholds, texts and protocols come from versioned config (`packages/core/config`), not from hard-coded values.
-- Fully bilingual (English and Spanish).
-
-## Tech stack
-
-| Area | Tools |
-|---|---|
-| Monorepo | pnpm workspaces and Turborepo |
-| Web | Next.js 16, Tailwind 4, shadcn/ui, MongoDB, AI SDK with OpenAI (Orion AI) |
-| Mobile | Expo SDK 58, Expo Router, NativeWind, SQLite (offline storage) |
-| Watch | SwiftUI |
-| Database and hosting | MongoDB Atlas on Vercel |
-| Quality | Biome, ESLint (mobile accessibility), swift-format, Vitest, GitHub Actions CI |
-
-## Quick start
-
-Requirements: Node 24 and pnpm 12 (`corepack enable`), plus MongoDB Atlas or Docker. Building for iOS and Apple Watch needs macOS with Xcode.
+## Run it
 
 ```bash
 pnpm install
-cp apps/web/.env.example apps/web/.env.local    # set MONGODB_URI
-cp apps/mobile/.env.example apps/mobile/.env    # set the Ground View URL
-pnpm dev:web                                    # http://localhost:3000
-pnpm --filter web seed                          # sample mission Ares-1 (code ARES01)
-cd apps/mobile && pnpm ios                      # development build on the iOS simulator
+cp apps/web/.env.example apps/web/.env.local   # set MONGODB_URI
+pnpm dev:web                                   # http://localhost:3000
+pnpm --filter web seed                         # sample mission (code ARES01)
+cd apps/mobile && pnpm ios                     # iPhone + Apple Watch simulator
 ```
 
-To link an astronaut, create a mission and its crew in the web app, open the crew page, and scan the invitation QR code (or type the code) in the mobile app.
+Requires Node 24, pnpm 12 and MongoDB. iOS builds need macOS with Xcode.
 
-Without internet, set `MONGODB_USE_LOCAL=true` and run `pnpm db:up` to use a local MongoDB in Docker. Orion AI needs `OPENAI_API_KEY`; without it, the chat tells you the key is missing.
+## AI disclosure
 
-## AI disclosure (Use of Super Intelligence)
+The idea and the design of HAVEN are our team's own. We used AI tools only to speed up the work:
 
-The idea, the problem framing and the design decisions behind HAVEN came from the CODA team. We used AI tools to speed up the build:
+- **Code:** we used **Claude Code (Anthropic)** as a coding assistant to write, refactor, debug, test and document parts of this repository. The team reviewed and tested all of that code. Commits made with AI help carry a `Co-Authored-By: Claude` line.
+- **Video:** the CGI clips were made with Higgsfield (Google Veo 3.1), and the voice, music and sound effects with ElevenLabs. The AI-generated visuals have a visible watermark, and the video file states it in its metadata.
+- **In the product:** the Orion AI assistant uses the OpenAI API.
 
-- **Code: Claude Code (Anthropic).** We used Claude Code as an AI coding assistant to help write, refactor, debug, test and document parts of this repository: the web app, the mobile app, the Apple Watch app and the shared rules engine. The team reviewed, tested and integrated all AI-assisted code. Commits made with AI assistance carry a `Co-Authored-By: Claude` trailer.
-- **Video:** voiceovers were generated with ElevenLabs TTS, music with ElevenLabs Music, sound effects with ElevenLabs, and CGI clips with Higgsfield (Google Veo 3.1). The AI-generated visuals carry a visible watermark, and the video files include this disclosure in their metadata.
-- **In-product AI:** Orion AI uses the OpenAI API at runtime. It is a feature of the product, not a tool we used to build it.
-
-No NASA logos, flags or mission identifiers were generated or modified with AI.
-
-## Team
-
-Built by **CODA** for NASA Space Apps Challenge 2026.
+No NASA logos or mission identifiers were generated with AI.
 
 ## License
 
